@@ -50,7 +50,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.print_help()
         return 2
 
-    output_dir = ensure_output_dir(Path(args.output_dir) if getattr(args, "output_dir", None) else None)
+    output_dir = ensure_output_dir(Path(args.output_dir))
     repo = RunCsvRepository()
 
     if args.command in {"step1-export", "step1"}:
