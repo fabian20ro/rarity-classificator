@@ -52,7 +52,18 @@ class ResponseParserTest(unittest.TestCase):
                 expected_items=2,
             )
 
-    def test_parsing_with_fuzzy_matches(self):
+    def test_malformed_envelope_is_repaired(self):
+        # Missing closing brace for the root object
+        body = '{"choices": [{"message": {"content": "[1]"}}]' 
+        parsed = self.parser.parse(
+            batch=self.batch,
+            response_body=body,
+            output_mode=ScoringOutputMode.SELECTED_WORD_IDS,
+            forced_rarity_level=1,
+            expected_items=1,
+        )
+        self.assertEqual(len(parsed.scores), 1)
+        self.assertEqual(parsed.scores[0].word_id, 101)
         # 'casă' in batch, but 'casa' in response (no diacritics)
         body = self._wrap_content('[{"word_id": 102, "word": "casa", "type": "N", "rarity_level": 2, "tag": "test", "confidence": 1.0}]')
         parsed = self.parser.parse(

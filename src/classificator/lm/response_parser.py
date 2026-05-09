@@ -42,7 +42,15 @@ class LmStudioResponseParser:
         forced_rarity_level: int | None = None,
         expected_items: int | None = None,
     ) -> ParsedBatch:
-        root = json.loads(response_body)
+        repaired_body = repair_json(response_body)
+        if repaired_body != response_body and self.metrics:
+            self.metrics.record_json_repair()
+
+        try:
+            root = json.loads(repaired_body)
+        except Exception as e:
+            raise RuntimeError(f"Failed to parse response body even after repair: {e}")
+
         content = self._extract_model_content(root)
         if not content:
             raise RuntimeError("LM response missing assistant content")
