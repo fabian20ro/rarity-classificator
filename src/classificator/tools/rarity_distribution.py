@@ -53,11 +53,8 @@ def run_rarity_distribution(
     )
     print(
         "distribution_pct=["
-        f"1:{_pct(distribution[1], total_rows):.2f}% "
-        f"2:{_pct(distribution[2], total_rows):.2f}% "
-        f"3:{_pct(distribution[3], total_rows):.2f}% "
-        f"4:{_pct(distribution[4], total_rows):.2f}% "
-        f"5:{_pct(distribution[5], total_rows):.2f}%]"
+        + " ".join([f"{k}:{_pct(v, total_rows):.2f}%" for k, v in sorted(distribution.items())])
+        + "]"
     )
 
     return RarityDistributionResult(
