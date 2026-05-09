@@ -52,6 +52,19 @@ class ResponseParserTest(unittest.TestCase):
                 expected_items=2,
             )
 
+    def test_parsing_with_fuzzy_matches(self):
+        # 'casă' in batch, but 'casa' in response (no diacritics)
+        body = self._wrap_content('[{"word_id": 102, "word": "casa", "type": "N", "rarity_level": 2, "tag": "test", "confidence": 1.0}]')
+        parsed = self.parser.parse(
+            batch=self.batch,
+            response_body=body,
+            output_mode=ScoringOutputMode.SCORE_RESULTS,
+            forced_rarity_level=None,
+            expected_items=None,
+        )
+        self.assertEqual(len(parsed.scores), 1)
+        self.assertEqual(parsed.scores[0].word_id, 102)
+
 
 if __name__ == "__main__":
     unittest.main()
