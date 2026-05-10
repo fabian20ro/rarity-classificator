@@ -43,6 +43,7 @@ from .models import Step3MergeStrategy, UploadMode
 
 
 def main(argv: list[str] | None = None) -> int:
+    \"\"\"Entry point for the classificator CLI. Handles subcommand routing and orchestration.\"\"\"
     parser = _build_parser()
     args = parser.parse_args(argv)
 
@@ -236,6 +237,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _build_parser() -> argparse.ArgumentParser:
+    \"\"\"Builds the argument parser with all subcommands and options.\"\"\"
     parser = argparse.ArgumentParser(prog="classificator", description="Romanian rarity classificator pipeline")
     parser.add_argument("--output-dir", default="build/rarity", help="Output root dir (default: build/rarity)")
 
