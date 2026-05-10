@@ -105,10 +105,6 @@ class LmStudioResponseParser:
                     node_id = None
             elif isinstance(node, dict):
                 node_id = _to_int(node.get("local_id"))
-                if node_id is None:
-                    node_id = _to_int(node.get("word_id"))
-                if node_id is None:
-                    node_id = _to_int(node)
                 raw_word = node.get("word")
                 word = str(raw_word).strip() if raw_word is not None else None
                 if word == "":
