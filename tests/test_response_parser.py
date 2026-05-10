@@ -56,6 +56,17 @@ class ResponseParserTest(unittest.TestCase):
                 expected_items=1,
             )
 
+    def test_selected_word_ids_rejects_zero_based_positions(self):
+        body = self._wrap_content('[0]')
+        with self.assertRaises(RuntimeError):
+            self.parser.parse(
+                batch=self.batch,
+                response_body=body,
+                output_mode=ScoringOutputMode.SELECTED_WORD_IDS,
+                forced_rarity_level=1,
+                expected_items=1,
+            )
+
     def test_selected_word_ids_enforces_exact_count(self):
         body = self._wrap_content("[1]")
         with self.assertRaises(RuntimeError):

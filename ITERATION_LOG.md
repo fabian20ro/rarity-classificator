@@ -130,4 +130,14 @@ Each entry should follow this structure:
 
 ---
 
+### [2026-05-10] Hardened selected-word-id parsing to reject non-local fallbacks
+
+**Context:** `selected-word-id` mode is supposed to obey the strict batch-local id contract (`1..N`, no zero, no word-id fallback).
+**What happened:** Removed the word/positional fallback path from `LmStudioResponseParser._coerce_selections_to_word_ids`, added a regression test that `[0]` is rejected, and verified the full unit suite with `PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py'`.
+**Outcome:** Success. The parser now fails fast when the model returns non-local ids instead of silently reinterpreting them.
+**Insight:** For batch-local selection flows, permissive recovery creates contract drift; it is better to reject bad ids than guess.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 <!-- New entries go above this line, most recent first -->

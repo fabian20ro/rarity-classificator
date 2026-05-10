@@ -152,7 +152,7 @@ class LmStudioResponseParser:
         selected: list[int] = []
         selected_set: set[int] = set()
 
-        # 1) strict local_id only
+        # strict local_id only — no word or positional fallback in this mode.
         for candidate in raw_selections:
             local_id = candidate.returned_id
             if local_id is None:
@@ -165,59 +165,7 @@ class LmStudioResponseParser:
             if len(selected) == expected:
                 return selected
 
-        # 2) fallback by word matching
-        if len(selected) < expected:
-            remaining = {wid: row for wid, row in batch_by_id.items() if wid not in selected_set}
-            for candidate in raw_selections:
-                if len(selected) == expected:
-                    return selected
-                if candidate.returned_id is not None and candidate.returned_id in batch_by_local_id:
-                    continue
-                if not candidate.word:
-                    continue
-                raw_word = candidate.word.strip()
-                exact_key = raw_word.lower()
-                norm_key = _normalize_selection_word(raw_word)
-                matched = None
-                for row in remaining.values():
-                    if row.word.lower() == exact_key or (
-                        norm_key and _normalize_selection_word(row.word) == norm_key
-                    ):
-                        matched = row
-                        break
-                if matched is None:
-                    continue
-                if matched.word_id not in selected_set:
-                    selected_set.add(matched.word_id)
-                    selected.append(matched.word_id)
-                    remaining.pop(matched.word_id, None)
-            if len(selected) == expected:
-                return selected
-
-        # 3) positional fallback (0-based or 1-based)
-        if selected:
-            return selected
-        distinct_ids = []
-        seen = set()
-        for candidate in raw_selections:
-            if candidate.returned_id is not None and candidate.returned_id not in seen:
-                seen.add(candidate.returned_id)
-                distinct_ids.append(candidate.returned_id)
-        if not distinct_ids:
-            return []
-        has_zero = 0 in distinct_ids
-        base = 0 if has_zero else 1
-
-        indices: list[int] = []
-        seen_idx: set[int] = set()
-        for raw_id in distinct_ids:
-            idx = raw_id - base
-            if 0 <= idx < len(batch) and idx not in seen_idx:
-                seen_idx.add(idx)
-                indices.append(idx)
-            if len(indices) == expected:
-                break
-        return [batch[idx].word_id for idx in indices]
+        return selected
 
     def _parse_results_lenient(self, *, batch: list[BaseWordRow], results: list[object]) -> ParsedBatch:
         if not batch:
