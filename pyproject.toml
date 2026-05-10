@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = []
+dev = ["pytest", "black"]
 
 [project.scripts]
 classificator = "classificator.cli:main"
