@@ -42,6 +42,7 @@ move it to the Archive section at the bottom with a date and reason.
 **[2026-02-14]** Strict parsing beats permissive autofill — long rebalance campaigns are safer when malformed LM selections fail fast instead of being auto-completed.
 **[2026-05-10]** Selected-word-id mode must stay local-id only — accepting word text or 0-based positional fallbacks can silently corrupt batch-local selection contracts.
 **[2026-05-11]** Duplicate selected local IDs must be rejected — deduping them can make an invalid LM response appear to satisfy exact-count checks while violating uniqueness.
+**[2026-05-11]** Normalization boundaries need mixed-shape coverage — when a parser accepts ints, strings, and dicts for the same contract field, add tests that mix shapes so duplicate detection exercises the shared normalization path.
 **[2026-02-14]** Deterministic decode profiles improve JSON stability — lower-variance decoding (for example `temperature=0`) reduces structured-output breakage.
 **[2026-02-20]** Reset/reimport can invalidate `word_id` alignment — if Step4 report is all `missing_db_word`, verify DB `id` range before retrying; remap candidate IDs deterministically (for example fixed offset) and keep upload mode `partial` so only `rarity_level` is changed.
 

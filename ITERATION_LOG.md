@@ -150,4 +150,14 @@ Each entry should follow this structure:
 
 ---
 
+### [2026-05-11] Added mixed-shape duplicate-id coverage for selected-word-id parsing
+
+**Context:** The parser normalizes selected ids from ints, strings, and dicts, so duplicate detection should be exercised across shape boundaries instead of only with repeated scalar ids.
+**What happened:** Added a regression test that mixes an int local id and a dict local id with the same value, then reran the focused `tests.test_response_parser` suite.
+**Outcome:** Success. The new test passed, and the strict duplicate-id contract is now covered across heterogeneous LM response shapes.
+**Insight:** Normalization boundaries are where duplicate bugs hide; mixed-shape fixtures are worth adding whenever a contract accepts more than one input form.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 <!-- New entries go above this line, most recent first -->
