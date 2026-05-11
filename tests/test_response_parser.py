@@ -78,6 +78,17 @@ class ResponseParserTest(unittest.TestCase):
                 expected_items=2,
             )
 
+    def test_selected_word_ids_rejects_duplicate_local_ids(self):
+        body = self._wrap_content("[1, 1]")
+        with self.assertRaises(RuntimeError):
+            self.parser.parse(
+                batch=self.batch,
+                response_body=body,
+                output_mode=ScoringOutputMode.SELECTED_WORD_IDS,
+                forced_rarity_level=1,
+                expected_items=1,
+            )
+
     def test_score_results_parsing(self):
         # Testing the scoring mode with a valid dict response
         body = self._wrap_content('[{"word_id": 102, "word": "casă", "type": "N", "rarity_level": 2, "tag": "test", "confidence": 1.0}]')

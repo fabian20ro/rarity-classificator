@@ -151,19 +151,21 @@ class LmStudioResponseParser:
 
         selected: list[int] = []
         selected_set: set[int] = set()
+        selected_local_ids: set[int] = set()
 
         # strict local_id only — no word or positional fallback in this mode.
         for candidate in raw_selections:
             local_id = candidate.returned_id
             if local_id is None:
                 continue
+            if local_id in selected_local_ids:
+                raise RuntimeError(f"Duplicate local_id {local_id} in selected-word-id mode")
+            selected_local_ids.add(local_id)
             if local_id in batch_by_local_id:
                 wid = batch_by_local_id[local_id].word_id
                 if wid not in selected_set:
                     selected_set.add(wid)
                     selected.append(wid)
-            if len(selected) == expected:
-                return selected
 
         return selected
 

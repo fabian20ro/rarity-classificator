@@ -140,4 +140,14 @@ Each entry should follow this structure:
 
 ---
 
+### [2026-05-11] Rejected duplicate local IDs in selected-word-id parsing
+
+**Context:** Strict Step5 selection contracts require exact-count local ids with no duplicates, but the parser only deduped repeated ids and could still accept `[1, 1]` when one id was expected.
+**What happened:** Updated `LmStudioResponseParser._coerce_selections_to_word_ids` to track seen local ids and raise on duplicates, added a regression test, and reran the full unit suite.
+**Outcome:** Success. Duplicate local ids now fail fast instead of slipping through exact-count validation.
+**Insight:** Unique-count checks are not enough for batch-local selection contracts; duplicate detection must be explicit.
+**Promoted to Lessons Learned:** Yes
+
+---
+
 <!-- New entries go above this line, most recent first -->
