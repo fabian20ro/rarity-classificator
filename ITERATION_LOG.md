@@ -160,4 +160,12 @@ Each entry should follow this structure:
 
 ---
 
+### [2026-05-12] Hardened selected-word-id request schema
+
+**Context:** Step5 selected-word-id mode already had strict parser validation, but the request builder still allowed implicit expected-count fallback when generating JSON Schema.
+**What happened:** Added a request-builder guard that requires `expected_items` in selected-word-id schema mode, and added focused tests covering the exact-count/uniqueItems schema plus the missing-count failure path. Ran the request-builder and response-parser tests, then the full unit suite.
+**Outcome:** Success. Schema generation now matches the parser's exact-count contract and the full test suite passed.
+**Insight:** The request schema is part of the same contract as the parser; if they diverge, the model can be prompted into a shape the runtime will reject.
+**Promoted to Lessons Learned:** Yes
+
 <!-- New entries go above this line, most recent first -->
