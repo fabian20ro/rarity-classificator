@@ -176,4 +176,12 @@ Each entry should follow this structure:
 **Insight:** Exact-count contracts need both shape validation and feasibility validation; a schema can still be invalid for the current batch even when it is structurally correct.
 **Promoted to Lessons Learned:** Yes
 
+### [2026-05-12] Synced README quality gate with mandatory anchor recall
+
+**Context:** The README quality gate example still showed only Jaccard and anchor precision, while the CLI and runbook already require anchor recall too.
+**What happened:** Updated the README quality gate example to include `--min-anchor-l1-recall 0.70`, so the quickstart matches the actual `quality-audit` contract.
+**Outcome:** Success. Documentation now reflects the full gate threshold set used by the tool.
+**Insight:** Quality-gate examples need to stay in lockstep with the CLI flag set, or the quickest path becomes the wrong path.
+**Promoted to Lessons Learned:** No
+
 <!-- New entries go above this line, most recent first -->

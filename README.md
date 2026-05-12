@@ -88,7 +88,8 @@ classificator quality-audit \
   --reference-csv build/rarity/runs/reference.csv \
   --anchor-l1-file docs/rarity-anchor-l1-ro.txt \
   --min-l1-jaccard 0.80 \
-  --min-anchor-l1-precision 0.90
+  --min-anchor-l1-precision 0.90 \
+  --min-anchor-l1-recall 0.70
 
 # Distribution check
 classificator rarity-distribution --csv build/rarity/runs/campaign_a.rebalanced.csv
