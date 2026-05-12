@@ -168,4 +168,12 @@ Each entry should follow this structure:
 **Insight:** The request schema is part of the same contract as the parser; if they diverge, the model can be prompted into a shape the runtime will reject.
 **Promoted to Lessons Learned:** Yes
 
+### [2026-05-12] Rejected impossible expected count in selected-word-id request schema
+
+**Context:** Selected-word-id request generation already required exact-count JSON Schema, but it still allowed `expected_items` values larger than the batch size.
+**What happened:** Added a guard in `LmStudioRequestBuilder.build_request` to fail fast when `expected_items > len(batch)`, added a focused regression test in `tests/test_request_builder.py`, updated `LESSONS_LEARNED.md`, and reran the request-builder, response-parser, step5 progress, and full unit suites with `PYTHONPATH=src`.
+**Outcome:** Success. The request builder now refuses impossible exact-count schemas instead of generating prompts the model cannot satisfy.
+**Insight:** Exact-count contracts need both shape validation and feasibility validation; a schema can still be invalid for the current batch even when it is structurally correct.
+**Promoted to Lessons Learned:** Yes
+
 <!-- New entries go above this line, most recent first -->
