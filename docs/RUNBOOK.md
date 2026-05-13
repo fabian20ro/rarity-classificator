@@ -64,6 +64,12 @@ classificator step3-compare \
 
 ## 6) Optional Rebalance (Step5)
 
+Step5 contract reminder:
+
+- selections are exact-count `local_id` values from `1..N`
+- no duplicates, no `0`, no word-id fallback
+- request builder and parser both enforce the same batch-local contract
+
 Single transition:
 
 ```bash

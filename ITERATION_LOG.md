@@ -184,4 +184,14 @@ Each entry should follow this structure:
 **Insight:** Quality-gate examples need to stay in lockstep with the CLI flag set, or the quickest path becomes the wrong path.
 **Promoted to Lessons Learned:** No
 
+### [2026-05-13] Clarified Step5 contract in runbook
+
+**Context:** The operator runbook showed the Step5 command, but the exact-count local-id contract was only stated in higher-level docs.
+**What happened:** Added a short Step5 contract reminder to `docs/RUNBOOK.md` so the rebalance section now explicitly says selections must be exact-count `local_id` values in `1..N`, with no duplicates, no `0`, and no word-id fallback.
+**Outcome:** Success. Operator-facing docs now restate the strict batch-local contract where the command is shown.
+**Insight:** Small contract reminders belong next to the operational command, not only in overview docs.
+**Promoted to Lessons Learned:** No
+
+---
+
 <!-- New entries go above this line, most recent first -->
