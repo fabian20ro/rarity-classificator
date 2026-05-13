@@ -18,6 +18,14 @@ Each entry should follow this structure:
 **Insight:** (optional) What would you tell the next agent about this?
 **Promoted to Lessons Learned:** Yes/No
 
+### [2026-05-13] Synced README quickstart with Step5 local-id contract
+
+**Context:** The README quickstart showed the Step5 rebalance command but did not restate the strict batch-local `local_id` contract beside the runnable example.
+**What happened:** Added a short Step5 reminder under the README quickstart so the example now says selections are exact-count, unique `local_id` values in `1..N`, with no `0` and no word-id fallback. Also recorded the same doc-surface lesson in `LESSONS_LEARNED.md` and appended this iteration note.
+**Outcome:** Success. The quickstart now matches the parser/request contract more closely, and the repo-local learning log was updated as required.
+**Insight:** Command snippets that drive a strict parser should restate the boundary right where the user copies them.
+**Promoted to Lessons Learned:** Yes
+
 ---
 
 ### [2026-02-20] Restored rarity after reset by remapping shifted word IDs
