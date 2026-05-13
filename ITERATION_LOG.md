@@ -200,6 +200,14 @@ Each entry should follow this structure:
 **Insight:** Small contract reminders belong next to the operational command, not only in overview docs.
 **Promoted to Lessons Learned:** No
 
+### [2026-05-13] Clarified Step5 contract in onboarding
+
+**Context:** The onboarding checklist still sent readers through the validation flow without restating the strict batch-local Step5 selection contract.
+**What happened:** Added a short reminder to `docs/ONBOARDING.md` so the first-safe-validation flow now says Step5 selections must be exact-count `local_id` values in `1..N`, with no duplicates, no `0`, and no word-id fallback.
+**Outcome:** Success. The onboarding path now mirrors the same strict Step5 contract already shown in the README and runbook.
+**Insight:** First-run checklists should restate the strictest selection contract where new contributors are most likely to see it.
+**Promoted to Lessons Learned:** No
+
 ---
 
 <!-- New entries go above this line, most recent first -->

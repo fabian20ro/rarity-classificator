@@ -24,7 +24,8 @@ PYTHONPATH=src python -m unittest discover -s tests -p 'test_*.py'
 1. Export a small source CSV with `step1-export`.
 2. Run `quality-audit` on a tiny synthetic CSV to confirm tooling works.
 3. Run one short Step2 scoring test on limited rows.
-4. Verify logs (`runs/*.jsonl`, `failed_batches/*.failed.jsonl`).
+4. If you reach Step5 during onboarding, keep selections batch-local: exact-count `local_id` values in `1..N`, no duplicates, no `0`, no word-id fallback.
+5. Verify logs (`runs/*.jsonl`, `failed_batches/*.failed.jsonl`).
 
 ## Critical Don'ts
 
