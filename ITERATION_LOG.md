@@ -219,3 +219,13 @@ Each entry should follow this structure:
 **Promoted to Lessons Learned:** Yes
 
 ---
+
+### [2026-05-14] Synced Step5 contract wording across handover and design docs
+
+**Context:** The strict Step5 local-id contract was already enforced in code and covered in README/runbook/onboarding, but the handover and pipeline design docs still used shorter wording.
+**What happened:** Expanded the Step5 wording in `docs/HANDOVER.md` and `docs/PIPELINE_DESIGN.md` to restate the exact batch-local contract: exact-count `local_id` values in `1..N`, unique, no `0`, no word-id fallback.
+**Outcome:** Success. The operator-facing design docs now mirror the same contract language as the executable request/parser boundary.
+**Insight:** Small contract reminders belong in every operator-facing surface, not just the main quickstart.
+**Promoted to Lessons Learned:** No
+
+---
