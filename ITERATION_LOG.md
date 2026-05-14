@@ -249,3 +249,13 @@ Each entry should follow this structure:
 **Promoted to Lessons Learned:** No
 
 ---
+
+### [2026-05-14] Clarified Step5 CLI help and fixed broken docstring syntax
+
+**Context:** The Step5 CLI entrypoint help was vague, and importing `classificator.cli` exposed literal escaped docstring quotes that broke Python syntax.
+**What happened:** Repaired the escaped docstrings in `src/classificator/cli.py`, expanded the `step5`/`step5-rebalance` help text to restate the batch-local exact-count `local_id` contract, and added a focused CLI-help test.
+**Outcome:** Success. The CLI module imports cleanly again, and the help text now points operators at the strict Step5 selection contract.
+**Insight:** Syntax verification can catch mechanical text corruption before it turns into a runtime blocker.
+**Promoted to Lessons Learned:** Yes
+
+---
