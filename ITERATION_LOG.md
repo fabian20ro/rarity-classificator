@@ -239,3 +239,13 @@ Each entry should follow this structure:
 **Promoted to Lessons Learned:** Yes
 
 ---
+
+### [2026-05-14] Pinned upload-mode parser defaults and aliases
+
+**Context:** The upload-mode and merge-strategy parsers are part of the CLI contract, but they had no direct unit coverage for default handling or accepted aliases.
+**What happened:** Added `tests/test_models.py` to pin `UploadMode.parse` defaulting to `partial`, accepting `full-fallback` and `full_fallback`, rejecting unknown values, and to cover the `Step3MergeStrategy.parse` aliases and rejection path. Verified the new test file with `PYTHONPATH=src python3 -m unittest tests.test_models` after discovering `python` is not installed in this environment.
+**Outcome:** Success. The parser contract now has direct regression coverage for its documented defaults and aliases.
+**Insight:** Small enum parsers are easy to drift; pinning their defaults and accepted spellings keeps CLI behavior stable.
+**Promoted to Lessons Learned:** No
+
+---
