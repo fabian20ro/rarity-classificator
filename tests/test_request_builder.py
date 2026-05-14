@@ -71,6 +71,36 @@ class RequestBuilderTest(unittest.TestCase):
                 schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
             )
 
+    def test_selected_word_ids_require_positive_expected_count_even_without_json_schema(self):
+        with self.assertRaises(ValueError):
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=512,
+                expected_items=0,
+                schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
+            )
+
+    def test_selected_word_ids_reject_impossible_expected_count_even_without_json_schema(self):
+        with self.assertRaises(ValueError):
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=512,
+                expected_items=3,
+                schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

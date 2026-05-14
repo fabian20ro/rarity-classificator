@@ -46,8 +46,9 @@ move it to the Archive section at the bottom with a date and reason.
 **[2026-05-11]** Numeric-string local_id aliases matter — selection parsers should treat "1" and 1 as the same local id when enforcing uniqueness.
 **[2026-05-12]** Selected-word-id schema and parser must stay in lockstep — request-building should enforce the same exact-count local-id contract as the parser, so model-side JSON Schema cannot drift from runtime validation.
 **[2026-05-12]** Selected-word-id schema should reject impossible counts — if the requested exact count exceeds the batch size, fail fast instead of emitting a schema the model cannot satisfy.
+**[2026-05-14]** Selected-word-id request building must reject impossible exact counts before any response-format branching — the request builder should fail on `expected_items <= 0` and on counts larger than the batch, even when JSON schema is disabled, so prompt generation never advertises an impossible selection contract.
 **[2026-02-14]** Deterministic decode profiles improve JSON stability — lower-variance decoding (for example `temperature=0`) reduces structured-output breakage.
-**[2026-02-20]** Reset/reimport can invalidate `word_id` alignment — if Step4 report is all `missing_db_word`, verify DB `id` range before retrying; remap candidate IDs deterministically (for example fixed offset) and keep upload mode `partial` so only `rarity_level` is changed.
+
 
 ## Testing & Quality
 

@@ -102,6 +102,12 @@ class LmStudioRequestBuilder:
             if config.enable_thinking is not None:
                 payload["chat_template_kwargs"] = {"enable_thinking": config.enable_thinking}
 
+        if schema_kind == JsonSchemaKind.SELECTED_WORD_IDS:
+            if expected_items is None or expected_items <= 0:
+                raise ValueError("expected_items is required for selected-word-id mode")
+            if expected_items > len(batch):
+                raise ValueError("expected_items cannot exceed batch size in selected-word-id mode")
+
         if response_format_mode == ResponseFormatMode.JSON_OBJECT:
             payload["response_format"] = {"type": "json_object"}
         elif response_format_mode == ResponseFormatMode.JSON_SCHEMA:
@@ -109,10 +115,6 @@ class LmStudioRequestBuilder:
                 expected = expected_items or len(batch)
                 payload["response_format"] = _score_results_schema(expected)
             else:
-                if expected_items is None or expected_items <= 0:
-                    raise ValueError("expected_items is required for selected-word-id mode")
-                if expected_items > len(batch):
-                    raise ValueError("expected_items cannot exceed batch size in selected-word-id mode")
                 payload["response_format"] = _selected_word_ids_schema(expected_items=expected_items, max_local_id=len(batch))
 
         return json.dumps(payload, ensure_ascii=False)

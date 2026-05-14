@@ -210,4 +210,12 @@ Each entry should follow this structure:
 
 ---
 
-<!-- New entries go above this line, most recent first -->
+### [2026-05-14] Hardened selected-word-id request building against impossible counts
+
+**Context:** The Step5 selected-word-id contract already had parser/schema guards, but the request builder still coerced `expected_items=0` to `1` in non-schema mode.
+**What happened:** Updated `LmStudioRequestBuilder.build_request` so selected-word-id mode now rejects `expected_items <= 0` and counts larger than the batch before any response-format branching; added focused request-builder tests for the non-schema zero-count and overflow cases.
+**Outcome:** Success. The request builder now fails fast on impossible exact-count selection requests in every response-format mode, and the full unit suite passed.
+**Insight:** Contract validation belongs at the request boundary, not only in the schema branch.
+**Promoted to Lessons Learned:** Yes
+
+---
