@@ -229,3 +229,13 @@ Each entry should follow this structure:
 **Promoted to Lessons Learned:** No
 
 ---
+
+### [2026-05-14] Restated Step5 contract in selection-repair prompt
+
+**Context:** The Step5 recovery prompt still said "select the most common entries" without explicitly repeating the batch-local exact-count contract that the parser and request builder already enforce.
+**What happened:** Tightened `SELECTION_REPAIR_SYSTEM_PROMPT` and `SELECTION_REPAIR_USER_TEMPLATE` in `src/classificator/lm/client.py` so repair mode now restates exact-count `local_id` `1..N`, uniqueness, no `0`, and no `word_id` fallback; added a focused unit test for the prompt strings.
+**Outcome:** Success. The recovery prompt now mirrors the strict Step5 contract instead of leaving it implicit, and the focused unittest passed.
+**Insight:** Repair prompts are part of the same contract surface as the main request builder; if they stay vague, they can reintroduce drift during fallback paths.
+**Promoted to Lessons Learned:** Yes
+
+---

@@ -47,6 +47,7 @@ move it to the Archive section at the bottom with a date and reason.
 **[2026-05-12]** Selected-word-id schema and parser must stay in lockstep — request-building should enforce the same exact-count local-id contract as the parser, so model-side JSON Schema cannot drift from runtime validation.
 **[2026-05-12]** Selected-word-id schema should reject impossible counts — if the requested exact count exceeds the batch size, fail fast instead of emitting a schema the model cannot satisfy.
 **[2026-05-14]** Selected-word-id request building must reject impossible exact counts before any response-format branching — the request builder should fail on `expected_items <= 0` and on counts larger than the batch, even when JSON schema is disabled, so prompt generation never advertises an impossible selection contract.
+**[2026-05-14]** Selection repair prompts must restate the same strict batch-local contract — recovery wording should repeat exact-count `local_id` `1..N`, uniqueness, no `0`, and no `word_id` fallback so repair mode cannot drift from parser rules.
 **[2026-02-14]** Deterministic decode profiles improve JSON stability — lower-variance decoding (for example `temperature=0`) reduces structured-output breakage.
 
 
