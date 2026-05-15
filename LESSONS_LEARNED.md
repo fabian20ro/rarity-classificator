@@ -82,6 +82,7 @@ move it to the Archive section at the bottom with a date and reason.
 **[2026-02-15]** Prefer structured per-batch logs for long rebalances — progress JSONL with picked words and counters is easier to monitor and audit than stdout-only output.
 **[2026-05-13]** Mirror strict Step5 rules in README quickstarts — The first runnable example should repeat the batch-local `local_id` contract (`1..N`, exact-count, unique, no `0`, no word-id fallback) so quickstart readers do not miss the parser boundary.
 **[2026-05-14]** CLI help/docstring edits need import smoke checks — escaped quote corruption can break Python modules, so run a focused import or unit test after text-only source edits.
+**[2026-05-15]** argparse help output wraps long descriptions — help assertions should use stable substrings, not one exact wrapped line.
 
 ---
 

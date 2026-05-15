@@ -259,3 +259,13 @@ Each entry should follow this structure:
 **Promoted to Lessons Learned:** Yes
 
 ---
+
+### [2026-05-15] Mirrored Step5 help contract into docs and tests
+
+**Context:** The Step5 CLI help and README quickstart already named the strict batch-local selection contract, but the wording could better mirror the parser/request boundary and the help test needed to survive argparse wrapping.
+**What happened:** Expanded `src/classificator/cli.py` help text for `step5` and `step5-rebalance` to include `unique`, `no 0`, and `no word-id fallback`; added the same reminder to the README quickstart; strengthened `tests/test_cli_help.py` with stable substrings instead of one wrapped line; recorded the wrapping caveat in `LESSONS_LEARNED.md`.
+**Outcome:** Success. Focused CLI-help verification passed with `PYTHONPATH=src python3 -m unittest tests.test_cli_help`.
+**Insight:** Generated help text can wrap, so assertions should target durable substrings rather than one exact line.
+**Promoted to Lessons Learned:** Yes
+
+---

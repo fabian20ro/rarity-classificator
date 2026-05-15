@@ -264,12 +264,12 @@ def _build_parser() -> argparse.ArgumentParser:
 
     p5 = sub.add_parser(
         "step5-rebalance",
-        help="Rebalance levels with strict batch-local local_id selection (exact-count 1..N)",
+        help="Rebalance levels with strict batch-local local_id selection (exact-count 1..N, unique, no 0, no word-id fallback)",
     )
     _add_step5_args(p5)
     p5a = sub.add_parser(
         "step5",
-        help="Alias of step5-rebalance (strict batch-local local_id selection, exact-count 1..N)",
+        help="Alias of step5-rebalance (strict batch-local local_id selection, exact-count 1..N, unique, no 0, no word-id fallback)",
     )
     _add_step5_args(p5a)
 

@@ -82,6 +82,7 @@ classificator step5-rebalance \
   --output-csv build/rarity/runs/campaign_a.rebalanced.csv \
   --from-level 2 --to-level 1
 # Step5 selections are batch-local `local_id` values in `1..N`, exact-count and unique; no `0`, no word-id fallback.
+# Keep the contract mirrored in CLI help: exact-count `1..N`, unique, no `0`, no word-id fallback.
 
 # Quality gate
 classificator quality-audit \
