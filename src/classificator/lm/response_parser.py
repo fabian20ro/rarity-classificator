@@ -95,22 +95,20 @@ class LmStudioResponseParser:
         raw: list[SelectionCandidate] = []
         for node in results:
             node_id = None
-            word = None
             if isinstance(node, int):
                 node_id = node
             elif isinstance(node, str):
                 try:
                     node_id = int(node)
                 except Exception:
-                    node_id = None
+                    raise RuntimeError("selected-word-id mode requires integer local_id values")
             elif isinstance(node, dict):
                 node_id = _to_int(node.get("local_id"))
-                raw_word = node.get("word")
-                word = str(raw_word).strip() if raw_word is not None else None
-                if word == "":
-                    word = None
-            if node_id is not None or word is not None:
-                raw.append(SelectionCandidate(returned_id=node_id, word=word))
+                if node_id is None:
+                    raise RuntimeError("selected-word-id mode requires local_id on every result item")
+            else:
+                raise RuntimeError("selected-word-id mode requires integer local_id values")
+            raw.append(SelectionCandidate(returned_id=node_id, word=None))
 
         selected = self._coerce_selections_to_word_ids(
             raw_selections=raw,
@@ -157,15 +155,16 @@ class LmStudioResponseParser:
         for candidate in raw_selections:
             local_id = candidate.returned_id
             if local_id is None:
-                continue
+                raise RuntimeError("selected-word-id mode requires local_id on every result item")
             if local_id in selected_local_ids:
                 raise RuntimeError(f"Duplicate local_id {local_id} in selected-word-id mode")
             selected_local_ids.add(local_id)
-            if local_id in batch_by_local_id:
-                wid = batch_by_local_id[local_id].word_id
-                if wid not in selected_set:
-                    selected_set.add(wid)
-                    selected.append(wid)
+            if local_id not in batch_by_local_id:
+                raise RuntimeError(f"local_id {local_id} is out of range for batch of {len(batch)}")
+            wid = batch_by_local_id[local_id].word_id
+            if wid not in selected_set:
+                selected_set.add(wid)
+                selected.append(wid)
 
         return selected
 

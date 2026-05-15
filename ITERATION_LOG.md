@@ -269,3 +269,13 @@ Each entry should follow this structure:
 **Promoted to Lessons Learned:** Yes
 
 ---
+
+### [2026-05-15] Tightened selected-word-id parsing for out-of-range ids
+
+**Context:** The selected-word-id parser already enforced exact-count and duplicate checks, but malformed responses could still include extra out-of-range local ids that were silently ignored if enough valid ids remained.
+**What happened:** Hardened `src/classificator/lm/response_parser.py` so selected-word-id mode now requires integer `local_id` values on every result item and rejects any `local_id` outside the current batch range. Added a regression test in `tests/test_response_parser.py` for out-of-range ids.
+**Outcome:** Success. Focused response-parser tests passed with `PYTHONPATH=src python3 -m unittest tests.test_response_parser -v`.
+**Insight:** Exact-count selection contracts need to reject extra malformed ids, not just count the valid ones, or invalid model output can slip through with a superficially correct total.
+**Promoted to Lessons Learned:** Yes
+
+---
