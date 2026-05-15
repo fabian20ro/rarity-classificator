@@ -279,3 +279,13 @@ Each entry should follow this structure:
 **Promoted to Lessons Learned:** Yes
 
 ---
+
+### [2026-05-15] Clarified handover upload wording
+
+**Context:** The handover doc still said `full-fallback` uploads during experiments unless explicitly intended, which read awkwardly next to the project-wide partial-default contract.
+**What happened:** Reworded the `docs/HANDOVER.md` do/don't line to say `Avoid full-fallback uploads unless explicitly intended.` so it matches the rest of the upload-mode guidance more directly.
+**Outcome:** Success. Documentation now states the same upload-mode intent more plainly.
+**Insight:** Small contract wording fixes are easiest to trust when the negative case is phrased directly.
+**Promoted to Lessons Learned:** No
+
+---

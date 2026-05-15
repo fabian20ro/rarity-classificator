@@ -45,7 +45,7 @@ Don’t:
 
 - Relax Step5 selection count checks.
 - Re-enable permissive fallback that invents/auto-fills ids.
-- Run `full-fallback` uploads during experiments unless explicitly intended.
+- Avoid `full-fallback` uploads unless explicitly intended.
 
 ## Suggested Baseline Run Flow
 
