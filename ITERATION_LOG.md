@@ -289,3 +289,13 @@ Each entry should follow this structure:
 **Promoted to Lessons Learned:** No
 
 ---
+
+### [2026-05-15] Made step4 alias help discoverable in argparse output
+
+**Context:** The `step4` alias was present, but its detailed upload-mode guidance only showed up in the top-level parser help. The alias subcommand's own `format_help()` output stayed generic because `help=` alone does not surface there.
+**What happened:** Expanded `src/classificator/cli.py` so `step4` now carries the same partial-default / `full-fallback` wording in both `help=` and `description=`, added a focused CLI-help regression for the alias output, and recorded the argparse behavior in `LESSONS_LEARNED.md`.
+**Outcome:** Success. Focused CLI-help verification passed with `PYTHONPATH=src python3 -m unittest tests.test_cli_help`.
+**Insight:** For subcommand aliases, put operator-facing wording in `description=` if you want it visible in the alias's own help output.
+**Promoted to Lessons Learned:** Yes
+
+---

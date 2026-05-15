@@ -257,9 +257,16 @@ def _build_parser() -> argparse.ArgumentParser:
     p3a = sub.add_parser("step3", help="Alias of step3-compare")
     _add_step3_args(p3a)
 
-    p4 = sub.add_parser("step4-upload", help="Upload final levels to DB")
+    p4 = sub.add_parser(
+        "step4-upload",
+        help="Upload final levels to DB (default: partial; accepts full-fallback/full_fallback)",
+    )
     _add_step4_args(p4)
-    p4a = sub.add_parser("step4", help="Alias of step4-upload")
+    p4a = sub.add_parser(
+        "step4",
+        help="Alias of step4-upload (default: partial; accepts full-fallback/full_fallback)",
+        description="Alias of step4-upload (default: partial; accepts full-fallback/full_fallback)",
+    )
     _add_step4_args(p4a)
 
     p5 = sub.add_parser(

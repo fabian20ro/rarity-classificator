@@ -84,6 +84,7 @@ move it to the Archive section at the bottom with a date and reason.
 **[2026-05-14]** CLI help/docstring edits need import smoke checks — escaped quote corruption can break Python modules, so run a focused import or unit test after text-only source edits.
 **[2026-05-15]** argparse help output wraps long descriptions — help assertions should use stable substrings, not one exact wrapped line.
 **[2026-05-15]** Selected-word-id parsers must reject out-of-range ids — silently skipping extra local ids can let malformed LM output satisfy the exact-count check while still violating the batch-local contract.
+**[2026-05-15]** Argparse subcommand aliases need description, not just help, for detailed alias output — `help=` shows in the parent command listing, while `description=` is what surfaces in the alias subcommand's own `format_help()` output.
 
 ---
 
