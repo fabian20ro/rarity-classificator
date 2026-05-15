@@ -1,9 +1,17 @@
+import argparse
 import unittest
 
 from classificator.cli import _build_parser
 
 
 class CliHelpTest(unittest.TestCase):
+    def test_step4_help_mentions_upload_mode_aliases(self):
+        parser = _build_parser()
+        subparsers = next(action for action in parser._actions if isinstance(action, argparse._SubParsersAction))
+        help_text = subparsers.choices["step4-upload"].format_help()
+        self.assertIn("Upload mode (default: partial; accepts full-", help_text)
+        self.assertIn("fallback/full_fallback)", help_text)
+
     def test_step5_help_mentions_exact_count_local_id_contract(self):
         help_text = _build_parser().format_help()
         self.assertIn("Rebalance levels with strict batch-local local_id", help_text)

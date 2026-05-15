@@ -373,7 +373,11 @@ def _add_step3_args(parser: argparse.ArgumentParser) -> None:
 
 def _add_step4_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--final-csv", required=True)
-    parser.add_argument("--mode", default="partial")
+    parser.add_argument(
+        "--mode",
+        default="partial",
+        help="Upload mode (default: partial; accepts full-fallback/full_fallback)",
+    )
     parser.add_argument("--report-csv", default="build/rarity/step4_upload_report.csv")
     parser.add_argument("--upload-batch-id")
 
