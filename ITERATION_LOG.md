@@ -299,3 +299,13 @@ Each entry should follow this structure:
 **Promoted to Lessons Learned:** Yes
 
 ---
+
+### [2026-05-16] Added README tip for undecided review labels
+
+**Context:** The README human-review example showed `review-low-confidence`, but the `--include-undecided` queue option was only called out in the runbook.
+**What happened:** Added a short shell-comment tip beside the README `review-low-confidence` example so operators can rediscover `--include-undecided` from the top-level quickstart.
+**Outcome:** Success. The README now points at the existing undecided-label queue path without changing behavior.
+**Insight:** Small queue-affordance notes are most useful when they sit next to the copy/paste command.
+**Promoted to Lessons Learned:** No
+
+---

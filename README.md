@@ -102,6 +102,8 @@ classificator review-low-confidence \
   --only-levels 1 \
   --max-items 200
 
+# Tip: add `--include-undecided` to resurface previously undecided labels in the queue.
+
 # L1 review gate from labels file
 classificator l1-review-check \
   --labels-csv build/rarity/review_labels.csv \
