@@ -309,3 +309,11 @@ Each entry should follow this structure:
 **Promoted to Lessons Learned:** No
 
 ---
+
+### [2026-05-16] Surfaced undecided-review recovery tip in the runbook
+
+**Context:** The README already showed `--include-undecided` beside the human-review example, but the operator runbook still only mentioned it in the label legend.
+**What happened:** Added the same `--include-undecided` tip as a shell comment beside the `review-low-confidence` example in `docs/RUNBOOK.md` so the recovery affordance is visible where operators launch the queue.
+**Outcome:** Success. The runbook now mirrors the review-queue recovery path at the point of use.
+**Insight:** Queue recovery switches are easier to rediscover when they sit next to the copy/paste command.
+**Promoted to Lessons Learned:** Yes

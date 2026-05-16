@@ -157,6 +157,7 @@ classificator review-low-confidence \
 L1-focused review queue:
 
 ```bash
+# Tip: add `--include-undecided` to resurface previously undecided labels in the queue.
 classificator review-low-confidence \
   --csv build/rarity/runs/campaign_a.csv \
   --only-levels 1 \
