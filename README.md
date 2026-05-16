@@ -81,6 +81,8 @@ classificator step5-rebalance \
   --input-csv build/rarity/runs/campaign_a.csv \
   --output-csv build/rarity/runs/campaign_a.rebalanced.csv \
   --from-level 2 --to-level 1
+# Step5 selections are batch-local `local_id` values in `1..N`, exact-count and unique; no `0`, no word-id fallback.
+# Keep the contract mirrored in CLI help: exact-count `1..N`, unique, no `0`, no word-id fallback.
 
 # Quality gate
 classificator quality-audit \
@@ -88,7 +90,8 @@ classificator quality-audit \
   --reference-csv build/rarity/runs/reference.csv \
   --anchor-l1-file docs/rarity-anchor-l1-ro.txt \
   --min-l1-jaccard 0.80 \
-  --min-anchor-l1-precision 0.90
+  --min-anchor-l1-precision 0.90 \
+  --min-anchor-l1-recall 0.70
 
 # Distribution check
 classificator rarity-distribution --csv build/rarity/runs/campaign_a.rebalanced.csv
@@ -98,6 +101,8 @@ classificator review-low-confidence \
   --csv build/rarity/runs/campaign_a.rebalanced.csv \
   --only-levels 1 \
   --max-items 200
+
+# Tip: add `--include-undecided` to resurface previously undecided labels in the queue.
 
 # L1 review gate from labels file
 classificator l1-review-check \

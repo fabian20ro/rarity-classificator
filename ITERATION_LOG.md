@@ -18,6 +18,14 @@ Each entry should follow this structure:
 **Insight:** (optional) What would you tell the next agent about this?
 **Promoted to Lessons Learned:** Yes/No
 
+### [2026-05-13] Synced README quickstart with Step5 local-id contract
+
+**Context:** The README quickstart showed the Step5 rebalance command but did not restate the strict batch-local `local_id` contract beside the runnable example.
+**What happened:** Added a short Step5 reminder under the README quickstart so the example now says selections are exact-count, unique `local_id` values in `1..N`, with no `0` and no word-id fallback. Also recorded the same doc-surface lesson in `LESSONS_LEARNED.md` and appended this iteration note.
+**Outcome:** Success. The quickstart now matches the parser/request contract more closely, and the repo-local learning log was updated as required.
+**Insight:** Command snippets that drive a strict parser should restate the boundary right where the user copies them.
+**Promoted to Lessons Learned:** Yes
+
 ---
 
 ### [2026-02-20] Restored rarity after reset by remapping shifted word IDs
@@ -130,4 +138,192 @@ Each entry should follow this structure:
 
 ---
 
-<!-- New entries go above this line, most recent first -->
+### [2026-05-10] Hardened selected-word-id parsing to reject non-local fallbacks
+
+**Context:** `selected-word-id` mode is supposed to obey the strict batch-local id contract (`1..N`, no zero, no word-id fallback).
+**What happened:** Removed the word/positional fallback path from `LmStudioResponseParser._coerce_selections_to_word_ids`, added a regression test that `[0]` is rejected, and verified the full unit suite with `PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py'`.
+**Outcome:** Success. The parser now fails fast when the model returns non-local ids instead of silently reinterpreting them.
+**Insight:** For batch-local selection flows, permissive recovery creates contract drift; it is better to reject bad ids than guess.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-11] Rejected duplicate local IDs in selected-word-id parsing
+
+**Context:** Strict Step5 selection contracts require exact-count local ids with no duplicates, but the parser only deduped repeated ids and could still accept `[1, 1]` when one id was expected.
+**What happened:** Updated `LmStudioResponseParser._coerce_selections_to_word_ids` to track seen local ids and raise on duplicates, added a regression test, and reran the full unit suite.
+**Outcome:** Success. Duplicate local ids now fail fast instead of slipping through exact-count validation.
+**Insight:** Unique-count checks are not enough for batch-local selection contracts; duplicate detection must be explicit.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-11] Added mixed-shape duplicate-id coverage for selected-word-id parsing
+
+**Context:** The parser normalizes selected ids from ints, strings, and dicts, so duplicate detection should be exercised across shape boundaries instead of only with repeated scalar ids.
+**What happened:** Added a regression test that mixes an int local id and a dict local id with the same value, then reran the focused `tests.test_response_parser` suite.
+**Outcome:** Success. The new test passed, and the strict duplicate-id contract is now covered across heterogeneous LM response shapes.
+**Insight:** Normalization boundaries are where duplicate bugs hide; mixed-shape fixtures are worth adding whenever a contract accepts more than one input form.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-12] Hardened selected-word-id request schema
+
+**Context:** Step5 selected-word-id mode already had strict parser validation, but the request builder still allowed implicit expected-count fallback when generating JSON Schema.
+**What happened:** Added a request-builder guard that requires `expected_items` in selected-word-id schema mode, and added focused tests covering the exact-count/uniqueItems schema plus the missing-count failure path. Ran the request-builder and response-parser tests, then the full unit suite.
+**Outcome:** Success. Schema generation now matches the parser's exact-count contract and the full test suite passed.
+**Insight:** The request schema is part of the same contract as the parser; if they diverge, the model can be prompted into a shape the runtime will reject.
+**Promoted to Lessons Learned:** Yes
+
+### [2026-05-12] Rejected impossible expected count in selected-word-id request schema
+
+**Context:** Selected-word-id request generation already required exact-count JSON Schema, but it still allowed `expected_items` values larger than the batch size.
+**What happened:** Added a guard in `LmStudioRequestBuilder.build_request` to fail fast when `expected_items > len(batch)`, added a focused regression test in `tests/test_request_builder.py`, updated `LESSONS_LEARNED.md`, and reran the request-builder, response-parser, step5 progress, and full unit suites with `PYTHONPATH=src`.
+**Outcome:** Success. The request builder now refuses impossible exact-count schemas instead of generating prompts the model cannot satisfy.
+**Insight:** Exact-count contracts need both shape validation and feasibility validation; a schema can still be invalid for the current batch even when it is structurally correct.
+**Promoted to Lessons Learned:** Yes
+
+### [2026-05-12] Synced README quality gate with mandatory anchor recall
+
+**Context:** The README quality gate example still showed only Jaccard and anchor precision, while the CLI and runbook already require anchor recall too.
+**What happened:** Updated the README quality gate example to include `--min-anchor-l1-recall 0.70`, so the quickstart matches the actual `quality-audit` contract.
+**Outcome:** Success. Documentation now reflects the full gate threshold set used by the tool.
+**Insight:** Quality-gate examples need to stay in lockstep with the CLI flag set, or the quickest path becomes the wrong path.
+**Promoted to Lessons Learned:** No
+
+### [2026-05-13] Clarified Step5 contract in runbook
+
+**Context:** The operator runbook showed the Step5 command, but the exact-count local-id contract was only stated in higher-level docs.
+**What happened:** Added a short Step5 contract reminder to `docs/RUNBOOK.md` so the rebalance section now explicitly says selections must be exact-count `local_id` values in `1..N`, with no duplicates, no `0`, and no word-id fallback.
+**Outcome:** Success. Operator-facing docs now restate the strict batch-local contract where the command is shown.
+**Insight:** Small contract reminders belong next to the operational command, not only in overview docs.
+**Promoted to Lessons Learned:** No
+
+### [2026-05-13] Clarified Step5 contract in onboarding
+
+**Context:** The onboarding checklist still sent readers through the validation flow without restating the strict batch-local Step5 selection contract.
+**What happened:** Added a short reminder to `docs/ONBOARDING.md` so the first-safe-validation flow now says Step5 selections must be exact-count `local_id` values in `1..N`, with no duplicates, no `0`, and no word-id fallback.
+**Outcome:** Success. The onboarding path now mirrors the same strict Step5 contract already shown in the README and runbook.
+**Insight:** First-run checklists should restate the strictest selection contract where new contributors are most likely to see it.
+**Promoted to Lessons Learned:** No
+
+---
+
+### [2026-05-14] Hardened selected-word-id request building against impossible counts
+
+**Context:** The Step5 selected-word-id contract already had parser/schema guards, but the request builder still coerced `expected_items=0` to `1` in non-schema mode.
+**What happened:** Updated `LmStudioRequestBuilder.build_request` so selected-word-id mode now rejects `expected_items <= 0` and counts larger than the batch before any response-format branching; added focused request-builder tests for the non-schema zero-count and overflow cases.
+**Outcome:** Success. The request builder now fails fast on impossible exact-count selection requests in every response-format mode, and the full unit suite passed.
+**Insight:** Contract validation belongs at the request boundary, not only in the schema branch.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-14] Synced Step5 contract wording across handover and design docs
+
+**Context:** The strict Step5 local-id contract was already enforced in code and covered in README/runbook/onboarding, but the handover and pipeline design docs still used shorter wording.
+**What happened:** Expanded the Step5 wording in `docs/HANDOVER.md` and `docs/PIPELINE_DESIGN.md` to restate the exact batch-local contract: exact-count `local_id` values in `1..N`, unique, no `0`, no word-id fallback.
+**Outcome:** Success. The operator-facing design docs now mirror the same contract language as the executable request/parser boundary.
+**Insight:** Small contract reminders belong in every operator-facing surface, not just the main quickstart.
+**Promoted to Lessons Learned:** No
+
+---
+
+### [2026-05-14] Restated Step5 contract in selection-repair prompt
+
+**Context:** The Step5 recovery prompt still said "select the most common entries" without explicitly repeating the batch-local exact-count contract that the parser and request builder already enforce.
+**What happened:** Tightened `SELECTION_REPAIR_SYSTEM_PROMPT` and `SELECTION_REPAIR_USER_TEMPLATE` in `src/classificator/lm/client.py` so repair mode now restates exact-count `local_id` `1..N`, uniqueness, no `0`, and no `word_id` fallback; added a focused unit test for the prompt strings.
+**Outcome:** Success. The recovery prompt now mirrors the strict Step5 contract instead of leaving it implicit, and the focused unittest passed.
+**Insight:** Repair prompts are part of the same contract surface as the main request builder; if they stay vague, they can reintroduce drift during fallback paths.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-14] Pinned upload-mode parser defaults and aliases
+
+**Context:** The upload-mode and merge-strategy parsers are part of the CLI contract, but they had no direct unit coverage for default handling or accepted aliases.
+**What happened:** Added `tests/test_models.py` to pin `UploadMode.parse` defaulting to `partial`, accepting `full-fallback` and `full_fallback`, rejecting unknown values, and to cover the `Step3MergeStrategy.parse` aliases and rejection path. Verified the new test file with `PYTHONPATH=src python3 -m unittest tests.test_models` after discovering `python` is not installed in this environment.
+**Outcome:** Success. The parser contract now has direct regression coverage for its documented defaults and aliases.
+**Insight:** Small enum parsers are easy to drift; pinning their defaults and accepted spellings keeps CLI behavior stable.
+**Promoted to Lessons Learned:** No
+
+---
+
+### [2026-05-14] Clarified Step5 CLI help and fixed broken docstring syntax
+
+**Context:** The Step5 CLI entrypoint help was vague, and importing `classificator.cli` exposed literal escaped docstring quotes that broke Python syntax.
+**What happened:** Repaired the escaped docstrings in `src/classificator/cli.py`, expanded the `step5`/`step5-rebalance` help text to restate the batch-local exact-count `local_id` contract, and added a focused CLI-help test.
+**Outcome:** Success. The CLI module imports cleanly again, and the help text now points operators at the strict Step5 selection contract.
+**Insight:** Syntax verification can catch mechanical text corruption before it turns into a runtime blocker.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-15] Mirrored Step5 help contract into docs and tests
+
+**Context:** The Step5 CLI help and README quickstart already named the strict batch-local selection contract, but the wording could better mirror the parser/request boundary and the help test needed to survive argparse wrapping.
+**What happened:** Expanded `src/classificator/cli.py` help text for `step5` and `step5-rebalance` to include `unique`, `no 0`, and `no word-id fallback`; added the same reminder to the README quickstart; strengthened `tests/test_cli_help.py` with stable substrings instead of one wrapped line; recorded the wrapping caveat in `LESSONS_LEARNED.md`.
+**Outcome:** Success. Focused CLI-help verification passed with `PYTHONPATH=src python3 -m unittest tests.test_cli_help`.
+**Insight:** Generated help text can wrap, so assertions should target durable substrings rather than one exact line.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-15] Tightened selected-word-id parsing for out-of-range ids
+
+**Context:** The selected-word-id parser already enforced exact-count and duplicate checks, but malformed responses could still include extra out-of-range local ids that were silently ignored if enough valid ids remained.
+**What happened:** Hardened `src/classificator/lm/response_parser.py` so selected-word-id mode now requires integer `local_id` values on every result item and rejects any `local_id` outside the current batch range. Added a regression test in `tests/test_response_parser.py` for out-of-range ids.
+**Outcome:** Success. Focused response-parser tests passed with `PYTHONPATH=src python3 -m unittest tests.test_response_parser -v`.
+**Insight:** Exact-count selection contracts need to reject extra malformed ids, not just count the valid ones, or invalid model output can slip through with a superficially correct total.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-15] Clarified handover upload wording
+
+**Context:** The handover doc still said `full-fallback` uploads during experiments unless explicitly intended, which read awkwardly next to the project-wide partial-default contract.
+**What happened:** Reworded the `docs/HANDOVER.md` do/don't line to say `Avoid full-fallback uploads unless explicitly intended.` so it matches the rest of the upload-mode guidance more directly.
+**Outcome:** Success. Documentation now states the same upload-mode intent more plainly.
+**Insight:** Small contract wording fixes are easiest to trust when the negative case is phrased directly.
+**Promoted to Lessons Learned:** No
+
+---
+
+### [2026-05-15] Made step4 alias help discoverable in argparse output
+
+**Context:** The `step4` alias was present, but its detailed upload-mode guidance only showed up in the top-level parser help. The alias subcommand's own `format_help()` output stayed generic because `help=` alone does not surface there.
+**What happened:** Expanded `src/classificator/cli.py` so `step4` now carries the same partial-default / `full-fallback` wording in both `help=` and `description=`, added a focused CLI-help regression for the alias output, and recorded the argparse behavior in `LESSONS_LEARNED.md`.
+**Outcome:** Success. Focused CLI-help verification passed with `PYTHONPATH=src python3 -m unittest tests.test_cli_help`.
+**Insight:** For subcommand aliases, put operator-facing wording in `description=` if you want it visible in the alias's own help output.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-16] Added README tip for undecided review labels
+
+**Context:** The README human-review example showed `review-low-confidence`, but the `--include-undecided` queue option was only called out in the runbook.
+**What happened:** Added a short shell-comment tip beside the README `review-low-confidence` example so operators can rediscover `--include-undecided` from the top-level quickstart.
+**Outcome:** Success. The README now points at the existing undecided-label queue path without changing behavior.
+**Insight:** Small queue-affordance notes are most useful when they sit next to the copy/paste command.
+**Promoted to Lessons Learned:** No
+
+---
+
+### [2026-05-16] Surfaced undecided-review recovery tip in the runbook
+
+**Context:** The README already showed `--include-undecided` beside the human-review example, but the operator runbook still only mentioned it in the label legend.
+**What happened:** Added the same `--include-undecided` tip as a shell comment beside the `review-low-confidence` example in `docs/RUNBOOK.md` so the recovery affordance is visible where operators launch the queue.
+**Outcome:** Success. The runbook now mirrors the review-queue recovery path at the point of use.
+**Insight:** Queue recovery switches are easier to rediscover when they sit next to the copy/paste command.
+**Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-16] Surfaced review recovery flag in CLI help
+
+**Context:** The `review-low-confidence` command already supported `--include-undecided`, but that recovery affordance was only visible in the shell comment tip and not in the subcommand's own help description.
+**What happened:** Updated `src/classificator/cli.py` so both `review-low-confidence` and its `review` alias mention `--include-undecided` in `description=` as well as `help=`; added focused CLI-help coverage in `tests/test_cli_help.py`; verified the touched surface with `PYTHONPATH=src python3 -m unittest tests.test_cli_help tests.test_review_low_confidence`.
+**Outcome:** Success. The recovery flag now surfaces in both the primary command help and the alias help, and the focused tests passed.
+**Insight:** If a recovery flag matters during operator use, expose it in the subcommand description so `format_help()` shows it on every entry point.
+**Promoted to Lessons Learned:** Yes

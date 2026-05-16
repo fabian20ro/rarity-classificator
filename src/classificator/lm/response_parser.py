@@ -42,7 +42,15 @@ class LmStudioResponseParser:
         forced_rarity_level: int | None = None,
         expected_items: int | None = None,
     ) -> ParsedBatch:
-        root = json.loads(response_body)
+        repaired_body = repair_json(response_body)
+        if repaired_body != response_body and self.metrics:
+            self.metrics.record_json_repair()
+
+        try:
+            root = json.loads(repaired_body)
+        except Exception as e:
+            raise RuntimeError(f"Failed to parse response body even after repair: {e}")
+
         content = self._extract_model_content(root)
         if not content:
             raise RuntimeError("LM response missing assistant content")
@@ -87,26 +95,20 @@ class LmStudioResponseParser:
         raw: list[SelectionCandidate] = []
         for node in results:
             node_id = None
-            word = None
             if isinstance(node, int):
                 node_id = node
             elif isinstance(node, str):
                 try:
                     node_id = int(node)
                 except Exception:
-                    node_id = None
+                    raise RuntimeError("selected-word-id mode requires integer local_id values")
             elif isinstance(node, dict):
                 node_id = _to_int(node.get("local_id"))
                 if node_id is None:
-                    node_id = _to_int(node.get("word_id"))
-                if node_id is None:
-                    node_id = _to_int(node)
-                raw_word = node.get("word")
-                word = str(raw_word).strip() if raw_word is not None else None
-                if word == "":
-                    word = None
-            if node_id is not None or word is not None:
-                raw.append(SelectionCandidate(returned_id=node_id, word=word))
+                    raise RuntimeError("selected-word-id mode requires local_id on every result item")
+            else:
+                raise RuntimeError("selected-word-id mode requires integer local_id values")
+            raw.append(SelectionCandidate(returned_id=node_id, word=None))
 
         selected = self._coerce_selections_to_word_ids(
             raw_selections=raw,
@@ -147,73 +149,24 @@ class LmStudioResponseParser:
 
         selected: list[int] = []
         selected_set: set[int] = set()
+        selected_local_ids: set[int] = set()
 
-        # 1) strict local_id only
+        # strict local_id only — no word or positional fallback in this mode.
         for candidate in raw_selections:
             local_id = candidate.returned_id
             if local_id is None:
-                continue
-            if local_id in batch_by_local_id:
-                wid = batch_by_local_id[local_id].word_id
-                if wid not in selected_set:
-                    selected_set.add(wid)
-                    selected.append(wid)
-            if len(selected) == expected:
-                return selected
+                raise RuntimeError("selected-word-id mode requires local_id on every result item")
+            if local_id in selected_local_ids:
+                raise RuntimeError(f"Duplicate local_id {local_id} in selected-word-id mode")
+            selected_local_ids.add(local_id)
+            if local_id not in batch_by_local_id:
+                raise RuntimeError(f"local_id {local_id} is out of range for batch of {len(batch)}")
+            wid = batch_by_local_id[local_id].word_id
+            if wid not in selected_set:
+                selected_set.add(wid)
+                selected.append(wid)
 
-        # 2) fallback by word matching
-        if len(selected) < expected:
-            remaining = {wid: row for wid, row in batch_by_id.items() if wid not in selected_set}
-            for candidate in raw_selections:
-                if len(selected) == expected:
-                    return selected
-                if candidate.returned_id is not None and candidate.returned_id in batch_by_local_id:
-                    continue
-                if not candidate.word:
-                    continue
-                raw_word = candidate.word.strip()
-                exact_key = raw_word.lower()
-                norm_key = _normalize_selection_word(raw_word)
-                matched = None
-                for row in remaining.values():
-                    if row.word.lower() == exact_key or (
-                        norm_key and _normalize_selection_word(row.word) == norm_key
-                    ):
-                        matched = row
-                        break
-                if matched is None:
-                    continue
-                if matched.word_id not in selected_set:
-                    selected_set.add(matched.word_id)
-                    selected.append(matched.word_id)
-                    remaining.pop(matched.word_id, None)
-            if len(selected) == expected:
-                return selected
-
-        # 3) positional fallback (0-based or 1-based)
-        if selected:
-            return selected
-        distinct_ids = []
-        seen = set()
-        for candidate in raw_selections:
-            if candidate.returned_id is not None and candidate.returned_id not in seen:
-                seen.add(candidate.returned_id)
-                distinct_ids.append(candidate.returned_id)
-        if not distinct_ids:
-            return []
-        has_zero = 0 in distinct_ids
-        base = 0 if has_zero else 1
-
-        indices: list[int] = []
-        seen_idx: set[int] = set()
-        for raw_id in distinct_ids:
-            idx = raw_id - base
-            if 0 <= idx < len(batch) and idx not in seen_idx:
-                seen_idx.add(idx)
-                indices.append(idx)
-            if len(indices) == expected:
-                break
-        return [batch[idx].word_id for idx in indices]
+        return selected
 
     def _parse_results_lenient(self, *, batch: list[BaseWordRow], results: list[object]) -> ParsedBatch:
         if not batch:

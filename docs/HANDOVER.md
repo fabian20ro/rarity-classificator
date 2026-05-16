@@ -17,7 +17,7 @@ This Python project replaces only the rarity/classification tooling. Backend API
 
 ## What Worked
 
-- Strict Step5 `local_id` contract with exact-count enforcement.
+- Strict Step5 `local_id` contract: exact-count `1..N`, unique, no `0`, no word-id fallback.
 - Batch split retries with preserved expected selection counts.
 - Gated upload policy based on semantic quality metrics (not histogram only).
 - CSV-first workflow with resumable JSONL logs and explicit checkpoints.
@@ -45,7 +45,7 @@ Don’t:
 
 - Relax Step5 selection count checks.
 - Re-enable permissive fallback that invents/auto-fills ids.
-- Run `full-fallback` uploads during experiments unless explicitly intended.
+- Avoid `full-fallback` uploads unless explicitly intended.
 
 ## Suggested Baseline Run Flow
 

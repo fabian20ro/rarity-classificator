@@ -39,12 +39,12 @@ This repository is the source of truth for offline rarity classification.
   - run/failure JSONL logs.
 - `step3-compare`: merges 2/3 runs into `final_level` and outliers.
 - `step4-upload`: writes `final_level`/`rarity_level` to DB (default partial mode) and writes upload markers.
-- `step5-rebalance`: strict two-bucket split from source levels to target level using `local_id` selections only.
+- `step5-rebalance`: strict two-bucket split from source levels to target level using exact-count batch-local `local_id` selections only (`1..N`, unique, no `0`, no word-id fallback).
 
 ## Rebalance Contract (Critical)
 
 - LM must return exactly `N` selected ids per batch.
-- Id domain is strictly local batch ids (`1..batch_size`), unique, no `0`.
+- Id domain is strictly local batch ids (`1..batch_size`), unique, exact count, no `0`, no word-id fallback.
 - Parser fails fast when count mismatches (no silent auto-fill).
 - Recursive split retries preserve expected selection counts proportionally.
 
@@ -61,7 +61,7 @@ This protects against superficially correct histograms with semantically poor L1
 
 - Level semantics: lower number means more common word.
 - Output values are constrained to `1..5`.
-- Step5 selection mode uses local batch ids only (`1..N`, unique, exact count, no `0`).
+- Step5 selection mode uses local batch ids only (`1..N`, unique, exact count, no `0`, no word-id fallback).
 - Step4 upload default mode is `partial`.
 
 ## Artifact Layout

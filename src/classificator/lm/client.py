@@ -40,12 +40,12 @@ SELECTION_REPAIR_MAX_RETRIES = 1
 
 SELECTION_REPAIR_SYSTEM_PROMPT = """
 Ești selector lexical pentru limba română.
-Alege cele mai comune intrări din listă (uz curent, vorbire de zi cu zi în România).
+Alege exact numărul cerut de intrări din listă (uz curent, vorbire de zi cu zi în România).
 
 Răspunsul trebuie să fie STRICT JSON valid: un array de numere întregi.
-Fiecare număr trebuie să fie un `local_id` din input.
+Fiecare număr trebuie să fie un `local_id` din input, în intervalul `1..N`.
 Nu adăuga text extra, explicații, markdown sau blocuri de cod.
-Nu inventa id-uri. Fără duplicate.
+Nu inventa id-uri. Fără duplicate. Fără `0`. Fără fallback la `word_id` sau poziții.
 Evită termeni vulgari/obsceni când există alternative.
 """.strip()
 
@@ -53,7 +53,7 @@ SELECTION_REPAIR_USER_TEMPLATE = """
 Returnează DOAR JSON valid: array de întregi `local_id`.
 Fără text extra, fără markdown, fără blocuri de cod.
 Selectează cele mai comune intrări din listă.
-Numărul exact de id-uri este impus de schema JSON; respectă schema.
+Numărul exact de id-uri este impus de schema JSON; respectă schema și contractul local_id `1..N`.
 
 Input:
 {{INPUT_JSON}}

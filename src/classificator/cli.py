@@ -43,6 +43,7 @@ from .models import Step3MergeStrategy, UploadMode
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Entry point for the classificator CLI. Handles subcommand routing and orchestration."""
     parser = _build_parser()
     args = parser.parse_args(argv)
 
@@ -50,7 +51,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.print_help()
         return 2
 
-    output_dir = ensure_output_dir(Path(args.output_dir) if getattr(args, "output_dir", None) else None)
+    output_dir = ensure_output_dir(Path(args.output_dir))
     repo = RunCsvRepository()
 
     if args.command in {"step1-export", "step1"}:
@@ -236,6 +237,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _build_parser() -> argparse.ArgumentParser:
+    """Builds the argument parser with all subcommands and options."""
     parser = argparse.ArgumentParser(prog="classificator", description="Romanian rarity classificator pipeline")
     parser.add_argument("--output-dir", default="build/rarity", help="Output root dir (default: build/rarity)")
 
@@ -255,14 +257,27 @@ def _build_parser() -> argparse.ArgumentParser:
     p3a = sub.add_parser("step3", help="Alias of step3-compare")
     _add_step3_args(p3a)
 
-    p4 = sub.add_parser("step4-upload", help="Upload final levels to DB")
+    p4 = sub.add_parser(
+        "step4-upload",
+        help="Upload final levels to DB (default: partial; accepts full-fallback/full_fallback)",
+    )
     _add_step4_args(p4)
-    p4a = sub.add_parser("step4", help="Alias of step4-upload")
+    p4a = sub.add_parser(
+        "step4",
+        help="Alias of step4-upload (default: partial; accepts full-fallback/full_fallback)",
+        description="Alias of step4-upload (default: partial; accepts full-fallback/full_fallback)",
+    )
     _add_step4_args(p4a)
 
-    p5 = sub.add_parser("step5-rebalance", help="Rebalance levels with strict local_id selection")
+    p5 = sub.add_parser(
+        "step5-rebalance",
+        help="Rebalance levels with strict batch-local local_id selection (exact-count 1..N, unique, no 0, no word-id fallback)",
+    )
     _add_step5_args(p5)
-    p5a = sub.add_parser("step5", help="Alias of step5-rebalance")
+    p5a = sub.add_parser(
+        "step5",
+        help="Alias of step5-rebalance (strict batch-local local_id selection, exact-count 1..N, unique, no 0, no word-id fallback)",
+    )
     _add_step5_args(p5a)
 
     qa = sub.add_parser("quality-audit", help="Compute distribution + L1 Jaccard + anchor precision/recall")
@@ -280,7 +295,11 @@ def _build_parser() -> argparse.ArgumentParser:
     rda.add_argument("--csv", required=True)
     rda.add_argument("--level-column", help="Optional explicit level column (e.g. rarity_level/final_level)")
 
-    rv = sub.add_parser("review-low-confidence", help="Interactive review of lowest-confidence words")
+    rv = sub.add_parser(
+        "review-low-confidence",
+        help="Interactive review of lowest-confidence words (use --include-undecided to resurface undecided labels)",
+        description="Interactive review of lowest-confidence words (use --include-undecided to resurface undecided labels)",
+    )
     rv.add_argument("--csv", required=True)
     rv.add_argument("--labels-csv", default="build/rarity/review_labels.csv")
     rv.add_argument("--level-column")
@@ -288,7 +307,11 @@ def _build_parser() -> argparse.ArgumentParser:
     rv.add_argument("--only-levels", help="Comma-separated levels to include (e.g. 1 or 1,2,3)")
     rv.add_argument("--max-items", type=int, default=200)
     rv.add_argument("--include-undecided", action=argparse.BooleanOptionalAction, default=False)
-    rva = sub.add_parser("review", help="Alias of review-low-confidence")
+    rva = sub.add_parser(
+        "review",
+        help="Alias of review-low-confidence (use --include-undecided to resurface undecided labels)",
+        description="Alias of review-low-confidence (use --include-undecided to resurface undecided labels)",
+    )
     rva.add_argument("--csv", required=True)
     rva.add_argument("--labels-csv", default="build/rarity/review_labels.csv")
     rva.add_argument("--level-column")
@@ -365,7 +388,11 @@ def _add_step3_args(parser: argparse.ArgumentParser) -> None:
 
 def _add_step4_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--final-csv", required=True)
-    parser.add_argument("--mode", default="partial")
+    parser.add_argument(
+        "--mode",
+        default="partial",
+        help="Upload mode (default: partial; accepts full-fallback/full_fallback)",
+    )
     parser.add_argument("--report-csv", default="build/rarity/step4_upload_report.csv")
     parser.add_argument("--upload-batch-id")
 

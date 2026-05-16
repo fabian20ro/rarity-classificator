@@ -40,8 +40,16 @@ move it to the Archive section at the bottom with a date and reason.
 **[2026-02-14]** Prompt/parser contract drift causes hard failures — exact-count semantics and id rules must match verbatim between prompt text and parser validation.
 **[2026-02-14]** Prompt wording is a behavior contract — small phrasing edits can materially shift L1 composition; treat prompt files as versioned assets.
 **[2026-02-14]** Strict parsing beats permissive autofill — long rebalance campaigns are safer when malformed LM selections fail fast instead of being auto-completed.
+**[2026-05-10]** Selected-word-id mode must stay local-id only — accepting word text or 0-based positional fallbacks can silently corrupt batch-local selection contracts.
+**[2026-05-11]** Duplicate selected local IDs must be rejected — deduping them can make an invalid LM response appear to satisfy exact-count checks while violating uniqueness.
+**[2026-05-11]** Normalization boundaries need mixed-shape coverage — when a parser accepts ints, strings, and dicts for the same contract field, add tests that mix shapes so duplicate detection exercises the shared normalization path.
+**[2026-05-11]** Numeric-string local_id aliases matter — selection parsers should treat "1" and 1 as the same local id when enforcing uniqueness.
+**[2026-05-12]** Selected-word-id schema and parser must stay in lockstep — request-building should enforce the same exact-count local-id contract as the parser, so model-side JSON Schema cannot drift from runtime validation.
+**[2026-05-12]** Selected-word-id schema should reject impossible counts — if the requested exact count exceeds the batch size, fail fast instead of emitting a schema the model cannot satisfy.
+**[2026-05-14]** Selected-word-id request building must reject impossible exact counts before any response-format branching — the request builder should fail on `expected_items <= 0` and on counts larger than the batch, even when JSON schema is disabled, so prompt generation never advertises an impossible selection contract.
+**[2026-05-14]** Selection repair prompts must restate the same strict batch-local contract — recovery wording should repeat exact-count `local_id` `1..N`, uniqueness, no `0`, and no `word_id` fallback so repair mode cannot drift from parser rules.
 **[2026-02-14]** Deterministic decode profiles improve JSON stability — lower-variance decoding (for example `temperature=0`) reduces structured-output breakage.
-**[2026-02-20]** Reset/reimport can invalidate `word_id` alignment — if Step4 report is all `missing_db_word`, verify DB `id` range before retrying; remap candidate IDs deterministically (for example fixed offset) and keep upload mode `partial` so only `rarity_level` is changed.
+
 
 ## Testing & Quality
 
@@ -72,6 +80,14 @@ move it to the Archive section at the bottom with a date and reason.
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
 **[2026-02-15]** Keep one lessons source of truth — maintain lessons only in root `LESSONS_LEARNED.md` to prevent drift between duplicated files.
 **[2026-02-15]** Prefer structured per-batch logs for long rebalances — progress JSONL with picked words and counters is easier to monitor and audit than stdout-only output.
+**[2026-05-13]** Mirror strict Step5 rules in README quickstarts — The first runnable example should repeat the batch-local `local_id` contract (`1..N`, exact-count, unique, no `0`, no word-id fallback) so quickstart readers do not miss the parser boundary.
+**[2026-05-14]** CLI help/docstring edits need import smoke checks — escaped quote corruption can break Python modules, so run a focused import or unit test after text-only source edits.
+**[2026-05-15]** argparse help output wraps long descriptions — help assertions should use stable substrings, not one exact wrapped line.
+**[2026-05-15]** Selected-word-id parsers must reject out-of-range ids — silently skipping extra local ids can let malformed LM output satisfy the exact-count check while still violating the batch-local contract.
+**[2026-05-15]** Argparse subcommand aliases need description, not just help, for detailed alias output — `help=` shows in the parent command listing, while `description=` is what surfaces in the alias subcommand's own `format_help()` output.
+**[2026-05-16]** Recovery affordances should live in parser descriptions, not only shell comments — if a subcommand exposes a recovery flag like `--include-undecided`, put the reminder in `description=` so the alias's own help surfaces it too.
+
+**[2026-05-16]** Queue recovery affordances belong next to the command — Review flows are easier to rediscover when `--include-undecided` is shown beside the `review-low-confidence` example instead of only being described in the label legend.
 
 ---
 
