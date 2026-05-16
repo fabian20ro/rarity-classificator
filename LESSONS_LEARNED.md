@@ -85,6 +85,7 @@ move it to the Archive section at the bottom with a date and reason.
 **[2026-05-15]** argparse help output wraps long descriptions — help assertions should use stable substrings, not one exact wrapped line.
 **[2026-05-15]** Selected-word-id parsers must reject out-of-range ids — silently skipping extra local ids can let malformed LM output satisfy the exact-count check while still violating the batch-local contract.
 **[2026-05-15]** Argparse subcommand aliases need description, not just help, for detailed alias output — `help=` shows in the parent command listing, while `description=` is what surfaces in the alias subcommand's own `format_help()` output.
+**[2026-05-16]** Recovery affordances should live in parser descriptions, not only shell comments — if a subcommand exposes a recovery flag like `--include-undecided`, put the reminder in `description=` so the alias's own help surfaces it too.
 
 **[2026-05-16]** Queue recovery affordances belong next to the command — Review flows are easier to rediscover when `--include-undecided` is shown beside the `review-low-confidence` example instead of only being described in the label legend.
 

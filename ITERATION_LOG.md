@@ -317,3 +317,13 @@ Each entry should follow this structure:
 **Outcome:** Success. The runbook now mirrors the review-queue recovery path at the point of use.
 **Insight:** Queue recovery switches are easier to rediscover when they sit next to the copy/paste command.
 **Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-16] Surfaced review recovery flag in CLI help
+
+**Context:** The `review-low-confidence` command already supported `--include-undecided`, but that recovery affordance was only visible in the shell comment tip and not in the subcommand's own help description.
+**What happened:** Updated `src/classificator/cli.py` so both `review-low-confidence` and its `review` alias mention `--include-undecided` in `description=` as well as `help=`; added focused CLI-help coverage in `tests/test_cli_help.py`; verified the touched surface with `PYTHONPATH=src python3 -m unittest tests.test_cli_help tests.test_review_low_confidence`.
+**Outcome:** Success. The recovery flag now surfaces in both the primary command help and the alias help, and the focused tests passed.
+**Insight:** If a recovery flag matters during operator use, expose it in the subcommand description so `format_help()` shows it on every entry point.
+**Promoted to Lessons Learned:** Yes

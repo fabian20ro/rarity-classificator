@@ -295,7 +295,11 @@ def _build_parser() -> argparse.ArgumentParser:
     rda.add_argument("--csv", required=True)
     rda.add_argument("--level-column", help="Optional explicit level column (e.g. rarity_level/final_level)")
 
-    rv = sub.add_parser("review-low-confidence", help="Interactive review of lowest-confidence words")
+    rv = sub.add_parser(
+        "review-low-confidence",
+        help="Interactive review of lowest-confidence words (use --include-undecided to resurface undecided labels)",
+        description="Interactive review of lowest-confidence words (use --include-undecided to resurface undecided labels)",
+    )
     rv.add_argument("--csv", required=True)
     rv.add_argument("--labels-csv", default="build/rarity/review_labels.csv")
     rv.add_argument("--level-column")
@@ -303,7 +307,11 @@ def _build_parser() -> argparse.ArgumentParser:
     rv.add_argument("--only-levels", help="Comma-separated levels to include (e.g. 1 or 1,2,3)")
     rv.add_argument("--max-items", type=int, default=200)
     rv.add_argument("--include-undecided", action=argparse.BooleanOptionalAction, default=False)
-    rva = sub.add_parser("review", help="Alias of review-low-confidence")
+    rva = sub.add_parser(
+        "review",
+        help="Alias of review-low-confidence (use --include-undecided to resurface undecided labels)",
+        description="Alias of review-low-confidence (use --include-undecided to resurface undecided labels)",
+    )
     rva.add_argument("--csv", required=True)
     rva.add_argument("--labels-csv", default="build/rarity/review_labels.csv")
     rva.add_argument("--level-column")
