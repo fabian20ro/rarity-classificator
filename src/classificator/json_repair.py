@@ -117,9 +117,6 @@ def _remove_trailing_commas(input_text: str) -> str:
 
     for ch in input_text:
         if in_string:
-            if pending_comma:
-                out.append(",")
-                pending_comma = False
             out.append(ch)
             if escaped:
                 escaped = False
@@ -146,12 +143,13 @@ def _remove_trailing_commas(input_text: str) -> str:
             out.append(ch)
             continue
 
-        if ch.isspace() and pending_comma:
+        if pending_comma and ch.isspace():
             continue
 
         if pending_comma:
             out.append(",")
             pending_comma = False
+
         out.append(ch)
 
     if pending_comma:
