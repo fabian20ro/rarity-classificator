@@ -337,3 +337,13 @@ Each entry should follow this structure:
 **Outcome:** Success. Focused Step5 contract test and full unit discovery both pass.
 **Insight:** No new reusable lesson; this reinforced existing Step5 local-id contract guidance.
 **Promoted to Lessons Learned:** No
+
+---
+
+### [2026-05-19] Added PR CI for compound gate
+
+**Context:** `make gate` blocked on this repo because GitHub reported no PR checks for the branch.
+**What happened:** Added `.github/workflows/ci.yml` with a pull-request test job that runs the documented unittest command, then verified locally with `PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py'`.
+**Outcome:** Success. Local tests pass; the branch now has a workflow for GitHub to report in the PR status rollup.
+**Insight:** Compound gate cannot turn green for a repo with an open PR and no GitHub Actions workflow because the PR status rollup stays empty.
+**Promoted to Lessons Learned:** Yes
