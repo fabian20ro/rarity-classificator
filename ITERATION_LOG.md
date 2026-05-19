@@ -327,3 +327,23 @@ Each entry should follow this structure:
 **Outcome:** Success. The recovery flag now surfaces in both the primary command help and the alias help, and the focused tests passed.
 **Insight:** If a recovery flag matters during operator use, expose it in the subcommand description so `format_help()` shows it on every entry point.
 **Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-05-17] Tightened Step5 selected-id contract test
+
+**Context:** Compound Autopilot picked the existing Step5 contract plan, which called for verifying the rebalance path does not drift toward 0-based local-id handling.
+**What happened:** Reworked `tests/test_step5_contract.py` from a passive output word-id check into a mocked Step5 run that forces LM selection, asserts `ScoringOutputMode.SELECTED_WORD_IDS`, asserts exact expected item count, verifies progress has one selected id and no `0`, and checks the output level update matches the selected word.
+**Outcome:** Success. Focused Step5 contract test and full unit discovery both pass.
+**Insight:** No new reusable lesson; this reinforced existing Step5 local-id contract guidance.
+**Promoted to Lessons Learned:** No
+
+---
+
+### [2026-05-19] Added PR CI for compound gate
+
+**Context:** `make gate` blocked on this repo because GitHub reported no PR checks for the branch.
+**What happened:** Added `.github/workflows/ci.yml` with a pull-request test job that runs the documented unittest command, then verified locally with `PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py'`.
+**Outcome:** Success. Local tests pass; the branch now has a workflow for GitHub to report in the PR status rollup.
+**Insight:** Compound gate cannot turn green for a repo with an open PR and no GitHub Actions workflow because the PR status rollup stays empty.
+**Promoted to Lessons Learned:** Yes

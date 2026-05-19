@@ -67,6 +67,7 @@ move it to the Archive section at the bottom with a date and reason.
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
 **[2026-02-14]** Local model instability requires bounded recovery tactics — retries, partial salvage, and capped batch splitting are necessary for predictable throughput.
 **[2026-02-14]** Pair-level rebalance works better with stratified source mixing — mixed batches from both source levels reduce unstable transitions.
+**[2026-05-19]** PR branches need at least one workflow-backed check for compound gate — If a repo opens PRs but has no `.github/workflows` entry, GitHub returns an empty status rollup and compound gate reports checks as unknown.
 
 ## Dependencies & External Services
 
