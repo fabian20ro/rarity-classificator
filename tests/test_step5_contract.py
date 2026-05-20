@@ -1,5 +1,4 @@
 import unittest
-import unittest
 from unittest.mock import MagicMock
 from pathlib import Path
 import csv
@@ -11,6 +10,7 @@ sys.path.append("/workspace/git/word-rarity-classifier/src")
 from classificator.steps.step5_rebalance import run_step5, Step5Options
 from classificator.transitions import LevelTransition
 from classificator.csv_codec import CsvRecord
+from classificator.models import ScoreResult
 
 class TestStep5Contract(unittest.TestCase):
     def setUp(self):
@@ -57,7 +57,6 @@ class TestStep5Contract(unittest.TestCase):
         )
         mock_repo.read_table.return_value = mock_table
 
-        # IMPLEMENT THE MISSING WRITE LOGIC IN MOCK
         def write_table_atomic(path, headers, rows):
             with open(path, 'w', newline='') as f:
                 writer = csv.writer(f)
@@ -77,10 +76,72 @@ class TestStep5Contract(unittest.TestCase):
             reader = csv.DictReader(f)
             for row in reader:
                 self.assertNotEqual(row["word_id"], "0", f"Found word_id 0 in output CSV: {row}")
+    def test_rebalance_preserves_all_ids(self):
+        # Add more rows to input
+        with open(self.input_csv, 'a', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(["4", "date", "format-err", "1"])
+            writer.writerow(["5", "elderberry", "fruit", "2"])
+
+        mock_repo = MagicMock()
+        class MockTable:
+            def __init__(self, headers, records):
+                self.headers = headers
+                self.records = records
+        
+        with open(self.input_csv, 'r') as f:
+            reader = csv.DictReader(f)
+            rows = list(reader)
+        
+        mock_records = [
+            CsvRecord(line_number=i+2, values=list(row.values()))
+            for i, row in enumerate(rows)
+        ]
+
+        mock_table = MockTable(
+            headers=["word_id", "word", "type", "final_level"],
+            records=mock_records
+        )
+        mock_repo.read_table.return_value = mock_table
+
+        def write_table_atomic(path, headers, rows):
+            with open(path, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(headers)
+                for row in rows:
+                    writer.writerow(row)
+        mock_repo.write_table_atomic.side_effect = write_table_atomic
+
+        mock_lm = MagicMock()
+        mock_lm.resolve_endpoint.return_value = MagicMock(endpoint="http://localhost", flavor=MagicMock(), source=MagicMock())
+        
+        def side_effect_score(base_rows, scoring_ctx):
+            # Return the first row as selected to satisfy the contract check in the code
+            if base_rows:
+                row = base_rows[0]
+                return [ScoreResult(
+                    word_id=row.word_id, 
+                    word=row.word, 
+                    type=row.type, 
+                    rarity_level=scoring_ctx.forced_rarity_level, 
+                    tag="test-tag", 
+                    confidence=1.0
+                )]
+            return []
+        mock_lm.score_batch_resilient.side_effect = side_effect_score
+
+        run_step5(self.options, repo=mock_repo, lm_client=mock_lm, output_dir=self.test_dir)
+
+        with open(self.output_csv, 'r') as f:
+            reader = csv.DictReader(f)
+            output_ids = {row["word_id"] for row in reader}
+            input_ids = {"1", "2", "3", "4", "5"}
+            self.assertEqual(input_ids, output_ids)
 
     def tearDown(self):
         if self.test_dir.exists():
-            shutil.rmtree(self.test_dir)
+            shint_path = self.test_dir
+            shutil.rmtree(shint_path)
 
 if __name__ == "__main__":
     unittest.main()
