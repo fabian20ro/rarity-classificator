@@ -608,13 +608,8 @@ def _append_batch_progress(
         "picked_target_count": len(target_word_ids),
         "picked_target_word_ids": target_word_ids,
         "picked_target_words": [batch_by_id[word_id].word for word_id in target_word_ids if word_id in batch_by_id],
-        "distribution": {
-            "1": runtime.distribution.count(1),
-            "2": runtime.distribution.count(2),
-            "3": runtime.distribution.count(3),
-            "4": runtime.distribution.count(4),
-            "5": runtime.distribution.count(5),
-        },
+        "distribution": {str(lvl): runtime.distribution.count(lvl) for lvl in range(1, 6)},
+
     }
     _append_json_line(logs.progress_log_path, payload)
     run_payload = dict(payload)
