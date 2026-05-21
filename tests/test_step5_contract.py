@@ -14,7 +14,7 @@ from classificator.models import ScoreResult
 
 class TestStep5Contract(unittest.TestCase):
     def setUp(self):
-        self.test_dir = Path("/tmp/word-rust-test")
+        self.test_dir = Path("/tmp/test-word-rarity")
         if self.test_dir.exists():
             shutil.rmtree(self.test_dir)
         self.test_dir.mkdir(parents=True, exist_ok=True)
@@ -140,8 +140,7 @@ class TestStep5Contract(unittest.TestCase):
 
     def tearDown(self):
         if self.test_dir.exists():
-            shint_path = self.test_dir
-            shutil.rmtree(shint_path)
+            shutil.rmtree(self.test_dir)
 
 if __name__ == "__main__":
     unittest.main()
