@@ -2,6 +2,11 @@ from __future__ import annotations
 
 
 def repair(raw: str) -> str:
+    """
+    Perform basic repairs on raw JSON-like strings to make them parseable by standard JSON decoders.
+    Removes line comments, fixes trailing decimals (e.g., '1.' -> '1.0'), 
+    closes unclosed structures ('{' or '['), and removes trailing commas in objects/arrays.
+    """
     s1 = _remove_line_comments(raw)
     s2 = _fix_trailing_decimal_points(s1)
     s3 = _close_unclosed_structures(s2)
