@@ -59,7 +59,9 @@ def run_review_low_confidence(
 
     print(f"input_csv={csv_path}")
     print(f"labels_csv={labels_csv}")
-    print(f"queue_size={len(queue)} include_undecided={str(include_undecided).lower()} max_items={max_items}")
+    print(
+        f"queue_size={len(queue)} include_undecided={str(include_undecided).lower()} max_items={max_items}"
+    )
     print("labels: 1 | 2 | 3 | u=unknown(4/5) | d=undecided | s=skip | q=quit")
 
     if not queue:
@@ -118,7 +120,9 @@ def run_l1_review_check(
 
     failures: list[str] = []
     if min_reviewed is not None and stats.reviewed_decided < min_reviewed:
-        failures.append(f"l1_reviewed_decided {stats.reviewed_decided} < min {min_reviewed}")
+        failures.append(
+            f"l1_reviewed_decided {stats.reviewed_decided} < min {min_reviewed}"
+        )
     if min_precision is not None and stats.precision < min_precision:
         failures.append(f"l1_precision {stats.precision:.4f} < min {min_precision:.4f}")
 
@@ -146,24 +150,37 @@ def load_review_items(
     idx_word = _require_col(table.headers, "word")
     idx_type = table.headers.index("type") if "type" in table.headers else None
     idx_level = table.headers.index(level_col)
-    idx_conf = table.headers.index(confidence_column) if confidence_column in table.headers else None
+    idx_conf = (
+        table.headers.index(confidence_column)
+        if confidence_column in table.headers
+        else None
+    )
 
     items: list[ReviewItem] = []
     for rec in table.records:
         vals = rec.values
         if len(vals) == 1 and vals[0] == "":
             continue
-        word_id = _parse_int(vals[idx_word_id], f"word_id at row {rec.line_number} in {csv_path}")
+        word_id = _parse_int(
+            vals[idx_word_id], f"word_id at row {rec.line_number} in {csv_path}"
+        )
         word = vals[idx_word].strip()
         wtype = vals[idx_type].strip() if idx_type is not None else ""
-        level = _parse_int(vals[idx_level], f"{level_col} at row {rec.line_number} in {csv_path}")
+        level = _parse_int(
+            vals[idx_level], f"{level_col} at row {rec.line_number} in {csv_path}"
+        )
         if level < 1 or level > 5:
-            raise ValueError(f"Invalid {level_col} {level} at row {rec.line_number} in {csv_path}")
+            raise ValueError(
+                f"Invalid {level_col} {level} at row {rec.line_number} in {csv_path}"
+            )
         if only_levels is not None and level not in only_levels:
             continue
         confidence = 1.0
         if idx_conf is not None:
-            confidence = _parse_float(vals[idx_conf], f"{confidence_column} at row {rec.line_number} in {csv_path}")
+            confidence = _parse_float(
+                vals[idx_conf],
+                f"{confidence_column} at row {rec.line_number} in {csv_path}",
+            )
             if confidence < 0.0 or confidence > 1.0:
                 raise ValueError(
                     f"Invalid {confidence_column} {confidence} at row {rec.line_number} in {csv_path}"
@@ -209,9 +226,13 @@ def load_latest_review_labels(labels_csv: Path) -> dict[int, ReviewLabel]:
         reader = csv.DictReader(handle)
         for row in reader:
             word_id = _parse_int(row.get("word_id", ""), f"word_id in {labels_csv}")
-            predicted_level = _parse_int(row.get("predicted_level", ""), f"predicted_level in {labels_csv}")
+            predicted_level = _parse_int(
+                row.get("predicted_level", ""), f"predicted_level in {labels_csv}"
+            )
             label = (row.get("label", "") or "").strip()
-            latest[word_id] = ReviewLabel(word_id=word_id, predicted_level=predicted_level, label=label)
+            latest[word_id] = ReviewLabel(
+                word_id=word_id, predicted_level=predicted_level, label=label
+            )
     return latest
 
 
@@ -232,7 +253,9 @@ def build_review_queue(
     return out
 
 
-def append_review_label(*, labels_csv: Path, run_csv: Path, item: ReviewItem, label: str) -> None:
+def append_review_label(
+    *, labels_csv: Path, run_csv: Path, item: ReviewItem, label: str
+) -> None:
     labels_csv.parent.mkdir(parents=True, exist_ok=True)
     exists = labels_csv.exists()
     with labels_csv.open("a", encoding="utf-8", newline="") as handle:

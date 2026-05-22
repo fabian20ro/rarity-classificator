@@ -50,7 +50,9 @@ class CsvCodec:
 
         return CsvTable(headers=headers, records=records)
 
-    def write_table(self, path: Path, headers: list[str], rows: list[list[str]]) -> None:
+    def write_table(
+        self, path: Path, headers: list[str], rows: list[list[str]]
+    ) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("w", encoding="utf-8", newline="") as handle:
             writer = csv.writer(handle, quoting=csv.QUOTE_ALL)
@@ -62,7 +64,9 @@ class CsvCodec:
                     )
                 writer.writerow(row)
 
-    def write_table_atomic(self, path: Path, headers: list[str], rows: list[list[str]]) -> None:
+    def write_table_atomic(
+        self, path: Path, headers: list[str], rows: list[list[str]]
+    ) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         tmp = path.with_name(f"{path.name}.tmp")
         self.write_table(tmp, headers, rows)

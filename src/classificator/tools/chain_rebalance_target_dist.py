@@ -35,7 +35,13 @@ class ChainOptions:
     base_url_option: str | None
 
 
-def run_chain_rebalance(*, options: ChainOptions, repo: RunCsvRepository, lm_client: LmStudioClient, output_dir: Path) -> Path:
+def run_chain_rebalance(
+    *,
+    options: ChainOptions,
+    repo: RunCsvRepository,
+    lm_client: LmStudioClient,
+    output_dir: Path,
+) -> Path:
     if not options.input_csv.exists():
         raise FileNotFoundError(f"Missing input CSV: {options.input_csv}")
 
@@ -75,18 +81,24 @@ def run_chain_rebalance(*, options: ChainOptions, repo: RunCsvRepository, lm_cli
     target_l5 = 30000
     target_l4 = total_words - target_l1 - target_l2 - target_l3 - target_l5
     if target_l4 < 1:
-        raise ValueError(f"Invalid target distribution for total={total_words}: computed level4={target_l4}")
+        raise ValueError(
+            f"Invalid target distribution for total={total_words}: computed level4={target_l4}"
+        )
     targets = {1: target_l1, 2: target_l2, 3: target_l3, 4: target_l4, 5: target_l5}
 
     print("Starting chained rarity rebalancing campaign")
     print(f"model={options.model}")
     print(f"run_base={options.run_base}")
-    print(f"resume={options.resume} state_file={options.state_file} last_completed_step={last_completed}")
+    print(
+        f"resume={options.resume} state_file={options.state_file} last_completed_step={last_completed}"
+    )
     print(
         f"batch_size={options.batch_size} max_tokens={options.max_tokens} timeout_seconds={options.timeout_seconds} max_retries={options.max_retries}"
     )
     print(f"current_csv={current_csv}")
-    print(f"target_distribution=[1:{target_l1} 2:{target_l2} 3:{target_l3} 4:{target_l4} 5:{target_l5}] total={total_words}")
+    print(
+        f"target_distribution=[1:{target_l1} 2:{target_l2} 3:{target_l3} 4:{target_l4} 5:{target_l5}] total={total_words}"
+    )
 
     system_prompt = options.system_prompt_file.read_text(encoding="utf-8")
     user_prompt = options.user_template_file.read_text(encoding="utf-8")
@@ -95,7 +107,9 @@ def run_chain_rebalance(*, options: ChainOptions, repo: RunCsvRepository, lm_cli
         next_csv = options.runs_dir / f"{options.run_base}_step{step_idx}.csv"
         if options.resume and step_idx <= last_completed:
             if not next_csv.exists():
-                raise FileNotFoundError(f"Resume state says step completed, but output missing: {next_csv}")
+                raise FileNotFoundError(
+                    f"Resume state says step completed, but output missing: {next_csv}"
+                )
             current_csv = next_csv
             print(f"[step {step_idx}] resume skip -> {current_csv}")
             continue
@@ -109,7 +123,9 @@ def run_chain_rebalance(*, options: ChainOptions, repo: RunCsvRepository, lm_cli
         target_to_level = targets[to_level]
 
         if pool <= 1:
-            raise ValueError(f"[step {step_idx}] pool too small for levels {from_low}+{from_high}: {pool}")
+            raise ValueError(
+                f"[step {step_idx}] pool too small for levels {from_low}+{from_high}: {pool}"
+            )
         if target_to_level < 1 or target_to_level >= pool:
             raise ValueError(
                 f"[step {step_idx}] invalid target={target_to_level} for pool={pool} (levels {from_low}+{from_high})"
@@ -117,9 +133,13 @@ def run_chain_rebalance(*, options: ChainOptions, repo: RunCsvRepository, lm_cli
 
         ratio = target_to_level / pool
         if not (0.01 <= ratio <= 0.99):
-            raise ValueError(f"[step {step_idx}] ratio out of range 0.01..0.99: ratio={ratio}")
+            raise ValueError(
+                f"[step {step_idx}] ratio out of range 0.01..0.99: ratio={ratio}"
+            )
 
-        step_slug = _sanitize_slug(f"s{step_idx}_{from_low}{from_high}to{to_level}_{options.run_base[-24:]}")
+        step_slug = _sanitize_slug(
+            f"s{step_idx}_{from_low}{from_high}to{to_level}_{options.run_base[-24:]}"
+        )
 
         print(f"\n========== STEP {step_idx} ==========")
         print(f"input_csv={current_csv}")
@@ -204,7 +224,9 @@ def _get_level_count(csv_path: Path, level: int, repo: RunCsvRepository) -> int:
     return count
 
 
-def _write_state(path: Path, step: int, current_csv: Path, options: ChainOptions) -> None:
+def _write_state(
+    path: Path, step: int, current_csv: Path, options: ChainOptions
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     lines = [
         f"last_completed_step\t{step}",
@@ -231,6 +253,8 @@ def _load_state(path: Path) -> dict[str, object]:
 
 
 def _sanitize_slug(raw: str) -> str:
-    cleaned = "".join(ch for ch in raw.lower().replace("-", "_") if ch.isalnum() or ch == "_")
+    cleaned = "".join(
+        ch for ch in raw.lower().replace("-", "_") if ch.isalnum() or ch == "_"
+    )
     cleaned = cleaned[:40]
     return cleaned or "rebalance_run"

@@ -8,7 +8,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from ..batch_size_adapter import BatchSizeAdapter
-from ..constants import DEFAULT_BATCH_SIZE, DEFAULT_MAX_RETRIES, DEFAULT_MAX_TOKENS, DEFAULT_TIMEOUT_SECONDS
+from ..constants import (
+    DEFAULT_BATCH_SIZE,
+    DEFAULT_MAX_RETRIES,
+    DEFAULT_MAX_TOKENS,
+    DEFAULT_TIMEOUT_SECONDS,
+)
 from ..distribution import RarityDistribution
 from ..lock_manager import acquire_output_lock
 from ..models import BaseWordRow, ResolvedEndpoint, RunBaseline, RunCsvRow
@@ -60,7 +65,13 @@ class Step2Counters:
     failed_count: int
 
 
-def run_step2(options: Step2Options, *, repo: RunCsvRepository, lm_client: LmStudioClient, output_dir: Path) -> None:
+def run_step2(
+    options: Step2Options,
+    *,
+    repo: RunCsvRepository,
+    lm_client: LmStudioClient,
+    output_dir: Path,
+) -> None:
     run_slug = sanitize_run_slug(options.run_slug)
     files = _prepare_files(output_dir, run_slug)
     metrics = lm_client.metrics
@@ -74,7 +85,16 @@ def run_step2(options: Step2Options, *, repo: RunCsvRepository, lm_client: LmStu
                 return
 
             resolved_endpoint = _resolve_endpoint(options, lm_client)
-            counters = _score_pending_batches(options, run_slug, ctx, files, resolved_endpoint, repo, lm_client, metrics)
+            counters = _score_pending_batches(
+                options,
+                run_slug,
+                ctx,
+                files,
+                resolved_endpoint,
+                repo,
+                lm_client,
+                metrics,
+            )
             pending_after = counters.failed_count
 
             baseline = RunBaseline(
@@ -88,7 +108,10 @@ def run_step2(options: Step2Options, *, repo: RunCsvRepository, lm_client: LmStu
                 baseline=baseline,
             )
 
-            _write_state(files.state_path, _completed_state(options, files, counters, pending_after))
+            _write_state(
+                files.state_path,
+                _completed_state(options, files, counters, pending_after),
+            )
             _print_summary(options, files, counters, pending_after, metrics)
         except Exception as exc:
             _write_state(files.state_path, _failed_state(run_slug, exc))
@@ -109,10 +132,15 @@ def _prepare_files(output_dir: Path, run_slug: str) -> Step2Files:
 
 def _build_context(options: Step2Options, repo: RunCsvRepository) -> Step2Context:
     source_csv = options.input_csv_path or options.base_csv_path
-    base_rows = sorted({r.word_id: r for r in repo.load_base_rows(source_csv)}.values(), key=lambda r: r.word_id)
+    base_rows = sorted(
+        {r.word_id: r for r in repo.load_base_rows(source_csv)}.values(),
+        key=lambda r: r.word_id,
+    )
     existing_rows = {r.word_id: r for r in repo.load_run_rows(options.output_csv_path)}
 
-    pending = [row for row in base_rows if options.force or row.word_id not in existing_rows]
+    pending = [
+        row for row in base_rows if options.force or row.word_id not in existing_rows
+    ]
     if options.limit and options.limit > 0:
         pending = pending[: options.limit]
 
@@ -126,9 +154,15 @@ def _build_context(options: Step2Options, repo: RunCsvRepository) -> Step2Contex
     )
 
 
-def _resolve_endpoint(options: Step2Options, lm_client: LmStudioClient) -> ResolvedEndpoint:
-    resolved = lm_client.resolve_endpoint(options.endpoint_option, options.base_url_option)
-    print(f"LM endpoint: {resolved.endpoint} (flavor={resolved.flavor.value}, source={resolved.source})")
+def _resolve_endpoint(
+    options: Step2Options, lm_client: LmStudioClient
+) -> ResolvedEndpoint:
+    resolved = lm_client.resolve_endpoint(
+        options.endpoint_option, options.base_url_option
+    )
+    print(
+        f"LM endpoint: {resolved.endpoint} (flavor={resolved.flavor.value}, source={resolved.source})"
+    )
     if options.skip_preflight:
         print("Skipping LM preflight (--skip-preflight=true)")
     else:
@@ -194,7 +228,10 @@ def _score_pending_batches(
         processed += len(batch)
         remaining_count = max(0, total_pending - processed)
         if metrics:
-            line = metrics.format_progress(remaining=remaining_count, effective_batch_size=adapter.recommended_size())
+            line = metrics.format_progress(
+                remaining=remaining_count,
+                effective_batch_size=adapter.recommended_size(),
+            )
             print(f"Step 2 progress run='{run_slug}' {line} {distribution.format()}")
         else:
             print(
@@ -232,12 +269,19 @@ def _running_state(options: Step2Options) -> dict[str, object]:
         "host": socket.gethostname(),
         "started_at": datetime.now(timezone.utc).isoformat(),
         "base_csv": str(options.base_csv_path.resolve()),
-        "input_csv": str(options.input_csv_path.resolve()) if options.input_csv_path else None,
+        "input_csv": (
+            str(options.input_csv_path.resolve()) if options.input_csv_path else None
+        ),
         "output_csv": str(options.output_csv_path.resolve()),
     }
 
 
-def _completed_state(options: Step2Options, files: Step2Files, counters: Step2Counters, pending_count: int) -> dict[str, object]:
+def _completed_state(
+    options: Step2Options,
+    files: Step2Files,
+    counters: Step2Counters,
+    pending_count: int,
+) -> dict[str, object]:
     return {
         "status": "completed",
         "run_slug": options.run_slug,

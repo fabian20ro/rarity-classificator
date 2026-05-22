@@ -11,8 +11,9 @@ from ..constants import (
 )
 from ..models import LmModelConfig
 
-
-DEFAULT_FALLBACK = LmModelConfig(model_id="fallback", temperature=0.0, top_k=40, top_p=1.0)
+DEFAULT_FALLBACK = LmModelConfig(
+    model_id="fallback", temperature=0.0, top_k=40, top_p=1.0
+)
 
 DEFAULTS = {
     MODEL_GPT_OSS_20B.lower(): LmModelConfig(

@@ -20,12 +20,20 @@ class Step4Options:
     upload_batch_id: str | None
 
 
-def run_step4(options: Step4Options, *, word_store: WordStore, repo: RunCsvRepository, marker_writer: UploadMarkerWriter) -> None:
+def run_step4(
+    options: Step4Options,
+    *,
+    word_store: WordStore,
+    repo: RunCsvRepository,
+    marker_writer: UploadMarkerWriter,
+) -> None:
     final_levels = repo.load_final_levels(options.final_csv_path)
     db_levels = {wl.word_id: wl for wl in word_store.fetch_all_word_levels()}
 
     input_dist = RarityDistribution.from_levels(list(final_levels.values()))
-    updates, report_rows, status_by_word_id = _build_upload_plan(options.mode, final_levels, db_levels)
+    updates, report_rows, status_by_word_id = _build_upload_plan(
+        options.mode, final_levels, db_levels
+    )
 
     uploaded_dist = RarityDistribution.from_levels(list(updates.values()))
     word_store.update_rarity_levels_chunked(updates)
@@ -35,7 +43,8 @@ def run_step4(options: Step4Options, *, word_store: WordStore, repo: RunCsvRepos
         final_csv_path=options.final_csv_path,
         uploaded_levels=updates,
         status_by_word_id=status_by_word_id,
-        upload_batch_id=options.upload_batch_id or f"upload_{int(datetime.now(tz=timezone.utc).timestamp() * 1000)}",
+        upload_batch_id=options.upload_batch_id
+        or f"upload_{int(datetime.now(tz=timezone.utc).timestamp() * 1000)}",
         uploaded_at=datetime.now(tz=timezone.utc).isoformat(),
     )
 
@@ -74,7 +83,9 @@ def _build_partial_plan(
             continue
 
         updates[word_id] = level
-        report_rows.append([str(word_id), str(existing.rarity_level), str(level), "final_csv"])
+        report_rows.append(
+            [str(word_id), str(existing.rarity_level), str(level), "final_csv"]
+        )
         status[word_id] = "uploaded"
 
     return updates, report_rows, status
@@ -92,7 +103,9 @@ def _build_full_fallback_plan(
         new_level = final_levels.get(existing.word_id, FALLBACK_RARITY_LEVEL)
         source = "final_csv" if in_final else "fallback_4"
         updates[existing.word_id] = new_level
-        report_rows.append([str(existing.word_id), str(existing.rarity_level), str(new_level), source])
+        report_rows.append(
+            [str(existing.word_id), str(existing.rarity_level), str(new_level), source]
+        )
 
     status = {
         word_id: ("uploaded" if word_id in db_levels else "missing_db_word")

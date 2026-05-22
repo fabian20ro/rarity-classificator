@@ -79,9 +79,13 @@ class LmStudioResponseParser:
         forced_rarity_level: int | None,
         expected_items: int | None,
     ) -> ParsedBatch:
-        rarity_level = forced_rarity_level if forced_rarity_level in {1, 2, 3, 4, 5} else None
+        rarity_level = (
+            forced_rarity_level if forced_rarity_level in {1, 2, 3, 4, 5} else None
+        )
         if rarity_level is None:
-            raise ValueError("forced_rarity_level is required for selected-word-id mode")
+            raise ValueError(
+                "forced_rarity_level is required for selected-word-id mode"
+            )
         expected = expected_items if expected_items and expected_items > 0 else None
         if expected is None:
             raise ValueError("expected_items is required for selected-word-id mode")
@@ -101,13 +105,19 @@ class LmStudioResponseParser:
                 try:
                     node_id = int(node)
                 except Exception:
-                    raise RuntimeError("selected-word-id mode requires integer local_id values")
+                    raise RuntimeError(
+                        "selected-word-id mode requires integer local_id values"
+                    )
             elif isinstance(node, dict):
                 node_id = _to_int(node.get("local_id"))
                 if node_id is None:
-                    raise RuntimeError("selected-word-id mode requires local_id on every result item")
+                    raise RuntimeError(
+                        "selected-word-id mode requires local_id on every result item"
+                    )
             else:
-                raise RuntimeError("selected-word-id mode requires integer local_id values")
+                raise RuntimeError(
+                    "selected-word-id mode requires integer local_id values"
+                )
             raw.append(SelectionCandidate(returned_id=node_id, word=None))
 
         selected = self._coerce_selections_to_word_ids(
@@ -155,12 +165,18 @@ class LmStudioResponseParser:
         for candidate in raw_selections:
             local_id = candidate.returned_id
             if local_id is None:
-                raise RuntimeError("selected-word-id mode requires local_id on every result item")
+                raise RuntimeError(
+                    "selected-word-id mode requires local_id on every result item"
+                )
             if local_id in selected_local_ids:
-                raise RuntimeError(f"Duplicate local_id {local_id} in selected-word-id mode")
+                raise RuntimeError(
+                    f"Duplicate local_id {local_id} in selected-word-id mode"
+                )
             selected_local_ids.add(local_id)
             if local_id not in batch_by_local_id:
-                raise RuntimeError(f"local_id {local_id} is out of range for batch of {len(batch)}")
+                raise RuntimeError(
+                    f"local_id {local_id} is out of range for batch of {len(batch)}"
+                )
             wid = batch_by_local_id[local_id].word_id
             if wid not in selected_set:
                 selected_set.add(wid)
@@ -168,7 +184,9 @@ class LmStudioResponseParser:
 
         return selected
 
-    def _parse_results_lenient(self, *, batch: list[BaseWordRow], results: list[object]) -> ParsedBatch:
+    def _parse_results_lenient(
+        self, *, batch: list[BaseWordRow], results: list[object]
+    ) -> ParsedBatch:
         if not batch:
             return ParsedBatch(scores=[], unresolved=[])
 
@@ -182,7 +200,9 @@ class LmStudioResponseParser:
             candidate = self._parse_score_candidate(node)
             if candidate is None:
                 continue
-            matched = self._match_candidate(candidate, pending_by_id, pending_by_word_type)
+            matched = self._match_candidate(
+                candidate, pending_by_id, pending_by_word_type
+            )
             if matched is None:
                 continue
             scored.append(
@@ -233,7 +253,9 @@ class LmStudioResponseParser:
             key = (row.word, row.type)
             queue = pending_by_word_type.get(key)
             if queue:
-                pending_by_word_type[key] = [x for x in queue if x.word_id != row.word_id]
+                pending_by_word_type[key] = [
+                    x for x in queue if x.word_id != row.word_id
+                ]
                 if not pending_by_word_type[key]:
                     pending_by_word_type.pop(key, None)
             return row
@@ -329,7 +351,9 @@ class LmStudioResponseParser:
                     return val
             keys = ",".join(content_json.keys())
             raise RuntimeError(f"LM content has no results array. keys=[{keys}]")
-        raise RuntimeError(f"LM content must be JSON object/array, got {type(content_json)!r}")
+        raise RuntimeError(
+            f"LM content must be JSON object/array, got {type(content_json)!r}"
+        )
 
 
 def _to_int(value: object) -> int | None:
@@ -405,7 +429,7 @@ def _strip_code_fences(content: str) -> str:
             out = out[len(prefix) :]
             break
     if out.endswith("```"):
-        out = out[: -3]
+        out = out[:-3]
     return out.strip()
 
 

@@ -42,7 +42,9 @@ def require_valid_transition(from_level: int, to_level: int) -> None:
         )
 
 
-def require_valid_pair_transition(from_lower: int, from_upper: int, to_level: int) -> None:
+def require_valid_pair_transition(
+    from_lower: int, from_upper: int, to_level: int
+) -> None:
     if not (1 <= from_lower <= 5 and 1 <= from_upper <= 5 and 1 <= to_level <= 5):
         raise ValueError("Pair transition levels must be in 1..5")
     if from_upper != from_lower + 1:
@@ -72,7 +74,9 @@ def parse_transitions(raw: str | None) -> list[LevelTransition]:
     for token in input_text.split(","):
         parts = token.strip().split(":")
         if len(parts) != 2:
-            raise ValueError(f"Invalid transition token '{token}'. Expected from:to or from-from:to")
+            raise ValueError(
+                f"Invalid transition token '{token}'. Expected from:to or from-from:to"
+            )
         src = parts[0].strip()
         to_level = int(parts[1].strip())
         if "-" in src:
@@ -80,7 +84,9 @@ def parse_transitions(raw: str | None) -> list[LevelTransition]:
             lo = int(lo_s.strip())
             hi = int(hi_s.strip())
             require_valid_pair_transition(lo, hi, to_level)
-            out.append(LevelTransition(from_level=lo, from_level_upper=hi, to_level=to_level))
+            out.append(
+                LevelTransition(from_level=lo, from_level_upper=hi, to_level=to_level)
+            )
         else:
             fr = int(src)
             require_valid_transition(fr, to_level)
@@ -89,6 +95,9 @@ def parse_transitions(raw: str | None) -> list[LevelTransition]:
     deduped: dict[tuple[int, int, int | None], LevelTransition] = {
         (t.from_level, t.to_level, t.from_level_upper): t for t in out
     }
-    result = sorted(deduped.values(), key=lambda t: (t.from_level, t.from_level_upper or t.from_level, t.to_level))
+    result = sorted(
+        deduped.values(),
+        key=lambda t: (t.from_level, t.from_level_upper or t.from_level, t.to_level),
+    )
     validate_transition_set(result)
     return result

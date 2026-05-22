@@ -75,7 +75,9 @@ class Step2Metrics:
             f"Partial extractions: {self.partial_extraction_count}",
         ]
         if self.error_counts:
-            ranked = sorted(self.error_counts.items(), key=lambda item: item[1], reverse=True)
+            ranked = sorted(
+                self.error_counts.items(), key=lambda item: item[1], reverse=True
+            )
             lines.append("Errors: " + ", ".join(f"{k}={v}" for k, v in ranked if v > 0))
         return "\n".join(lines)
 
@@ -94,7 +96,11 @@ def categorize_error(message: str | None) -> str:
         return "WORD_MISMATCH"
     if "model" in lower and ("crash" in lower or "exit code" in lower):
         return "MODEL_CRASH"
-    if "timed out" in lower or "connection refused" in lower or ("connect" in lower and "fail" in lower):
+    if (
+        "timed out" in lower
+        or "connection refused" in lower
+        or ("connect" in lower and "fail" in lower)
+    ):
         return "CONNECTIVITY"
     return "OTHER"
 

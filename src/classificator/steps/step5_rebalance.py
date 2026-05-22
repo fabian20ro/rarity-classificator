@@ -103,7 +103,13 @@ class TransitionSummary:
     switched_count: int
 
 
-def run_step5(options: Step5Options, *, repo: RunCsvRepository, lm_client: LmStudioClient, output_dir: Path) -> None:
+def run_step5(
+    options: Step5Options,
+    *,
+    repo: RunCsvRepository,
+    lm_client: LmStudioClient,
+    output_dir: Path,
+) -> None:
     transitions = options.transitions or []
     validate_transition_set(transitions)
 
@@ -112,7 +118,9 @@ def run_step5(options: Step5Options, *, repo: RunCsvRepository, lm_client: LmStu
     logs = _prepare_logs(output_dir, options.run_slug)
     runtime = RebalanceRuntime(
         levels_by_id=dict(dataset.levels_by_id),
-        distribution=RarityDistribution.from_levels(list(dataset.levels_by_id.values())),
+        distribution=RarityDistribution.from_levels(
+            list(dataset.levels_by_id.values())
+        ),
         rebalance_rules={},
         processed_word_ids=set(),
     )
@@ -121,7 +129,9 @@ def run_step5(options: Step5Options, *, repo: RunCsvRepository, lm_client: LmStu
     seed = options.seed or int(datetime.now(tz=timezone.utc).timestamp() * 1000)
     rng = random.Random(seed)
 
-    transitions_txt = ",".join([f"{t.describe_sources()}->{t.to_level}" for t in transitions])
+    transitions_txt = ",".join(
+        [f"{t.describe_sources()}->{t.to_level}" for t in transitions]
+    )
     print(
         f"Step 5 rebalance run='{options.run_slug}' seed={seed} batchSize={options.batch_size} "
         f"lowerRatio={options.lower_ratio:.4f} transitions={transitions_txt}"
@@ -209,12 +219,20 @@ def _resolve_level_column(headers: list[str]) -> str:
         return "rarity_level"
     if "median_level" in headers:
         return "median_level"
-    raise ValueError(f"CSV must contain one of final_level/rarity_level/median_level (got: {', '.join(headers)})")
+    raise ValueError(
+        f"CSV must contain one of final_level/rarity_level/median_level (got: {', '.join(headers)})"
+    )
 
 
-def _resolve_endpoint(options: Step5Options, lm_client: LmStudioClient) -> ResolvedEndpoint:
-    resolved = lm_client.resolve_endpoint(options.endpoint_option, options.base_url_option)
-    print(f"LM endpoint: {resolved.endpoint} (flavor={resolved.flavor.value}, source={resolved.source})")
+def _resolve_endpoint(
+    options: Step5Options, lm_client: LmStudioClient
+) -> ResolvedEndpoint:
+    resolved = lm_client.resolve_endpoint(
+        options.endpoint_option, options.base_url_option
+    )
+    print(
+        f"LM endpoint: {resolved.endpoint} (flavor={resolved.flavor.value}, source={resolved.source})"
+    )
     if options.skip_preflight:
         print("Skipping LM preflight (--skip-preflight=true)")
     else:
@@ -240,15 +258,20 @@ def _apply_transition(
         items = [
             w
             for w in dataset.words_by_id.values()
-            if runtime.levels_by_id.get(w.word_id) == level and w.word_id not in runtime.processed_word_ids
+            if runtime.levels_by_id.get(w.word_id) == level
+            and w.word_id not in runtime.processed_word_ids
         ]
         rng.shuffle(items)
         remaining_by_source[level] = items
 
-    initial_source_counts = {lvl: len(remaining_by_source[lvl]) for lvl in source_levels}
+    initial_source_counts = {
+        lvl: len(remaining_by_source[lvl]) for lvl in source_levels
+    }
     eligible_count = sum(initial_source_counts.values())
     if eligible_count == 0:
-        return TransitionSummary(transition=transition, eligible=0, target_assigned=0, switched_count=0)
+        return TransitionSummary(
+            transition=transition, eligible=0, target_assigned=0, switched_count=0
+        )
 
     processed = 0
     target_assigned = 0
@@ -279,7 +302,11 @@ def _apply_transition(
         batch_mix = _format_batch_source_mix(batch, runtime)
 
         common_level = min(transition.to_level, transition.other_level())
-        common_count = target_count if transition.to_level == common_level else (len(batch) - target_count)
+        common_count = (
+            target_count
+            if transition.to_level == common_level
+            else (len(batch) - target_count)
+        )
 
         if common_count <= 0:
             selected_common_word_ids: set[int] = set()
@@ -311,9 +338,15 @@ def _apply_transition(
             options=options,
             logs=logs,
         )
-        _append_batch_checkpoint(logs, transition, [w.word_id for w in batch], switched_events)
+        _append_batch_checkpoint(
+            logs, transition, [w.word_id for w in batch], switched_events
+        )
 
-        assigned_to_target = len(selected_common_word_ids) if transition.to_level == common_level else (len(batch) - len(selected_common_word_ids))
+        assigned_to_target = (
+            len(selected_common_word_ids)
+            if transition.to_level == common_level
+            else (len(batch) - len(selected_common_word_ids))
+        )
         target_assigned += assigned_to_target
         switched_count += len(switched_events)
 
@@ -357,7 +390,9 @@ def _select_stratified_batch(
     max_batch_size: int,
     rng: random.Random,
 ) -> list[RebalanceWord]:
-    total_remaining = sum(len(remaining_by_source_level.get(level, [])) for level in source_levels)
+    total_remaining = sum(
+        len(remaining_by_source_level.get(level, [])) for level in source_levels
+    )
     if total_remaining == 0:
         return []
 
@@ -368,12 +403,17 @@ def _select_stratified_batch(
         total_initial = float(sum(initial_source_counts.values()))
         quotas = {}
         for level in source_levels:
-            quotas[level] = int(batch_size * ((initial_source_counts.get(level, 0) / total_initial)))
+            quotas[level] = int(
+                batch_size * ((initial_source_counts.get(level, 0) / total_initial))
+            )
 
         unassigned = batch_size - sum(quotas.values())
         fractions = sorted(
             source_levels,
-            key=lambda level: (batch_size * ((initial_source_counts.get(level, 0) / total_initial))) - quotas[level],
+            key=lambda level: (
+                batch_size * ((initial_source_counts.get(level, 0) / total_initial))
+            )
+            - quotas[level],
             reverse=True,
         )
         for level in fractions:
@@ -400,7 +440,8 @@ def _select_stratified_batch(
             break
         candidate = max(
             candidates,
-            key=lambda level: len(remaining_by_source_level.get(level, [])) - quotas.get(level, 0),
+            key=lambda level: len(remaining_by_source_level.get(level, []))
+            - quotas.get(level, 0),
         )
         quotas[candidate] += 1
         missing -= 1
@@ -434,7 +475,9 @@ def _compute_adaptive_target_count(
     return max(0, min(batch_size, delta))
 
 
-def _format_batch_source_mix(batch: list[RebalanceWord], runtime: RebalanceRuntime) -> str:
+def _format_batch_source_mix(
+    batch: list[RebalanceWord], runtime: RebalanceRuntime
+) -> str:
     counts: dict[int, int] = {}
     for word in batch:
         lvl = runtime.levels_by_id.get(word.word_id, -1)
@@ -471,7 +514,9 @@ def _score_transition_batch(
         output_mode=ScoringOutputMode.SELECTED_WORD_IDS,
         forced_rarity_level=common_level,
     )
-    base_rows = [BaseWordRow(word_id=w.word_id, word=w.word, type=w.type) for w in batch]
+    base_rows = [
+        BaseWordRow(word_id=w.word_id, word=w.word, type=w.type) for w in batch
+    ]
     return lm_client.score_batch_resilient(base_rows, scoring_ctx)
 
 
@@ -486,7 +531,11 @@ def _select_common_word_ids(
     selected = []
     seen = set()
     for s in scored:
-        if s.word_id in batch_ids and s.rarity_level == common_level and s.word_id not in seen:
+        if (
+            s.word_id in batch_ids
+            and s.rarity_level == common_level
+            and s.word_id not in seen
+        ):
             seen.add(s.word_id)
             selected.append(s.word_id)
     if len(selected) != common_count:
@@ -510,7 +559,9 @@ def _apply_batch_assignments(
 
     switched_events: list[SwitchedWordEvent] = []
     for word in batch:
-        next_level = common_level if word.word_id in selected_common_word_ids else rare_level
+        next_level = (
+            common_level if word.word_id in selected_common_word_ids else rare_level
+        )
         previous = runtime.levels_by_id.get(word.word_id)
         runtime.levels_by_id[word.word_id] = next_level
         runtime.distribution.set_level(previous, next_level)
@@ -533,7 +584,12 @@ def _apply_batch_assignments(
     return switched_events
 
 
-def _log_switched_word(logs: Step5Logs, options: Step5Options, transition: LevelTransition, switched: SwitchedWordEvent) -> None:
+def _log_switched_word(
+    logs: Step5Logs,
+    options: Step5Options,
+    transition: LevelTransition,
+    switched: SwitchedWordEvent,
+) -> None:
     payload = {
         "timestamp": datetime.now(tz=timezone.utc).isoformat(),
         "run_slug": options.run_slug,
@@ -549,7 +605,12 @@ def _log_switched_word(logs: Step5Logs, options: Step5Options, transition: Level
     _append_json_line(logs.switched_words_log_path, payload)
 
 
-def _append_batch_checkpoint(logs: Step5Logs, transition: LevelTransition, processed_word_ids: list[int], switched_events: list[SwitchedWordEvent]) -> None:
+def _append_batch_checkpoint(
+    logs: Step5Logs,
+    transition: LevelTransition,
+    processed_word_ids: list[int],
+    switched_events: list[SwitchedWordEvent],
+) -> None:
     payload = {
         "timestamp": datetime.now(tz=timezone.utc).isoformat(),
         "transition": f"{transition.describe_sources()}->{transition.to_level}",
@@ -585,7 +646,9 @@ def _append_batch_progress(
     if transition.to_level == common_level:
         target_word_ids = selected_common_sorted
     else:
-        target_word_ids = sorted([w.word_id for w in batch if w.word_id not in selected_common_word_ids])
+        target_word_ids = sorted(
+            [w.word_id for w in batch if w.word_id not in selected_common_word_ids]
+        )
 
     payload = {
         "timestamp": datetime.now(tz=timezone.utc).isoformat(),
@@ -603,11 +666,19 @@ def _append_batch_progress(
         "selected_common_level": common_level,
         "selected_common_count": len(selected_common_sorted),
         "selected_common_word_ids": selected_common_sorted,
-        "selected_common_words": [batch_by_id[word_id].word for word_id in selected_common_sorted if word_id in batch_by_id],
+        "selected_common_words": [
+            batch_by_id[word_id].word
+            for word_id in selected_common_sorted
+            if word_id in batch_by_id
+        ],
         "picked_target_level": transition.to_level,
         "picked_target_count": len(target_word_ids),
         "picked_target_word_ids": target_word_ids,
-        "picked_target_words": [batch_by_id[word_id].word for word_id in target_word_ids if word_id in batch_by_id],
+        "picked_target_words": [
+            batch_by_id[word_id].word
+            for word_id in target_word_ids
+            if word_id in batch_by_id
+        ],
         "distribution": {
             "1": runtime.distribution.count(1),
             "2": runtime.distribution.count(2),
@@ -622,7 +693,9 @@ def _append_batch_progress(
     _append_json_line(logs.run_log_path, run_payload)
 
 
-def _restore_from_checkpoint(dataset: RebalanceDataset, runtime: RebalanceRuntime, logs: Step5Logs) -> Step5ResumeStats:
+def _restore_from_checkpoint(
+    dataset: RebalanceDataset, runtime: RebalanceRuntime, logs: Step5Logs
+) -> Step5ResumeStats:
     if not logs.checkpoint_path.exists():
         return Step5ResumeStats(0, 0, 0)
 
@@ -646,7 +719,11 @@ def _restore_from_checkpoint(dataset: RebalanceDataset, runtime: RebalanceRuntim
                         word_id = int(pid)
                     except Exception:
                         continue
-                    if word_id > 0 and word_id in dataset.words_by_id and word_id not in runtime.processed_word_ids:
+                    if (
+                        word_id > 0
+                        and word_id in dataset.words_by_id
+                        and word_id not in runtime.processed_word_ids
+                    ):
                         runtime.processed_word_ids.add(word_id)
                         resumed_processed += 1
 
@@ -663,7 +740,10 @@ def _restore_from_checkpoint(dataset: RebalanceDataset, runtime: RebalanceRuntim
                     rule = str(item.get("rule", ""))
                     if word_id <= 0 or new_level not in {1, 2, 3, 4, 5}:
                         continue
-                    if word_id not in dataset.words_by_id or word_id in applied_switched_ids:
+                    if (
+                        word_id not in dataset.words_by_id
+                        or word_id in applied_switched_ids
+                    ):
                         continue
                     applied_switched_ids.add(word_id)
                     previous = runtime.levels_by_id.get(word_id)
@@ -676,7 +756,11 @@ def _restore_from_checkpoint(dataset: RebalanceDataset, runtime: RebalanceRuntim
     return Step5ResumeStats(resumed_batches, resumed_processed, resumed_switched)
 
 
-def _print_switched_events(options: Step5Options, transition: LevelTransition, switched_events: list[SwitchedWordEvent]) -> None:
+def _print_switched_events(
+    options: Step5Options,
+    transition: LevelTransition,
+    switched_events: list[SwitchedWordEvent],
+) -> None:
     if not switched_events:
         return
     selected = [ev for ev in switched_events if ev.selected_by_llm]
@@ -703,9 +787,20 @@ def _print_switched_group(label: str, events: list[SwitchedWordEvent]) -> None:
         print(prefix + content)
 
 
-def _write_output(dataset: RebalanceDataset, runtime: RebalanceRuntime, options: Step5Options, repo: RunCsvRepository) -> None:
+def _write_output(
+    dataset: RebalanceDataset,
+    runtime: RebalanceRuntime,
+    options: Step5Options,
+    repo: RunCsvRepository,
+) -> None:
     headers = list(dataset.input_headers)
-    for col in ["final_level", "rebalance_rule", "rebalance_model", "rebalance_run", "rebalanced_at"]:
+    for col in [
+        "final_level",
+        "rebalance_rule",
+        "rebalance_model",
+        "rebalance_run",
+        "rebalanced_at",
+    ]:
         if col not in headers:
             headers.append(col)
 
@@ -715,7 +810,9 @@ def _write_output(dataset: RebalanceDataset, runtime: RebalanceRuntime, options:
         try:
             word_id = int(row.get("word_id", ""))
         except Exception as exc:
-            raise CsvFormatError("Invalid word_id in memory while writing output") from exc
+            raise CsvFormatError(
+                "Invalid word_id in memory while writing output"
+            ) from exc
 
         final_level = runtime.levels_by_id.get(word_id)
         if final_level is None:
@@ -724,16 +821,24 @@ def _write_output(dataset: RebalanceDataset, runtime: RebalanceRuntime, options:
         row["final_level"] = str(final_level)
         changed = word_id in runtime.rebalance_rules
         row["rebalance_rule"] = runtime.rebalance_rules.get(word_id, "")
-        row["rebalance_model"] = options.model if changed else row.get("rebalance_model", "")
-        row["rebalance_run"] = options.run_slug if changed else row.get("rebalance_run", "")
-        row["rebalanced_at"] = rebalanced_at if changed else row.get("rebalanced_at", "")
+        row["rebalance_model"] = (
+            options.model if changed else row.get("rebalance_model", "")
+        )
+        row["rebalance_run"] = (
+            options.run_slug if changed else row.get("rebalance_run", "")
+        )
+        row["rebalanced_at"] = (
+            rebalanced_at if changed else row.get("rebalanced_at", "")
+        )
 
         rows.append([row.get(h, "") for h in headers])
 
     repo.write_table_atomic(options.output_csv_path, headers, rows)
 
 
-def _render_template(template: str, transition: LevelTransition, common_level: int) -> str:
+def _render_template(
+    template: str, transition: LevelTransition, common_level: int
+) -> str:
     source_label = transition.describe_sources()
     return (
         template.replace(REBALANCE_FROM_LEVEL_PLACEHOLDER, source_label)

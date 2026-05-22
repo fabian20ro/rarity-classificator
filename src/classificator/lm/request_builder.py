@@ -49,8 +49,7 @@ class LmStudioRequestBuilder:
             ]
         else:
             entries = [
-                {"local_id": idx + 1, "word": row.word}
-                for idx, row in enumerate(batch)
+                {"local_id": idx + 1, "word": row.word} for idx, row in enumerate(batch)
             ]
 
         entries_json = json.dumps(entries, ensure_ascii=False)
@@ -64,7 +63,9 @@ class LmStudioRequestBuilder:
             effective = max(self.SCORE_MIN_MAX_TOKENS, min(estimated, max_tokens))
         else:
             expected = max(1, expected_items or 1)
-            estimated = expected * self.SELECTION_TOKENS_PER_ITEM + self.SELECTION_BASE_TOKENS
+            estimated = (
+                expected * self.SELECTION_TOKENS_PER_ITEM + self.SELECTION_BASE_TOKENS
+            )
             effective = max(self.SELECTION_MIN_MAX_TOKENS, min(estimated, max_tokens))
             effective = min(effective, self.SELECTION_HARD_MAX_TOKENS)
 
@@ -100,13 +101,17 @@ class LmStudioRequestBuilder:
             if config.thinking_type is not None:
                 payload["thinking"] = {"type": config.thinking_type}
             if config.enable_thinking is not None:
-                payload["chat_template_kwargs"] = {"enable_thinking": config.enable_thinking}
+                payload["chat_template_kwargs"] = {
+                    "enable_thinking": config.enable_thinking
+                }
 
         if schema_kind == JsonSchemaKind.SELECTED_WORD_IDS:
             if expected_items is None or expected_items <= 0:
                 raise ValueError("expected_items is required for selected-word-id mode")
             if expected_items > len(batch):
-                raise ValueError("expected_items cannot exceed batch size in selected-word-id mode")
+                raise ValueError(
+                    "expected_items cannot exceed batch size in selected-word-id mode"
+                )
 
         if response_format_mode == ResponseFormatMode.JSON_OBJECT:
             payload["response_format"] = {"type": "json_object"}
@@ -115,7 +120,9 @@ class LmStudioRequestBuilder:
                 expected = expected_items or len(batch)
                 payload["response_format"] = _score_results_schema(expected)
             else:
-                payload["response_format"] = _selected_word_ids_schema(expected_items=expected_items, max_local_id=len(batch))
+                payload["response_format"] = _selected_word_ids_schema(
+                    expected_items=expected_items, max_local_id=len(batch)
+                )
 
         return json.dumps(payload, ensure_ascii=False)
 
@@ -141,10 +148,15 @@ def _score_results_schema(expected_items: int) -> dict[str, object]:
         "minItems": expected,
         "maxItems": expected,
     }
-    return {"type": "json_schema", "json_schema": {"name": "rarity_batch_array", "schema": schema}}
+    return {
+        "type": "json_schema",
+        "json_schema": {"name": "rarity_batch_array", "schema": schema},
+    }
 
 
-def _selected_word_ids_schema(expected_items: int, max_local_id: int) -> dict[str, object]:
+def _selected_word_ids_schema(
+    expected_items: int, max_local_id: int
+) -> dict[str, object]:
     expected = max(1, expected_items)
     bounded_max = max(1, max_local_id)
     schema = {
@@ -154,4 +166,7 @@ def _selected_word_ids_schema(expected_items: int, max_local_id: int) -> dict[st
         "maxItems": expected,
         "uniqueItems": True,
     }
-    return {"type": "json_schema", "json_schema": {"name": "selected_word_ids", "schema": schema}}
+    return {
+        "type": "json_schema",
+        "json_schema": {"name": "selected_word_ids", "schema": schema},
+    }

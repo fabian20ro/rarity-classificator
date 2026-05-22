@@ -74,9 +74,13 @@ def run_quality_audit(
             f"anchor_l1_recall={recall:.4f} ({inter}/{len(anchors)})"
         )
         if min_anchor_l1_precision is not None and precision < min_anchor_l1_precision:
-            failures.append(f"anchor_l1_precision {precision:.4f} < min {min_anchor_l1_precision:.4f}")
+            failures.append(
+                f"anchor_l1_precision {precision:.4f} < min {min_anchor_l1_precision:.4f}"
+            )
         if min_anchor_l1_recall is not None and recall < min_anchor_l1_recall:
-            failures.append(f"anchor_l1_recall {recall:.4f} < min {min_anchor_l1_recall:.4f}")
+            failures.append(
+                f"anchor_l1_recall {recall:.4f} < min {min_anchor_l1_recall:.4f}"
+            )
 
     passed = not failures
     if passed:
@@ -112,7 +116,9 @@ def _load_run(path: Path, repo: RunCsvRepository) -> dict[str, object]:
     elif "median_level" in table.headers:
         level_col = "median_level"
     else:
-        raise ValueError("CSV missing level column: final_level/rarity_level/median_level")
+        raise ValueError(
+            "CSV missing level column: final_level/rarity_level/median_level"
+        )
 
     distribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
     l1_word_ids: set[int] = set()

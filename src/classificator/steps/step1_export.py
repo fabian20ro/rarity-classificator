@@ -13,7 +13,9 @@ class Step1Options:
     output_csv_path: Path
 
 
-def run_step1(options: Step1Options, *, word_store: WordStore, repo: RunCsvRepository) -> Path:
+def run_step1(
+    options: Step1Options, *, word_store: WordStore, repo: RunCsvRepository
+) -> Path:
     words = sorted(word_store.fetch_all_words(), key=lambda w: w.word_id)
     rows = [[str(w.word_id), w.word, w.type] for w in words]
     repo.write_rows(options.output_csv_path, BASE_CSV_HEADERS, rows)

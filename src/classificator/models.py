@@ -33,7 +33,12 @@ class Step3MergeStrategy(str, Enum):
         v = (value or "median").strip().lower()
         if v in {"median", ""}:
             return cls.MEDIAN
-        if v in {"any-extremes", "any_extremes", "three-any-extremes", "three_any_extremes"}:
+        if v in {
+            "any-extremes",
+            "any_extremes",
+            "three-any-extremes",
+            "three_any_extremes",
+        }:
             return cls.ANY_EXTREMES
         raise ValueError(f"Invalid merge strategy: {value}")
 

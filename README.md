@@ -39,10 +39,19 @@ Contract this repository must preserve:
 
 ## Install
 
+### Using UV (Recommended)
+
+```bash
+uv venv .venv_run
+source .venv_run/bin/activate
+uv pip install -e .[dev]
+```
+
+### Standard Python
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -e .
+pip install -e .[dev]
 ```
 
 ## Environment

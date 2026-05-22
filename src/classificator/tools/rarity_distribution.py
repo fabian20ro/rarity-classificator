@@ -35,14 +35,20 @@ def run_rarity_distribution(
             continue
         total_rows += 1
         if idx_level >= len(vals):
-            raise ValueError(f"Missing {resolved_level_col} at row {rec.line_number} in {csv_path}")
+            raise ValueError(
+                f"Missing {resolved_level_col} at row {rec.line_number} in {csv_path}"
+            )
         raw_level = vals[idx_level].strip()
         try:
             level = int(raw_level)
         except Exception as exc:
-            raise ValueError(f"Invalid {resolved_level_col} '{raw_level}' at row {rec.line_number} in {csv_path}") from exc
+            raise ValueError(
+                f"Invalid {resolved_level_col} '{raw_level}' at row {rec.line_number} in {csv_path}"
+            ) from exc
         if level < 1 or level > 5:
-            raise ValueError(f"Invalid {resolved_level_col} {level} at row {rec.line_number} in {csv_path}")
+            raise ValueError(
+                f"Invalid {resolved_level_col} {level} at row {rec.line_number} in {csv_path}"
+            )
         distribution[level] += 1
 
     print(f"input_csv={csv_path}")
@@ -53,7 +59,9 @@ def run_rarity_distribution(
     )
     print(
         "distribution_pct=["
-        + " ".join([f"{k}:{_pct(v, total_rows):.2f}%" for k, v in sorted(distribution.items())])
+        + " ".join(
+            [f"{k}:{_pct(v, total_rows):.2f}%" for k, v in sorted(distribution.items())]
+        )
         + "]"
     )
 

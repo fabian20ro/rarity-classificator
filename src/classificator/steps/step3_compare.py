@@ -33,14 +33,24 @@ def run_step3(options: Step3Options, *, repo: RunCsvRepository) -> None:
     base_rows = repo.load_base_rows(options.base_csv_path)
     run_a = {r.word_id: r for r in repo.load_run_rows(options.run_a_csv_path)}
     run_b = {r.word_id: r for r in repo.load_run_rows(options.run_b_csv_path)}
-    run_c = {r.word_id: r for r in repo.load_run_rows(options.run_c_csv_path)} if options.run_c_csv_path else {}
+    run_c = (
+        {r.word_id: r for r in repo.load_run_rows(options.run_c_csv_path)}
+        if options.run_c_csv_path
+        else {}
+    )
 
     comparison_rows: list[list[str]] = []
     outlier_rows: list[list[str]] = []
     dist = RarityDistribution()
 
     for base in base_rows:
-        row = _build_comparison_row(base, run_a.get(base.word_id), run_b.get(base.word_id), run_c.get(base.word_id), options)
+        row = _build_comparison_row(
+            base,
+            run_a.get(base.word_id),
+            run_b.get(base.word_id),
+            run_c.get(base.word_id),
+            options,
+        )
         comparison_rows.append(_to_comparison_csv(row))
         dist.increment(row["final_level"])
         if row["is_outlier"]:
@@ -62,13 +72,33 @@ def _build_comparison_row(
     run_c: RunCsvRow | None,
     options: Step3Options,
 ) -> dict[str, object]:
-    levels = [x for x in [run_a.rarity_level if run_a else None, run_b.rarity_level if run_b else None, run_c.rarity_level if run_c else None] if x is not None]
-    median_level = FALLBACK_RARITY_LEVEL if not levels else median([int(x) for x in levels])
+    levels = [
+        x
+        for x in [
+            run_a.rarity_level if run_a else None,
+            run_b.rarity_level if run_b else None,
+            run_c.rarity_level if run_c else None,
+        ]
+        if x is not None
+    ]
+    median_level = (
+        FALLBACK_RARITY_LEVEL if not levels else median([int(x) for x in levels])
+    )
     spread = 0 if len(levels) < 2 else max(levels) - min(levels)
 
-    confidences = [x for x in [run_a.confidence if run_a else None, run_b.confidence if run_b else None, run_c.confidence if run_c else None] if x is not None]
+    confidences = [
+        x
+        for x in [
+            run_a.confidence if run_a else None,
+            run_b.confidence if run_b else None,
+            run_c.confidence if run_c else None,
+        ]
+        if x is not None
+    ]
     low_confidence = any(x < options.confidence_threshold for x in confidences)
-    is_outlier = len(levels) >= 2 and (spread >= options.outlier_threshold or low_confidence)
+    is_outlier = len(levels) >= 2 and (
+        spread >= options.outlier_threshold or low_confidence
+    )
 
     reasons = []
     if spread >= options.outlier_threshold:
@@ -76,7 +106,9 @@ def _build_comparison_row(
     if low_confidence:
         reasons.append(f"low_confidence<{options.confidence_threshold}")
 
-    final_level, merge_rule = _resolve_final_level(levels, median_level, options.merge_strategy)
+    final_level, merge_rule = _resolve_final_level(
+        levels, median_level, options.merge_strategy
+    )
 
     return {
         "word_id": base.word_id,
@@ -98,7 +130,9 @@ def _build_comparison_row(
     }
 
 
-def _resolve_final_level(levels: list[int], median_level: int, strategy: Step3MergeStrategy) -> tuple[int, str]:
+def _resolve_final_level(
+    levels: list[int], median_level: int, strategy: Step3MergeStrategy
+) -> tuple[int, str]:
     if strategy == Step3MergeStrategy.MEDIAN:
         return median_level, "median"
 

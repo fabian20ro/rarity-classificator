@@ -29,7 +29,11 @@ from .tools.build_retry_input import build_retry_input
 from .tools.chain_rebalance_target_dist import ChainOptions, run_chain_rebalance
 from .tools.quality_audit import run_quality_audit
 from .tools.rarity_distribution import run_rarity_distribution
-from .tools.review_low_confidence import parse_only_levels, run_l1_review_check, run_review_low_confidence
+from .tools.review_low_confidence import (
+    parse_only_levels,
+    run_l1_review_check,
+    run_review_low_confidence,
+)
 from .transitions import (
     LevelTransition,
     parse_transitions,
@@ -56,12 +60,18 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command in {"step1-export", "step1"}:
         store = WordStore()
-        run_step1(Step1Options(output_csv_path=Path(args.output_csv)), word_store=store, repo=repo)
+        run_step1(
+            Step1Options(output_csv_path=Path(args.output_csv)),
+            word_store=store,
+            repo=repo,
+        )
         return 0
 
     if args.command in {"step2-score", "step2"}:
         metrics = Step2Metrics()
-        lm_client = LmStudioClient(api_key=os.getenv("LMSTUDIO_API_KEY"), metrics=metrics)
+        lm_client = LmStudioClient(
+            api_key=os.getenv("LMSTUDIO_API_KEY"), metrics=metrics
+        )
         run_step2(
             Step2Options(
                 run_slug=args.run,
@@ -78,8 +88,12 @@ def main(argv: list[str] | None = None) -> int:
                 force=args.force,
                 endpoint_option=args.endpoint,
                 base_url_option=args.base_url,
-                system_prompt=Path(args.system_prompt_file).read_text(encoding="utf-8").strip(),
-                user_template=Path(args.user_template_file).read_text(encoding="utf-8").strip(),
+                system_prompt=Path(args.system_prompt_file)
+                .read_text(encoding="utf-8")
+                .strip(),
+                user_template=Path(args.user_template_file)
+                .read_text(encoding="utf-8")
+                .strip(),
             ),
             repo=repo,
             lm_client=lm_client,
@@ -122,7 +136,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command in {"step5-rebalance", "step5"}:
         metrics = Step2Metrics()
-        lm_client = LmStudioClient(api_key=os.getenv("LMSTUDIO_API_KEY"), metrics=metrics)
+        lm_client = LmStudioClient(
+            api_key=os.getenv("LMSTUDIO_API_KEY"), metrics=metrics
+        )
         transitions = _resolve_step5_transitions(args)
         run_step5(
             Step5Options(
@@ -140,8 +156,12 @@ def main(argv: list[str] | None = None) -> int:
                 base_url_option=args.base_url,
                 seed=args.seed,
                 transitions=transitions,
-                system_prompt=Path(args.system_prompt_file).read_text(encoding="utf-8").strip(),
-                user_template=Path(args.user_template_file).read_text(encoding="utf-8").strip(),
+                system_prompt=Path(args.system_prompt_file)
+                .read_text(encoding="utf-8")
+                .strip(),
+                user_template=Path(args.user_template_file)
+                .read_text(encoding="utf-8")
+                .strip(),
             ),
             repo=repo,
             lm_client=lm_client,
@@ -202,16 +222,24 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "chain-rebalance-target-dist":
         metrics = Step2Metrics()
-        lm_client = LmStudioClient(api_key=os.getenv("LMSTUDIO_API_KEY"), metrics=metrics)
+        lm_client = LmStudioClient(
+            api_key=os.getenv("LMSTUDIO_API_KEY"), metrics=metrics
+        )
         run_chain_rebalance(
             options=ChainOptions(
                 input_csv=Path(args.input_csv),
                 model=args.model,
                 run_base=args.run_base,
                 runs_dir=Path(args.runs_dir),
-                state_file=Path(args.state_file) if args.state_file else Path(args.runs_dir) / f"{args.run_base}.rebalance.state",
+                state_file=(
+                    Path(args.state_file)
+                    if args.state_file
+                    else Path(args.runs_dir) / f"{args.run_base}.rebalance.state"
+                ),
                 resume=args.resume,
-                final_output_csv=Path(args.final_output_csv) if args.final_output_csv else None,
+                final_output_csv=(
+                    Path(args.final_output_csv) if args.final_output_csv else None
+                ),
                 batch_size=args.batch_size,
                 max_tokens=args.max_tokens,
                 timeout_seconds=args.timeout_seconds,
@@ -219,7 +247,9 @@ def main(argv: list[str] | None = None) -> int:
                 system_prompt_file=Path(args.system_prompt_file),
                 user_template_file=Path(args.user_template_file),
                 reference_csv=Path(args.reference_csv) if args.reference_csv else None,
-                anchor_l1_file=Path(args.anchor_l1_file) if args.anchor_l1_file else None,
+                anchor_l1_file=(
+                    Path(args.anchor_l1_file) if args.anchor_l1_file else None
+                ),
                 min_l1_jaccard=args.min_l1_jaccard,
                 min_anchor_l1_precision=args.min_anchor_l1_precision,
                 min_anchor_l1_recall=args.min_anchor_l1_recall,
@@ -238,21 +268,31 @@ def main(argv: list[str] | None = None) -> int:
 
 def _build_parser() -> argparse.ArgumentParser:
     """Builds the argument parser with all subcommands and options."""
-    parser = argparse.ArgumentParser(prog="classificator", description="Romanian rarity classificator pipeline")
-    parser.add_argument("--output-dir", default="build/rarity", help="Output root dir (default: build/rarity)")
+    parser = argparse.ArgumentParser(
+        prog="classificator", description="Romanian rarity classificator pipeline"
+    )
+    parser.add_argument(
+        "--output-dir",
+        default="build/rarity",
+        help="Output root dir (default: build/rarity)",
+    )
 
     sub = parser.add_subparsers(dest="command")
 
     p1 = sub.add_parser("step1-export", help="Export source words from DB to CSV")
     p1.add_argument("--output-csv", required=True)
-    sub.add_parser("step1", help="Alias of step1-export").add_argument("--output-csv", required=True)
+    sub.add_parser("step1", help="Alias of step1-export").add_argument(
+        "--output-csv", required=True
+    )
 
     p2 = sub.add_parser("step2-score", help="Score words with LM and write run CSV")
     _add_step2_args(p2)
     p2a = sub.add_parser("step2", help="Alias of step2-score")
     _add_step2_args(p2a)
 
-    p3 = sub.add_parser("step3-compare", help="Compare 2-3 run CSVs and produce final_level")
+    p3 = sub.add_parser(
+        "step3-compare", help="Compare 2-3 run CSVs and produce final_level"
+    )
     _add_step3_args(p3)
     p3a = sub.add_parser("step3", help="Alias of step3-compare")
     _add_step3_args(p3a)
@@ -280,7 +320,10 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     _add_step5_args(p5a)
 
-    qa = sub.add_parser("quality-audit", help="Compute distribution + L1 Jaccard + anchor precision/recall")
+    qa = sub.add_parser(
+        "quality-audit",
+        help="Compute distribution + L1 Jaccard + anchor precision/recall",
+    )
     qa.add_argument("--candidate-csv", required=True)
     qa.add_argument("--reference-csv")
     qa.add_argument("--anchor-l1-file")
@@ -288,12 +331,20 @@ def _build_parser() -> argparse.ArgumentParser:
     qa.add_argument("--min-anchor-l1-precision", type=float)
     qa.add_argument("--min-anchor-l1-recall", type=float)
 
-    rd = sub.add_parser("rarity-distribution", help="Print rarity level distribution for a CSV")
+    rd = sub.add_parser(
+        "rarity-distribution", help="Print rarity level distribution for a CSV"
+    )
     rd.add_argument("--csv", required=True)
-    rd.add_argument("--level-column", help="Optional explicit level column (e.g. rarity_level/final_level)")
+    rd.add_argument(
+        "--level-column",
+        help="Optional explicit level column (e.g. rarity_level/final_level)",
+    )
     rda = sub.add_parser("dist", help="Alias of rarity-distribution")
     rda.add_argument("--csv", required=True)
-    rda.add_argument("--level-column", help="Optional explicit level column (e.g. rarity_level/final_level)")
+    rda.add_argument(
+        "--level-column",
+        help="Optional explicit level column (e.g. rarity_level/final_level)",
+    )
 
     rv = sub.add_parser(
         "review-low-confidence",
@@ -304,9 +355,13 @@ def _build_parser() -> argparse.ArgumentParser:
     rv.add_argument("--labels-csv", default="build/rarity/review_labels.csv")
     rv.add_argument("--level-column")
     rv.add_argument("--confidence-column", default="confidence")
-    rv.add_argument("--only-levels", help="Comma-separated levels to include (e.g. 1 or 1,2,3)")
+    rv.add_argument(
+        "--only-levels", help="Comma-separated levels to include (e.g. 1 or 1,2,3)"
+    )
     rv.add_argument("--max-items", type=int, default=200)
-    rv.add_argument("--include-undecided", action=argparse.BooleanOptionalAction, default=False)
+    rv.add_argument(
+        "--include-undecided", action=argparse.BooleanOptionalAction, default=False
+    )
     rva = sub.add_parser(
         "review",
         help="Alias of review-low-confidence (use --include-undecided to resurface undecided labels)",
@@ -316,21 +371,32 @@ def _build_parser() -> argparse.ArgumentParser:
     rva.add_argument("--labels-csv", default="build/rarity/review_labels.csv")
     rva.add_argument("--level-column")
     rva.add_argument("--confidence-column", default="confidence")
-    rva.add_argument("--only-levels", help="Comma-separated levels to include (e.g. 1 or 1,2,3)")
+    rva.add_argument(
+        "--only-levels", help="Comma-separated levels to include (e.g. 1 or 1,2,3)"
+    )
     rva.add_argument("--max-items", type=int, default=200)
-    rva.add_argument("--include-undecided", action=argparse.BooleanOptionalAction, default=False)
+    rva.add_argument(
+        "--include-undecided", action=argparse.BooleanOptionalAction, default=False
+    )
 
-    l1c = sub.add_parser("l1-review-check", help="Gate L1 quality from human review labels")
+    l1c = sub.add_parser(
+        "l1-review-check", help="Gate L1 quality from human review labels"
+    )
     l1c.add_argument("--labels-csv", default="build/rarity/review_labels.csv")
     l1c.add_argument("--min-precision", type=float)
     l1c.add_argument("--min-reviewed", type=int)
 
-    br = sub.add_parser("build-retry-input", help="Build retry input CSV from failed JSONL")
+    br = sub.add_parser(
+        "build-retry-input", help="Build retry input CSV from failed JSONL"
+    )
     br.add_argument("--failed-jsonl", required=True)
     br.add_argument("--base-csv", required=True)
     br.add_argument("--output-csv", required=True)
 
-    ch = sub.add_parser("chain-rebalance-target-dist", help="Run fixed 8-step rebalance chain to target distribution")
+    ch = sub.add_parser(
+        "chain-rebalance-target-dist",
+        help="Run fixed 8-step rebalance chain to target distribution",
+    )
     ch.add_argument("--input-csv", required=True)
     ch.add_argument("--model", default="openai/gpt-oss-20b")
     ch.add_argument("--run-base", default="rb_run")
@@ -342,8 +408,12 @@ def _build_parser() -> argparse.ArgumentParser:
     ch.add_argument("--max-tokens", type=int, default=1200)
     ch.add_argument("--timeout-seconds", type=int, default=120)
     ch.add_argument("--max-retries", type=int, default=2)
-    ch.add_argument("--system-prompt-file", default="prompts/rebalance_system_prompt_ro.txt")
-    ch.add_argument("--user-template-file", default="prompts/rebalance_user_prompt_template_ro.txt")
+    ch.add_argument(
+        "--system-prompt-file", default="prompts/rebalance_system_prompt_ro.txt"
+    )
+    ch.add_argument(
+        "--user-template-file", default="prompts/rebalance_user_prompt_template_ro.txt"
+    )
     ch.add_argument("--reference-csv")
     ch.add_argument("--anchor-l1-file")
     ch.add_argument("--min-l1-jaccard", type=float)
@@ -366,12 +436,16 @@ def _add_step2_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--max-retries", type=int, default=DEFAULT_MAX_RETRIES)
     parser.add_argument("--timeout-seconds", type=int, default=DEFAULT_TIMEOUT_SECONDS)
     parser.add_argument("--max-tokens", type=int, default=DEFAULT_MAX_TOKENS)
-    parser.add_argument("--skip-preflight", action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument(
+        "--skip-preflight", action=argparse.BooleanOptionalAction, default=False
+    )
     parser.add_argument("--force", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--endpoint")
     parser.add_argument("--base-url")
     parser.add_argument("--system-prompt-file", default="prompts/system_prompt_ro.txt")
-    parser.add_argument("--user-template-file", default="prompts/user_prompt_template_ro.txt")
+    parser.add_argument(
+        "--user-template-file", default="prompts/user_prompt_template_ro.txt"
+    )
 
 
 def _add_step3_args(parser: argparse.ArgumentParser) -> None:
@@ -381,8 +455,12 @@ def _add_step3_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--output-csv", required=True)
     parser.add_argument("--outliers-csv", default="build/rarity/step3_outliers.csv")
     parser.add_argument("--base-csv", default="build/rarity/step1_words.csv")
-    parser.add_argument("--outlier-threshold", type=int, default=DEFAULT_OUTLIER_THRESHOLD)
-    parser.add_argument("--confidence-threshold", type=float, default=DEFAULT_CONFIDENCE_THRESHOLD)
+    parser.add_argument(
+        "--outlier-threshold", type=int, default=DEFAULT_OUTLIER_THRESHOLD
+    )
+    parser.add_argument(
+        "--confidence-threshold", type=float, default=DEFAULT_CONFIDENCE_THRESHOLD
+    )
     parser.add_argument("--merge-strategy", default="median")
 
 
@@ -403,11 +481,15 @@ def _add_step5_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--input-csv", required=True)
     parser.add_argument("--output-csv", required=True)
     parser.add_argument("--batch-size", type=int, default=DEFAULT_REBALANCE_BATCH_SIZE)
-    parser.add_argument("--lower-ratio", type=float, default=DEFAULT_REBALANCE_LOWER_RATIO)
+    parser.add_argument(
+        "--lower-ratio", type=float, default=DEFAULT_REBALANCE_LOWER_RATIO
+    )
     parser.add_argument("--max-retries", type=int, default=DEFAULT_MAX_RETRIES)
     parser.add_argument("--timeout-seconds", type=int, default=DEFAULT_TIMEOUT_SECONDS)
     parser.add_argument("--max-tokens", type=int, default=DEFAULT_MAX_TOKENS)
-    parser.add_argument("--skip-preflight", action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument(
+        "--skip-preflight", action=argparse.BooleanOptionalAction, default=False
+    )
     parser.add_argument("--endpoint")
     parser.add_argument("--base-url")
     parser.add_argument("--seed", type=int)
@@ -417,8 +499,12 @@ def _add_step5_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--to-level", type=int)
     parser.add_argument("--transitions", default=DEFAULT_REBALANCE_TRANSITIONS)
 
-    parser.add_argument("--system-prompt-file", default="prompts/rebalance_system_prompt_ro.txt")
-    parser.add_argument("--user-template-file", default="prompts/rebalance_user_prompt_template_ro.txt")
+    parser.add_argument(
+        "--system-prompt-file", default="prompts/rebalance_system_prompt_ro.txt"
+    )
+    parser.add_argument(
+        "--user-template-file", default="prompts/rebalance_user_prompt_template_ro.txt"
+    )
 
 
 def _resolve_step5_transitions(args) -> list[LevelTransition]:
@@ -428,10 +514,18 @@ def _resolve_step5_transitions(args) -> list[LevelTransition]:
 
     if from_level is not None or to_level is not None:
         if from_level is None or to_level is None:
-            raise ValueError("Step5 requires both --from-level and --to-level when one is provided")
+            raise ValueError(
+                "Step5 requires both --from-level and --to-level when one is provided"
+            )
         if from_level_high is not None:
             require_valid_pair_transition(from_level, from_level_high, to_level)
-            transitions = [LevelTransition(from_level=from_level, from_level_upper=from_level_high, to_level=to_level)]
+            transitions = [
+                LevelTransition(
+                    from_level=from_level,
+                    from_level_upper=from_level_high,
+                    to_level=to_level,
+                )
+            ]
         else:
             require_valid_transition(from_level, to_level)
             transitions = [LevelTransition(from_level=from_level, to_level=to_level)]

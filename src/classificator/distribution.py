@@ -6,7 +6,9 @@ class RarityDistribution:
         self._counts = [0, 0, 0, 0, 0, 0]
 
     @classmethod
-    def from_levels(cls, levels: list[int] | tuple[int, ...] | set[int]) -> "RarityDistribution":
+    def from_levels(
+        cls, levels: list[int] | tuple[int, ...] | set[int]
+    ) -> "RarityDistribution":
         d = cls()
         for level in levels:
             d.increment(level)
@@ -17,7 +19,11 @@ class RarityDistribution:
             self._counts[level] += 1
 
     def set_level(self, previous_level: int | None, new_level: int) -> None:
-        if previous_level is not None and 1 <= previous_level <= 5 and self._counts[previous_level] > 0:
+        if (
+            previous_level is not None
+            and 1 <= previous_level <= 5
+            and self._counts[previous_level] > 0
+        ):
             self._counts[previous_level] -= 1
         if 1 <= new_level <= 5:
             self._counts[new_level] += 1

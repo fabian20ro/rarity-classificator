@@ -78,7 +78,12 @@ OUTLIERS_CSV_HEADERS = [
     "reason",
 ]
 UPLOAD_REPORT_HEADERS = ["word_id", "previous_level", "new_level", "source"]
-UPLOAD_MARKER_HEADERS = ["uploaded_at", "uploaded_level", "upload_status", "upload_batch_id"]
+UPLOAD_MARKER_HEADERS = [
+    "uploaded_at",
+    "uploaded_level",
+    "upload_status",
+    "upload_batch_id",
+]
 
 
 def ensure_output_dir(root: Path | None = None) -> Path:

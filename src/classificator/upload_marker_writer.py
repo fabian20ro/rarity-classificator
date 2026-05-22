@@ -22,7 +22,9 @@ class UploadMarkerWriter:
         uploaded_at: str | None = None,
     ) -> UploadMarkerResult:
         if not status_by_word_id:
-            return UploadMarkerResult(marker_path=final_csv_path, used_companion_file=False, marked_rows=0)
+            return UploadMarkerResult(
+                marker_path=final_csv_path, used_companion_file=False, marked_rows=0
+            )
 
         uploaded_at = uploaded_at or datetime.now(timezone.utc).isoformat()
         try:
@@ -55,7 +57,9 @@ class UploadMarkerWriter:
         if "word_id" not in table.headers:
             raise ValueError(f"CSV {final_csv_path} missing word_id")
 
-        headers = table.headers + [h for h in UPLOAD_MARKER_HEADERS if h not in table.headers]
+        headers = table.headers + [
+            h for h in UPLOAD_MARKER_HEADERS if h not in table.headers
+        ]
         rows: list[list[str]] = []
         marked = 0
 
@@ -78,7 +82,9 @@ class UploadMarkerWriter:
             rows.append([row.get(h, "") for h in headers])
 
         self.repo.write_table_atomic(final_csv_path, headers, rows)
-        return UploadMarkerResult(marker_path=final_csv_path, used_companion_file=False, marked_rows=marked)
+        return UploadMarkerResult(
+            marker_path=final_csv_path, used_companion_file=False, marked_rows=marked
+        )
 
     def _write_companion(
         self,
@@ -89,16 +95,22 @@ class UploadMarkerWriter:
         upload_batch_id: str,
         uploaded_at: str,
     ) -> UploadMarkerResult:
-        companion = final_csv_path.with_name(f"{final_csv_path.name}.upload_markers.csv")
+        companion = final_csv_path.with_name(
+            f"{final_csv_path.name}.upload_markers.csv"
+        )
         headers = ["word_id", *UPLOAD_MARKER_HEADERS]
         rows = []
         for word_id, status in sorted(status_by_word_id.items()):
-            rows.append([
-                str(word_id),
-                uploaded_at,
-                str(uploaded_levels.get(word_id, "")),
-                status,
-                upload_batch_id,
-            ])
+            rows.append(
+                [
+                    str(word_id),
+                    uploaded_at,
+                    str(uploaded_levels.get(word_id, "")),
+                    status,
+                    upload_batch_id,
+                ]
+            )
         self.repo.write_rows(companion, headers, rows)
-        return UploadMarkerResult(marker_path=companion, used_companion_file=True, marked_rows=len(rows))
+        return UploadMarkerResult(
+            marker_path=companion, used_companion_file=True, marked_rows=len(rows)
+        )

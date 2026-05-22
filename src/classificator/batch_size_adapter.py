@@ -4,7 +4,9 @@ from collections import deque
 
 
 class BatchSizeAdapter:
-    def __init__(self, initial_size: int, min_size: int = 3, window_size: int = 10) -> None:
+    def __init__(
+        self, initial_size: int, min_size: int = 3, window_size: int = 10
+    ) -> None:
         if initial_size < min_size:
             raise ValueError("initial_size must be >= min_size")
         if min_size < 1:
