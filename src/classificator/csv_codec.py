@@ -24,6 +24,7 @@ class CsvTable:
 
 class CsvCodec:
     def read_table(self, path: Path) -> CsvTable:
+        """Reads a CSV file and returns a CsvTable. The first row is treated as headers."""
         if not path.exists():
             raise FileNotFoundError(f"CSV file not found: {path}")
 
