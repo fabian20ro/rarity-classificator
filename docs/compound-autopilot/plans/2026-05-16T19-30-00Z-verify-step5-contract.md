@@ -18,7 +18,7 @@
     - The test should generate a dummy input CSV with valid levels.
     - Run `classificator step5-rebalance` (mocked or minimal).
     - Check output for presence of any `0` in `local_id`.
-    - Status: `pending`.
+    - Status: `completed`.
 
 **Expected Files:**
 - `tests/test_step5_contract.py`
