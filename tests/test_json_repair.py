@@ -11,3 +11,6 @@ def test_preserves_comma_before_non_space_character():
 
 def test_closes_unclosed_object_and_array():
     assert repair('[{"id": 1') == '[{"id": 1}]'
+
+def test_fix_trailing_decimal_point():
+    assert repair('{"val": 1.}') == '{"val": 1.0}'
