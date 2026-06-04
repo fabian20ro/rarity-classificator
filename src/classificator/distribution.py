@@ -23,6 +23,8 @@ class RarityDistribution:
             self._counts[new_level] += 1
 
     def count(self, level: int) -> int:
+        if not (1 <= level <= 5):
+            raise ValueError(f"Level must be in range 1..5, got {level}")
         return self._counts[level]
 
     def format(self) -> str:
