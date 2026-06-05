@@ -2,6 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from classificator.distribution import RarityDistribution
 from classificator.run_csv_repository import RunCsvRepository
 from classificator.tools.rarity_distribution import run_rarity_distribution
 
@@ -54,6 +55,32 @@ class RarityDistributionTest(unittest.TestCase):
             )
             with self.assertRaises(ValueError):
                 run_rarity_distribution(csv_path=path, repo=self.repo)
+
+    def test_count_validates_level_range(self):
+        dist = RarityDistribution.from_levels([1, 2, 3])
+        self.assertEqual(dist.count(1), 1)
+        with self.assertRaises(ValueError):
+            dist.count(0)
+        with self.assertRaises(ValueError):
+            dist.count(6)
+
+    def test_count_returns_zero_for_unincremented_level(self):
+        dist = RarityDistribution.from_levels([1, 1])
+        self.assertEqual(dist.count(2), 0)
+
+    def test_total_returns_sum_of_counts(self):
+        dist = RarityDistribution.from_levels([1, 2, 3, 3, 5])
+        self.assertEqual(dist.total, 5)
+
+    def test_total_is_zero_for_empty_distribution(self):
+        dist = RarityDistribution()
+        self.assertEqual(dist.total, 0)
+
+    def test_format_uses_total_property(self):
+        dist = RarityDistribution.from_levels([1, 1])
+        formatted = dist.format()
+        self.assertIn("1:2", formatted)
+        self.assertIn("100.0%", formatted)
 
 
 if __name__ == "__main__":

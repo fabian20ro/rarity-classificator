@@ -23,10 +23,16 @@ class RarityDistribution:
             self._counts[new_level] += 1
 
     def count(self, level: int) -> int:
+        if not (1 <= level <= 5):
+            raise ValueError(f"Level must be in range 1..5, got {level}")
         return self._counts[level]
 
+    @property
+    def total(self) -> int:
+        return sum(self._counts[1:6])
+
     def format(self) -> str:
-        total = sum(self._counts[1:6])
+        total = self.total
         parts = []
         for level in range(1, 6):
             count = self._counts[level]
