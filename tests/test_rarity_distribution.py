@@ -68,6 +68,20 @@ class RarityDistributionTest(unittest.TestCase):
         dist = RarityDistribution.from_levels([1, 1])
         self.assertEqual(dist.count(2), 0)
 
+    def test_total_returns_sum_of_counts(self):
+        dist = RarityDistribution.from_levels([1, 2, 3, 3, 5])
+        self.assertEqual(dist.total, 5)
+
+    def test_total_is_zero_for_empty_distribution(self):
+        dist = RarityDistribution()
+        self.assertEqual(dist.total, 0)
+
+    def test_format_uses_total_property(self):
+        dist = RarityDistribution.from_levels([1, 1])
+        formatted = dist.format()
+        self.assertIn("1:2", formatted)
+        self.assertIn("100.0%", formatted)
+
 
 if __name__ == "__main__":
     unittest.main()
