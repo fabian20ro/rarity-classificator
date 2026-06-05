@@ -82,6 +82,35 @@ class RarityDistributionTest(unittest.TestCase):
         self.assertIn("1:2", formatted)
         self.assertIn("100.0%", formatted)
 
+    def test_set_level_moves_count_between_levels(self):
+        dist = RarityDistribution.from_levels([1, 2, 3])
+        self.assertEqual(dist.count(1), 1)
+        self.assertEqual(dist.count(3), 1)
+        dist.set_level(previous_level=2, new_level=4)
+        self.assertEqual(dist.count(1), 1)
+        self.assertEqual(dist.count(2), 0)
+        self.assertEqual(dist.count(3), 1)
+        self.assertEqual(dist.count(4), 1)
+
+    def test_set_level_with_none_previous_only_increments(self):
+        dist = RarityDistribution()
+        dist.set_level(previous_level=None, new_level=3)
+        self.assertEqual(dist.count(3), 1)
+        self.assertEqual(dist.total, 1)
+
+    def test_set_level_preserves_total(self):
+        dist = RarityDistribution.from_levels([1, 2, 3, 4, 5])
+        before_total = dist.total
+        dist.set_level(previous_level=2, new_level=4)
+        self.assertEqual(dist.total, before_total)
+
+    def test_set_level_with_invalid_previous_is_noop_on_decrement(self):
+        dist = RarityDistribution.from_levels([1, 2])
+        self.assertEqual(dist.count(2), 1)
+        dist.set_level(previous_level=0, new_level=3)
+        self.assertEqual(dist.count(2), 1)
+        self.assertEqual(dist.count(3), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
