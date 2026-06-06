@@ -1,6 +1,6 @@
 import unittest
 
-from classificator.models import Step3MergeStrategy, UploadMode
+from classificator.models import Step3MergeStrategy, UploadMode, LmModelConfig
 
 
 class ModelsTest(unittest.TestCase):
@@ -27,6 +27,12 @@ class ModelsTest(unittest.TestCase):
     def test_step3_merge_strategy_parse_rejects_unknown_value(self):
         with self.assertRaises(ValueError):
             Step3MergeStrategy.parse("unexpected")
+
+    def test_lm_model_config_reasoning_controls(self):
+        assert LmModelConfig(model_id="test", reasoning_effort="high").has_reasoning_controls() is True
+        assert LmModelConfig(model_id="test", enable_thinking=True).has_reasoning_controls() is True
+        assert LmModelConfig(model_id="test", thinking_type="enabled").has_reasoning_controls() is True
+        assert LmModelConfig(model_id="test").has_reasoning_controls() is False
 
 
 if __name__ == "__main__":
