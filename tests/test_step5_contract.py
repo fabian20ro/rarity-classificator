@@ -48,7 +48,7 @@ class TestStep5Contract(unittest.TestCase):
         
         mock_records = [
             CsvRecord(line_number=2, values=["1", "apple", "fruit", "1"]),
-            CsvRecord(line_number=3, values=["2", "banana", "fruit", "2"]),
+            CsvRecord(line_number=3, values=["2", "banana", "fruit", "2"]), 
             CsvRecord(line_number=4, values=["3", "carrot", "veg", "1"]),
         ]
         mock_table = MockTable(
@@ -56,7 +56,7 @@ class TestStep5Contract(unittest.TestCase):
             records=mock_records
         )
         mock_repo.read_table.return_value = mock_table
-
+ 
         def write_table_atomic(path, headers, rows):
             with open(path, 'w', newline='') as f:
                 writer = csv.writer(f)
@@ -64,20 +64,27 @@ class TestStep5Contract(unittest.TestCase):
                 for row in rows:
                     writer.writerow(row)
         mock_repo.write_table_atomic.side_effect = write_table_atomic
-
+ 
         mock_lm = MagicMock()
         mock_lm.resolve_endpoint.return_value = MagicMock(endpoint="http://localhost", flavor=MagicMock(), source=MagicMock())
         mock_lm.score_batch_resilient.return_value = []
-
+ 
         run_step5(self.options, repo=mock_repo, lm_client=mock_lm, output_dir=self.test_dir)
-
+ 
         self.assertTrue(self.output_csv.exists())
         with open(self.output_csv, 'r') as f:
             reader = csv.DictReader(f)
             for row in reader:
                 self.assertNotEqual(row["word_id"], "0", f"Found word_id 0 in output CSV: {row}")
-    def test_rebalance_preserves_all_ids(self):
-        # Add more rows to input
+
+    def test_transition_overlap_error(self):
+        from classificator.transitions import LevelTransition, validate_transition_set
+        t1 = LevelTransition(from_level=1, to_level=2)
+        t2 = LevelTransition(from_level=1, to_level=1)
+        with self.assertRaises(ValueError) as cm:
+            validate_transition_set([t1, t2])
+        self.assertIn("Transitions must not overlap source levels", str(cm.exception))
+
         with open(self.input_csv, 'a', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(["4", "date", "format-err", "1"])
