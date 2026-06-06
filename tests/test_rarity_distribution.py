@@ -104,12 +104,10 @@ class RarityDistributionTest(unittest.TestCase):
         dist.set_level(previous_level=2, new_level=4)
         self.assertEqual(dist.total, before_total)
 
-    def test_set_level_with_invalid_previous_is_noop_on_decrement(self):
-        dist = RarityDistribution.from_levels([1, 2])
-        self.assertEqual(dist.count(2), 1)
-        dist.set_level(previous_level=0, new_level=3)
-        self.assertEqual(dist.count(2), 1)
-        self.assertEqual(dist.count(3), 1)
+    def test_set_level_invalid_new_level_raises(self):
+        dist = RarityDistribution.from_levels([1, 2, 3])
+        with self.assertRaises(ValueError):
+            dist.set_level(previous_level=1, new_level=6)
 
 
 if __name__ == "__main__":
