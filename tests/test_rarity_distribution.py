@@ -56,6 +56,18 @@ class RarityDistributionTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 run_rarity_distribution(csv_path=path, repo=self.repo)
 
+    def test_run_rarity_distribution_invalid_level_raises_high(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "bad.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "rarity_level"],
+                [["1", "om", "6"]],
+            )
+            with self.assertRaises(ValueError):
+                run_rarity_distribution(csv_path=path, repo=self.repo)
+
     def test_count_validates_level_range(self):
         dist = RarityDistribution.from_levels([1, 2, 3])
         self.assertEqual(dist.count(1), 1)
@@ -109,6 +121,18 @@ class RarityDistributionTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             dist.set_level(previous_level=1, new_level=6)
 
+    def test_invalid_row_raises(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "bad.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "rarity_level"],
+                [["1", "om", "1"], ["2", "casă", ""], ["3", "rar", "5"]],
+            )
+            with self.assertRaises(ValueError) as cm:
+                run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertIn("Invalid rarity_level '' at row 3", str(cm.exception))
 
 if __name__ == "__main__":
     unittest.main()
