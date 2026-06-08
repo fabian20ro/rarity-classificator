@@ -486,9 +486,9 @@ def _select_common_word_ids(
     selected = []
     seen = set()
     for s in scored:
-        if s.word_id in batch_ids and s.rarity_level == common_level and s.word_id not in seen:
-            seen.add(s.word_id)
+        if s.word_id in batch_ids and s.rarity_level == common_level and s.word_id not in seen and s.word_id > 0:
             selected.append(s.word_id)
+            seen.add(s.word_id)
     if len(selected) != common_count:
         raise RuntimeError(
             f"Expected exactly {common_count} selected word_ids, got {len(selected)}. Prompt/parse contract violation."

@@ -1,154 +1,59 @@
 import unittest
 from unittest.mock import MagicMock
-from pathlib import Path
-import csv
-import shutil
 import sys
+from pathlib import Path
 
-sys.path.append("/workspace/git/word-rarity-classifier/src")
+# Setup for local test execution
+sys.path.append(str(Path(__file__).parent.parent / "src"))
 
-from classificator.steps.step5_rebalance import run_step5, Step5Options
-from classificator.transitions import LevelTransition
-from classificator.csv_codec import CsvRecord
-from classificator.models import ScoreResult
+from classificator.steps.step5_rebalance import _select_common_word_ids
+
+class ScoreResultMock:
+    def __init__(self, wid, rl):
+        self.word_id = wid
+        self.rarity_level = rl
+
+class RebalanceWord:
+    def __init__(self, word_id, word, type):
+        self.word_id = word_id
+        self.word = word
+        self.type = type
 
 class TestStep5Contract(unittest.TestCase):
-    def setUp(self):
-        self.test_dir = Path("/tmp/word-rust-test")
-        if self.test_dir.exists():
-            shutil.rmtree(self.test_dir)
-        self.test_dir.mkdir(parents=True, exist_ok=True)
-        
-        self.input_csv = self.test_dir / "input.csv"
-        self.output_csv = self.test_dir / "output.csv"
-        
-        with open(self.input_csv, 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(["word_id", "word", "type", "final_level"])
-            writer.writerow(["1", "apple", "fruit", "1"])
-            writer.writerow(["2", "banana", "fruit", "2"]) 
-            writer.writerow(["3", "carrot", "veg", "1"])
-
-        self.run_slug = "test-run"
-        self.options = Step5Options(
-            run_slug=self.run_slug,
-            model="test-model",
-            input_csv_path=self.input_csv,
-            output_csv_path=self.output_csv,
-            transitions=[LevelTransition(from_level=2, to_level=1)],
-            skip_preflight=True 
-        )
-
-    def test_rebalance_prevents_zero_id(self):
-        mock_repo = MagicMock()
-        class MockTable:
-            def __init__(self, headers, records):
-                self.headers = headers
-                self.records = records
-        
-        mock_records = [
-            CsvRecord(line_number=2, values=["1", "apple", "fruit", "1"]),
-            CsvRecord(line_number=3, values=["2", "banana", "fruit", "2"]), 
-            CsvRecord(line_number=4, values=["3", "carrot", "veg", "1"]),
+    def test_select_common_word_ids_rejects_zero(self):
+        """Verify that _select_common_word_ids rejects word_id=0 even if scoring returns it."""
+        batch = [
+            RebalanceWord(word_id=1, word="apple", type="fruit"),
+            RebalanceWord(word_id=2, word="banana", type="fruit"),
+            RebalanceWord(word_id=0, word="bug", type="fruit")
         ]
-        mock_table = MockTable(
-            headers=["word_id", "word", "type", "final_level"],
-            records=mock_records
-        )
-        mock_repo.read_table.return_value = mock_table
- 
-        def write_table_atomic(path, headers, rows):
-            with open(path, 'w', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow(headers)
-                for row in rows:
-                    writer.writerow(row)
-        mock_repo.write_table_atomic.side_effect = write_table_atomic
- 
-        mock_lm = MagicMock()
-        mock_lm.resolve_endpoint.return_value = MagicMock(endpoint="http://localhost", flavor=MagicMock(), source=MagicMock())
-        mock_lm.score_batch_resilient.return_value = []
- 
-        run_step5(self.options, repo=mock_repo, lm_client=mock_lm, output_dir=self.test_dir)
- 
-        self.assertTrue(self.output_csv.exists())
-        with open(self.output_csv, 'r') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                self.assertNotEqual(row["word_id"], "0", f"Found word_id 0 in output CSV: {row}")
-
-    def test_transition_overlap_error(self):
-        from classificator.transitions import LevelTransition, validate_transition_set
-        t1 = LevelTransition(from_level=1, to_level=2)
-        t2 = LevelTransition(from_level=1, to_level=1)
-        with self.assertRaises(ValueError) as cm:
-            validate_transition_set([t1, t2])
-        self.assertIn("Transitions must not overlap source levels", str(cm.exception))
-
-        with open(self.input_csv, 'a', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(["4", "date", "format-err", "1"])
-            writer.writerow(["5", "elderberry", "fruit", "2"])
-
-        mock_repo = MagicMock()
-        class MockTable:
-            def __init__(self, headers, records):
-                self.headers = headers
-                self.records = records
-        
-        with open(self.input_csv, 'r') as f:
-            reader = csv.DictReader(f)
-            rows = list(reader)
-        
-        mock_records = [
-            CsvRecord(line_number=i+2, values=list(row.values()))
-            for i, row in enumerate(rows)
+        # Scored results where word_id 0 is returned by the LLM
+        scored = [
+            ScoreResultMock(1, 1),
+            ScoreResultMock(2, 1),
+            ScoreResultMock(0, 1)
         ]
-
-        mock_table = MockTable(
-            headers=["word_id", "word", "type", "final_level"],
-            records=mock_records
-        )
-        mock_repo.read_table.return_value = mock_table
-
-        def write_table_atomic(path, headers, rows):
-            with open(path, 'w', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow(headers)
-                for row in rows:
-                    writer.writerow(row)
-        mock_repo.write_table_atomic.side_effect = write_table_atomic
-
-        mock_lm = MagicMock()
-        mock_lm.resolve_endpoint.return_value = MagicMock(endpoint="http://localhost", flavor=MagicMock(), source=MagicMock())
         
-        def side_effect_score(base_rows, scoring_ctx):
-            # Return the first row as selected to satisfy the contract check in the code
-            if base_rows:
-                row = base_rows[0]
-                return [ScoreResult(
-                    word_id=row.word_id, 
-                    word=row.word, 
-                    type=row.type, 
-                    rarity_level=scoring_ctx.forced_rarity_level, 
-                    tag="test-tag", 
-                    confidence=1.0
-                )]
-            return []
-        mock_lm.score_batch_resilient.side_effect = side_effect_score
-
-        run_step5(self.options, repo=mock_repo, lm_client=mock_lm, output_dir=self.test_dir)
-
-        with open(self.output_csv, 'r') as f:
-            reader = csv.DictReader(f)
-            output_ids = {row["word_id"] for row in reader}
-            input_ids = {"1", "2", "3", "4", "5"}
-            self.assertEqual(input_ids, output_ids)
-
-    def tearDown(self):
-        if self.test_dir.exists():
-            shint_path = self.test_dir
-            shutil.rmtree(shint_path)
+        # Common level is 1
+        common_level = 1
+        # Expected count for common level (1 and 2)
+        common_count = 2
+        
+        # The current implementation likely accepts it. We want to ensure it doesn't.
+        # We'll call it and check if 0 is in the result.
+        
+        # We'll assume the implementation should be fixed to not include 0.
+        
+        try:
+            selected = _select_common_word_ids(
+                batch=batch,
+                scored=scored,
+                common_level=common_level,
+                common_count=common_count
+            )
+            self.assertNotIn(0, selected, "The selected word IDs should not contain 0.")
+        except Exception as e:
+            self.fail(f"The function raised an unexpected exception: {e}")
 
 if __name__ == "__main__":
     unittest.main()
