@@ -1,12 +1,11 @@
 import pytest
 from unittest.mock import MagicMock
 import csv
-from pathlib import Path
-from src.classificator.steps.step5_rebalance import run_step5, Step5Options
-from src.classificator.run_csv_repository import RunCsvRepository
-from src.classificator.lm.client import LmStudioClient, ScoringContext
-from src.classificator.models import ResolvedEndpoint, LmApiFlavor, ScoringOutputMode
-from src.classificator.transitions import LevelTransition
+from classificator.steps.step5_rebalance import run_step5, Step5Options
+from classificator.run_csv_repository import RunCsvRepository
+from classificator.lm.client import LmStudioClient, ScoringContext
+from classificator.models import ResolvedEndpoint, LmApiFlavor, ScoringOutputMode
+from classificator.transitions import LevelTransition
 
 def test_step5_contract_no_zero_level(tmp_path):
     # Setup input CSV with a 0 level

@@ -1,5 +1,5 @@
 import unittest
-from src.classificator.distribution import RarityDistribution
+from classificator.distribution import RarityDistribution
 
 class TestRarityDistributionEdgeCases(unittest.TestCase):
     def test_invalid_increment_levels(self):
