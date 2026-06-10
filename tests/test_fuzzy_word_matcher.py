@@ -1,5 +1,5 @@
 import pytest
-from src.classificator.fuzzy_word_matcher import normalize, matches, levenshtein, MAX_EDIT_DISTANCE
+from classificator.fuzzy_word_matcher import normalize, matches, levenshtein, MAX_EDIT_DISTANCE
 
 def test_normalize():
     assert normalize("ăn") == "an"
