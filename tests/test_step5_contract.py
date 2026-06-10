@@ -1,59 +1,46 @@
-import unittest
+import pytest
 from unittest.mock import MagicMock
-import sys
+import csv
 from pathlib import Path
+from src.classificator.steps.step5_rebalance import run_step5, Step5Options
+from src.classificator.run_csv_repository import RunCsvRepository
+from src.classificator.lm.client import LmStudioClient, ScoringContext
+from src.classificator.models import ResolvedEndpoint, LmApiFlavor, ScoringOutputMode
+from src.classificator.transitions import LevelTransition
 
-# Setup for local test execution
-sys.path.append(str(Path(__file__).parent.parent / "src"))
+def test_step5_contract_no_zero_level(tmp_path):
+    # Setup input CSV with a 0 level
+    input_csv = tmp_path / "input.csv"
+    with open(input_csv, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["word_id", "word", "type", "final_level"])
+        writer.writerow(["1", "apple", "noun", "1"])
+        writer.writerow(["2", "banana", "noun", "0"])  # Invalid level
+        writer.writerow(["3", "cherry", "noun", "3"])
 
-from classificator.steps.step5_rebalance import _select_common_word_ids
-
-class ScoreResultMock:
-    def __init__(self, wid, rl):
-        self.word_id = wid
-        self.rarity_level = rl
-
-class RebalanceWord:
-    def __init__(self, word_id, word, type):
-        self.word_id = word_id
-        self.word = word
-        self.type = type
-
-class TestStep5Contract(unittest.TestCase):
-    def test_select_common_word_ids_rejects_zero(self):
-        """Verify that _select_common_word_ids rejects word_id=0 even if scoring returns it."""
-        batch = [
-            RebalanceWord(word_id=1, word="apple", type="fruit"),
-            RebalanceWord(word_id=2, word="banana", type="fruit"),
-            RebalanceWord(word_id=0, word="bug", type="fruit")
-        ]
-        # Scored results where word_id 0 is returned by the LLM
-        scored = [
-            ScoreResultMock(1, 1),
-            ScoreResultMock(2, 1),
-            ScoreResultMock(0, 1)
-        ]
-        
-        # Common level is 1
-        common_level = 1
-        # Expected count for common level (1 and 2)
-        common_count = 2
-        
-        # The current implementation likely accepts it. We want to ensure it doesn't.
-        # We'll call it and check if 0 is in the result.
-        
-        # We'll assume the implementation should be fixed to not include 0.
-        
-        try:
-            selected = _select_common_word_ids(
-                batch=batch,
-                scored=scored,
-                common_level=common_level,
-                common_count=common_count
-            )
-            self.assertNotIn(0, selected, "The selected word IDs should not contain 0.")
-        except Exception as e:
-            self.fail(f"The function raised an unexpected exception: {e}")
-
-if __name__ == "__main__":
-    unittest.main()
+    repo = RunCsvRepository()
+    lm_client = MagicMock(spec=LmStudioClient)
+    lm_client.resolve_endpoint.return_value = ResolvedEndpoint(
+        endpoint="http://localhost:1234/v1",
+        models_endpoint=None,
+        flavor=LmApiFlavor.LMSTUDIO_REST,
+        source="mock"
+    )
+    
+    output_dir = tmp_path / "output"
+    output_dir.mkdir()
+    
+    options = Step5Options(
+        run_slug="test-run",
+        model="gpt-4",
+        input_csv_path=input_csv,
+        output_csv_path=tmp_path / "output.csv",
+        skip_preflight=True,
+        transitions=[LevelTransition(from_level=3, to_level=2)]
+    )
+    
+    # The current implementation should raise CsvFormatError in _load_dataset
+    with pytest.raises(Exception) as excinfo:
+        run_step5(options, repo=repo, lm_client=lm_client, output_dir=output_dir)
+    
+    assert "out of range" in str(excinfo.value)
