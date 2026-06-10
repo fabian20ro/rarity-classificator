@@ -1,5 +1,6 @@
 import json
 import unittest
+from pathlib import Path
 
 from classificator.lm.request_builder import (
     JsonSchemaKind,
@@ -101,6 +102,23 @@ class RequestBuilderTest(unittest.TestCase):
                 schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
             )
 
+    def test_max_tokens_cap_respected(self):
+        config = LmModelConfig(model_id="test-model", max_tokens_cap=50)
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=config,
+                max_tokens=512,
+                expected_items=1,
+                schema_kind=JsonSchemaKind.SCORE_RESULTS,
+            )
+        )
+        self.assertEqual(payload["max_tokens"], 50)
 
 if __name__ == "__main__":
     unittest.main()
