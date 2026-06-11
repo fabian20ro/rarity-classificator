@@ -100,6 +100,19 @@ class ResponseParserTest(unittest.TestCase):
                 expected_items=1,
             )
 
+    def test_selected_word_ids_with_markdown_code_blocks(self):
+        body = self._wrap_content("Here is the result: ```json\n[1, 2]\n```")
+        parsed = self.parser.parse(
+            batch=self.batch,
+            response_body=body,
+            output_mode=ScoringOutputMode.SELECTED_WORD_IDS,
+            forced_rarity_level=1,
+            expected_items=2,
+        )
+        self.assertEqual(len(parsed.scores), 2)
+        self.assertEqual(parsed.scores[0].word_id, 101)
+        self.assertEqual(parsed.scores[1].word_id, 102)
+
     def test_selected_word_ids_rejects_duplicate_local_ids_across_shapes(self):
         body = self._wrap_content('[1, {"local_id": 1, "word": "om"}]')
         with self.assertRaises(RuntimeError):

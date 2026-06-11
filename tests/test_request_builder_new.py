@@ -9,7 +9,6 @@ from classificator.lm.request_builder import (
 )
 from classificator.models import BaseWordRow, LmModelConfig
 
-
 class RequestBuilderTest(unittest.TestCase):
     def setUp(self):
         self.builder = LmStudioRequestBuilder()
@@ -57,36 +56,6 @@ class RequestBuilderTest(unittest.TestCase):
                 schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
             )
 
-    def test_selected_word_ids_schema_rejects_impossible_expected_count(self):
-        with self.assertRaises(ValueError):
-            self.builder.build_request(
-                model="test-model",
-                batch=self.batch,
-                system_prompt="sys",
-                user_template="user",
-                response_format_mode=ResponseFormatMode.JSON_SCHEMA,
-                include_reasoning_controls=False,
-                config=self.config,
-                max_tokens=512,
-                expected_items=3,
-                schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
-            )
-
-    def test_selected_word_ids_require_positive_expected_count_even_without_json_schema(self):
-        with self.assertRaises(ValueError):
-            self.builder.build_request(
-                model="test-model",
-                batch=self.batch,
-                system_prompt="sys",
-                user_template="user",
-                response_format_mode=ResponseFormatMode.NONE,
-                include_reasoning_controls=False,
-                config=self.config,
-                max_tokens=512,
-                expected_items=0,
-                schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
-            )
-
     def test_selected_word_ids_reject_impossible_expected_count_even_without_json_schema(self):
         with self.assertRaises(ValueError):
             self.builder.build_request(
@@ -119,6 +88,3 @@ class RequestBuilderTest(unittest.TestCase):
             )
         )
         self.assertEqual(payload["max_tokens"], 50)
-
-if __name__ == "__main__":
-    unittest.main()

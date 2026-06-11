@@ -28,10 +28,26 @@ class TransitionsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_transition_set(transitions)
 
-    def test_valid_transition_guards(self):
+    def test_require_valid_transition_edge_cases(self):
+        # Valid
         require_valid_transition(3, 2)
         require_valid_transition(2, 2)
         require_valid_pair_transition(2, 3, 2)
+        require_valid_pair_transition(2, 3, 3)
+        
+        # Invalid range
+        with self.assertRaises(ValueError):
+            require_valid_transition(0, 1)
+        with self.assertRaises(ValueError):
+            require_valid_transition(6, 5)
+            
+        # Invalid relation
+        with self.assertRaises(ValueError):
+            require_valid_transition(1, 3)
+            
+        # 5:5 forbidden
+        with self.assertRaises(ValueError):
+            require_valid_transition(5, 5)
 
 
 if __name__ == "__main__":
