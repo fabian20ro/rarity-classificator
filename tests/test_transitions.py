@@ -1,5 +1,4 @@
 import unittest
-
 from classificator.transitions import (
     LevelTransition,
     parse_transitions,
@@ -44,11 +43,20 @@ class TransitionsTest(unittest.TestCase):
         # Invalid relation
         with self.assertRaises(ValueError):
             require_valid_transition(1, 3)
+        with self.assertRaises(ValueError):
+            require_valid_transition(2, 3)
             
         # 5:5 forbidden
         with self.assertRaises(ValueError):
             require_valid_transition(5, 5)
-
+            
+    def test_parse_transitions_invalid_format(self):
+        with self.assertRaises(ValueError):
+            parse_transitions("2-1") # missing :
+        with self.assertRaises(ValueError):
+            parse_transitions("2:3") # invalid relation (upgrade)
+        with self.assertRaises(ValueError):
+            parse_transitions("5:5") # 5:5 forbidden
 
 if __name__ == "__main__":
     unittest.main()
