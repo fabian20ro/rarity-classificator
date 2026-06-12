@@ -335,9 +335,11 @@ class LmStudioResponseParser:
 def _to_int(value: object) -> int | None:
     if isinstance(value, int):
         return value
+    if isinstance(value, float):
+        return int(value)
     if isinstance(value, str):
         try:
-            return int(value)
+            return int(float(value))
         except Exception:
             return None
     return None
