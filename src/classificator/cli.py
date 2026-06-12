@@ -142,6 +142,7 @@ def main(argv: list[str] | None = None) -> int:
                 transitions=transitions,
                 system_prompt=Path(args.system_prompt_file).read_text(encoding="utf-8").strip(),
                 user_template=Path(args.user_template_file).read_text(encoding="utf-8").strip(),
+                dry_run=args.dry_run,
             ),
             repo=repo,
             lm_client=lm_client,
@@ -419,6 +420,7 @@ def _add_step5_args(parser: argparse.ArgumentParser) -> None:
 
     parser.add_argument("--system-prompt-file", default="prompts/rebalance_system_prompt_ro.txt")
     parser.add_argument("--user-template-file", default="prompts/rebalance_user_prompt_template_ro.txt")
+    parser.add_argument("--dry-run", action="store_true", help="Simulate the run without writing the output CSV")
 
 
 def _resolve_step5_transitions(args) -> list[LevelTransition]:
