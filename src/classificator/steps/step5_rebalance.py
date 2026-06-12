@@ -43,6 +43,7 @@ class Step5Options:
     transitions: list[LevelTransition] | None = None
     system_prompt: str = ""
     user_template: str = ""
+    dry_run: bool = False
 
 
 @dataclass(frozen=True)
@@ -149,7 +150,10 @@ def run_step5(options: Step5Options, *, repo: RunCsvRepository, lm_client: LmStu
         )
         summaries.append(summary)
 
-    _write_output(dataset, runtime, options, repo)
+    if not options.dry_run:
+        _write_output(dataset, runtime, options, repo)
+    else:
+        print(f"Dry-run mode: Skipping writing output to {options.output_csv_path}")
 
     total_switched = sum(s.switched_count for s in summaries)
     for s in summaries:
