@@ -1,101 +1,100 @@
-import unittest
-import csv
-import os
-from pathlib import Path
-from unittest.mock import MagicMock
 import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
-# Ensure src is in the path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
-
-from classificator.steps.step5_rebalance import run_step5, Step5Options
+import unittest
+from unittest.mock import MagicMock
+from dataclasses import dataclass
+from classificator.steps.step5_rebalance import (
+    run_step5, Step5Options, LevelTransition
+)
+from classificator.models import ScoreResult, LmApiFlavor
+from classificator.lm.client import LmStudioClient
 from classificator.run_csv_repository import RunCsvRepository
-from classificator.lm.client import LmStudioClient, ResolvedEndpoint, ScoringContext
-from classificator.transitions import LevelTransition
-from classificator.csv_codec import CsvRecord, CsvTable
 
 class TestStep5Contract(unittest.TestCase):
-    def setUp(self: None):
-        self.test_dir = Path("/tmp/test_word_rarity_classifier")
-        if self.test_dir.exists():
-            import shutil
-            shutil.rmtree(self.test_dir)
-        self.test_dir.mkdir(parents=True)
+    def setUp(self: "TestStep5Contract"):
+        self.run_slug = "test-contract"
+        self.base_dir = Path(__file__).parent.parent.parent / "test_tmp"
+        self.input_csv = self.base_dir / "test_input.csv"
+        self.output_csv = self.base_dir / "test_output.csv"
+        self.output_dir = self.base_dir / "test_output_dir"
+        self.base_dir.mkdir(parents=True, exist_ok=True)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         
-        self.input_csv = self.test_dir / "input.csv"
-        self.output_csv = self.test_dir / "output_actual.csv"
-        self.logs_dir = self.test_dir / "logs"
-        self.logs_dir.mkdir()
+        # Create dummy input CSV
+        with open(self.input_csv, "w") as f:
+            f.write("word_id,word,type,rarity_level\n")
+            f.write("1,apple,noun,1\n")
+            f.write("2,banana,noun,1\n")
+            f.write("3,cherry,noun,1\n")
 
-        # Prepare dummy input
-        with open(self.input_csv, 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['word_id', 'word', 'type', 'final_level'])
-            writer.writerow(['1', 'apple', 'fruit', '2'])
-            writer.writerow(['2', 'banana', 'fruit', '2'])
-            writer.writerow(['3', 'carrot', 'veg', '1'])
-
-        # Mocking dependencies
-        self.mock_repo = MagicMock(spec=RunCsvRepository)
-        
-        # Create actual CsvRecord objects to avoid mock issues
-        records = [
-            CsvRecord(line_number=2, values=['1', 'apple', 'fruit', '2']),
-            CsvRecord(line_number=3, values=['2', 'banana', 'fruit', '2']),
-            CsvRecord(line_number=4, values=['3', 'carrot', 'veg', '1']),
-        ]
-        mock_table = CsvTable(headers=['word_id', 'word', 'type', 'final_level'], records=records)
-        self.mock_repo.read_table.return_value = mock_table
-        
-        def side_effect_write_table_atomic(path, headers, rows):
-            target_path = path if isinstance(path, Path) else self.test_dir / "output_actual.csv"
-            with open(target_path, 'w', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow(headers)
-                for row in rows:
-                    writer.writerow(row)
-        self.mock_repo.write_table_atomic.side_effect = side_effect_write_table_atomic
-
-        self.mock_lm = MagicMock(spec=LmStudioClient)
-        
-        # Fix the flavor mock
-        mock_flavor = MagicMock()
-        mock_flavor.value = "test"
-        
-        self.mock_lm.resolve_endpoint.return_value = MagicMock(
-            endpoint="http://localhost:1234", 
-            flavor=mock_flavor, 
-            source="mock"
+        self.lm_client = MagicMock(spec=LmStudioClient)
+        self.lm_client.resolve_endpoint.return_value = MagicMock(
+            endpoint="http://localhost:1234",
+            flavor=LmApiFlavor.LMSTUDIO_REST
         )
         
-        self.mock_lm.score_batch_resilient.return_value = [
-            MagicMock(word_id=1, rarity_level=2),
-            MagicMock(word_id=2, rarity_level=2),
-            MagicMock(word_id=3, rarity_level=1),
+        self.repo = MagicMock(spec=RunCsvRepository)
+        
+        class MockTable:
+            headers = ["word_id", "word", "type", "rarity_level"]
+            def __init__(self, records):
+                self.records = records
+            def get(self, name):
+                return None
+        
+        self.mock_records = [
+            {"word_id": 1, "word": "apple", "type": "noun", "rarity_level": 1},
+            {"word_id": 2, "word": "banana", "type": "noun", "rarity_level": 1},
+            {"word_id": 3, "word": "cherry", "type": "noun", "rarity_level": 1},
         ]
+        self.repo.read_table.return_value = MockTable(self.mock_records)
 
-    def test_no_zero_local_ids(self):
-        options = Step5Options(
-            run_slug="test-contract",
+        def mock_write_table_atomic(path, headers, rows):
+            with open(path, "w") as f:
+                f.write(",".join(headers) + "\n")
+                for row in rows:
+                    f.write(",".join(map(str, row)) + "\n")
+        
+        self.repo.write_table_atomic.side_effect = mock_write_table_atomic
+        
+        # Mock transitions (all mapping 1 -> 1 for simplicity)
+        transition = LevelTransition(from_level=1, to_level=1)
+        self.options = Step5Options(
+            run_slug=self.run_slug,
             model="test-model",
             input_csv_path=self.input_csv,
             output_csv_path=self.output_csv,
-            transitions=[LevelTransition(from_level=1, to_level=2)],
-            skip_preflight=True,
-            seed=42
+            transitions=[transition],
+            dry_run=False,
+            batch_size=10
         )
 
-        run_step5(options, repo=self.mock_repo, lm_client=self.mock_lm, output_dir=self.test_dir)
+    def tearDown(self):
+        import shutil
+        if self.base_dir.exists():
+            shutil.rmtree(self.base_dir)
 
-        # Verify output file exists and check for 0s
-        actual_outputs = list(self.test_dir.glob("*.csv"))
-        if not actual_outputs:
-            self.fail("No output CSV was produced")
-        
-        with open(actual_outputs[0], 'r') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                self.assertNotEqual(int(row['word_id']), 0)
+    def test_output_has_no_zero_ids(self):
+        # Mock LM returning exactly 1 word_id (as expected by the adaptive target)
+        # In our case, expected_target_total = round(3 * 0.3333) = 1
+        mock_scores = [
+            ScoreResult(word_id=1, word="apple", type="noun", rarity_level=1, tag="test", confidence=1.0),
+        ]
+        self.lm_client.score_batch_resilient.return_value = mock_scores
+
+        run_step5(self.options, repo=self.repo, lm_client=self.lm_client, output_dir=self.output_dir)
+
+        # Check the output CSV
+        self.assertTrue(self.output_csv.exists(), "Output file was not created")
+        with open(self.output_csv, "r") as f:
+            lines = f.readlines()
+            # The first line is header
+            for line in lines[1:]:
+                if "," in line:
+                    # Check that word_id is not 0
+                    self.assertFalse(line.startswith("0,"), f"Found 0 as word_id in output: {line}")
 
 if __name__ == "__main__":
     unittest.main()
