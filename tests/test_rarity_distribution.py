@@ -21,14 +21,15 @@ class RarityDistributionTest(unittest.TestCase):
             self._write_csv(
                 path,
                 ["word_id", "word", "type", "rarity_level"],
-                [["1", "om", "N", "1"], ["2", "casă", "N", "2"], ["3", "rar", "A", "5"]],
+                [["1", "om", "N", "1"], ["2", "casă", "N", "2"], ["3", "rar", "A", "5"], ["4", "test", "X", "1"]],
             )
             result = run_rarity_distribution(csv_path=path, repo=self.repo)
             self.assertEqual(result.level_column, "rarity_level")
-            self.assertEqual(result.total_rows, 3)
-            self.assertEqual(result.distribution[1], 1)
+            self.assertEqual(result.total_rows, 4)
+            self.assertEqual(result.distribution[1], 2)
             self.assertEqual(result.distribution[2], 1)
             self.assertEqual(result.distribution[5], 1)
+            self.assertEqual(result.mode, 1)
 
     def test_can_use_explicit_level_column(self):
         with tempfile.TemporaryDirectory() as td:
