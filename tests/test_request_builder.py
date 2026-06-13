@@ -102,8 +102,8 @@ class RequestBuilderTest(unittest.TestCase):
                 schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
             )
 
-    def test_max_tokens_cap_respected(self):
-        config = LmModelConfig(model_id="test-model", max_tokens_cap=50)
+    def test_reasoning_controls(self):
+        config = LmModelConfig(model_id="test-model", reasoning_effort="high", enable_thinking=True)
         payload = json.loads(
             self.builder.build_request(
                 model="test-model",
@@ -111,14 +111,15 @@ class RequestBuilderTest(unittest.TestCase):
                 system_prompt="sys",
                 user_template="user",
                 response_format_mode=ResponseFormatMode.NONE,
-                include_reasoning_controls=False,
+                include_reasoning_controls=True,
                 config=config,
                 max_tokens=512,
                 expected_items=1,
                 schema_kind=JsonSchemaKind.SCORE_RESULTS,
             )
         )
-        self.assertEqual(payload["max_tokens"], 50)
+        self.assertEqual(payload["reasoning_effort"], "high")
+        self.assertEqual(payload["chat_template_kwargs"]["enable_thinking"], True)
 
 if __name__ == "__main__":
     unittest.main()
