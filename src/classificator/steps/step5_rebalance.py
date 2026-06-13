@@ -432,7 +432,7 @@ def _compute_adaptive_target_count(
     if batch_size <= 0:
         return 0
     processed_after = processed_before_batch + batch_size
-    desired_cumulative = round(processed_after * ratio)
+    desired_cumulative = int(processed_after * ratio + 0.5)
     desired_cumulative = max(0, min(expected_total, desired_cumulative))
     delta = desired_cumulative - assigned_before_batch
     return max(0, min(batch_size, delta))
