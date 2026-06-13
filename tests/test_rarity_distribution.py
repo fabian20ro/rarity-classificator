@@ -136,3 +136,16 @@ class RarityDistributionTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_requested_level_column_missing_raises(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "missing_col.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "rarity_level"],
+                [["1", "om", "1"]],
+            )
+            with self.assertRaises(ValueError) as cm:
+                run_rarity_distribution(csv_path=path, level_column="invalid_col", repo=self.repo)
+            self.assertIn("CSV missing requested level column 'invalid_col'", str(cm.exception))
