@@ -5,6 +5,14 @@ class RarityDistribution:
     def __init__(self) -> None:
         self._counts = [0, 0, 0, 0, 0, 0]
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, RarityDistribution):
+            return False
+        return self._counts == other._counts
+
+    def __repr__(self) -> str:
+        return f"RarityDistribution(counts={self._counts})"
+
     @classmethod
     def from_levels(cls, levels: list[int] | tuple[int, ...] | set[int]) -> "RarityDistribution":
         d = cls()
