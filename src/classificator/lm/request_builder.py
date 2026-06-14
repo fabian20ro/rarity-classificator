@@ -104,8 +104,10 @@ class LmStudioRequestBuilder:
                 payload["chat_template_kwargs"]["thinking_type"] = config.thinking_type
 
         if schema_kind == JsonSchemaKind.SELECTED_WORD_IDS:
-            if expected_items is None or expected_items <= 0:
+            if expected_items is None:
                 raise ValueError("expected_items is required for selected-word-id mode")
+            if expected_items <= 0:
+                raise ValueError("expected_items must be positive for selected-word-id mode")
             if expected_items > len(batch):
                 raise ValueError("expected_items cannot exceed batch size in selected-word-id mode")
 
