@@ -48,10 +48,10 @@ def run_rarity_distribution(
 
     mode = max(distribution, key=distribution.get)
     print(
-        f"input_csv={csv_path}"
-        f"level_column={resolved_level_col}"
-        f"mode={mode}"
-        f"distribution=[1:{distribution[1]} 2:{distribution[2]} 3:{distribution[3]} "
+        f"input_csv={csv_path}",
+        f"level_column={resolved_level_col}",
+        f"mode={mode}",
+        f"distribution=[1:{distribution[1]} 2:{distribution[2]} 3:{distribution[3]} ",
         f"4:{distribution[4]} 5:{distribution[5]}] total={total_rows}"
     )
     print(
