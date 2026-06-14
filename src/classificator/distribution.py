@@ -11,7 +11,7 @@ class RarityDistribution:
         return self._counts == other._counts
 
     def __repr__(self) -> str:
-        return f"RarityDistribution(counts={self._counts})"
+        return f"RarityDistribution(counts={self._counts[1:]})"
 
     @classmethod
     def from_levels(cls, levels: list[int] | tuple[int, ...] | set[int]) -> "RarityDistribution":
