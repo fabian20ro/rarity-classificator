@@ -174,7 +174,7 @@ def _load_dataset(path: Path, repo: RunCsvRepository) -> RebalanceDataset:
         raise ValueError(f"CSV {path} missing required columns: {', '.join(missing)}")
 
     level_column = _resolve_level_column(table.headers)
-    mutable_rows = [dict(zip(table.headers, list(rec.values))) for rec in table.records]
+    mutable_rows = [dict(zip(table.headers, list(rec.values()))) for rec in table.records]
 
     words_by_id: dict[int, RebalanceWord] = {}
     levels_by_id: dict[int, int] = {}
@@ -218,7 +218,7 @@ def _resolve_level_column(headers: list[str]) -> str:
 
 def _resolve_endpoint(options: Step5Options, lm_client: LmStudioClient) -> ResolvedEndpoint:
     resolved = lm_client.resolve_endpoint(options.endpoint_option, options.base_url_option)
-    print(f"LM endpoint: {resolved.endpoint} (flavor={resolved.flavor.value}, source={resolved.source})")
+    print(f"LM endpoint: {resolved.endpoint} (flavor={resolved.flavor}, source={resolved.source})")
     if options.skip_preflight:
         print("Skipping LM preflight (--skip-preflight=true)")
     else:
