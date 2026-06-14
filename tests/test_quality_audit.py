@@ -45,10 +45,109 @@ class QualityAuditTest(unittest.TestCase):
                 min_anchor_l1_recall=0.4,
                 repo=self.repo,
             )
-
             self.assertTrue(result.passed)
             self.assertIsNotNone(result.l1_jaccard)
             self.assertIsNotNone(result.anchor_precision)
+
+    def test_empty_anchor_raises_value_error(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            reference = root / "reference.csv"
+            anchor = root / "anchor.txt"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            cand_rows = [["1", "om", "N", "1"]]
+            ref_rows = [["1", "om", "N", "1"]]
+            self._write_csv(candidate, headers, cand_rows)
+            self._write_csv(reference, headers, ref_rows)
+            anchor.write_text("", encoding="utf-8")
+
+            with self.assertRaises(ValueError):
+                run_quality_audit(
+                    candidate_csv=candidate,
+                    reference_csv=reference,
+                    anchor_l1_file=anchor,
+                    min_l1_jaccard=0.1,
+                    min_anchor_l1_precision=0.4,
+                    min_anchor_l1_recall=0.4,
+                    repo=self.repo,
+                )
+
+    def test_anchor_with_only_comments_raises_value_error(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            reference = root / "reference.csv"
+            anchor = root / "anchor.txt"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            cand_rows = [["1", "om", "N", "1"]]
+            ref_rows = [["1", "om", "N", "1"]]
+            self._write_csv(candidate, headers, cand_rows)
+            self._write_csv(reference, headers, ref_rows)
+            anchor.write_text("# This is a comment\n\n# Another one", encoding="utf-8")
+
+            with self.assertRaises(ValueError):
+                run_quality_audit(
+                    candidate_csv=candidate,
+                    reference_csv=reference,
+                    anchor_l1_file=anchor,
+                    min_l1_jaccard=0.1,
+                    min_anchor_l1_precision=0.4,
+                    min_anchor_l1_recall=0.4,
+                    repo=self.repo,
+                )
+
+    def test_empty_anchor_raises_value_error(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            reference = root / "reference.csv"
+            anchor = root / "anchor.txt"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            cand_rows = [["1", "om", "N", "1"]]
+            ref_rows = [["1", "om", "N", "1"]]
+            self._write_csv(candidate, headers, cand_rows)
+            self._write_csv(reference, headers, ref_rows)
+            anchor.write_text("", encoding="utf-8")
+
+            with self.assertRaises(ValueError):
+                run_quality_audit(
+                    candidate_csv=candidate,
+                    reference_csv=reference,
+                    anchor_l1_file=anchor,
+                    min_l1_jaccard=0.1,
+                    min_anchor_l1_precision=0.4,
+                    min_anchor_l1_recall=0.4,
+                    repo=self.repo,
+                )
+
+    def test_anchor_with_only_comments_raises_value_error(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            reference = root / "reference.csv"
+            anchor = root / "anchor.txt"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            cand_rows = [["1", "om", "N", "1"]]
+            ref_rows = [["1", "om", "N", "1"]]
+            self._write_csv(candidate, headers, cand_rows)
+            self._write_csv(reference, headers, ref_rows)
+            anchor.write_text("# This is a comment\n\n# Another one", encoding="utf-8")
+
+            with self.assertRaises(ValueError):
+                run_quality_audit(
+                    candidate_csv=candidate,
+                    reference_csv=reference,
+                    anchor_l1_file=anchor,
+                    min_l1_jaccard=0.1,
+                    min_anchor_l1_precision=0.4,
+                    min_anchor_l1_recall=0.4,
+                    repo=self.repo,
+                )
 
     def test_quality_gate_fails_on_thresholds(self):
         with tempfile.TemporaryDirectory() as td:
