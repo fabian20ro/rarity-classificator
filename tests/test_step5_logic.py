@@ -60,5 +60,42 @@ class TestStep5Logic(unittest.TestCase):
         )
         self.assertEqual(result, 1)
 
+    def test_rounding_precision(self):
+        # Test the rounding behavior (int(x * ratio + 0.5))
+        # processed_after = 1, ratio = 0.33, expected = 10
+        # 1 * 0.33 + 0.5 = 0.83 -> 0
+        # 1 * 0.66 + 0.5 = 1.16 -> 1
+        # 1 * 0.5 + 0.5 = 1.0 -> 1
+        
+        # case 1
+        result = _compute_adaptive_target_count(
+            processed_before_batch=0,
+            assigned_before_batch=0,
+            batch_size=1,
+            ratio=0.33,
+            expected_total=10
+        )
+        self.assertEqual(result, 0)
+        
+        # case 2
+        result = _compute_adaptive_target_count(
+            processed_before_batch=0,
+            assigned_before_batch=0,
+            batch_size=1,
+            ratio=0.66,
+            expected_total=10
+        )
+        self.assertEqual(result, 1)
+
+        # case 3
+        result = _compute_adaptive_target_count(
+            processed_before_batch=0,
+            assigned_before_batch=0,
+            batch_size=1,
+            ratio=0.5,
+            expected_total=10
+        )
+        self.assertEqual(result, 1)
+
 if __name__ == "__main__":
     unittest.main()
