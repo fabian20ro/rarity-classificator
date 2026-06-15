@@ -174,7 +174,7 @@ def _load_dataset(path: Path, repo: RunCsvRepository) -> RebalanceDataset:
         raise ValueError(f"CSV {path} missing required columns: {', '.join(missing)}")
 
     level_column = _resolve_level_column(table.headers)
-    mutable_rows = [dict(zip(table.headers, list(rec.values()))) for rec in table.records]
+    mutable_rows = [dict(zip(table.headers, rec.values)) for rec in table.records]
 
     words_by_id: dict[int, RebalanceWord] = {}
     levels_by_id: dict[int, int] = {}
