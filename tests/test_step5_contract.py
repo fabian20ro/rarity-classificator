@@ -17,7 +17,7 @@ class TestStep5Contract(unittest.TestCase):
         self.test_dir.mkdir(parents=True, exist_ok=True)
         self.input_csv = self.test_dir / "input.csv"
         self.output_csv = self.test_dir / "output.csv"
-        
+
         # Prepare input CSV
         with open(self.input_csv, 'w', newline='') as f:
             writer = csv.writer(f)
@@ -36,13 +36,13 @@ class TestStep5Contract(unittest.TestCase):
     @patch('classificator.lm.client.LmStudioClient.resolve_endpoint')
     def test_no_zero_local_id(self, mock_resolve, mock_preflight, mock_score):
         mock_resolve.return_value = MagicMock(endpoint="http://localhost:1234", flavor="local", source="test")
-        
+
         # We want 2 items to be assigned to transition to level 1.
         # Input: 1 (lvl 1), 2 (lvl 2), 3 (lvl 1)
         # We want to test that the output doesn't have local_id=0.
-        
+
         # We'll simulate that word 2 is selected for transition.
-        
+
         # The batch contains word 2.
         mock_results = [
             MagicMock(word_id=2, rarity_level=1)
@@ -57,17 +57,17 @@ class TestStep5Contract(unittest.TestCase):
             transitions=[LevelTransition(from_level=2, to_level=1)],
             dry_run=False
         )
-        
+
         repo = RunCsvRepository()
         lm_client = LmStudioClient(api_key="dummy")
-        
+
         run_step5(options, repo=repo, lm_client=lm_client, output_dir=self.test_dir)
-        
+
         # Verify output
         with open(self.output_csv, 'r') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                # In the output, word_id is a column. 
+                # In the output, word_id is a column.
                 # We check that it's not 0.
                 self.assertNotEqual(int(row['word_id']), 0)
 
