@@ -31,10 +31,11 @@ class TestStep5Contract(unittest.TestCase):
         if self.test_dir.exists():
             shutil.rmtree(self.test_dir)
 
+    @patch('classificator.lm.client.requests', create=True)
     @patch('classificator.lm.client.LmStudioClient.score_batch_resilient')
     @patch('classificator.lm.client.LmStudioClient.preflight')
     @patch('classificator.lm.client.LmStudioClient.resolve_endpoint')
-    def test_no_zero_local_id(self, mock_resolve, mock_preflight, mock_score):
+    def test_no_zero_local_id(self, mock_requests, mock_resolve, mock_preflight, mock_score):
         mock_resolve.return_value = MagicMock(endpoint="http://localhost:1234", flavor="local", source="test")
 
         # We want 2 items to be assigned to transition to level 1.
