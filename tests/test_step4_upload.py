@@ -12,11 +12,9 @@ from classificator.csv_codec import CsvRecord, CsvTable
 
 class TestStep4Upload(unittest.TestCase):
     def setUp(self):
-        self.test_dir = Path("/tmp/test_step4")
-        if self.test_dir.exists():
-            import shutil
-            shutil.rmtree(self.test_dir)
-        self.test_dir.mkdir(parents=True)
+        import tempfile
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.test_dir = Path(self.temp_dir.name)
         
         self.final_csv = self.test_dir / "final.csv"
         self.report_csv = self.test_dir / "report.csv"
@@ -97,6 +95,9 @@ class TestStep4Upload(unittest.TestCase):
             # word_id 3 should have fallback level 4
             found_3 = next(r for r in rows if r['word_id'] == '3')
             self.assertEqual(found_3['new_level'], '4')
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
 
 if __name__ == "__main__":
     unittest.main()
