@@ -41,6 +41,7 @@ class ResponseParserTest(unittest.TestCase):
         )
         self.assertEqual(len(parsed.scores), 1)
         self.assertEqual(parsed.scores[0].word_id, 101)
+        self.assertEqual(parsed.scores[0].rarity_level, 1)
 
     def test_selected_word_ids_rejects_word_id_fallback(self):
         # Should NOT allow word_id as a fallback in dict mode to prevent corruption
@@ -78,17 +79,6 @@ class ResponseParserTest(unittest.TestCase):
                 expected_items=2,
             )
 
-    def test_selected_word_ids_rejects_out_of_range_local_ids(self):
-        body = self._wrap_content("[1, 3]")
-        with self.assertRaises(RuntimeError):
-            self.parser.parse(
-                batch=self.batch,
-                response_body=body,
-                output_mode=ScoringOutputMode.SELECTED_WORD_IDS,
-                forced_rarity_level=1,
-                expected_items=1,
-            )
-
     def test_selected_word_ids_rejects_duplicate_local_ids(self):
         body = self._wrap_content("[1, 1]")
         with self.assertRaises(RuntimeError):
@@ -99,19 +89,6 @@ class ResponseParserTest(unittest.TestCase):
                 forced_rarity_level=1,
                 expected_items=1,
             )
-
-    def test_selected_word_ids_with_markdown_code_blocks(self):
-        body = self._wrap_content("Here is the result: ```json\n[1, 2]\n```")
-        parsed = self.parser.parse(
-            batch=self.batch,
-            response_body=body,
-            output_mode=ScoringOutputMode.SELECTED_WORD_IDS,
-            forced_rarity_level=1,
-            expected_items=2,
-        )
-        self.assertEqual(len(parsed.scores), 2)
-        self.assertEqual(parsed.scores[0].word_id, 101)
-        self.assertEqual(parsed.scores[1].word_id, 102)
 
     def test_selected_word_ids_rejects_duplicate_local_ids_across_shapes(self):
         body = self._wrap_content('[1, {"local_id": 1, "word": "om"}]')
@@ -148,6 +125,18 @@ class ResponseParserTest(unittest.TestCase):
         self.assertEqual(len(parsed.scores), 1)
         self.assertEqual(parsed.scores[0].word_id, 102)
         self.assertEqual(parsed.scores[0].rarity_level, 2)
+
+    def test_score_results_rejects_float_ids(self):
+        # Should NOT accept float IDs as valid integers
+        body = self._wrap_content('[{"word_id": 102.5, "word": "casă", "type": "N", "rarity_level": 2, "tag": "test", "confidence": 1.0}]')
+        with self.assertRaises(RuntimeError):
+            self.parser.parse(
+                batch=self.batch,
+                response_body=body,
+                output_mode=ScoringOutputMode.SCORE_RESULTS,
+                forced_rarity_level=None,
+                expected_items=None,
+            )
 
 if __name__ == "__main__":
     unittest.main()

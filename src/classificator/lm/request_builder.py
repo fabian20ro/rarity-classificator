@@ -97,14 +97,17 @@ class LmStudioRequestBuilder:
         if include_reasoning_controls:
             if config.reasoning_effort is not None:
                 payload["reasoning_effort"] = config.reasoning_effort
-            if config.thinking_type is not None:
-                payload["thinking"] = {"type": config.thinking_type}
             if config.enable_thinking is not None:
                 payload["chat_template_kwargs"] = {"enable_thinking": config.enable_thinking}
+            if config.thinking_type is not None:
+                payload["chat_template_kwargs"] = payload.get("chat_template_kwargs", {})
+                payload["chat_template_kwargs"]["thinking_type"] = config.thinking_type
 
         if schema_kind == JsonSchemaKind.SELECTED_WORD_IDS:
-            if expected_items is None or expected_items <= 0:
-                raise ValueError("expected_items is required for selected-word-id mode")
+            if expected_items is None:
+                raise ValueError("expected_items is required")
+            if expected_items <= 0:
+                raise ValueError("expected_items is required")
             if expected_items > len(batch):
                 raise ValueError("expected_items cannot exceed batch size in selected-word-id mode")
 

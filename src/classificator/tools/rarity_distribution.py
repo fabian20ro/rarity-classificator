@@ -14,6 +14,7 @@ class RarityDistributionResult:
     level_column: str
     total_rows: int
     distribution: dict[int, int]
+    mode: int
 
 
 def run_rarity_distribution(
@@ -45,10 +46,12 @@ def run_rarity_distribution(
             raise ValueError(f"Invalid {resolved_level_col} {level} at row {rec.line_number} in {csv_path}")
         distribution[level] += 1
 
-    print(f"input_csv={csv_path}")
-    print(f"level_column={resolved_level_col}")
+    mode = max(distribution, key=distribution.get)
     print(
-        f"distribution=[1:{distribution[1]} 2:{distribution[2]} 3:{distribution[3]} "
+        f"input_csv={csv_path}",
+        f"level_column={resolved_level_col}",
+        f"mode={mode}",
+        f"distribution=[1:{distribution[1]} 2:{distribution[2]} 3:{distribution[3]} ",
         f"4:{distribution[4]} 5:{distribution[5]}] total={total_rows}"
     )
     print(
@@ -62,6 +65,7 @@ def run_rarity_distribution(
         level_column=resolved_level_col,
         total_rows=total_rows,
         distribution=distribution,
+        mode=mode,
     )
 
 

@@ -135,10 +135,9 @@ def _load_run(path: Path, repo: RunCsvRepository) -> dict[str, object]:
             raise ValueError(f"Invalid level at row {rec.line_number} in {path}")
         word = vals[idx_word].strip()
         distribution[level] += 1
-        if level == 1:
+        if level == 1 and word:
             l1_word_ids.add(word_id)
-            if word:
-                l1_words.add(word.lower())
+            l1_words.add(word.lower())
 
     return {
         "path": str(path),

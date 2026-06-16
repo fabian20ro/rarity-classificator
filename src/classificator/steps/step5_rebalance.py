@@ -218,7 +218,7 @@ def _resolve_level_column(headers: list[str]) -> str:
 
 def _resolve_endpoint(options: Step5Options, lm_client: LmStudioClient) -> ResolvedEndpoint:
     resolved = lm_client.resolve_endpoint(options.endpoint_option, options.base_url_option)
-    print(f"LM endpoint: {resolved.endpoint} (flavor={resolved.flavor.value}, source={resolved.source})")
+    print(f"LM endpoint: {resolved.endpoint} (flavor={resolved.flavor}, source={resolved.source})")
     if options.skip_preflight:
         print("Skipping LM preflight (--skip-preflight=true)")
     else:
@@ -432,7 +432,7 @@ def _compute_adaptive_target_count(
     if batch_size <= 0:
         return 0
     processed_after = processed_before_batch + batch_size
-    desired_cumulative = round(processed_after * ratio)
+    desired_cumulative = int(processed_after * ratio + 0.5)
     desired_cumulative = max(0, min(expected_total, desired_cumulative))
     delta = desired_cumulative - assigned_before_batch
     return max(0, min(batch_size, delta))

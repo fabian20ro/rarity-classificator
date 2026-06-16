@@ -212,9 +212,13 @@ class LmStudioResponseParser:
         if rarity not in {1, 2, 3, 4, 5}:
             return None
 
+        wid = _to_int(node.get("word_id"))
+        if wid is None:
+            return None
+
         confidence = _normalize_confidence(node.get("confidence"))
         return ScoreCandidate(
-            word_id=_to_int(node.get("word_id")),
+            word_id=wid,
             word=_to_str_or_none(node.get("word")),
             type=_to_str_or_none(node.get("type")),
             rarity_level=rarity,
@@ -335,9 +339,12 @@ class LmStudioResponseParser:
 def _to_int(value: object) -> int | None:
     if isinstance(value, int):
         return value
+    if isinstance(value, float):
+        return int(value) if value.is_integer() else None
     if isinstance(value, str):
         try:
-            return int(value)
+            f = float(value)
+            return int(f) if f.is_integer() else None
         except Exception:
             return None
     return None
