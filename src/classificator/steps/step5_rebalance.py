@@ -257,7 +257,7 @@ def _apply_transition(
     processed = 0
     target_assigned = 0
     switched_count = 0
-    expected_target_total = round(eligible_count * options.lower_ratio)
+    expected_target_total = int(eligible_count * options.lower_ratio + 0.5)
     batch_index = 0
 
     while True:

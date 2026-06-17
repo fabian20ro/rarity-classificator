@@ -86,9 +86,9 @@ def parse_transitions(raw: str | None) -> list[LevelTransition]:
             require_valid_transition(fr, to_level)
             out.append(LevelTransition(from_level=fr, to_level=to_level))
 
+    validate_transition_set(out)
     deduped: dict[tuple[int, int, int | None], LevelTransition] = {
         (t.from_level, t.to_level, t.from_level_upper): t for t in out
     }
     result = sorted(deduped.values(), key=lambda t: (t.from_level, t.from_level_upper or t.from_level, t.to_level))
-    validate_transition_set(result)
     return result
