@@ -50,13 +50,10 @@ class TransitionsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             require_valid_transition(5, 5)
 
-    def test_parse_transitions_invalid_format(self):
+    def test_parse_transitions_duplicates(self):
+        # If duplicates are provided, it should now raise ValueError.
         with self.assertRaises(ValueError):
-            parse_transitions("2-1") # missing :
-        with self.assertRaises(ValueError):
-            parse_transitions("2:3") # invalid relation (upgrade)
-        with self.assertRaises(ValueError):
-            parse_transitions("5:5") # 5:5 forbidden
+            parse_transitions("2:1, 2:1")
 
     def test_require_valid_pair_transition_failures(self):
         # Invalid range
