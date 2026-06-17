@@ -75,5 +75,9 @@ class TransitionsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             require_valid_pair_transition(1, 2, 3)
 
+    def test_validate_transition_set_empty_fails(self):
+        with self.assertRaises(ValueError):
+            validate_transition_set([])
+
 if __name__ == "__main__":
     unittest.main()
