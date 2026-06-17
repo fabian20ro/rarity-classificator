@@ -55,6 +55,11 @@ class TransitionsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse_transitions("2:1, 2:1")
 
+    def test_parse_transitions_overlap_fails(self):
+        # If transitions overlap source levels (e.g. single and pair), it should raise ValueError.
+        with self.assertRaises(ValueError):
+            parse_transitions("1:1, 1-2:2")
+
     def test_require_valid_pair_transition_failures(self):
         # Invalid range
         with self.assertRaises(ValueError):
