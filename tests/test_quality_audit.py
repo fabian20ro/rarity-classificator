@@ -166,6 +166,30 @@ class QualityAuditTest(unittest.TestCase):
             self.assertFalse(result.passed)
             self.assertGreaterEqual(len(result.failures), 1)
 
+    def test_quality_audit_zero_jaccard(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            reference = root / "reference.csv"
+            headers = ["word_id", "word", "type", "final_level"]
+            cand_rows = [["1", "om", "N", "1"], ["2", "casă", "N", "1"]]
+            ref_rows = [["1", "uncommon", "A", "5"], ["2", "rarity", "A", "5"]]
+            
+            self.repo.write_rows(candidate, headers, cand_rows)
+            self.repo.write_rows(reference, headers, ref_rows)
+
+            result = run_quality_audit(
+                candidate_csv=candidate,
+                reference_csv=reference,
+                repo=self.repo,
+            )
+            
+            self.assertTrue(result.passed)
+            self.assertEqual(result.l1_jaccard, 0.0)
+            self.assertEqual(result.l1_intersection, 0)
+            self.assertEqual(result.l1_candidate_size, 2)
+            self.assertEqual(result.l1_reference_size, 0)
+
 
 if __name__ == "__main__":
     unittest.main()
