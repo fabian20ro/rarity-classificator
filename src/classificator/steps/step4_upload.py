@@ -95,7 +95,7 @@ def _build_full_fallback_plan(
         report_rows.append([str(existing.word_id), str(existing.rarity_level), str(new_level), source])
 
     status = {
-        word_id: ("uploaded" if word_id in db_levels else "missing_db_word")
-        for word_id in final_levels.keys()
+        word_id: "uploaded"
+        for word_id in updates.keys()
     }
     return updates, report_rows, status
