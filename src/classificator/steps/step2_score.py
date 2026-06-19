@@ -26,6 +26,7 @@ class Step2Options:
     output_csv_path: Path
     input_csv_path: Path | None = None
     batch_size: int = DEFAULT_BATCH_SIZE
+    batch_window: int = 10
     limit: int | None = None
     max_retries: int = DEFAULT_MAX_RETRIES
     timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS
@@ -155,8 +156,12 @@ def _score_pending_batches(
         distribution.increment(row.rarity_level)
 
     min_adaptive = max(5, min(options.batch_size, options.batch_size // 5))
-    adapter = BatchSizeAdapter(initial_size=options.batch_size, min_size=min_adaptive)
-
+    adapter = BatchSizeAdapter(
+        initial_size=options.batch_size,
+        min_size=min_adaptive,
+        window_size=options.batch_window,
+    )
+    distribution.increment(row.rarity_level)
     scoring_ctx = ScoringContext(
         run_slug=run_slug,
         model=options.model,
