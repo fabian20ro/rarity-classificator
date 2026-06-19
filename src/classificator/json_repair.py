@@ -149,6 +149,7 @@ def _remove_trailing_commas(input_text: str) -> str:
             continue
 
         if pending_comma and ch.isspace():
+            out.append(ch)
             continue
 
         if pending_comma:
