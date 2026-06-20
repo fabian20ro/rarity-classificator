@@ -113,6 +113,11 @@ def main(argv: list[str] | None = None) -> int:
                 mode=UploadMode.parse(args.mode),
                 report_path=Path(args.report_csv),
                 upload_batch_id=args.upload_batch_id,
+                reference_csv=Path(args.reference_csv) if args.reference_csv else None,
+                anchor_l1_file=Path(args.anchor_l1_file) if args.anchor_l1_file else None,
+                min_l1_jaccard=args.min_l1_jaccard,
+                min_anchor_l1_precision=args.min_anchor_l1_precision,
+                min_anchor_l1_recall=args.min_anchor_l1_recall,
             ),
             word_store=store,
             repo=repo,
@@ -396,6 +401,11 @@ def _add_step4_args(parser: argparse.ArgumentParser) -> None:
     )
     parser.add_argument("--report-csv", default="build/rarity/step4_upload_report.csv")
     parser.add_argument("--upload-batch-id")
+    parser.add_argument("--reference-csv")
+    parser.add_argument("--anchor-l1-file")
+    parser.add_argument("--min-l1-jaccard", type=float)
+    parser.add_argument("--min-anchor-l1-precision", type=float)
+    parser.add_argument("--min-anchor-l1-recall", type=float)
 
 
 def _add_step5_args(parser: argparse.ArgumentParser) -> None:
