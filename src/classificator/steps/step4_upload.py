@@ -18,9 +18,27 @@ class Step4Options:
     mode: UploadMode
     report_path: Path
     upload_batch_id: str | None
+    reference_csv: Path | None = None
+    anchor_l1_file: Path | None = None
+    min_l1_jaccard: float | None = None
+    min_anchor_l1_precision: float | None = None
+    min_anchor_l1_recall: float | None = None
 
 
 def run_step4(options: Step4Options, *, word_store: WordStore, repo: RunCsvRepository, marker_writer: UploadMarkerWriter) -> None:
+    if any((options.reference_csv, options.anchor_l1_file, options.min_l1_jaccard, options.min_anchor_l1_precision, options.min_anchor_l1_recall)):
+        from ..tools.quality_audit import run_quality_audit
+        result = run_quality_audit(
+            candidate_csv=options.final_csv_path,
+            reference_csv=options.reference_csv,
+            anchor_l1_file=options.anchor_l1_file,
+            min_l1_jaccard=options.min_l1_jaccard,
+            min_anchor_l1_precision=options.min_anchor_l1_precision,
+            min_anchor_l1_recall=options.min_anchor_l1_recall,
+            repo=repo,
+        )
+        if not result.passed:
+            raise RuntimeError(f"Quality audit failed: {', '.join(result.failures)}")
     final_levels = repo.load_final_levels(options.final_csv_path)
     db_levels = {wl.word_id: wl for wl in word_store.fetch_all_word_levels()}
 
