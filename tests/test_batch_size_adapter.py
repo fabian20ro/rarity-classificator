@@ -64,5 +64,20 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter.record_outcome(1.0)
         self.assertEqual(len(adapter.outcomes), 2)
 
+    def test_limits(self):
+        # Test min_size limit
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)
+        adapter.current_size = 3
+        adapter.record_outcome(0.0)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 3)
+
+        # Test initial_size limit
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)
+        adapter.current_size = 10
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 10)
+
 if __name__ == "__main__":
     unittest.main()
