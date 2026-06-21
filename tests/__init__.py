@@ -27,3 +27,11 @@ class TestPackageSmoke(unittest.TestCase):
         adapter.current_size = 3
         adapter.record_outcome(0.0)  # rate 0.0 -> size max(3, 3*2//3) = 3
         self.assertEqual(adapter.current_size, 3)
+
+    def test_batch_size_adapter_invalid_init(self):
+        with self.assertRaises(ValueError):
+            BatchSizeAdapter(initial_size=2, min_size=5)
+        with self.assertRaises(ValueError):
+            BatchSizeAdapter(initial_size=10, min_size=0)
+        with self.assertRaises(ValueError):
+            BatchSizeAdapter(initial_size=10, min_size=5, window_size=0)
