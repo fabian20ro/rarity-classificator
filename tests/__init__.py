@@ -48,5 +48,16 @@ class TestPackageSmoke(unittest.TestCase):
         adapter.record_outcome(0.0)
         self.assertEqual(adapter.current_size, 10)
 
+    def test_categorize_error(self):
+        from src.classificator.step2_metrics import categorize_error
+        self.assertEqual(categorize_error("Missing content"), "MISSING_CONTENT")
+        self.assertEqual(categorize_error("Unexpected end"), "TRUNCATED_JSON")
+        self.assertEqual(categorize_error("Decimal error"), "DECIMAL_FORMAT")
+        self.assertEqual(categorize_error("Word mismatch"), "WORD_MISMATCH")
+        self.assertEqual(categorize_error("Model crash"), "MODEL_CRASH")
+        self.assertEqual(categorize_error("Connection refused"), "CONNECTIVITY")
+        self.assertEqual(categorize_error("Unknown"), "OTHER")
+        self.assertEqual(categorize_error(None), "OTHER")
+
 if __name__ == "__main__":
     unittest.main()
