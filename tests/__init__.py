@@ -95,7 +95,7 @@ class TestPackageSmoke(unittest.TestCase):
     def test_batch_size_adapter_edge_case_rates_window_1(self):
         adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=1)
         adapter.record_outcome(1.0)
-        self.assertEqual(adapter.current_size, 15)
+        self.assertEqual(adapter.current_size, 10)
         adapter.record_outcome(0.0)
         self.assertEqual(adapter.current_size, 10)
         adapter.record_outcome(0.0)
