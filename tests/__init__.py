@@ -48,6 +48,17 @@ class TestPackageSmoke(unittest.TestCase):
         adapter.record_outcome(0.0)
         self.assertEqual(adapter.current_size, 10)
 
+    def test_batch_size_adapter_adjustment_up(self):
+        adapter = BatchSizeAdapter(initial_size=20, min_size=3, window_size=2)
+        adapter.record_outcome(0.0)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 13)
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 19)
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 20)
+
     def test_categorize_error(self):
         from src.classificator.step2_metrics import categorize_error
         self.assertEqual(categorize_error("Missing content"), "MISSING_CONTENT")
