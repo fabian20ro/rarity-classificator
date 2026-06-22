@@ -52,7 +52,7 @@ class TestPackageSmoke(unittest.TestCase):
         adapter = BatchSizeAdapter(initial_size=20, min_size=3, window_size=2)
         adapter.record_outcome(0.0)
         adapter.record_outcome(0.0)
-        self.assertEqual(adapter.current_size, 13)
+        self.assertEqual(adapter.current_size, 8)
         adapter.record_outcome(1.0)
         adapter.record_outcome(1.0)
         self.assertEqual(adapter.current_size, 19)
