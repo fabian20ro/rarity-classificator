@@ -79,5 +79,24 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter.record_outcome(1.0)
         self.assertEqual(adapter.current_size, 10)
 
+    def test_success_thresholds(self):
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        # 0.9 should be success
+        adapter.record_outcome(0.9)
+        self.assertTrue(adapter.outcomes[-1])
+        # 0.89 should be failure
+        adapter.record_outcome(0.89)
+        self.assertFalse(adapter.outcomes[-1])
+        # 1.1 should be success
+        adapter.record_outcome(1.1)
+        self.assertTrue(adapter.outcomes[-1])
+        # -0.1 should be failure
+        adapter.record_outcome(-0.1)
+        self.assertFalse(adapter.outcomes[-1])
+
+    def test_recommended_size(self):
+        adapter = BatchSizeAdapter(initial_size=10)
+        self.assertEqual(adapter.recommended_size(), 10)
+
 if __name__ == "__main__":
     unittest.main()
