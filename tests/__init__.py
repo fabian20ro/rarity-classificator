@@ -40,6 +40,13 @@ class TestPackageSmoke(unittest.TestCase):
         adapter.record_outcome(-0.1)
         self.assertFalse(adapter.outcomes[-1])
 
+    def test_batch_size_adapter_adjustment_down(self):
+        adapter = BatchSizeAdapter(initial_size=15, min_size=3, window_size=2)
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 10)
 
 if __name__ == "__main__":
     unittest.main()
