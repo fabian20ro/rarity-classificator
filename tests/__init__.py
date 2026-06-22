@@ -70,5 +70,31 @@ class TestPackageSmoke(unittest.TestCase):
         self.assertEqual(categorize_error("Unknown"), "OTHER")
         self.assertEqual(categorize_error(None), "OTHER")
 
+    def test_batch_size_adapter_edge_case_rates(self):
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=10)
+        # Rate = 0.5: 5 successes, 5 failures out of 10
+        for _ in range(5):
+            adapter.record_outcome(1.0)
+        for _ in range(5):
+            adapter.record_outcome(0.0)
+        self.assertEqual(adapter.success_rate(), 0.5)
+        self.assertEqual(adapter.current_size, 10)
+
+        # Rate = 0.9: 9 successes, 1 failure out of 10
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=10)
+        for _ in range(9):
+            adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.success_rate(), 0.9)
+        self.assertEqual(adapter.current_size, 10)
+
+    def test_step2_metrics_edge_case(self):
+        metrics = Step2Metrics()
+        self.assertEqual(metrics.total_batches, 0)
+        self.assertEqual(metrics.total_scored, 0)
+        self.assertEqual(metrics.total_failed, 0)
+        self.assertEqual(metrics.successful_batches, 0)
+        self.assertEqual(metrics.success_rate(), 1.0)
+
 if __name__ == "__main__":
     unittest.main()
