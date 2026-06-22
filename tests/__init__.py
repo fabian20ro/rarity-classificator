@@ -1,5 +1,6 @@
 import unittest
 from src.classificator.batch_size_adapter import BatchSizeAdapter
+from src.classificator.step2_metrics import Step2Metrics
 
 class TestPackageSmoke(unittest.TestCase):
     def test_batch_size_adapter_import(self):
@@ -16,6 +17,16 @@ class TestPackageSmoke(unittest.TestCase):
         adapter.record_outcome(0.0)
         self.assertEqual(adapter.success_rate(), 0.5)
         self.assertEqual(adapter.current_size, 10)
+
+    def test_step2_metrics_logic(self):
+        metrics = Step2Metrics()
+        metrics.record_batch_result(10, 10)
+        metrics.record_batch_result(10, 5)
+        self.assertEqual(metrics.total_batches, 2)
+        self.assertEqual(metrics.total_scored, 15)
+        self.assertEqual(metrics.total_failed, 5)
+        self.assertEqual(metrics.successful_batches, 1)
+        self.assertEqual(metrics.success_rate(), 0.5)
 
 
 if __name__ == "__main__":
