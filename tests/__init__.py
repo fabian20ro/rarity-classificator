@@ -88,6 +88,21 @@ class TestPackageSmoke(unittest.TestCase):
         self.assertEqual(adapter.success_rate(), 0.9)
         self.assertEqual(adapter.current_size, 10)
 
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 10)
+
+    def test_batch_size_adapter_edge_case_rates_window_1(self):
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=1)
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 15)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 10)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 6)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 5)
+
     def test_step2_metrics_edge_case(self):
         metrics = Step2Metrics()
         self.assertEqual(metrics.total_batches, 0)
