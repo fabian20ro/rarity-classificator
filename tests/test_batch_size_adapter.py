@@ -98,5 +98,15 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter = BatchSizeAdapter(initial_size=10)
         self.assertEqual(adapter.recommended_size(), 10)
 
+    def test_window_size_one(self):
+        adapter = BatchSizeAdapter(initial_size=100, min_size=1, window_size=1)
+        adapter.current_size = 10
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 15)
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 22)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 14)
+
 if __name__ == "__main__":
     unittest.main()
