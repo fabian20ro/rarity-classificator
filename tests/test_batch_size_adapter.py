@@ -121,5 +121,28 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter.record_outcome(0.0)
         self.assertEqual(adapter.current_size, 14)
 
+    def test_boundary_conditions(self):
+        # window_size=10, initial=100, min=10
+        adapter = BatchSizeAdapter(initial_size=100, min_size=10, window_size=10)
+        # 1. Rate = 0.5 (5 successes, 5 failures) -> No change
+        for _ in range(5):
+            adapter.record_outcome(1.0)
+        for _ in range(5):
+            adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 100)
+        # 2. Rate = 0.9 (9 successes, 1 failure) -> No change
+        adapter = BatchSizeAdapter(initial_size=100, min_size=10, window_size=10)
+        for _ in range(9):
+            adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 100)
+        # 3. Rate = 0.4 (4 successes, 6 failures) -> Decrease
+        adapter = BatchSizeAdapter(initial_size=100, min_size=10, window_size=10)
+        for _ in range(4):
+            adapter.record_outcome(1.0)
+        for _ in range(6):
+            adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 44)
+
 if __name__ == "__main__":
     unittest.main()
