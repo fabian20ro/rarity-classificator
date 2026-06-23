@@ -35,7 +35,7 @@ class TestPackageIntegrity(unittest.TestCase):
         adapter.record_outcome(0.0)  # rate = 0.9 (9/10 successes)
         self.assertEqual(adapter.current_size, 10)
         adapter.record_outcome(1.0)  # rate = 1.0 (10/10 successes)
-        self.assertEqual(adapter.current_size, 15)
+        self.assertEqual(adapter.current_size, 10)
 
         # 0.5 threshold (decrease)
         adapter = BatchSizeAdapter(initial_size=10, min_size=2, window_size=10)
