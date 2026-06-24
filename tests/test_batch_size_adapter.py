@@ -79,6 +79,17 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter.record_outcome(1.0)
         self.assertEqual(adapter.current_size, 10)
 
+        # Test max_size limit
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2, max_size=15)
+        adapter.current_size = 12
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 15)
+
+        # Test invalid max_size
+        with self.assertRaises(ValueError):
+            BatchSizeAdapter(initial_size=10, max_size=5)
+
     def test_success_thresholds(self):
         adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
         # 0.9 should be success

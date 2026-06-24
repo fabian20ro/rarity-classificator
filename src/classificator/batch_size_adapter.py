@@ -4,7 +4,7 @@ from collections import deque
 
 
 class BatchSizeAdapter:
-    def __init__(self, initial_size: int, min_size: int = 3, window_size: int = 10, success_threshold: float = 0.9) -> None:
+    def __init__(self, initial_size: int, min_size: int = 3, window_size: int = 10, success_threshold: float = 0.9, max_size: int = None) -> None:
         """
         Initialize the BatchSizeAdapter.
 
@@ -13,6 +13,7 @@ class BatchSizeAdapter:
             min_size: The minimum allowed batch size.
             window_size: The number of outcomes to consider for adjustment.
             success_threshold: The threshold above which an outcome is considered a success.
+            max_size: The maximum allowed batch size.
         """
         if initial_size < min_size:
             raise ValueError("initial_size must be >= min_size")
@@ -20,12 +21,15 @@ class BatchSizeAdapter:
             raise ValueError("min_size must be >= 1")
         if window_size < 1:
             raise ValueError("window_size must be >= 1")
+        if max_size is not None and max_size < initial_size:
+            raise ValueError("max_size must be >= initial_size")
         if not (0.0 <= success_threshold <= 1.0):
             raise ValueError("success_threshold must be between 0.0 and 1.0")
         self.initial_size = initial_size
         self.min_size = min_size
         self.window_size = window_size
         self.success_threshold = success_threshold
+        self.max_size = max_size if max_size is not None else initial_size
         self.current_size = initial_size
         self.outcomes: deque[bool] = deque()
 
@@ -50,4 +54,4 @@ class BatchSizeAdapter:
         if rate < 0.5:
             self.current_size = max(self.min_size, (self.current_size * 2) // 3)
         elif rate > 0.9:
-            self.current_size = min(self.initial_size, (self.current_size * 3) // 2)
+            self.current_size = min(self.max_size, (self.current_size * 3) // 2)
