@@ -4,7 +4,7 @@ from collections import deque
 
 
 class BatchSizeAdapter:
-    def __init__(self, initial_size: int, min_size: int = 3, window_size: int = 10) -> None:
+    def __init__(self, initial_size: int, min_size: int = 3, window_size: int = 10, success_threshold: float = 0.9) -> None:
         """
         Initialize the BatchSizeAdapter.
 
@@ -12,6 +12,7 @@ class BatchSizeAdapter:
             initial_size: The starting batch size.
             min_size: The minimum allowed batch size.
             window_size: The number of outcomes to consider for adjustment.
+            success_threshold: The threshold above which an outcome is considered a success.
         """
         if initial_size < min_size:
             raise ValueError("initial_size must be >= min_size")
@@ -19,9 +20,12 @@ class BatchSizeAdapter:
             raise ValueError("min_size must be >= 1")
         if window_size < 1:
             raise ValueError("window_size must be >= 1")
+        if not (0.0 <= success_threshold <= 1.0):
+            raise ValueError("success_threshold must be between 0.0 and 1.0")
         self.initial_size = initial_size
         self.min_size = min_size
         self.window_size = window_size
+        self.success_threshold = success_threshold
         self.current_size = initial_size
         self.outcomes: deque[bool] = deque()
 
@@ -30,7 +34,7 @@ class BatchSizeAdapter:
 
     def record_outcome(self, success_ratio: float) -> None:
         normalized = max(0.0, min(1.0, success_ratio))
-        success = normalized >= 0.9
+        success = normalized >= self.success_threshold
         self.outcomes.append(success)
         while len(self.outcomes) > self.window_size:
             self.outcomes.popleft()
