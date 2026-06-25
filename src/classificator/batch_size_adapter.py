@@ -44,6 +44,11 @@ class BatchSizeAdapter:
             self.outcomes.popleft()
         self._adjust_size()
 
+    def reset(self) -> None:
+        """Resets the adapter to its initial state."""
+        self.outcomes.clear()
+        self.current_size = self.initial_size
+
     def success_rate(self) -> float:
         if not self.outcomes:
             return 1.0
