@@ -423,9 +423,9 @@ def _add_step5_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--base-url")
     parser.add_argument("--seed", type=int)
 
-    parser.add_argument("--from-level", type=int)
-    parser.add_argument("--from-level-high", type=int)
-    parser.add_argument("--to-level", type=int)
+    parser.add_argument("--from-level", type=int, help="Start of the level range (required if --to-level is provided)")
+    parser.add_argument("--from-level-high", type=int, help="Upper bound of the starting level range")
+    parser.add_argument("--to-level", type=int, help="Target level (required if --from-level is provided)")
     parser.add_argument("--transitions", default=DEFAULT_REBALANCE_TRANSITIONS)
 
     parser.add_argument("--system-prompt-file", default="prompts/rebalance_system_prompt_ro.txt")

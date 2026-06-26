@@ -105,9 +105,15 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter.record_outcome(-0.1)
         self.assertFalse(adapter.outcomes[-1])
 
-    def test_recommended_size(self):
-        adapter = BatchSizeAdapter(initial_size=10)
-        self.assertEqual(adapter.recommended_size(), 10)
+    def test_reset(self):
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        adapter.record_outcome(0.0)
+        adapter.record_outcome(0.0)
+        adapter.current_size = 5
+        adapter.reset()
+        self.assertEqual(adapter.current_size, 10)
+        self.assertEqual(len(adapter.outcomes), 0)
+        self.assertEqual(adapter.success_rate(), 1.0)
 
     def test_adjustment_long_sequence(self):
         # Test a long sequence of successes to see if it reaches initial_size

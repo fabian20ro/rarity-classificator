@@ -33,6 +33,9 @@ class BatchSizeAdapter:
         self.current_size = initial_size
         self.outcomes: deque[bool] = deque()
 
+    def __repr__(self) -> str:
+        return f"BatchSizeAdapter(size={self.current_size}, rate={self.success_rate():.2f}, window={len(self.outcomes)}/{self.window_size})"
+
     def recommended_size(self) -> int:
         return self.current_size
 
@@ -43,6 +46,11 @@ class BatchSizeAdapter:
         while len(self.outcomes) > self.window_size:
             self.outcomes.popleft()
         self._adjust_size()
+
+    def reset(self) -> None:
+        """Resets the adapter to its initial state."""
+        self.outcomes.clear()
+        self.current_size = self.initial_size
 
     def success_rate(self) -> float:
         if not self.outcomes:
