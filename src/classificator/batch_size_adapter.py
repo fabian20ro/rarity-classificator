@@ -46,6 +46,12 @@ class BatchSizeAdapter:
     def __repr__(self) -> str:
         return f"BatchSizeAdapter(size={self.current_size}, rate={self.success_rate():.2f}, trend={self.trend}, window={len(self.outcomes)}/{self.window_size}, min={self.min_size}, max={self.max_size}, threshold={self.success_threshold})"
 
+    def __len__(self) -> int:
+        return len(self.outcomes)
+
+    def __iter__(self):
+        return iter(self.outcomes)
+
     @property
     def trend(self) -> str:
         rate = self.success_rate()
