@@ -34,7 +34,16 @@ class BatchSizeAdapter:
         self.outcomes: deque[bool] = deque()
 
     def __repr__(self) -> str:
-        return f"BatchSizeAdapter(size={self.current_size}, rate={self.success_rate():.2f}, window={len(self.outcomes)}/{self.window_size}, min={self.min_size}, max={self.max_size})"
+        return f"BatchSizeAdapter(size={self.current_size}, rate={self.success_rate():.2f}, trend={self.trend}, window={len(self.outcomes)}/{self.window_size}, min={self.min_size}, max={self.max_size}, threshold={self.success_threshold})"
+
+    @property
+    def trend(self) -> str:
+        rate = self.success_rate()
+        if rate < 0.5:
+            return "decreasing"
+        if rate > 0.9:
+            return "increasing"
+        return "stable"
 
     def recommended_size(self) -> int:
         return self.current_size
