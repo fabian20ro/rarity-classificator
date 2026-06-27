@@ -82,10 +82,3 @@ class BatchSizeAdapter:
             self.current_size = max(self.min_size, (self.current_size * 2) // 3)
         elif rate > self.high_threshold:
             self.current_size = min(self.max_size, (self.current_size * 3) // 2)
-
-    def _adjust_size(self) -> None:
-        rate = self.success_rate()
-        if rate < 0.5:
-            self.current_size = max(self.min_size, (self.current_size * 2) // 3)
-        elif rate > 0.9:
-            self.current_size = min(self.max_size, (self.current_size * 3) // 2)
