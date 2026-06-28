@@ -48,5 +48,22 @@ class TestPackageIntegrity(unittest.TestCase):
         adapter.record_outcome(0.0)  # rate = 4/10 = 0.4. Decrease.
         self.assertEqual(adapter.current_size, 6)
 
+    def test_scaling_limits(self):
+        # Test max_size limit
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5, max_size=12)
+        for _ in range(5):
+            adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 12)
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 12)
+
+        # Test min_size limit
+        adapter = BatchSizeAdapter(initial_size=10, min_size=5, window_size=5)
+        for _ in range(5):
+            adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 5)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 5)
+
 if __name__ == "__main__":
     unittest.main()
