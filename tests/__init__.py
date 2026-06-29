@@ -63,7 +63,24 @@ class TestPackageIntegrity(unittest.TestCase):
             adapter.record_outcome(0.0)
         self.assertEqual(adapter.current_size, 5)
         adapter.record_outcome(0.0)
+        adapter.record_outcome(0.0)
         self.assertEqual(adapter.current_size, 5)
 
-if __name__ == "__main__":
+    def test_trend_states(self):
+        adapter = BatchSizeAdapter(initial_size=10, min_size=2, window_size=5)
+        # Initially outcomes is empty, rate=1.0, trend="increasing"
+        self.assertEqual(adapter.trend, "increasing")
+
+        # Force stability
+        # We need rate in [0.5, 0.9]. 3/5 = 0.6
+        for _ in range(3):
+            adapter.record_outcome(1.0)
+        for _ in range(2):
+            adapter.record_outcome(0.0)
+        self.assertEqual(adapter.trend, "stable")
+
+        # Force decreasing
+        # rate < 0.5. e.g., 2/5 = 0.4
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.trend, "decreasing")
     unittest.main()
