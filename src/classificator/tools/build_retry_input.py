@@ -6,7 +6,7 @@ from pathlib import Path
 from ..run_csv_repository import RunCsvRepository
 
 
-def build_retry_input(*, failed_jsonl: Path, base_csv: Path, output_csv: Path, repo: RunCsvRepository) -> int:
+def build_retry_input(failed_jsonl: Path, base_csv: Path, output_csv: Path, repo: RunCsvRepository) -> int:
     if not failed_jsonl.exists():
         raise FileNotFoundError(f"Failed JSONL not found: {failed_jsonl}")
     if not base_csv.exists():
