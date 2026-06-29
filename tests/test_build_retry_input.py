@@ -45,6 +45,41 @@ class BuildRetryInputTest(unittest.TestCase):
             ids = [int(rec.values[0]) for rec in table.records]
             self.assertEqual(ids, [2, 4])
 
+    def test_build_retry_input_raises_on_missing_word_id_header(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            failed.write_text("", encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["wrong_id"],
+                [["1"],],
+            )
+
+            with self.assertRaises(ValueError):
+                build_retry_input(failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo)
+
+    def test_build_retry_input_creates_output_dir_when_empty(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out_dir = root / "new_subdir"
+            out = out_dir / "retry.csv"
+
+            failed.write_text("", encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1", "test"]],
+            )
+
+            count = build_retry_input(failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo)
+            self.assertEqual(count, 0)
+            self.assertTrue(out.exists())
 
 if __name__ == "__main__":
     unittest.main()
