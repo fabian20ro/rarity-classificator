@@ -20,6 +20,8 @@ def build_retry_input(failed_jsonl: Path, base_csv: Path, output_csv: Path, repo
                 continue
             try:
                 node = json.loads(line)
+                if not isinstance(node, dict):
+                    continue
             except Exception:
                 continue
             word_id = node.get("word_id")
