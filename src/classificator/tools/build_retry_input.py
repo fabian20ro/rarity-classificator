@@ -32,6 +32,7 @@ def build_retry_input(failed_jsonl: Path, base_csv: Path, output_csv: Path, repo
     if "word_id" not in table.headers:
         raise ValueError(f"Base CSV must contain word_id: {base_csv}")
 
+    output_csv.parent.mkdir(parents=True, exist_ok=True)
     if not table.records:
         repo.write_rows(output_csv, table.headers, [])
         return 0
