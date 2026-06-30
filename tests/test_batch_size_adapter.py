@@ -105,15 +105,36 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter.record_outcome(-0.1)
         self.assertFalse(adapter.outcomes[-1])
 
-    def test_reset(self):
+    def test_is_stable(self):
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2, low_threshold=0.4, high_threshold=0.6)
+        # Rate 1.0 (increasing)
+        adapter.record_outcome(1.0)
+        self.assertFalse(adapter.is_stable)
+
+        # Rate 0.5 (stable)
+        adapter.record_outcome(0.0)
+        self.assertTrue(adapter.is_stable)
+
+        # Rate 0.0 (decreasing)
+        adapter.record_outcome(0.0)
+        self.assertFalse(adapter.is_stable)
+
+    def test_get_metrics(self):
         adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        metrics = adapter.get_metrics()
+        self.assertEqual(metrics["current_size"], 10)
+        self.assertEqual(metrics["success_rate"], 1.0)
+        self.assertEqual(metrics["trend"], "increasing")
+        self.assertFalse(metrics["is_stable"])
+        self.assertEqual(metrics["window_usage"], 0)
+        self.assertEqual(metrics["window_size"], 5)
+
         adapter.record_outcome(0.0)
-        adapter.record_outcome(0.0)
-        adapter.current_size = 5
-        adapter.reset()
-        self.assertEqual(adapter.current_size, 10)
-        self.assertEqual(len(adapter.outcomes), 0)
-        self.assertEqual(adapter.success_rate(), 1.0)
+        metrics = adapter.get_metrics()
+        self.assertEqual(metrics["success_rate"], 0.0)
+        self.assertEqual(metrics["trend"], "decreasing")
+        self.assertFalse(metrics["is_stable"])
+        self.assertEqual(metrics["window_usage"], 1)
 
     def test_adjustment_long_sequence(self):
         # Test a long sequence of successes to see if it reaches initial_size

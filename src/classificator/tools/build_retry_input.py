@@ -9,8 +9,12 @@ from ..run_csv_repository import RunCsvRepository
 def build_retry_input(failed_jsonl: Path, base_csv: Path, output_csv: Path, repo: RunCsvRepository) -> int:
     if not failed_jsonl.exists():
         raise FileNotFoundError(f"Failed JSONL not found: {failed_jsonl}")
+    if failed_jsonl.is_dir():
+        raise IsADirectoryError(f"Failed JSONL is a directory: {failed_jsonl}")
     if not base_csv.exists():
         raise FileNotFoundError(f"Base CSV not found: {base_csv}")
+    if base_csv.is_dir():
+        raise IsADirectoryError(f"Base CSV is a directory: {base_csv}")
 
     wanted_ids: set[int] = set()
     with failed_jsonl.open("r", encoding="utf-8") as handle:
@@ -20,6 +24,8 @@ def build_retry_input(failed_jsonl: Path, base_csv: Path, output_csv: Path, repo
                 continue
             try:
                 node = json.loads(line)
+                if not isinstance(node, dict):
+                    continue
             except Exception:
                 continue
             word_id = node.get("word_id")
