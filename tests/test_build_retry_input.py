@@ -62,6 +62,24 @@ class BuildRetryInputTest(unittest.TestCase):
             with self.assertRaises(IsADirectoryError):
                 build_retry_input(failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo)
 
+    def test_build_retry_input_raises_on_output_directory(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out_dir = root / "output_dir"
+            out_dir.mkdir()
+
+            failed.write_text('{"word_id": 1}\n', encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1", "test"]],
+            )
+
+            with self.assertRaises(IsADirectoryError):
+                build_retry_input(failed_jsonl=failed, base_csv=base, output_csv=out_dir, repo=self.repo)
+
     def test_build_retry_input_creates_output_dir_when_empty(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
