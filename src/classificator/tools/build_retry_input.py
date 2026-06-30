@@ -15,6 +15,8 @@ def build_retry_input(failed_jsonl: Path, base_csv: Path, output_csv: Path, repo
         raise FileNotFoundError(f"Base CSV not found: {base_csv}")
     if base_csv.is_dir():
         raise IsADirectoryError(f"Base CSV is a directory: {base_csv}")
+    if output_csv.is_dir():
+        raise IsADirectoryError(f"Output CSV is a directory: {output_csv}")
 
     wanted_ids: set[int] = set()
     with failed_jsonl.open("r", encoding="utf-8") as handle:
