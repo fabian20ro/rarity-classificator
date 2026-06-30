@@ -49,8 +49,11 @@ def build_retry_input(failed_jsonl: Path, base_csv: Path, output_csv: Path, repo
     rows = []
     for rec in table.records:
         try:
-            word_id = int(rec.values[idx])
-        except Exception:
+            word_id_val = rec.values[idx]
+            if word_id_val is None:
+                continue
+            word_id = int(word_id_val)
+        except (ValueError, TypeError):
             continue
         if word_id in wanted_ids:
             rows.append(rec.values)
