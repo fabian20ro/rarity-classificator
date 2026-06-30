@@ -11,6 +11,10 @@ class TestBatchSizeAdapter(unittest.TestCase):
             BatchSizeAdapter(initial_size=10, min_size=0)
         with self.assertRaises(ValueError):
             BatchSizeAdapter(initial_size=10, window_size=0)
+        with self.assertRaises(ValueError):
+            BatchSizeAdapter(initial_size=10, low_threshold=0.5, high_threshold=0.5)
+        with self.assertRaises(ValueError):
+            BatchSizeAdapter(initial_size=10, low_threshold=0.6, high_threshold=0.5)
 
     def test_success_rate(self):
         adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=3)
