@@ -45,21 +45,21 @@ class BuildRetryInputTest(unittest.TestCase):
             ids = [int(rec.values[0]) for rec in table.records]
             self.assertEqual(ids, [2, 4])
 
-    def test_build_retry_input_raises_on_missing_word_id_header(self):
+    def test_build_retry_input_raises_on_directory_instead_of_file(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            failed = root / "failed.jsonl"
+            failed = root / "failed_dir"
+            failed.mkdir()
             base = root / "base.csv"
             out = root / "retry.csv"
 
-            failed.write_text("", encoding="utf-8")
             self.repo.write_rows(
                 base,
-                ["wrong_id"],
-                [["1"],],
+                ["word_id", "word"],
+                [["1", "test"]],
             )
 
-            with self.assertRaises(ValueError):
+            with self.assertRaises(IsADirectoryError):
                 build_retry_input(failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo)
 
     def test_build_retry_input_creates_output_dir_when_empty(self):
