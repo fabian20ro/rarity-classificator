@@ -45,6 +45,23 @@ class BuildRetryInputTest(unittest.TestCase):
             ids = [int(rec.values[0]) for rec in table.records]
             self.assertEqual(ids, [2, 4])
 
+    def test_build_retry_input_handles_none_in_base(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            failed.write_text('{"word_id": 1}\n', encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [[None, "none_test"]],
+            )
+
+            count = build_retry_input(failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo)
+            self.assertEqual(count, 0)
+
     def test_build_retry_input_raises_on_directory_instead_of_file(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

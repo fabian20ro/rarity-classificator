@@ -83,6 +83,12 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter.record_outcome(0.0)
         self.assertEqual(adapter.recommended_size(), 6)
 
+    def test_max_size_none(self):
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5, max_size=None)
+        self.assertEqual(adapter.max_size, 10)
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 10)
+
     def test_limits(self):
         # Test min_size limit
         adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)
