@@ -116,5 +116,54 @@ class BuildRetryInputTest(unittest.TestCase):
             self.assertEqual(count, 0)
             self.assertTrue(out.exists())
 
+    def test_build_retry_input_empty_failed_file_produces_headers_only(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            # zero-byte file — no content, no valid word_ids extracted
+            failed.write_bytes(b"")
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1", "test"]],
+            )
+
+            count = build_retry_input(failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo)
+            self.assertEqual(count, 0)
+            table = self.repo.read_table(out)
+            # headers must survive so downstream consumers do not break
+            self.assertEqual(table.headers, ["word_id", "word"])
+            self.assertEqual(len(table.records), 0)
+
+    def test_build_retry_input_all_invalid_lines_yields_zero_rows(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            # lines that look like JSON but carry no valid word_id
+            rows = [
+                {"word": "skip_me"},
+                {},
+                "not-json",
+                {"word_id": None},
+                {"word_id": "abc"},
+            ]
+            failed.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1", "test"]],
+            )
+
+            count = build_retry_input(failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo)
+            self.assertEqual(count, 0)
+            table = self.repo.read_table(out)
+            self.assertEqual(table.headers, ["word_id", "word"])
+
 if __name__ == "__main__":
     unittest.main()
