@@ -250,5 +250,22 @@ class TestBatchSizeAdapter(unittest.TestCase):
         self.assertEqual(adapter.min_size, 5)
         self.assertEqual(adapter.window_size, 8)
 
+    def test_window_eviction_clears_stale_successes(self):
+        """After window overflow evicts old successes, success_rate reflects only recent history."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)
+
+        # Record 2 successes to fill the window at default thresholds (low=0.5, high=0.9)
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.success_rate(), 1.0)
+        self.assertEqual(adapter.current_size, 10)
+
+        # Overflow: record 2 failures — old successes evicted from window of size 2
+        adapter.record_outcome(0.0)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.success_rate(), 0.0)
+        # rate=0.0 < low_threshold=0.5 → decrease: max(3, 10*2//3) = 6
+        self.assertEqual(adapter.current_size, 6)
+
 if __name__ == "__main__":
     unittest.main()
