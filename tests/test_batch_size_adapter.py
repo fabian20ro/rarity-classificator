@@ -267,5 +267,33 @@ class TestBatchSizeAdapter(unittest.TestCase):
         # rate=0.0 < low_threshold=0.5 → decrease: max(3, 10*2//3) = 6
         self.assertEqual(adapter.current_size, 6)
 
+    def test_is_converged_requires_stable_and_full_window(self):
+        "is_converged is True only when trend=='stable' and window is full."
+        # Default thresholds: low=0.5, high=0.9 — rate<0.5 → decreasing, >0.9 → increasing, else stable
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=4)
+        self.assertFalse(adapter.is_converged)  # empty window
+
+        # 4 failures: rate=0.0 < low → not converged
+        for _ in range(4):
+            adapter.record_outcome(0.0)
+        self.assertEqual(adapter.trend, "decreasing")
+        self.assertFalse(adapter.is_converged)
+
+        # Reset; 4 successes: rate=1.0 > high → not converged
+        adapter.reset()
+        for _ in range(4):
+            adapter.record_outcome(1.0)
+        self.assertEqual(adapter.trend, "increasing")
+        self.assertFalse(adapter.is_converged)
+
+        # Mix 3 successes + 1 failure: rate=0.75 → stable but window full? Let's verify:
+        # outcomes window_size=4 after 4 records → [T,T,T,F] → rate=0.75, trend="stable"
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=4)
+        for _ in range(3):
+            adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.trend, "stable")
+        self.assertTrue(adapter.is_converged)
+
 if __name__ == "__main__":
     unittest.main()
