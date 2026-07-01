@@ -418,5 +418,82 @@ class TestBatchSizeAdapter(unittest.TestCase):
             adapter.record_outcome(1.0)
         self.assertEqual(adapter.current_size, 20)
 
+    def test_partial_window_adjustment_and_iteration(self):
+        """_adjust_size fires on every record_outcome (partial windows); len/iter reflect deque."""
+        adapter = BatchSizeAdapter(initial_size=9, min_size=1, window_size=5)
+        # First outcome: rate=1.0 > 0.9 → increase: (9*3)//2 = 13; max defaults to initial=9 → capped at 9
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 9)
+        self.assertEqual(len(adapter), 1)
+
+        # Second outcome: rate=1.0 → increase: (9*3)//2 = 13; still capped at max=initial=9 → 9
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 9)
+        self.assertEqual(len(adapter), 2)
+
+        # Third outcome (failure): rate=2/3 ≈ 0.67 — stable under default thresholds → no adjust
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 9)
+        self.assertEqual(len(adapter), 3)
+        # Iteration yields same elements as deque
+        self.assertEqual(list(iter(adapter)), list(adapter.outcomes))
+
+        # Fourth outcome (failure): rate=2/4 = 0.5 == low_threshold → stable, no adjust
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 9)
+        self.assertEqual(len(adapter), 4)
+
+        # Fifth outcome (failure): rate=2/5 = 0.4 < 0.5 → decrease: max(1, (9*2)//3)=6
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 6)
+        self.assertEqual(len(adapter), 5)
+
+        # Sixth outcome pushes window past capacity — eviction happens too
+        adapter.record_outcome(0.0)
+        self.assertEqual(len(adapter), 5)  # still capped at window_size
+
+    def test_success_ratio_clamp_boundary(self):
+        """record_outcome clamps values outside [0,1] to the boundary before classification."""
+        adapter = BatchSizeAdapter(
+            initial_size=8, min_size=2, window_size=3,
+            success_threshold=0.7, low_threshold=0.4, high_threshold=0.8,
+        )
+        # -5.0 normalized to 0.0 → below success_threshold=0.7 → failure
+        adapter.record_outcome(-5.0)
+        self.assertFalse(adapter.outcomes[-1])
+
+        # 3.0 normalized to 1.0 → above success_threshold=0.7 → success
+        adapter.record_outcome(3.0)
+        self.assertTrue(adapter.outcomes[-1])
+
+    def test_empty_window_first_record_triggers_increase(self):
+        """A single record on empty outcomes yields rate=1.0 which exceeds high_threshold,
+        triggering immediate size increase — verifying that _adjust_size fires before window is full."""
+        adapter = BatchSizeAdapter(
+            initial_size=6, min_size=2, window_size=5, max_size=30,
+        )
+        self.assertEqual(adapter.current_size, 6)
+        # Empty outcomes: success_rate() returns 1.0 > high_threshold=0.9 → increase
+        adapter.record_outcome(1.0)
+        # (6*3)//2 = 9; capped at max_size=30 → 9
+        self.assertEqual(adapter.current_size, 9)
+
+    def test_consecutive_increases_stop_at_max(self):
+        """Repeated successes must converge to max_size and hold there — increase chain terminates."""
+        adapter = BatchSizeAdapter(
+            initial_size=5, min_size=1, window_size=2, max_size=80,
+        )
+        # Drive up through several increases: 5→7→10→15→22→33→49→73 (next would be 109 but capped at 80)
+        sizes = []
+        for _ in range(20):
+            adapter.record_outcome(1.0)
+            sizes.append(adapter.current_size)
+
+        self.assertEqual(sizes[-1], 80)
+        # Verify the chain is monotonic and reaches cap
+        for i in range(len(sizes) - 1):
+            self.assertLessEqual(sizes[i], sizes[i + 1])
+        self.assertEqual(adapter.trend, "increasing")
+
 if __name__ == "__main__":
     unittest.main()
