@@ -65,12 +65,17 @@ class BatchSizeAdapter:
     def is_stable(self) -> bool:
         return self.trend == "stable"
 
+    @property
+    def is_converged(self) -> bool:
+        return self.is_stable and len(self.outcomes) == self.window_size
+
     def get_metrics(self) -> dict[str, float | str | int]:
         return {
             "current_size": self.current_size,
             "success_rate": self.success_rate(),
             "trend": self.trend,
             "is_stable": self.is_stable,
+            "is_converged": self.is_converged,
             "window_usage": len(self.outcomes),
             "window_size": self.window_size,
         }
