@@ -31,6 +31,10 @@ def build_retry_input(failed_jsonl: Path, base_csv: Path, output_csv: Path, repo
             except Exception:
                 continue
             word_id = node.get("word_id")
+            if isinstance(word_id, float):
+                raise ValueError(
+                    f"Non-integer word_id in failed JSONL (float): {node}"
+                )
             try:
                 wanted_ids.add(int(word_id))
             except Exception:
