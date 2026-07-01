@@ -418,5 +418,39 @@ class TestBatchSizeAdapter(unittest.TestCase):
             adapter.record_outcome(1.0)
         self.assertEqual(adapter.current_size, 20)
 
+    def test_partial_window_adjustment_and_iteration(self):
+        """_adjust_size fires on every record_outcome (partial windows); len/iter reflect deque."""
+        adapter = BatchSizeAdapter(initial_size=9, min_size=1, window_size=5)
+        # First outcome: rate=1.0 > 0.9 → increase: (9*3)//2 = 13; max defaults to initial=9 → capped at 9
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 9)
+        self.assertEqual(len(adapter), 1)
+
+        # Second outcome: rate=1.0 → increase: (9*3)//2 = 13; still capped at max=initial=9 → 9
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 9)
+        self.assertEqual(len(adapter), 2)
+
+        # Third outcome (failure): rate=2/3 ≈ 0.67 — stable under default thresholds → no adjust
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 9)
+        self.assertEqual(len(adapter), 3)
+        # Iteration yields same elements as deque
+        self.assertEqual(list(iter(adapter)), list(adapter.outcomes))
+
+        # Fourth outcome (failure): rate=2/4 = 0.5 == low_threshold → stable, no adjust
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 9)
+        self.assertEqual(len(adapter), 4)
+
+        # Fifth outcome (failure): rate=2/5 = 0.4 < 0.5 → decrease: max(1, (9*2)//3)=6
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 6)
+        self.assertEqual(len(adapter), 5)
+
+        # Sixth outcome pushes window past capacity — eviction happens too
+        adapter.record_outcome(0.0)
+        self.assertEqual(len(adapter), 5)  # still capped at window_size
+
 if __name__ == "__main__":
     unittest.main()
