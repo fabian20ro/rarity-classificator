@@ -207,5 +207,48 @@ class TestBatchSizeAdapter(unittest.TestCase):
             adapter.record_outcome(0.0)
         self.assertEqual(adapter.current_size, 44)
 
+    def test_success_threshold_vs_adjustment_thresholds(self):
+        """success_threshold decides binary outcome classification;
+        low/high thresholds decide size adjustment — they are distinct."""
+        # success_threshold=0.9: anything >=0.9 is a success record.
+        # low_threshold=0.4, high_threshold=0.8: 0.5 -> stable (no adjust).
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=2,
+            success_threshold=0.9, low_threshold=0.4, high_threshold=0.8,
+        )
+
+        # record 0.5 -> classified as failure (0.5 < 0.9), but rate=0.0 < 0.4 -> decrease
+        adapter.record_outcome(0.5)
+        self.assertFalse(adapter.outcomes[-1])
+        self.assertEqual(adapter.current_size, 6)  # max(3, 10*2//3)
+
+    def test_reset_clears_all_state(self):
+        """After reset() size and outcomes match a fresh instance."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        for _ in range(7):
+            adapter.record_outcome(0.0)
+        self.assertNotEqual(adapter.current_size, 10)
+
+        adapter.reset()
+        self.assertEqual(adapter.current_size, 10)
+        self.assertEqual(len(adapter.outcomes), 0)
+        # success_rate returns 1.0 when outcomes empty (existing contract);
+        # trend reflects that default → "increasing" under default thresholds
+        self.assertEqual(adapter.success_rate(), 1.0)
+
+    def test_reset_preserves_config(self):
+        """reset() must not alter constructor-set parameters."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=5, window_size=8, max_size=30,
+        )
+        for _ in range(9):
+            adapter.record_outcome(1.0)
+        self.assertNotEqual(adapter.current_size, 10)
+
+        adapter.reset()
+        self.assertEqual(adapter.initial_size, 10)
+        self.assertEqual(adapter.min_size, 5)
+        self.assertEqual(adapter.window_size, 8)
+
 if __name__ == "__main__":
     unittest.main()
