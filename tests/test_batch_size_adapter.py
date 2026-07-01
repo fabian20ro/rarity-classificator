@@ -295,5 +295,61 @@ class TestBatchSizeAdapter(unittest.TestCase):
         self.assertEqual(adapter.trend, "stable")
         self.assertTrue(adapter.is_converged)
 
+    def test_low_threshold_boundary_no_decrease(self):
+        """rate == low_threshold → no decrease (strict < in _adjust_size)."""
+        adapter = BatchSizeAdapter(
+            initial_size=9, min_size=3, window_size=2,
+            success_threshold=0.9, low_threshold=0.5, high_threshold=0.8,
+        )
+        # First record: rate=1.0 > 0.8 → increase to 13, capped at max_size=initial_size=9
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 9)
+        # Second record (failure): window=[T,F], rate=0.5 == low_threshold → no adjust
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.success_rate(), 0.5)
+        self.assertEqual(adapter.trend, "stable")
+        self.assertEqual(adapter.current_size, 9)
+
+    def test_high_threshold_boundary_no_increase(self):
+        """rate == high_threshold → no increase (strict > in _adjust_size)."""
+        adapter = BatchSizeAdapter(
+            initial_size=12, min_size=3, window_size=4,
+            success_threshold=0.9, low_threshold=0.4, high_threshold=0.75,
+        )
+        for _ in range(3):
+            adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        # window: [T,T,T,F], rate=0.75 == high_threshold → no adjust
+        self.assertEqual(adapter.success_rate(), 0.75)
+        self.assertEqual(adapter.trend, "stable")
+        self.assertEqual(adapter.current_size, 12)
+
+    def test_extreme_success_threshold_zero(self):
+        """success_threshold=0.0 classifies negative-normalized values as success."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=2,
+            success_threshold=0.0, low_threshold=0.4, high_threshold=0.8,
+        )
+        # -1.0 normalized to 0.0; >= 0.0 → True (success)
+        adapter.record_outcome(-1.0)
+        self.assertTrue(adapter.outcomes[-1])
+        # 0.0 ≥ 0.0 → True (success); both successes in window: rate=1.0 > 0.8 → increase
+        adapter.record_outcome(0.0)
+        # Both successes → rate=1.0 > high_threshold=0.8 → increase to 15
+        # but max_size defaults to initial_size=10 (max_size=None), so capped at 10
+        self.assertEqual(adapter.current_size, 10)
+
+    def test_extreme_success_threshold_one(self):
+        """success_threshold=1.0 classifies only perfect outcomes as success."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=2,
+            success_threshold=1.0, low_threshold=0.4, high_threshold=0.8,
+        )
+        # 0.99 < 1.0 → classified as failure even though near-perfect
+        adapter.record_outcome(0.99)
+        self.assertFalse(adapter.outcomes[-1])
+        # rate=0.0 < 0.4 → decrease: max(3, 10*2//3)=6
+        self.assertEqual(adapter.current_size, 6)
+
 if __name__ == "__main__":
     unittest.main()
