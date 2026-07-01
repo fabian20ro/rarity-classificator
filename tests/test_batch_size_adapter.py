@@ -161,6 +161,27 @@ class TestBatchSizeAdapter(unittest.TestCase):
         self.assertFalse(metrics["is_stable"])
         self.assertEqual(metrics["window_usage"], 1)
 
+    def test_str(self):
+        """__str__ returns a friendly single-line summary."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        s = str(adapter)
+        self.assertIn("size=10", s)
+        self.assertIn("trend=", s)
+        self.assertIn("success_rate=", s)
+        # After a failure: rate drops to 0%, trend changes.
+        adapter.record_outcome(0.0)
+        self.assertIn("rate=0%", str(adapter))
+
+    def test_repr(self):
+        """__repr__ includes all constructor parameters plus current state."""
+        adapter = BatchSizeAdapter(
+            initial_size=12, min_size=4, window_size=7, max_size=50,
+        )
+        r = repr(adapter)
+        self.assertIn("size=12", r)
+        self.assertIn("min=4", r)
+        self.assertIn("max=50", r)
+
     def test_adjustment_long_sequence(self):
         # Test a long sequence of successes to see if it reaches initial_size
         adapter = BatchSizeAdapter(initial_size=20, min_size=5, window_size=5)
