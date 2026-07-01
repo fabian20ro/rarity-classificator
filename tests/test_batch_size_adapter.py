@@ -372,5 +372,51 @@ class TestBatchSizeAdapter(unittest.TestCase):
         # rate=0.0 < 0.4 → decrease: max(3, 10*2//3)=6
         self.assertEqual(adapter.current_size, 6)
 
+    def test_adjustment_floor_math_progression(self):
+        """Continuous adjustment must follow exact (x*2)//3 / (x*3)//2 math at every step."""
+        # Decrease path: verify each floor-division step lands exactly where the formula says.
+        adapter = BatchSizeAdapter(initial_size=10, min_size=1, window_size=2)
+        expected_decrease = [6, 4, 2]  # (10*2)//3=6, (6*2)//3=4, (4*2)//3=2
+        for expected in expected_decrease:
+            adapter.record_outcome(0.0)
+            self.assertEqual(adapter.current_size, expected)
+
+        # Increase path with a small initial size so each step is observable.
+        adapter = BatchSizeAdapter(initial_size=4, min_size=1, window_size=2, max_size=50)
+        self.assertEqual(adapter.current_size, 4)
+        # Two successes: rate=1.0 > high_threshold=0.9 → increase: (4*3)//2 = 6
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 6)
+        # Third success: window=[T,T], rate=1.0 → increase: (6*3)//2 = 9
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 9)
+        # Fourth success: window=[T,T], rate=1.0 → increase: (9*3)//2 = 13
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 13)
+
+    def test_adjustment_min_cap_stops_decrease(self):
+        """Decrease must stop at min_size and never go below it regardless of further failures."""
+        adapter = BatchSizeAdapter(initial_size=4, min_size=2, window_size=2)
+        # (4*2)//3 = 2 — reaches min_size exactly.
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 2)
+        # Further failures must keep size at 2, not continue floor division to 1.
+        for _ in range(5):
+            adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 2)
+
+    def test_adjustment_max_cap_stops_increase(self):
+        """Increase must stop at max_size and never go above it regardless of further successes."""
+        adapter = BatchSizeAdapter(initial_size=15, min_size=3, window_size=2, max_size=20)
+        # Fill window with success to drive increase.
+        for _ in range(4):
+            adapter.record_outcome(1.0)
+        # Current size should be capped at 20 even though (some value*3)//2 exceeds it.
+        self.assertEqual(adapter.current_size, 20)
+        # Further successes must keep size at 20.
+        for _ in range(5):
+            adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 20)
+
 if __name__ == "__main__":
     unittest.main()
