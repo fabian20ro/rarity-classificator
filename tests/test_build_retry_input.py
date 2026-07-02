@@ -189,5 +189,69 @@ class BuildRetryInputTest(unittest.TestCase):
                     failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
                 )
 
+    def test_build_retry_input_rejects_non_positive_word_ids(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            rows = [
+                {"word_id": 0},
+                {"word_id": -1},
+                {"word_id": 5, "error": "ok"},
+            ]
+            failed.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1", "test"]],
+            )
+
+            with self.assertRaises(ValueError):
+                build_retry_input(
+                    failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+                )
+
+    def test_build_retry_input_raises_when_base_csv_lacks_word_id_header(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            failed.write_text('{"word_id": 1}\n', encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["id", "word"],
+                [["1", "test"]],
+            )
+
+            with self.assertRaises(ValueError) as ctx:
+                build_retry_input(
+                    failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+                )
+            self.assertIn("word_id", str(ctx.exception))
+
+    def test_build_retry_input_rejects_float_like_base_word_ids(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            failed.write_text('{"word_id": 1}\n', encoding="utf-8")
+            # Float-like strings in base CSV (simulates Excel-imported integer column)
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1.0", "one"], ["2.0", "two"]],
+            )
+
+            with self.assertRaises(ValueError):
+                build_retry_input(
+                    failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+                )
+
 if __name__ == "__main__":
     unittest.main()

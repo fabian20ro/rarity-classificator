@@ -36,9 +36,14 @@ def build_retry_input(failed_jsonl: Path, base_csv: Path, output_csv: Path, repo
                     f"Non-integer word_id in failed JSONL (float): {node}"
                 )
             try:
-                wanted_ids.add(int(word_id))
+                word_int = int(word_id)
             except Exception:
                 continue
+            if word_int <= 0:
+                raise ValueError(
+                    f"Non-positive word_id in failed JSONL: {word_int}"
+                )
+            wanted_ids.add(word_int)
 
     table = repo.read_table(base_csv)
     if "word_id" not in table.headers:
@@ -56,9 +61,16 @@ def build_retry_input(failed_jsonl: Path, base_csv: Path, output_csv: Path, repo
             word_id_val = rec.values[idx]
             if word_id_val is None:
                 continue
-            word_id = int(word_id_val)
-        except (ValueError, TypeError):
-            continue
+            word_id_str = str(word_id_val).strip()
+            if not word_id_str:
+                continue
+            if "." in word_id_str or "," in word_id_str:
+                raise ValueError(
+                    f"Non-integer word_id in base CSV (looks like float): {word_id_str}"
+                )
+            word_id = int(word_id_str)
+        except ValueError as exc:
+            raise exc
         if word_id in wanted_ids:
             rows.append(rec.values)
 
