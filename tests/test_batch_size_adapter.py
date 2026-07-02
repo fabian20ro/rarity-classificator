@@ -611,5 +611,29 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter.record_outcome(0.0)  # evicts first success → [True, False]
         self.assertEqual(adapter.history(), [True, False])
 
+    def test_decrease_respects_min_cap_with_nondefault_thresholds(self):
+        """_adjust_size must clamp to min_size via max(min_size, ...) even when
+        custom low/high thresholds reshape the window-rate trend boundary."""
+        adapter = BatchSizeAdapter(
+            initial_size=6, min_size=4, window_size=2,
+            success_threshold=0.9, low_threshold=0.3, high_threshold=0.7,
+        )
+        # Drive size down to exactly min_size via two consecutive failures:
+        #   start=6, empty window → rate=1.0 > 0.7 → increase capped at max=initial=6 → stays 6
+        adapter.record_outcome(0.0)  # outcomes=[F], rate=0.0 < 0.3 → decrease: max(4, (6*2)//3)=4
+        self.assertEqual(adapter.current_size, 4)
+
+        # Now at min_cap: further failures must NOT push size below min_size,
+        # even though the raw floor-division formula would yield a smaller value.
+        adapter.record_outcome(0.0)  # outcomes=[F,F], rate=0.0 < 0.3 → decrease: max(4, (4*2)//3)=max(4,2)=4
+        self.assertEqual(adapter.current_size, 4)
+
+        # Confirm the math path is hit — verify that without min cap, formula would differ.
+        # Formula at size=4 with rate<low_threshold → (4*2)//3 = 2; capped to 4 by max(min_size, ...)
+        # This exercises both the decrease branch and the min clamp in one flow under non-default thresholds.
+        for _ in range(5):
+            adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 4)
+
 if __name__ == "__main__":
     unittest.main()
