@@ -654,5 +654,43 @@ class TestBatchSizeAdapter(unittest.TestCase):
             adapter.record_outcome(0.0)
         self.assertEqual(adapter.current_size, 4)
 
+    def test_success_threshold_inside_adjustment_range(self):
+        """When success_threshold sits between low_threshold and high_threshold,
+        outcome classification (success_threshold) drives recording while size
+        adjustment (low/high thresholds) drives _adjust_size — confirming they
+        remain independent in this overlap configuration."""
+        # success_threshold=0.5 classifies outcomes >= 0.5 as success;
+        # low_threshold=0.3 / high_threshold=0.8 drive the window-rate trend band.
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=4,
+            success_threshold=0.5, low_threshold=0.3, high_threshold=0.8,
+        )
+
+        # --- Phase 1: build a stable mix inside [low, high] ---
+        # Record 0.6 (≥ 0.5 → True) and 0.4 (< 0.5 → False).
+        # After two records on empty window the first triggers an increase
+        # (rate=1.0 > 0.8) capped at max_size=initial_size=10, so size stays 10.
+        adapter.record_outcome(0.6)
+        self.assertTrue(adapter.outcomes[-1])
+        self.assertEqual(adapter.current_size, 10)
+
+        # First failure: window=[T,F], rate=0.5 — between low=0.3 and high=0.8 → stable
+        adapter.record_outcome(0.4)
+        self.assertFalse(adapter.outcomes[-1])
+        self.assertEqual(adapter.trend, "stable")
+        self.assertEqual(adapter.current_size, 10)
+
+        # --- Phase 2: push the window rate below low_threshold to trigger decrease ---
+        # Record two more failures → window=[F,F] (evicts old successes since max window=4 but we only have 4 items total now),
+        # rate = 0/4 = 0.0 < 0.3 → decrease: max(3, (10*2)//3) = 6.
+        adapter.record_outcome(0.2)  # classified False (< 0.5)
+        self.assertFalse(adapter.outcomes[-1])
+        adapter.record_outcome(0.1)  # classified False
+        self.assertFalse(adapter.outcomes[-1])
+
+        # Window now has [T, F, F, F] → rate = 1/4 = 0.25 < 0.3 → decrease
+        self.assertEqual(adapter.trend, "decreasing")
+        self.assertEqual(adapter.current_size, max(3, (10 * 2) // 3))
+
 if __name__ == "__main__":
     unittest.main()
