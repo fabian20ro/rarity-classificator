@@ -497,6 +497,57 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter.record_outcome(0.0)
         self.assertEqual(adapter.current_size, 12)
 
+    def test_get_metrics_reflects_converged_state(self):
+        """get_metrics returns is_converged=True only when trend=='stable' AND window is full."""
+        # Default thresholds: low=0.5, high=0.9 — stable at rate in [0.5, 0.9]
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=4)
+
+        # Empty outcomes → success_rate()=1.0 > 0.9 → trend="increasing", not converged
+        metrics = adapter.get_metrics()
+        self.assertFalse(metrics["is_converged"])
+        self.assertEqual(metrics["trend"], "increasing")
+        self.assertEqual(metrics["window_usage"], 0)
+
+        # Drive to full window with a stable mix: 3 successes + 1 failure → rate=0.75, stable
+        for _ in range(3):
+            adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        metrics = adapter.get_metrics()
+        self.assertTrue(metrics["is_converged"])
+        self.assertEqual(metrics["trend"], "stable")
+        self.assertTrue(metrics["is_stable"])
+        self.assertEqual(metrics["success_rate"], 0.75)
+        self.assertEqual(metrics["window_usage"], 4)
+
+        # After another record, window shifts: outcomes=[S,S,F,X] → partial (still full=4), but rate may shift to unstable
+        adapter.record_outcome(0.0)
+        metrics = adapter.get_metrics()
+        # Window still full (size 4): [T,T,F,F] → rate=0.5 == low_threshold → stable, converged
+        self.assertTrue(metrics["is_converged"])
+
+    def test_get_metrics_reflects_partial_window_not_converged(self):
+        """get_metrics must report is_converged=False when window is not full, even if trend is stable."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=5,
+            low_threshold=0.4, high_threshold=0.8,
+        )
+        # After 2 records at rate~1.0: trend="increasing" (not stable) but window partial → not converged
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(1.0)
+        metrics = adapter.get_metrics()
+        self.assertFalse(metrics["is_converged"])
+
+        # Drive to 5 records at rate=0.5 (stable under [0.4, 0.8]) but only partial window of size 3
+        adapter.reset()
+        for _ in range(2):
+            adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        metrics = adapter.get_metrics()
+        self.assertEqual(metrics["window_usage"], 3)
+        # rate=2/3≈0.67 — stable under [0.4,0.8] → is_stable=True but NOT converged (window not full)
+        self.assertTrue(metrics["is_stable"])
+        self.assertFalse(metrics["is_converged"])
+
     def test_consecutive_increases_stop_at_max(self):
         """Repeated successes must converge to max_size and hold there — increase chain terminates."""
         adapter = BatchSizeAdapter(
