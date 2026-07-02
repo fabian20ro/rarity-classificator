@@ -478,6 +478,99 @@ class TestBatchSizeAdapter(unittest.TestCase):
         # (6*3)//2 = 9; capped at max_size=30 → 9
         self.assertEqual(adapter.current_size, 9)
 
+    def test_alternating_outcomes_boundary_no_adjust(self):
+        """Consecutive alternating outcomes that hover at threshold boundary trigger no adjustment."""
+        # window_size=2; alternate S/F starting with success: [T,F] → rate=0.5 == low_threshold
+        # Default thresholds: low=0.5, high=0.9 — 0.5 is NOT < 0.5, so no decrease.
+        adapter = BatchSizeAdapter(initial_size=12, min_size=3, window_size=2)
+        self.assertEqual(adapter.current_size, 12)
+        # First success: rate=1.0 > 0.9 → increase capped at initial(12). Stays 12.
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 12)
+        # Second (failure): window=[T,F], rate=0.5 == low_threshold → no adjust
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 12)
+        # Third (success): window=[F,T], rate=0.5 == low_threshold → still stable
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 12)
+        # Fourth (failure): window=[T,F], rate=0.5 → no adjust again
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 12)
+
+    def test_get_metrics_reflects_converged_state(self):
+        """get_metrics returns is_converged=True only when trend=='stable' AND window is full."""
+        # Default thresholds: low=0.5, high=0.9 — stable at rate in [0.5, 0.9]
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=4)
+
+        # Empty outcomes → success_rate()=1.0 > 0.9 → trend="increasing", not converged
+        metrics = adapter.get_metrics()
+        self.assertFalse(metrics["is_converged"])
+        self.assertEqual(metrics["trend"], "increasing")
+        self.assertEqual(metrics["window_usage"], 0)
+
+        # Drive to full window with a stable mix: 3 successes + 1 failure → rate=0.75, stable
+        for _ in range(3):
+            adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        metrics = adapter.get_metrics()
+        self.assertTrue(metrics["is_converged"])
+        self.assertEqual(metrics["trend"], "stable")
+        self.assertTrue(metrics["is_stable"])
+        self.assertEqual(metrics["success_rate"], 0.75)
+        self.assertEqual(metrics["window_usage"], 4)
+
+        # After another record, window shifts: outcomes=[S,S,F,X] → partial (still full=4), but rate may shift to unstable
+        adapter.record_outcome(0.0)
+        metrics = adapter.get_metrics()
+        # Window still full (size 4): [T,T,F,F] → rate=0.5 == low_threshold → stable, converged
+        self.assertTrue(metrics["is_converged"])
+
+    def test_get_metrics_reflects_partial_window_not_converged(self):
+        """get_metrics must report is_converged=False when window is not full, even if trend is stable."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=5,
+            low_threshold=0.4, high_threshold=0.8,
+        )
+        # After 2 records at rate~1.0: trend="increasing" (not stable) but window partial → not converged
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(1.0)
+        metrics = adapter.get_metrics()
+        self.assertFalse(metrics["is_converged"])
+
+        # Drive to 5 records at rate=0.5 (stable under [0.4, 0.8]) but only partial window of size 3
+        adapter.reset()
+        for _ in range(2):
+            adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        metrics = adapter.get_metrics()
+        self.assertEqual(metrics["window_usage"], 3)
+        # rate=2/3≈0.67 — stable under [0.4,0.8] → is_stable=True but NOT converged (window not full)
+        self.assertTrue(metrics["is_stable"])
+        self.assertFalse(metrics["is_converged"])
+
+    def test_success_threshold_outside_adjustment_range_accepted(self):
+        """success_threshold can sit outside [low, high] — they serve different purposes (binary classification vs rate-based adjustment)."""
+        # success_threshold=0.95 is ABOVE high_threshold=0.8: outcomes >=0.95 classified as success;
+        # but size adjusts based on window-rate vs 0.4/0.8. These are independent concerns.
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=2,
+            success_threshold=0.95, low_threshold=0.4, high_threshold=0.8,
+        )
+
+        # Outcome 0.96 → classified as success (>= 0.95) despite being below high_threshold=0.8 for adjustment
+        adapter.record_outcome(0.96)
+        self.assertTrue(adapter.outcomes[-1])
+
+        # Window has one success: rate=1.0 > 0.8 → increase to 15 (capped at max_size=None → initial=10 wait — capped at max which is None so default to initial=10)
+        # Actually max defaults to initial_size if None, so cap = 10; increase would be (10*3)//2=15 but capped at 10.
+        self.assertEqual(adapter.current_size, 10)
+
+        # Now record failure: window=[T,F], rate=0.5 — between low=0.4 and high=0.8 → stable, no adjust
+        adapter.record_outcome(0.0)
+        self.assertFalse(adapter.outcomes[-1])
+        self.assertEqual(adapter.success_rate(), 0.5)
+        self.assertEqual(adapter.trend, "stable")
+
     def test_consecutive_increases_stop_at_max(self):
         """Repeated successes must converge to max_size and hold there — increase chain terminates."""
         adapter = BatchSizeAdapter(
@@ -494,6 +587,29 @@ class TestBatchSizeAdapter(unittest.TestCase):
         for i in range(len(sizes) - 1):
             self.assertLessEqual(sizes[i], sizes[i + 1])
         self.assertEqual(adapter.trend, "increasing")
+
+    def test_history_returns_plain_list(self):
+        """history() returns a plain list copy of outcomes (newest last)."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=4)
+        # Empty history before any record.
+        self.assertEqual(adapter.history(), [])
+
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        h = adapter.history()
+        self.assertEqual(h, [True, False])
+        self.assertIsInstance(h, list)
+        # Returned list is a copy — mutating it must not affect the adapter.
+        h.append(True)
+        self.assertNotEqual(adapter.outcomes[-1], True)  # deque still has 2 items
+
+    def test_history_respects_window(self):
+        """history() reflects current window contents after eviction."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)  # evicts first success → [True, False]
+        self.assertEqual(adapter.history(), [True, False])
 
 if __name__ == "__main__":
     unittest.main()

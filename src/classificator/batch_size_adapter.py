@@ -14,8 +14,19 @@ class BatchSizeAdapter:
         low_threshold: float = 0.5,
         high_threshold: float = 0.9,
     ) -> None:
-        """
-        Initialize the BatchSizeAdapter.
+        """Initialize the BatchSizeAdapter.
+
+        Two distinct thresholds serve different purposes and should not be confused:
+
+        * ``success_threshold`` — used by :meth:`record_outcome` to classify an individual
+          success ratio as a binary outcome (True/False). Defaults to 0.9.
+        * ``low_threshold`` / ``high_threshold`` — used by :attr:`trend` and :meth:`_adjust_size`
+          to decide whether the window-level success rate indicates a stable, increasing, or
+          decreasing trend that warrants adjusting ``current_size``. The default range [0.5, 0.9]
+          leaves a ~40 pp "stable" band between them.
+
+        These two threshold groups are independent — ``success_threshold`` may sit inside, outside,
+        or overlap the adjustment range without conflict.
         """
         if initial_size < min_size:
             raise ValueError("initial_size must be >= min_size")
@@ -107,6 +118,10 @@ class BatchSizeAdapter:
         if not self.outcomes:
             return 1.0
         return sum(1 for ok in self.outcomes if ok) / len(self.outcomes)
+
+    def history(self) -> list[bool]:
+        """Return outcomes as a plain list (newest last)."""
+        return list(self.outcomes)
 
     def _adjust_size(self) -> None:
         rate = self.success_rate()
