@@ -233,5 +233,25 @@ class BuildRetryInputTest(unittest.TestCase):
                 )
             self.assertIn("word_id", str(ctx.exception))
 
+    def test_build_retry_input_rejects_float_like_base_word_ids(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            failed.write_text('{"word_id": 1}\n', encoding="utf-8")
+            # Float-like strings in base CSV (simulates Excel-imported integer column)
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1.0", "one"], ["2.0", "two"]],
+            )
+
+            with self.assertRaises(ValueError):
+                build_retry_input(
+                    failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+                )
+
 if __name__ == "__main__":
     unittest.main()

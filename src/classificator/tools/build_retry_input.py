@@ -61,9 +61,16 @@ def build_retry_input(failed_jsonl: Path, base_csv: Path, output_csv: Path, repo
             word_id_val = rec.values[idx]
             if word_id_val is None:
                 continue
-            word_id = int(word_id_val)
-        except (ValueError, TypeError):
-            continue
+            word_id_str = str(word_id_val).strip()
+            if not word_id_str:
+                continue
+            if "." in word_id_str or "," in word_id_str:
+                raise ValueError(
+                    f"Non-integer word_id in base CSV (looks like float): {word_id_str}"
+                )
+            word_id = int(word_id_str)
+        except ValueError as exc:
+            raise exc
         if word_id in wanted_ids:
             rows.append(rec.values)
 
