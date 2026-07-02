@@ -611,6 +611,25 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter.record_outcome(0.0)  # evicts first success → [True, False]
         self.assertEqual(adapter.history(), [True, False])
 
+    def test_sparse_window_record_outcome_adjusts_on_empty_rate(self):
+        """First record_outcome fires _adjust_size after appending the outcome,
+        so success_rate() on the single-element window drives the first adjustment —
+        verifying the append-before-adjust ordering."""
+        adapter = BatchSizeAdapter(
+            initial_size=6, min_size=2, window_size=3, max_size=40,
+            success_threshold=0.7, low_threshold=0.5, high_threshold=0.8,
+        )
+        # First record: failure (0.0 < 0.7). outcome appended first → rate = 0/1 = 0.0 < 0.5 → decrease
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, max(2, (6 * 2) // 3))  # 4
+        self.assertFalse(adapter.outcomes[-1])
+        self.assertEqual(len(adapter.outcomes), 1)
+
+        # Second record: success → rate = 1/2 = 0.5 == low_threshold → no adjust
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 4)
+        self.assertTrue(adapter.outcomes[-1])
+
     def test_decrease_respects_min_cap_with_nondefault_thresholds(self):
         """_adjust_size must clamp to min_size via max(min_size, ...) even when
         custom low/high thresholds reshape the window-rate trend boundary."""
