@@ -213,5 +213,25 @@ class BuildRetryInputTest(unittest.TestCase):
                     failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
                 )
 
+    def test_build_retry_input_raises_when_base_csv_lacks_word_id_header(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            failed.write_text('{"word_id": 1}\n', encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["id", "word"],
+                [["1", "test"]],
+            )
+
+            with self.assertRaises(ValueError) as ctx:
+                build_retry_input(
+                    failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+                )
+            self.assertIn("word_id", str(ctx.exception))
+
 if __name__ == "__main__":
     unittest.main()
