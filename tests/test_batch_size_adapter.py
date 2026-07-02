@@ -588,5 +588,28 @@ class TestBatchSizeAdapter(unittest.TestCase):
             self.assertLessEqual(sizes[i], sizes[i + 1])
         self.assertEqual(adapter.trend, "increasing")
 
+    def test_history_returns_plain_list(self):
+        """history() returns a plain list copy of outcomes (newest last)."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=4)
+        # Empty history before any record.
+        self.assertEqual(adapter.history(), [])
+
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        h = adapter.history()
+        self.assertEqual(h, [True, False])
+        self.assertIsInstance(h, list)
+        # Returned list is a copy — mutating it must not affect the adapter.
+        h.append(True)
+        self.assertNotEqual(adapter.outcomes[-1], True)  # deque still has 2 items
+
+    def test_history_respects_window(self):
+        """history() reflects current window contents after eviction."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)  # evicts first success → [True, False]
+        self.assertEqual(adapter.history(), [True, False])
+
 if __name__ == "__main__":
     unittest.main()
