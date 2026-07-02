@@ -478,6 +478,25 @@ class TestBatchSizeAdapter(unittest.TestCase):
         # (6*3)//2 = 9; capped at max_size=30 → 9
         self.assertEqual(adapter.current_size, 9)
 
+    def test_alternating_outcomes_boundary_no_adjust(self):
+        """Consecutive alternating outcomes that hover at threshold boundary trigger no adjustment."""
+        # window_size=2; alternate S/F starting with success: [T,F] → rate=0.5 == low_threshold
+        # Default thresholds: low=0.5, high=0.9 — 0.5 is NOT < 0.5, so no decrease.
+        adapter = BatchSizeAdapter(initial_size=12, min_size=3, window_size=2)
+        self.assertEqual(adapter.current_size, 12)
+        # First success: rate=1.0 > 0.9 → increase capped at initial(12). Stays 12.
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 12)
+        # Second (failure): window=[T,F], rate=0.5 == low_threshold → no adjust
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 12)
+        # Third (success): window=[F,T], rate=0.5 == low_threshold → still stable
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 12)
+        # Fourth (failure): window=[T,F], rate=0.5 → no adjust again
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 12)
+
     def test_consecutive_increases_stop_at_max(self):
         """Repeated successes must converge to max_size and hold there — increase chain terminates."""
         adapter = BatchSizeAdapter(
