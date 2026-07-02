@@ -53,6 +53,7 @@ class BatchSizeAdapter:
         self.outcomes: deque[bool] = deque()
         self.low_threshold = low_threshold
         self.high_threshold = high_threshold
+        self.step_count = 0
 
     def __repr__(self) -> str:
         return f"BatchSizeAdapter(size={self.current_size}, rate={self.success_rate():.2f}, trend={self.trend}, window={len(self.outcomes)}/{self.window_size}, min={self.min_size}, max={self.max_size}, threshold={self.success_threshold})"
@@ -96,6 +97,7 @@ class BatchSizeAdapter:
             "is_converged": self.is_converged,
             "window_usage": len(self.outcomes),
             "window_size": self.window_size,
+            "step_count": self.step_count,
         }
 
     def recommended_size(self) -> int:
@@ -107,12 +109,14 @@ class BatchSizeAdapter:
         self.outcomes.append(success)
         while len(self.outcomes) > self.window_size:
             self.outcomes.popleft()
+        self.step_count += 1
         self._adjust_size()
 
     def reset(self) -> None:
         """Resets the adapter to its initial state."""
         self.outcomes.clear()
         self.current_size = self.initial_size
+        self.step_count = 0
 
     def success_rate(self) -> float:
         if not self.outcomes:

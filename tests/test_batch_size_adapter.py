@@ -692,5 +692,39 @@ class TestBatchSizeAdapter(unittest.TestCase):
         self.assertEqual(adapter.trend, "decreasing")
         self.assertEqual(adapter.current_size, max(3, (10 * 2) // 3))
 
+    def test_step_count_increments_per_record(self):
+        """Each record_outcome must increment step_count by exactly one."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        self.assertEqual(adapter.step_count, 0)
+        for _ in range(7):
+            adapter.record_outcome(1.0)
+        self.assertEqual(adapter.step_count, 7)
+
+    def test_step_count_resets_with_reset(self):
+        """reset() must clear step_count alongside other state."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        for _ in range(8):
+            adapter.record_outcome(1.0)
+        self.assertEqual(adapter.step_count, 8)
+        adapter.reset()
+        self.assertEqual(adapter.step_count, 0)
+
+    def test_step_count_in_metrics(self):
+        """get_metrics must report the current step_count."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        for _ in range(4):
+            adapter.record_outcome(1.0)
+        metrics = adapter.get_metrics()
+        self.assertEqual(metrics["step_count"], 4)
+
+    def test_step_count_independent_of_window(self):
+        """step_count must continue incrementing even after window eviction — it tracks total calls, not just visible outcomes."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)
+        for _ in range(5):
+            adapter.record_outcome(1.0)
+        self.assertEqual(adapter.step_count, 5)
+        self.assertEqual(len(adapter.outcomes), 2)
+
+
 if __name__ == "__main__":
     unittest.main()
