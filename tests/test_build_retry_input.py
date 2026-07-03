@@ -213,6 +213,35 @@ class BuildRetryInputTest(unittest.TestCase):
                     failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
                 )
 
+    def test_build_retry_input_deduplicates_base_word_ids(self):
+        """Regression: duplicate word_id in base CSV must not produce duplicates in output."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            failed.write_text('{"word_id": 2}\n', encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["word_id", "word", "type"],
+                [
+                    ["1", "one", "N"],
+                    ["2", "two_a", "N"],
+                    ["2", "two_b", "N"],  # duplicate word_id=2
+                    ["3", "three", "N"],
+                ],
+            )
+
+            count = build_retry_input(
+                failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+            )
+            self.assertEqual(count, 1)
+
+            table = self.repo.read_table(out)
+            ids = [int(rec.values[0]) for rec in table.records]
+            self.assertEqual(ids, [2])
+
     def test_build_retry_input_raises_when_base_csv_lacks_word_id_header(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

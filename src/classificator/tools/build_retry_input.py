@@ -82,6 +82,14 @@ def build_retry_input(
         if word_id in wanted_ids:
             rows.append(rec.values)
 
+    seen_ids: set[int] = set()
+    deduped_rows = []
+    for row in rows:
+        wid = int(row[0]) if row[0] is not None else None
+        if wid is not None and wid not in seen_ids:
+            seen_ids.add(wid)
+            deduped_rows.append(row)
+
     output_csv.parent.mkdir(parents=True, exist_ok=True)
-    repo.write_rows(output_csv, table.headers, rows)
-    return len(rows)
+    repo.write_rows(output_csv, table.headers, deduped_rows)
+    return len(deduped_rows)
