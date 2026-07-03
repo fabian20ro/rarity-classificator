@@ -725,6 +725,25 @@ class TestBatchSizeAdapter(unittest.TestCase):
         self.assertEqual(adapter.step_count, 5)
         self.assertEqual(len(adapter.outcomes), 2)
 
+    def test_history_matches_window_content_and_order(self):
+        """history() must return outcomes as a plain list preserving deque order."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=4)
+        # Empty adapter: history is empty.
+        self.assertEqual(adapter.history(), [])
+
+        # Record mixed outcomes — oldest first (deque FIFO).
+        adapter.record_outcome(1.0)   # True  -> [T]
+        adapter.record_outcome(0.0)   # False -> [T,F]
+        adapter.record_outcome(1.0)   # True  -> [T,F,T]
+        expected = list(adapter.outcomes)
+        self.assertEqual(adapter.history(), expected)
+
+        # After window eviction (window_size=4, add two more failures):
+        adapter.record_outcome(0.0)   # window=[T,F,T,F], len=4
+        adapter.record_outcome(0.0)   # evicts first T -> [F,T,F,F]
+        self.assertEqual(adapter.history(), list(adapter.outcomes))
+        self.assertEqual(len(adapter.history()), 4)
+
 
 if __name__ == "__main__":
     unittest.main()
