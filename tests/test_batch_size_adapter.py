@@ -969,6 +969,34 @@ class TestBatchSizeAdapter(unittest.TestCase):
         self.assertEqual(adapter.trend, "stable")
         self.assertEqual(adapter.current_size, 10)
 
+    def test_len_reflects_window_state(self):
+        """__len__ must return len(outcomes) across empty, partial, full-with-eviction, and post-reset."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=3)
+
+        self.assertEqual(len(adapter), 0)  # empty initially
+
+        adapter.record_outcome(1.0)
+        self.assertEqual(len(adapter), 1)  # partial
+
+        adapter.record_outcome(0.0)
+        self.assertEqual(len(adapter), 2)
+
+        adapter.record_outcome(1.0)
+        self.assertEqual(len(adapter), 3)  # full window
+
+        adapter.record_outcome(0.0)  # evicts oldest → window stays size 3
+        self.assertEqual(len(adapter), 3)
+
+        adapter.reset()
+        self.assertEqual(len(adapter), 0)  # reset empties outcomes deque
+
+    def test_len_matches_history_length(self):
+        """__len__ must equal len(history()) at every point — both reflect the window."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=4)
+        for _ in range(6):
+            adapter.record_outcome(1.0 if _ % 2 == 0 else 0.0)
+        self.assertEqual(len(adapter), len(adapter.history()))
+
 
 if __name__ == "__main__":
     unittest.main()
