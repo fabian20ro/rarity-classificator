@@ -717,6 +717,32 @@ class TestBatchSizeAdapter(unittest.TestCase):
         metrics = adapter.get_metrics()
         self.assertEqual(metrics["step_count"], 4)
 
+    def test_success_threshold_exact_boundary_classifies_as_true(self):
+        """record_outcome classifies success_ratio exactly equal to success_threshold as True (>=)."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=4,
+            success_threshold=0.7, low_threshold=0.5, high_threshold=0.8,
+        )
+        # Exactly at threshold → classified as True (not False).
+        adapter.record_outcome(0.7)
+        self.assertTrue(adapter.outcomes[-1])
+
+        # Just below threshold → False.
+        adapter.record_outcome(0.699999)
+        self.assertFalse(adapter.outcomes[-1])
+
+    def test_initial_equals_min_size_decrease_no_op(self):
+        """When initial_size == min_size, consecutive failures keep size at min — no underflow."""
+        adapter = BatchSizeAdapter(initial_size=5, min_size=5, window_size=2)
+        # Empty outcomes: rate=1.0 > 0.9 → increase capped at max=initial=5 → stays 5.
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 5)
+
+        # Two failures: rate=0.0 < 0.5 → decrease from 5 to max(5, (5*2)//3)=max(5,3)=5 → stays 5.
+        adapter.record_outcome(0.0)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 5)
+
     def test_step_count_independent_of_window(self):
         """step_count must continue incrementing even after window eviction — it tracks total calls, not just visible outcomes."""
         adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)
