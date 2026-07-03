@@ -770,6 +770,60 @@ class TestBatchSizeAdapter(unittest.TestCase):
         self.assertEqual(adapter.history(), list(adapter.outcomes))
         self.assertEqual(len(adapter.history()), 4)
 
+    def test_success_threshold_below_adjustment_range(self):
+        """When success_threshold sits below low_threshold, classification and adjustment remain independent.
+
+        success_threshold=0.2 classifies outcomes >= 0.2 as success;
+        low_threshold=0.4 / high_threshold=0.7 drive the window-rate trend band.
+        Outcome 0.15 is classified as failure (below success_threshold) even though it would be counted
+        positively by a looser threshold — and size adjustment still uses low/high thresholds only.
+        """
+        adapter = BatchSizeAdapter(
+            initial_size=9, min_size=3, window_size=2, max_size=50,
+            success_threshold=0.2, low_threshold=0.4, high_threshold=0.7,
+        )
+
+        # Outcome 0.15 < success_threshold=0.2 → classified as failure.
+        adapter.record_outcome(0.15)
+        self.assertFalse(adapter.outcomes[-1])
+        # Window=[F], rate=0.0 < low_threshold=0.4 → decrease: max(3, (9*2)//3)=6
+        self.assertEqual(adapter.current_size, 6)
+
+        # Outcome 0.5 >= success_threshold=0.2 → classified as success.
+        adapter.record_outcome(0.5)
+        self.assertTrue(adapter.outcomes[-1])
+        # Window=[F,T], rate=0.5 — between low=0.4 and high=0.7 → stable, no adjust
+        self.assertEqual(adapter.current_size, 6)
+
+        # Outcome 0.0 < success_threshold=0.2 → failure again.
+        adapter.record_outcome(0.0)
+        self.assertFalse(adapter.outcomes[-1])
+        # Window=[T,F], rate=0.5 — stable → no adjust still
+        self.assertEqual(adapter.current_size, 6)
+
+        # Outcome 0.8 (>= success_threshold) → success; window=[F,T] rate=0.5 → stable
+        adapter.record_outcome(0.8)
+        self.assertTrue(adapter.outcomes[-1])
+        # Window now full at size 2: [T,F,T] evicts oldest T → [F,T], rate=0.5 → stable
+        self.assertEqual(adapter.current_size, 6)
+
+    def test_success_threshold_outside_adjustment_range_upper(self):
+        """Inverse of the existing lower-extreme test — success_threshold > high_threshold boundary."""
+        adapter = BatchSizeAdapter(
+            initial_size=11, min_size=3, window_size=2, max_size=40,
+            success_threshold=0.95, low_threshold=0.4, high_threshold=0.7,
+        )
+
+        # Outcome 0.96 ≥ 0.95 → success; but for adjustment rate=1.0 > 0.7 → increase to (11*3)//2=16
+        adapter.record_outcome(0.96)
+        self.assertTrue(adapter.outcomes[-1])
+        self.assertEqual(adapter.current_size, 16)
+
+        # Outcome 0.5 < 0.95 → failure; window=[T,F] rate=0.5 — stable between [0.4, 0.7] → no adjust
+        adapter.record_outcome(0.5)
+        self.assertFalse(adapter.outcomes[-1])
+        self.assertEqual(adapter.current_size, 16)
+
 
 if __name__ == "__main__":
     unittest.main()
