@@ -213,6 +213,35 @@ class BuildRetryInputTest(unittest.TestCase):
                     failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
                 )
 
+    def test_build_retry_input_deduplicates_base_word_ids(self):
+        """Regression: duplicate word_id in base CSV must not produce duplicates in output."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            failed.write_text('{"word_id": 2}\n', encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["word_id", "word", "type"],
+                [
+                    ["1", "one", "N"],
+                    ["2", "two_a", "N"],
+                    ["2", "two_b", "N"],  # duplicate word_id=2
+                    ["3", "three", "N"],
+                ],
+            )
+
+            count = build_retry_input(
+                failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+            )
+            self.assertEqual(count, 1)
+
+            table = self.repo.read_table(out)
+            ids = [int(rec.values[0]) for rec in table.records]
+            self.assertEqual(ids, [2])
+
     def test_build_retry_input_raises_when_base_csv_lacks_word_id_header(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -252,6 +281,28 @@ class BuildRetryInputTest(unittest.TestCase):
                 build_retry_input(
                     failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
                 )
+
+    def test_build_retry_input_includes_record_number_on_invalid_base_word_id(self):
+        """Regression: invalid word_id in base CSV must include record number."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            failed.write_text('{"word_id": 1}\n', encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["abc", "one"]],
+            )
+
+            with self.assertRaises(ValueError) as ctx:
+                build_retry_input(
+                    failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+                )
+            self.assertIn("record 1", str(ctx.exception))
+            self.assertIn("'abc'", str(ctx.exception))
 
     def test_build_retry_input_rejects_boolean_word_ids(self):
         with tempfile.TemporaryDirectory() as td:

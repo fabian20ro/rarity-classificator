@@ -717,6 +717,32 @@ class TestBatchSizeAdapter(unittest.TestCase):
         metrics = adapter.get_metrics()
         self.assertEqual(metrics["step_count"], 4)
 
+    def test_success_threshold_exact_boundary_classifies_as_true(self):
+        """record_outcome classifies success_ratio exactly equal to success_threshold as True (>=)."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=4,
+            success_threshold=0.7, low_threshold=0.5, high_threshold=0.8,
+        )
+        # Exactly at threshold → classified as True (not False).
+        adapter.record_outcome(0.7)
+        self.assertTrue(adapter.outcomes[-1])
+
+        # Just below threshold → False.
+        adapter.record_outcome(0.699999)
+        self.assertFalse(adapter.outcomes[-1])
+
+    def test_initial_equals_min_size_decrease_no_op(self):
+        """When initial_size == min_size, consecutive failures keep size at min — no underflow."""
+        adapter = BatchSizeAdapter(initial_size=5, min_size=5, window_size=2)
+        # Empty outcomes: rate=1.0 > 0.9 → increase capped at max=initial=5 → stays 5.
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 5)
+
+        # Two failures: rate=0.0 < 0.5 → decrease from 5 to max(5, (5*2)//3)=max(5,3)=5 → stays 5.
+        adapter.record_outcome(0.0)
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 5)
+
     def test_step_count_independent_of_window(self):
         """step_count must continue incrementing even after window eviction — it tracks total calls, not just visible outcomes."""
         adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)
@@ -724,6 +750,172 @@ class TestBatchSizeAdapter(unittest.TestCase):
             adapter.record_outcome(1.0)
         self.assertEqual(adapter.step_count, 5)
         self.assertEqual(len(adapter.outcomes), 2)
+
+    def test_history_matches_window_content_and_order(self):
+        """history() must return outcomes as a plain list preserving deque order."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=4)
+        # Empty adapter: history is empty.
+        self.assertEqual(adapter.history(), [])
+
+        # Record mixed outcomes — oldest first (deque FIFO).
+        adapter.record_outcome(1.0)   # True  -> [T]
+        adapter.record_outcome(0.0)   # False -> [T,F]
+        adapter.record_outcome(1.0)   # True  -> [T,F,T]
+        expected = list(adapter.outcomes)
+        self.assertEqual(adapter.history(), expected)
+
+        # After window eviction (window_size=4, add two more failures):
+        adapter.record_outcome(0.0)   # window=[T,F,T,F], len=4
+        adapter.record_outcome(0.0)   # evicts first T -> [F,T,F,F]
+        self.assertEqual(adapter.history(), list(adapter.outcomes))
+        self.assertEqual(len(adapter.history()), 4)
+
+    def test_success_threshold_below_adjustment_range(self):
+        """When success_threshold sits below low_threshold, classification and adjustment remain independent.
+
+        success_threshold=0.2 classifies outcomes >= 0.2 as success;
+        low_threshold=0.4 / high_threshold=0.7 drive the window-rate trend band.
+        Outcome 0.15 is classified as failure (below success_threshold) even though it would be counted
+        positively by a looser threshold — and size adjustment still uses low/high thresholds only.
+        """
+        adapter = BatchSizeAdapter(
+            initial_size=9, min_size=3, window_size=2, max_size=50,
+            success_threshold=0.2, low_threshold=0.4, high_threshold=0.7,
+        )
+
+        # Outcome 0.15 < success_threshold=0.2 → classified as failure.
+        adapter.record_outcome(0.15)
+        self.assertFalse(adapter.outcomes[-1])
+        # Window=[F], rate=0.0 < low_threshold=0.4 → decrease: max(3, (9*2)//3)=6
+        self.assertEqual(adapter.current_size, 6)
+
+        # Outcome 0.5 >= success_threshold=0.2 → classified as success.
+        adapter.record_outcome(0.5)
+        self.assertTrue(adapter.outcomes[-1])
+        # Window=[F,T], rate=0.5 — between low=0.4 and high=0.7 → stable, no adjust
+        self.assertEqual(adapter.current_size, 6)
+
+        # Outcome 0.0 < success_threshold=0.2 → failure again.
+        adapter.record_outcome(0.0)
+        self.assertFalse(adapter.outcomes[-1])
+        # Window=[T,F], rate=0.5 — stable → no adjust still
+        self.assertEqual(adapter.current_size, 6)
+
+        # Outcome 0.8 (>= success_threshold) → success; window=[F,T] rate=0.5 → stable
+        adapter.record_outcome(0.8)
+        self.assertTrue(adapter.outcomes[-1])
+        # Window now full at size 2: [T,F,T] evicts oldest T → [F,T], rate=0.5 → stable
+        self.assertEqual(adapter.current_size, 6)
+
+    def test_success_threshold_outside_adjustment_range_upper(self):
+        """Inverse of the existing lower-extreme test — success_threshold > high_threshold boundary."""
+        adapter = BatchSizeAdapter(
+            initial_size=11, min_size=3, window_size=2, max_size=40,
+            success_threshold=0.95, low_threshold=0.4, high_threshold=0.7,
+        )
+
+        # Outcome 0.96 ≥ 0.95 → success; but for adjustment rate=1.0 > 0.7 → increase to (11*3)//2=16
+        adapter.record_outcome(0.96)
+        self.assertTrue(adapter.outcomes[-1])
+        self.assertEqual(adapter.current_size, 16)
+
+        # Outcome 0.5 < 0.95 → failure; window=[T,F] rate=0.5 — stable between [0.4, 0.7] → no adjust
+        adapter.record_outcome(0.5)
+        self.assertFalse(adapter.outcomes[-1])
+        self.assertEqual(adapter.current_size, 16)
+
+    def test_adjust_size_direct_increase_math(self):
+        """_adjust_size must apply (x*3)//2 for increase and clamp to max."""
+        adapter = BatchSizeAdapter(
+            initial_size=8, min_size=2, window_size=5, max_size=60,
+            low_threshold=0.4, high_threshold=0.7,
+        )
+        # Pre-set current size; pre-populate deque to force rate > high_threshold.
+        adapter.current_size = 12
+        adapter.outcomes.clear()
+        for _ in range(3):
+            adapter.outcomes.append(True)
+        self.assertEqual(adapter.success_rate(), 1.0)
+
+        # Direct call: rate=1.0 > 0.7 → increase; (12*3)//2 = 18; <= max=60 → 18.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 18)
+
+        # Next direct call from 18: (18*3)//2 = 27.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 27)
+
+    def test_adjust_size_direct_decrease_math(self):
+        """_adjust_size must apply (x*2)//3 for decrease and clamp to min."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=2, window_size=5,
+            success_threshold=0.9, low_threshold=0.4, high_threshold=0.7,
+        )
+        # Pre-set current size; pre-populate deque to force rate < low_threshold.
+        adapter.current_size = 18
+        adapter.outcomes.clear()
+        for _ in range(3):
+            adapter.outcomes.append(False)
+        self.assertEqual(adapter.success_rate(), 0.0)
+
+        # Direct call: rate=0.0 < 0.4 → decrease; max(2, (18*2)//3)=max(2,12)=12.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 12)
+
+        # Next direct call from 12: max(2, (12*2)//3)=max(2,8)=8.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 8)
+
+    def test_adjust_size_stable_no_change(self):
+        """_adjust_size must not change current_size when rate is in [low, high]."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=4,
+            success_threshold=0.9, low_threshold=0.5, high_threshold=0.8,
+        )
+        # Pre-populate to get a stable rate: 2 successes, 2 failures → rate=0.5 == low_threshold.
+        adapter.outcomes.clear()
+        for _ in range(2):
+            adapter.outcomes.append(True)
+        for _ in range(2):
+            adapter.outcomes.append(False)
+        self.assertEqual(adapter.trend, "stable")
+
+        # Direct call with stable rate must not modify current_size.
+        before = adapter.current_size
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, before)
+
+    def test_adjust_size_max_cap_enforced_direct(self):
+        """_adjust_size increase must clamp to max_size even when formula exceeds it."""
+        adapter = BatchSizeAdapter(
+            initial_size=50, min_size=2, window_size=3, max_size=60,
+            low_threshold=0.4, high_threshold=0.7,
+        )
+        adapter.current_size = 55
+        adapter.outcomes.clear()
+        for _ in range(2):
+            adapter.outcomes.append(True)
+        # (55*3)//2 = 82 > max_size=60 → must clamp to 60.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 60)
+
+    def test_adjust_size_min_cap_enforced_direct(self):
+        """_adjust_size decrease must clamp to min_size even when formula goes below it."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=4, window_size=3,
+            success_threshold=0.9, low_threshold=0.4, high_threshold=0.7,
+        )
+        adapter.current_size = 6
+        adapter.outcomes.clear()
+        for _ in range(2):
+            adapter.outcomes.append(False)
+        # (6*2)//3 = 4 == min_size → stays at 4; further decrease would go to 2 but clamp prevents.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 4)
+
+        # Next direct call from 4: (4*2)//3 = 2 < min_size=4 → must stay at 4.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 4)
 
 
 if __name__ == "__main__":
