@@ -6,7 +6,9 @@ from pathlib import Path
 from ..run_csv_repository import RunCsvRepository
 
 
-def build_retry_input(failed_jsonl: Path, base_csv: Path, output_csv: Path, repo: RunCsvRepository) -> int:
+def build_retry_input(
+    failed_jsonl: Path, base_csv: Path, output_csv: Path, repo: RunCsvRepository
+) -> int:
     if not failed_jsonl.exists():
         raise FileNotFoundError(f"Failed JSONL not found: {failed_jsonl}")
     if failed_jsonl.is_dir():
@@ -60,21 +62,23 @@ def build_retry_input(failed_jsonl: Path, base_csv: Path, output_csv: Path, repo
 
     idx = table.headers.index("word_id")
     rows = []
-    for rec in table.records:
+    for line_num, rec in enumerate(table.records, start=1):
+        word_id_val = rec.values[idx]
+        if word_id_val is None:
+            continue
+        word_id_str = str(word_id_val).strip()
+        if not word_id_str:
+            continue
+        if "." in word_id_str or "," in word_id_str:
+            raise ValueError(
+                f"Non-integer word_id at base CSV record {line_num} (looks like float): {word_id_str}"
+            )
         try:
-            word_id_val = rec.values[idx]
-            if word_id_val is None:
-                continue
-            word_id_str = str(word_id_val).strip()
-            if not word_id_str:
-                continue
-            if "." in word_id_str or "," in word_id_str:
-                raise ValueError(
-                    f"Non-integer word_id in base CSV (looks like float): {word_id_str}"
-                )
             word_id = int(word_id_str)
-        except ValueError as exc:
-            raise exc
+        except ValueError as inner_exc:
+            raise ValueError(
+                f"Invalid word_id at base CSV record {line_num}: '{word_id_str}'"
+            ) from None
         if word_id in wanted_ids:
             rows.append(rec.values)
 

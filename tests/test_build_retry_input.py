@@ -253,6 +253,28 @@ class BuildRetryInputTest(unittest.TestCase):
                     failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
                 )
 
+    def test_build_retry_input_includes_record_number_on_invalid_base_word_id(self):
+        """Regression: invalid word_id in base CSV must include record number."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            failed.write_text('{"word_id": 1}\n', encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["abc", "one"]],
+            )
+
+            with self.assertRaises(ValueError) as ctx:
+                build_retry_input(
+                    failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+                )
+            self.assertIn("record 1", str(ctx.exception))
+            self.assertIn("'abc'", str(ctx.exception))
+
     def test_build_retry_input_rejects_boolean_word_ids(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
