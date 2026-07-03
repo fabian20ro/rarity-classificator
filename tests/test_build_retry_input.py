@@ -253,5 +253,28 @@ class BuildRetryInputTest(unittest.TestCase):
                     failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
                 )
 
+    def test_build_retry_input_rejects_boolean_word_ids(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            rows = [
+                {"word_id": 1, "error": "ok"},
+                {"word_id": True},
+            ]
+            failed.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1", "test"]],
+            )
+
+            with self.assertRaises(ValueError):
+                build_retry_input(
+                    failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+                )
+
 if __name__ == "__main__":
     unittest.main()
