@@ -824,6 +824,99 @@ class TestBatchSizeAdapter(unittest.TestCase):
         self.assertFalse(adapter.outcomes[-1])
         self.assertEqual(adapter.current_size, 16)
 
+    def test_adjust_size_direct_increase_math(self):
+        """_adjust_size must apply (x*3)//2 for increase and clamp to max."""
+        adapter = BatchSizeAdapter(
+            initial_size=8, min_size=2, window_size=5, max_size=60,
+            low_threshold=0.4, high_threshold=0.7,
+        )
+        # Pre-set current size; pre-populate deque to force rate > high_threshold.
+        adapter.current_size = 12
+        adapter.outcomes.clear()
+        for _ in range(3):
+            adapter.outcomes.append(True)
+        self.assertEqual(adapter.success_rate(), 1.0)
+
+        # Direct call: rate=1.0 > 0.7 → increase; (12*3)//2 = 18; <= max=60 → 18.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 18)
+
+        # Next direct call from 18: (18*3)//2 = 27.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 27)
+
+    def test_adjust_size_direct_decrease_math(self):
+        """_adjust_size must apply (x*2)//3 for decrease and clamp to min."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=2, window_size=5,
+            success_threshold=0.9, low_threshold=0.4, high_threshold=0.7,
+        )
+        # Pre-set current size; pre-populate deque to force rate < low_threshold.
+        adapter.current_size = 18
+        adapter.outcomes.clear()
+        for _ in range(3):
+            adapter.outcomes.append(False)
+        self.assertEqual(adapter.success_rate(), 0.0)
+
+        # Direct call: rate=0.0 < 0.4 → decrease; max(2, (18*2)//3)=max(2,12)=12.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 12)
+
+        # Next direct call from 12: max(2, (12*2)//3)=max(2,8)=8.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 8)
+
+    def test_adjust_size_stable_no_change(self):
+        """_adjust_size must not change current_size when rate is in [low, high]."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=4,
+            success_threshold=0.9, low_threshold=0.5, high_threshold=0.8,
+        )
+        # Pre-populate to get a stable rate: 2 successes, 2 failures → rate=0.5 == low_threshold.
+        adapter.outcomes.clear()
+        for _ in range(2):
+            adapter.outcomes.append(True)
+        for _ in range(2):
+            adapter.outcomes.append(False)
+        self.assertEqual(adapter.trend, "stable")
+
+        # Direct call with stable rate must not modify current_size.
+        before = adapter.current_size
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, before)
+
+    def test_adjust_size_max_cap_enforced_direct(self):
+        """_adjust_size increase must clamp to max_size even when formula exceeds it."""
+        adapter = BatchSizeAdapter(
+            initial_size=50, min_size=2, window_size=3, max_size=60,
+            low_threshold=0.4, high_threshold=0.7,
+        )
+        adapter.current_size = 55
+        adapter.outcomes.clear()
+        for _ in range(2):
+            adapter.outcomes.append(True)
+        # (55*3)//2 = 82 > max_size=60 → must clamp to 60.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 60)
+
+    def test_adjust_size_min_cap_enforced_direct(self):
+        """_adjust_size decrease must clamp to min_size even when formula goes below it."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=4, window_size=3,
+            success_threshold=0.9, low_threshold=0.4, high_threshold=0.7,
+        )
+        adapter.current_size = 6
+        adapter.outcomes.clear()
+        for _ in range(2):
+            adapter.outcomes.append(False)
+        # (6*2)//3 = 4 == min_size → stays at 4; further decrease would go to 2 but clamp prevents.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 4)
+
+        # Next direct call from 4: (4*2)//3 = 2 < min_size=4 → must stay at 4.
+        adapter._adjust_size()
+        self.assertEqual(adapter.current_size, 4)
+
 
 if __name__ == "__main__":
     unittest.main()
