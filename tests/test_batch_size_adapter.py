@@ -497,6 +497,67 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter.record_outcome(0.0)
         self.assertEqual(adapter.current_size, 12)
 
+    def test_size_history_tracks_step_count_correctly(self):
+        """size_history() returns (step_number, size) tuples with correct step numbering;
+        stable-band steps are skipped from the log, initial state is always entry 0."""
+        adapter = BatchSizeAdapter(
+            initial_size=8, min_size=1, window_size=3, max_size=50,
+        )
+
+        # Initial state captured at step 0.
+        history = adapter.size_history()
+        self.assertEqual(len(history), 1)
+        self.assertEqual(history[0], (0, 8))
+
+        # First success: rate=1.0 > high_threshold=0.9 → increase; step_count becomes 1.
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 12)  # (8*3)//2 = 12
+        history = adapter.size_history()
+        self.assertEqual(history[1], (1, 12))
+
+        # Second success: rate=1.0 → increase to 18; step_count becomes 2.
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 18)  # (12*3)//2 = 18
+        history = adapter.size_history()
+        self.assertEqual(history[2], (2, 18))
+
+        # Third success: rate=1.0 → increase to 27; step_count becomes 3.
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 27)  # (18*3)//2 = 27
+        history = adapter.size_history()
+        self.assertEqual(history[3], (3, 27))
+
+        # Fourth success: rate=1.0 → increase to 40; step_count becomes 4.
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 40)  # (27*3)//2 = 40
+        history = adapter.size_history()
+        self.assertEqual(history[4], (4, 40))
+
+        # Fifth success: rate=1.0 → would be 60 but max_size=50 caps at 50; step_count becomes 5.
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 50)
+        history = adapter.size_history()
+        self.assertEqual(history[5], (5, 50))
+
+        # Stable-band step: window=[T,T,F] rate=2/3 → no adjust, entry skipped.
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 50)
+        history = adapter.size_history()
+        self.assertEqual(len(history), 6)
+
+        # Decrease step: window=[T,F,F] rate=1/3 < low_threshold → decrease to 33; step_count=7.
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 33)
+        history = adapter.size_history()
+        self.assertEqual(history[5], (5, 50))
+        self.assertEqual(history[6], (7, 33))
+
+        # Another decrease: window=[F,F,F] rate=0 → 22; step_count=8.
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 22)
+        history = adapter.size_history()
+        self.assertEqual(history[7], (8, 22))
+
     def test_get_metrics_reflects_converged_state(self):
         """get_metrics returns is_converged=True only when trend=='stable' AND window is full."""
         # Default thresholds: low=0.5, high=0.9 — stable at rate in [0.5, 0.9]
