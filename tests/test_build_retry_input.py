@@ -357,5 +357,48 @@ class BuildRetryInputTest(unittest.TestCase):
             self.assertEqual(table.headers, ["word_id", "word"])
             self.assertEqual(len(table.records), 0)
 
+    def test_build_retry_input_raises_on_structurally_corrupted_word_ids(self):
+        """Regression: list/dict word_id values must raise, not be silently dropped.
+
+        Previously these were skipped at the JSONL parse stage, producing empty output
+        that masked upstream data corruption. Now we fail fast with actionable context.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            rows = [
+                {"word_id": 3, "error": "ok"},
+                {"word_id": [1, 2]},       # list instead of scalar
+                {"word_id": {"nested": 1}}, # dict instead of scalar
+                {
+                    "word_id": None,        # missing/None — still skipped silently (existing contract)
+                    "error": "ok",
+                },
+            ]
+            failed.write_text(
+                "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
+            )
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1", "one"], ["2", "two"]],
+            )
+
+            with self.assertRaises(ValueError) as ctx:
+                build_retry_input(
+                    failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+                )
+            exc_str = str(ctx.exception)
+            # Must identify the offending type and content for debugging
+            self.assertIn("Unsupported", exc_str)
+            self.assertIn("[1, 2]", exc_str)
+
+    if __name__ == "__main__":
+        unittest.main()
+
+
 if __name__ == "__main__":
     unittest.main()

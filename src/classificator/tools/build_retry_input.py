@@ -12,13 +12,13 @@ def build_retry_input(
     if not failed_jsonl.exists():
         raise FileNotFoundError(f"Failed JSONL not found: {failed_jsonl}")
     if failed_jsonl.is_dir():
-        raise IsADirectoryError(f"Failed JSONL is a directory: {failed_jsonl}")
+        raise IsADirectoryError(f"Failed JSONL path is a directory: {failed_jsonl}")
     if not base_csv.exists():
         raise FileNotFoundError(f"Base CSV not found: {base_csv}")
     if base_csv.is_dir():
         raise IsADirectoryError(f"Base CSV is a directory: {base_csv}")
     if output_csv.is_dir():
-        raise IsADirectoryError(f"Output CSV is a directory: {output_csv}")
+        raise IsADirectoryError(f"Output CSV path is a directory: {output_csv}")
 
     wanted_ids: set[int] = set()
     with failed_jsonl.open("r", encoding="utf-8") as handle:
@@ -36,6 +36,10 @@ def build_retry_input(
             if isinstance(word_id, bool):
                 raise ValueError(
                     f"Boolean word_id in failed JSONL: {node}"
+                )
+            if isinstance(word_id, (list, dict)):
+                raise ValueError(
+                    f"Unsupported word_id type in failed JSONL ({type(word_id).__name__}): {word_id!r}"
                 )
             if isinstance(word_id, float):
                 raise ValueError(
