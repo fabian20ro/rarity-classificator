@@ -327,5 +327,35 @@ class BuildRetryInputTest(unittest.TestCase):
                     failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
                 )
 
+    def test_build_retry_input_no_matching_ids_writes_headers_only(self):
+        """Regression: when failed JSONL ids are absent from base CSV, output must still be valid."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            # word_ids 99 and 100 never appear in base (which has 1,2,3)
+            rows = [
+                {"word_id": 99},
+                {"word_id": 100},
+            ]
+            failed.write_text(
+                "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
+            )
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1", "one"], ["2", "two"], ["3", "three"]],
+            )
+
+            count = build_retry_input(
+                failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+            )
+            self.assertEqual(count, 0)
+            table = self.repo.read_table(out)
+            self.assertEqual(table.headers, ["word_id", "word"])
+            self.assertEqual(len(table.records), 0)
+
 if __name__ == "__main__":
     unittest.main()
