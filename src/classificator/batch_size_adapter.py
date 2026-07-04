@@ -54,6 +54,7 @@ class BatchSizeAdapter:
         self.low_threshold = low_threshold
         self.high_threshold = high_threshold
         self.step_count = 0
+        self._size_changes: list[tuple[int, int]] = [(0, initial_size)]
 
     def __repr__(self) -> str:
         return f"BatchSizeAdapter(size={self.current_size}, rate={self.success_rate():.2f}, trend={self.trend}, window={len(self.outcomes)}/{self.window_size}, min={self.min_size}, max={self.max_size}, threshold={self.success_threshold})"
@@ -103,6 +104,14 @@ class BatchSizeAdapter:
     def recommended_size(self) -> int:
         return self.current_size
 
+    def size_history(self) -> list[tuple[int, int]]:
+        """Return a log of (step_number, current_size) snapshots.
+
+        Captures every recorded adjustment including the initial state at step 0.
+        Useful for debugging convergence behavior over time.
+        """
+        return list(self._size_changes)
+
     def record_outcome(self, success_ratio: float) -> None:
         normalized = max(0.0, min(1.0, success_ratio))
         success = normalized >= self.success_threshold
@@ -117,6 +126,7 @@ class BatchSizeAdapter:
         self.outcomes.clear()
         self.current_size = self.initial_size
         self.step_count = 0
+        self._size_changes = [(0, self.initial_size)]
 
     def success_rate(self) -> float:
         if not self.outcomes:
@@ -129,7 +139,12 @@ class BatchSizeAdapter:
 
     def _adjust_size(self) -> None:
         rate = self.success_rate()
+        old_size = self.current_size
         if rate < self.low_threshold:
             self.current_size = max(self.min_size, (self.current_size * 2) // 3)
         elif rate > self.high_threshold:
             self.current_size = min(self.max_size, (self.current_size * 3) // 2)
+        else:
+            return
+        if self.current_size != old_size:
+            self._size_changes.append((self.step_count, self.current_size))

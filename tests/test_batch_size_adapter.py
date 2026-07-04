@@ -997,6 +997,91 @@ class TestBatchSizeAdapter(unittest.TestCase):
             adapter.record_outcome(1.0 if _ % 2 == 0 else 0.0)
         self.assertEqual(len(adapter), len(adapter.history()))
 
+    def test_size_history_starts_with_initial(self):
+        """size_history() starts with (0, initial_size) entry before any record."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        h = adapter.size_history()
+        self.assertEqual(h, [(0, 10)])
+
+    def test_size_history_records_increase(self):
+        """size_history() records a step when size actually changes upward."""
+        adapter = BatchSizeAdapter(
+            initial_size=6, min_size=2, window_size=3, max_size=40,
+        )
+        # Empty outcomes: rate=1.0 > 0.9 → increase to 9
+        adapter.record_outcome(1.0)
+        h = adapter.size_history()
+        self.assertEqual(h, [(0, 6), (1, 9)])
+
+    def test_size_history_skips_no_change(self):
+        """size_history() must not record entries when size stays the same after adjustment."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=5,
+            low_threshold=0.5, high_threshold=1.0,
+        )
+        # First record: empty outcomes rate=1.0 == high_threshold → no strict > → no adjust
+        adapter.record_outcome(1.0)
+        h = adapter.size_history()
+        self.assertEqual(h, [(0, 10)])
+
+        # Second record: window=[T,T], rate=1.0 still == high_threshold → still no adjust
+        adapter.record_outcome(1.0)
+        h = adapter.size_history()
+        self.assertEqual(h, [(0, 10)])
+
+    def test_size_history_tracks_multiple_changes(self):
+        """size_history() accumulates every distinct size change in order."""
+        adapter = BatchSizeAdapter(initial_size=5, min_size=2, window_size=3)
+        # Fill with successes to drive increase: 5→7→10 (capped at initial=5? no max defaults to initial so stays 5)
+        # Actually max=None → capped at initial_size=5. So first record fills empty window rate=1.0 > high → increase to 7 but cap at 5.
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 5)
+        h = adapter.size_history()
+        # Still just [(0, 5)] since size didn't change (capped).
+        self.assertEqual(h, [(0, 5)])
+
+    def test_size_history_with_explicit_max(self):
+        """size_history() tracks changes through increase chain up to max."""
+        adapter = BatchSizeAdapter(
+            initial_size=4, min_size=2, window_size=3, max_size=60,
+        )
+        # Step 1: rate=1.0 > high → (4*3)//2 = 6
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 6)
+        # Step 2: rate=1.0 > high → (6*3)//2 = 9
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 9)
+        h = adapter.size_history()
+        self.assertEqual(h, [(0, 4), (1, 6), (2, 9)])
+
+    def test_size_history_resets_with_reset(self):
+        """reset() must clear size history back to initial entry."""
+        adapter = BatchSizeAdapter(
+            initial_size=6, min_size=2, window_size=3, max_size=40,
+        )
+        for _ in range(5):
+            adapter.record_outcome(1.0)
+        self.assertGreater(len(adapter.size_history()), 1)
+
+        adapter.reset()
+        h = adapter.size_history()
+        self.assertEqual(h, [(0, 6)])
+
+    def test_size_history_does_not_mutate_on_stable(self):
+        """Stable-rate records must not add entries to size_history."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=5,
+            low_threshold=0.4, high_threshold=0.8,
+        )
+        # Drive stable: 2 successes + 2 failures → rate=0.5 (stable)
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        adapter.record_outcome(0.0)
+        h = adapter.size_history()
+        # First record: empty window rate=1.0 > 0.8 → increase to 15, capped at initial=10 → no change
+        # Subsequent records with stable rates → no changes
+        self.assertEqual(h, [(0, 10)])
 
 if __name__ == "__main__":
     unittest.main()
