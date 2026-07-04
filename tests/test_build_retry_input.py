@@ -445,9 +445,86 @@ class BuildRetryInputTest(unittest.TestCase):
             ids = [int(rec.values[-1]) for rec in table.records]
             self.assertEqual(ids, [2])
 
+    def test_build_retry_input_output_row_count_matches_return_value(self):
+        """Regression: output CSV row count must exactly match the return value.
+
+        Previously a bug could silently produce fewer rows than reported —
+        e.g. dedup logic changes or header-write short-circuit without body
+        would let count and actual I/O diverge. This assertion locks both sides.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            rows = [
+                {"word_id": 2, "error": "x"},
+                {"word_id": 4, "error": "y"},
+                {"word_id": 2, "error": "dup"},
+                {"word_id": 5, "error": "z"},
+            ]
+            failed.write_text(
+                "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
+            )
+
+            self.repo.write_rows(
+                base,
+                ["word_id", "word", "type"],
+                [
+                    ["1", "unu", "N"],
+                    ["2", "doi", "N"],
+                    ["3", "trei", "N"],
+                    ["4", "patru", "N"],
+                    ["5", "cinci", "N"],
+                    ["6", "sase", "N"],  # not in failed — excluded
+                ],
+            )
+
+            count = build_retry_input(
+                failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+            )
+            self.assertEqual(count, 3)
+
+            table = self.repo.read_table(out)
+            self.assertEqual(len(table.records), count)
+            self.assertEqual(table.headers, ["word_id", "word", "type"])
+            ids = [int(rec.values[0]) for rec in table.records]
+            self.assertEqual(sorted(ids), [2, 4, 5])
+
+    def test_build_retry_input_headers_preserved_when_no_matches(self):
+        """Regression: when no word_ids match, output CSV must still carry base headers.
+
+        Previously the empty-filters path could write an empty file without headers —
+        breaking downstream consumers that expect a valid CSV schema even on zero rows.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            # word_ids 9,10 never appear in base (which has 1-3)
+            rows = [{"word_id": 9}, {"word_id": 10}]
+            failed.write_text(
+                "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
+            )
+
+            self.repo.write_rows(
+                base,
+                ["word_id", "word", "type"],
+                [["1", "unu", "N"], ["2", "doi", "N"], ["3", "trei", "N"]],
+            )
+
+            count = build_retry_input(
+                failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+            )
+            self.assertEqual(count, 0)
+
+            table = self.repo.read_table(out)
+            # Headers must match the base CSV schema exactly — not be empty or partial.
+            self.assertEqual(table.headers, ["word_id", "word", "type"])
+            self.assertEqual(len(table.records), 0)
+
     if __name__ == "__main__":
         unittest.main()
-
-
-if __name__ == "__main__":
-    unittest.main()
