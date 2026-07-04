@@ -396,6 +396,42 @@ class BuildRetryInputTest(unittest.TestCase):
             self.assertIn("Unsupported", exc_str)
             self.assertIn("[1, 2]", exc_str)
 
+    def test_build_retry_input_dedup_uses_word_id_column_not_position_zero(self):
+        """Regression: dedup must use the word_id column index, not row[0].
+
+        When word_id is not column 0 (e.g. headers reordered), the previous code
+        crashed with ValueError because it tried int(row[0]) on a non-integer field.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            failed.write_text(
+                json.dumps({"word_id": 2}) + "\n", encoding="utf-8"
+            )
+            # word_id is the LAST column, not the first — simulates reordered headers
+            self.repo.write_rows(
+                base,
+                ["word", "type", "word_id"],
+                [
+                    ["one", "N", "1"],
+                    ["two_a", "N", "2"],
+                    ["two_b", "N", "2"],  # duplicate word_id=2
+                    ["three", "N", "3"],
+                ],
+            )
+
+            count = build_retry_input(
+                failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+            )
+            self.assertEqual(count, 1)
+
+            table = self.repo.read_table(out)
+            ids = [int(rec.values[-1]) for rec in table.records]
+            self.assertEqual(ids, [2])
+
     if __name__ == "__main__":
         unittest.main()
 

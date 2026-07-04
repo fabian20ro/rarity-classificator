@@ -89,7 +89,14 @@ def build_retry_input(
     seen_ids: set[int] = set()
     deduped_rows = []
     for row in rows:
-        wid = int(row[0]) if row[0] is not None else None
+        wid_val = row[idx] if idx < len(row) else None
+        if wid_val is not None and wid_val != "":
+            try:
+                wid = int(str(wid_val).strip())
+            except ValueError:
+                continue
+        else:
+            wid = None
         if wid is not None and wid not in seen_ids:
             seen_ids.add(wid)
             deduped_rows.append(row)
