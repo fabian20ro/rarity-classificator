@@ -396,6 +396,19 @@ class BuildRetryInputTest(unittest.TestCase):
             self.assertIn("Unsupported", exc_str)
             self.assertIn("[1, 2]", exc_str)
 
+    def test_build_retry_input_raises_when_files_missing(self):
+        """Regression: missing input paths must raise FileNotFoundError with path in message."""
+        root = Path("/tmp/word_rarity_test_no_access")
+
+        with self.assertRaises(FileNotFoundError) as ctx:
+            build_retry_input(
+                failed_jsonl=root / "does_not_exist.jsonl",
+                base_csv=root / "base.csv",
+                output_csv=Path("/tmp/out.csv"),
+                repo=self.repo,
+            )
+        self.assertIn("does_not_exist.jsonl", str(ctx.exception))
+
     def test_build_retry_input_dedup_uses_word_id_column_not_position_zero(self):
         """Regression: dedup must use the word_id column index, not row[0].
 
