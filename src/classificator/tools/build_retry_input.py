@@ -105,15 +105,21 @@ def build_retry_input(
 
     seen_ids: set[int] = set()
     deduped_rows = []
-    for row in rows:
+    for row_idx, row in enumerate(rows):
         wid_val = row[idx] if idx < len(row) else None
-        if wid_val is not None and wid_val != "":
-            try:
-                wid = int(str(wid_val).strip())
-            except ValueError:
-                continue
-        else:
-            wid = None
+        # Every row entering this pass was matched against `wanted_ids`, which
+        # already validated the word_id as a positive integer. An unparseable
+        # value here means the base CSV contained inconsistent data (e.g. a
+        # non-string ID that parsed in JSONL but not in CSV) — fail fast so
+        # corruption is visible rather than masked by silent dedup dropping.
+        if wid_val is None or wid_val == "":
+            continue
+        try:
+            wid = int(str(wid_val).strip())
+        except ValueError:
+            raise ValueError(
+                f"Unparseable word_id in matched row at index {row_idx}: '{wid_val}'"
+            )
         if wid is not None and wid not in seen_ids:
             seen_ids.add(wid)
             deduped_rows.append(row)

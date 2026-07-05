@@ -526,5 +526,40 @@ class BuildRetryInputTest(unittest.TestCase):
             self.assertEqual(table.headers, ["word_id", "word", "type"])
             self.assertEqual(len(table.records), 0)
 
+    def test_build_retry_input_dedup_preserves_first_occurrence(self):
+        """Dedup must keep first occurrence, not last — preserves base CSV row order."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            # Failed JSONL contains word_id=2 (valid positive int).
+            failed.write_text('{"word_id": 2}\n', encoding="utf-8")
+
+            # Base CSV: word_id=2 appears twice. First occurrence must survive dedup.
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [
+                    ["1", "first_one"],
+                    ["2", "first_two"],   # first occurrence of word_id=2
+                    ["3", "three"],
+                    ["2", "second_two"],  # duplicate — must be dropped
+                ],
+            )
+
+            count = build_retry_input(
+                failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+            )
+            self.assertEqual(count, 1)
+
+            table = self.repo.read_table(out)
+            ids = [int(rec.values[0]) for rec in table.records]
+            words = [rec.values[1] for rec in table.records]
+            # Exactly one row, first occurrence preserved
+            self.assertEqual(ids, [2])
+            self.assertEqual(words, ["first_two"])
+
     if __name__ == "__main__":
         unittest.main()
