@@ -761,6 +761,41 @@ class TestBatchSizeAdapter(unittest.TestCase):
             adapter.record_outcome(1.0)
         self.assertEqual(adapter.step_count, 7)
 
+    def test_consecutive_blocked_increases_no_history_entries(self):
+        """When size is pinned at max_size across multiple full-window cycles,
+        consecutive adjustment attempts must not create spurious history entries
+        — only real changes are logged."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=2, max_size=10,
+        )
+        # Fill window with successes to drive increase (capped at 10).
+        for _ in range(6):
+            before_len = len(adapter.size_history())
+            adapter.record_outcome(1.0)
+            after_len = len(adapter.size_history())
+            self.assertEqual(after_len, before_len, "No history entry when size unchanged")
+            self.assertEqual(adapter.current_size, 10)
+
+    def test_consecutive_blocked_decreases_no_history_entries(self):
+        """When size is pinned at min_size across multiple full-window cycles,
+        consecutive adjustment attempts must not create spurious history entries."""
+        adapter = BatchSizeAdapter(
+            initial_size=6, min_size=4, window_size=2,
+        )
+        # Drive down to min once.
+        adapter.record_outcome(0.0)  # rate=1.0 > high → increase capped at max=initial=6; stays 6
+        adapter.record_outcome(0.0)  # outcomes=[F,F], rate=0.0 < low=0.5 → decrease: max(4,(6*2)//3)=4
+        self.assertEqual(adapter.current_size, 4)
+
+        history_len_at_min = len(adapter.size_history())
+        # Now pin at min with consecutive failures — no size change should be logged.
+        for _ in range(8):
+            before_len = len(adapter.size_history())
+            adapter.record_outcome(0.0)
+            after_len = len(adapter.size_history())
+            self.assertEqual(after_len, before_len, "No history entry when pinned at min")
+            self.assertEqual(adapter.current_size, 4)
+
     def test_step_count_resets_with_reset(self):
         """reset() must clear step_count alongside other state."""
         adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
