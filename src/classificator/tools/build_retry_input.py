@@ -26,12 +26,28 @@ def build_retry_input(
             line = raw.strip()
             if not line:
                 continue
+
+            # Validate JSON parse independently — exceptions here (malformed
+            # lines) surface immediately so a broken producer is visible rather
+            # than masked by silent skip. The next check (`isinstance(node, dict)`
+            # and the rest of this loop's logic) runs OUTSIDE this try/except so
+            # failures there propagate with their own context.
             try:
                 node = json.loads(line)
-                if not isinstance(node, dict):
-                    continue
-            except Exception:
-                continue
+            except Exception as parse_exc:
+                raise ValueError(
+                    f"Unparseable failed-JSONL line: {line!r}"
+                ) from parse_exc
+
+            if not isinstance(node, dict):
+                # Valid JSON but wrong shape — signals schema drift in the
+                # producer of the failed JSONL (e.g. it started emitting arrays
+                # or bare strings after a code change). Surface immediately so
+                # the pipeline break is visible rather than masked by silent skip.
+                raise ValueError(
+                    f"Non-dict record in failed JSONL ({type(node).__name__}): {node!r}"
+                )
+
             word_id = node.get("word_id")
             if isinstance(word_id, bool):
                 raise ValueError(

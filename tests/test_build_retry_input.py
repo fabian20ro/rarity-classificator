@@ -145,15 +145,16 @@ class BuildRetryInputTest(unittest.TestCase):
             base = root / "base.csv"
             out = root / "retry.csv"
 
-            # lines that look like JSON but carry no valid word_id
+            # lines that carry no valid word_id — all silently skipped
             rows = [
                 {"word": "skip_me"},
                 {},
-                "not-json",
                 {"word_id": None},
                 {"word_id": "abc"},
             ]
-            failed.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
+            failed.write_text(
+                "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
+            )
             self.repo.write_rows(
                 base,
                 ["word_id", "word"],
@@ -395,6 +396,45 @@ class BuildRetryInputTest(unittest.TestCase):
             # Must identify the offending type and content for debugging
             self.assertIn("Unsupported", exc_str)
             self.assertIn("[1, 2]", exc_str)
+
+    def test_build_retry_input_rejects_non_dict_valid_json_records(self):
+        """Regression: valid-JSON lines that are arrays or bare strings must raise.
+
+        Previously these were silently dropped — an array record like `[3,"x"]`
+        parses fine as JSON but is not a dict, so the parser skipped it without
+        any signal. That produces empty output and masks producer-side schema
+        drift (e.g. a bug in the upstream writer that starts emitting arrays).
+        Now we raise ValueError so pipeline breakage surfaces immediately with
+        actionable context about what shape was found.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            rows = [
+                {"word_id": 3, "error": "ok"},
+                [1, 2],             # array instead of dict — valid JSON, wrong shape
+                ["bare_string"],    # bare string record — also wrong shape
+            ]
+            failed.write_text(
+                "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
+            )
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1", "one"], ["2", "two"]],
+            )
+
+            with self.assertRaises(ValueError) as ctx:
+                build_retry_input(
+                    failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+                )
+            exc_str = str(ctx.exception)
+            # Must identify the offending shape and content for debugging
+            self.assertIn("Non-dict", exc_str)
+            self.assertIn("list", exc_str)
 
     def test_build_retry_input_raises_when_files_missing(self):
         """Regression: missing input paths must raise FileNotFoundError with path in message."""
