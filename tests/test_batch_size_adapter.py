@@ -1179,5 +1179,12 @@ class TestBatchSizeAdapter(unittest.TestCase):
         # Subsequent records with stable rates → no changes
         self.assertEqual(h, [(0, 10)])
 
+    def test_success_threshold_must_be_in_valid_range(self):
+        """Constructor must reject success_threshold outside [0.0, 1.0]."""
+        with self.assertRaises(ValueError):
+            BatchSizeAdapter(initial_size=10, success_threshold=-0.1)
+        with self.assertRaises(ValueError):
+            BatchSizeAdapter(initial_size=10, success_threshold=1.1)
+
 if __name__ == "__main__":
     unittest.main()
