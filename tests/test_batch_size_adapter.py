@@ -360,6 +360,27 @@ class TestBatchSizeAdapter(unittest.TestCase):
         # but max_size defaults to initial_size=10 (max_size=None), so capped at 10
         self.assertEqual(adapter.current_size, 10)
 
+    def test_extreme_success_threshold_zero_multi_record(self):
+        """success_threshold=0.0 classifies any non-negative value as success;
+        consecutive positive records compound increases because _adjust_size fires per record."""
+        adapter = BatchSizeAdapter(
+            initial_size=8, min_size=2, window_size=3, max_size=100,
+            success_threshold=0.0, low_threshold=0.4, high_threshold=0.8,
+        )
+        # All three values are >= 0 → all classified as True (success).
+        adapter.record_outcome(0.5)   # normalized 0.5 ≥ 0.0 → success; rate=1.0 > 0.8 → increase: (8*3)//2 = 12
+        self.assertTrue(adapter.outcomes[-1])
+        adapter.record_outcome(1.0)   # normalized 1.0 ≥ 0.0 → success; size now 12, rate=1.0 > 0.8 → increase: (12*3)//2 = 18
+        self.assertTrue(adapter.outcomes[-1])
+        adapter.record_outcome(-2.0)  # clamped to 0.0 ≥ 0.0 → success; size now 18, rate=1.0 > 0.8 → increase: (18*3)//2 = 27
+        self.assertTrue(adapter.outcomes[-1])
+
+        # All three successes in window of size 3: rate=1.0 > high_threshold=0.8 → increase at each step
+        self.assertEqual(adapter.success_rate(), 1.0)
+        self.assertEqual(adapter.trend, "increasing")
+        # Compounded: 8 → 12 → 18 → 27 (each step fires _adjust_size on partial window)
+        self.assertEqual(adapter.current_size, 27)
+
     def test_extreme_success_threshold_one(self):
         """success_threshold=1.0 classifies only perfect outcomes as success."""
         adapter = BatchSizeAdapter(
