@@ -45,9 +45,19 @@ def build_retry_input(
                 raise ValueError(
                     f"Non-integer word_id in failed JSONL (float): {node}"
                 )
+            # None and empty-string are missing data — skip silently. Anything
+            # else that int() can't convert (custom objects, weird types) raises
+            # because it signals upstream corruption, not a benign parse miss.
+            if word_id is None or (isinstance(word_id, str) and word_id.strip() == ""):
+                continue
             try:
                 word_int = int(word_id)
-            except Exception:
+            except ValueError:
+                # int() only raises ValueError for strings it cannot convert.
+                # Keep the broad handler honest — unexpected errors (e.g. from
+                # custom __int__ subclasses, memory pressure, TypeError on
+                # unhandled types) should propagate so data corruption is visible
+                # rather than masked by silent skipping.
                 continue
             if word_int <= 0:
                 raise ValueError(
