@@ -426,6 +426,27 @@ class TestBatchSizeAdapter(unittest.TestCase):
             adapter.record_outcome(0.0)
         self.assertEqual(adapter.current_size, 2)
 
+    def test_absorbing_state_at_min_one(self):
+        """When current_size reaches 1 (absolute minimum given min_size >= 1),
+        neither increase nor decrease can change it — the floor-division math
+        makes size=1 an absorbing state. This is a genuine limitation of the
+        integer adjustment mechanism at very small sizes."""
+        adapter = BatchSizeAdapter(initial_size=2, min_size=1, window_size=3, max_size=50)
+        # Drive down to 1 via consecutive failures: (2*2)//3 = 1.
+        for _ in range(4):
+            adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 1)
+
+        # Consecutive successes must NOT pull it back up — (1*3)//2 = 1.
+        for _ in range(6):
+            adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 1)
+
+        # Consecutive failures from size=1 must also keep it at 1.
+        for _ in range(4):
+            adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 1)
+
     def test_adjustment_max_cap_stops_increase(self):
         """Increase must stop at max_size and never go above it regardless of further successes."""
         adapter = BatchSizeAdapter(initial_size=15, min_size=3, window_size=2, max_size=20)
