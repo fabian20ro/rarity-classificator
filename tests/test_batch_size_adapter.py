@@ -1034,6 +1034,45 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter._adjust_size()
         self.assertEqual(adapter.current_size, 4)
 
+    def test_adjust_size_direct_call_logs_history_at_step_count(self):
+        """Direct _adjust_size() calls must still log into _size_changes using the current step_count —
+        because step_count is only incremented by record_outcome, a caller that drives adjustment directly
+        (e.g. during recovery or re-initialisation) sees entries keyed at whatever step_count was set."""
+        adapter = BatchSizeAdapter(
+            initial_size=8, min_size=2, window_size=3, max_size=60,
+            success_threshold=0.9, low_threshold=0.4, high_threshold=0.7,
+        )
+        # Pre-populate to force increase; step_count stays at 0 (no record_outcome called).
+        adapter.outcomes.clear()
+        for _ in range(2):
+            adapter.outcomes.append(True)
+        self.assertEqual(adapter.success_rate(), 1.0)
+
+        before_history = list(adapter.size_history())
+        # Direct _adjust_size call: size changes, step_count is still 0 → entry must be keyed at (0, new).
+        adapter._adjust_size()
+        expected_entry = (0, 12)  # (8*3)//2 = 12
+        self.assertEqual(len(adapter.size_history()), len(before_history) + 1)
+        self.assertEqual(adapter.size_history()[-1], expected_entry)
+
+    def test_adjust_size_stable_does_not_log_history(self):
+        """_adjust_size called with stable rate must not append a (step_count, size) entry — the size is unchanged."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=4,
+            success_threshold=0.9, low_threshold=0.5, high_threshold=0.8,
+        )
+        adapter.outcomes.clear()
+        for _ in range(2):
+            adapter.outcomes.append(True)
+        for _ in range(2):
+            adapter.outcomes.append(False)
+        self.assertEqual(adapter.trend, "stable")
+
+        before_len = len(adapter.size_history())
+        adapter._adjust_size()
+        # No size change → no history entry appended.
+        self.assertEqual(len(adapter.size_history()), before_len)
+
     def test_success_threshold_equals_high_threshold_boundary(self):
         """success_threshold exactly equal to high_threshold: binary classification uses >= success_threshold,
         while adjustment uses strict > high_threshold — confirming the docstring's independence claim at exact equality.
