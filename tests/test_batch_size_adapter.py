@@ -1246,5 +1246,29 @@ class TestBatchSizeAdapter(unittest.TestCase):
         with self.assertRaises(ValueError):
             BatchSizeAdapter(initial_size=10, success_threshold=1.1)
 
+    def test_total_records_counter(self):
+        """total_records increments on every record_outcome call; reset clears it."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        self.assertEqual(adapter.total_records, 0)
+
+        for _ in range(7):
+            adapter.record_outcome(0.0)
+        self.assertEqual(adapter.total_records, 7)
+
+        # get_metrics includes the counter
+        metrics = adapter.get_metrics()
+        self.assertEqual(metrics["total_records"], 7)
+
+    def test_total_records_resets(self):
+        """After reset(), total_records returns to zero."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        for _ in range(4):
+            adapter.record_outcome(0.0)
+        self.assertEqual(adapter.total_records, 4)
+
+        adapter.reset()
+        self.assertEqual(adapter.total_records, 0)
+
+
 if __name__ == "__main__":
     unittest.main()
