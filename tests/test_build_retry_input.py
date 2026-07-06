@@ -628,5 +628,54 @@ class BuildRetryInputTest(unittest.TestCase):
             self.assertEqual(ids, [2])
             self.assertEqual(words, ["first_two"])
 
+    def test_build_retry_input_matches_failed_ids_against_base_records(self):
+        """Regression: output must contain exactly the records whose word_id appears in failed JSONL.
+
+        Previously a bug could skip valid matches or include non-matching rows —
+        for example if the wanted-ids set and base scan used different normalization,
+        one record would slip through unfiltered or a matching record would be dropped.
+        This assertion locks both sides: count AND content must match exactly.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            rows = [
+                {"word_id": 2, "error": "x"},
+                {"word_id": 5, "error": "y"},
+            ]
+            failed.write_text(
+                "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
+            )
+
+            self.repo.write_rows(
+                base,
+                ["word_id", "word", "type"],
+                [
+                    ["1", "unu", "N"],
+                    ["2", "doi", "N"],
+                    ["3", "trei", "N"],
+                    ["4", "patru", "N"],
+                    ["5", "cinci", "N"],
+                    ["6", "sase", "N"],  # not in failed — excluded
+                ],
+            )
+
+            count = build_retry_input(
+                failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+            )
+            self.assertEqual(count, 2)
+
+            table = self.repo.read_table(out)
+            self.assertEqual(len(table.records), 2)
+            ids = sorted(int(rec.values[0]) for rec in table.records)
+            words = [rec.values[1] for rec in table.records]
+            # Exactly the matched records, preserving base CSV order
+            self.assertEqual(ids, [2, 5])
+            self.assertIn("doi", words)
+            self.assertIn("cinci", words)
+
     if __name__ == "__main__":
         unittest.main()
