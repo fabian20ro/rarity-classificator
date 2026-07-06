@@ -61,6 +61,35 @@ class BuildRetryInputTest(unittest.TestCase):
             count = build_retry_input(failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo)
             self.assertEqual(count, 0)
 
+    def test_build_retry_input_refuses_to_overwrite_existing_output(self):
+        """Regression: pre-existing output CSV must raise FileExistsError.
+
+        Previously a stale output file was silently overwritten — masking
+        accidental reruns and silent data loss when the failed JSONL or base
+        changed between runs. Now we refuse to overwrite so the user sees the
+        collision on purpose instead of getting a different result than expected.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            failed.write_text('{"word_id": 1}\n', encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1", "test"]],
+            )
+            # Pre-create output file so it exists before build_retry_input runs
+            out.write_text("stale,data\n", encoding="utf-8")
+
+            with self.assertRaises(FileExistsError) as ctx:
+                build_retry_input(
+                    failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+                )
+            self.assertIn("retry.csv", str(ctx.exception))
+
     def test_build_retry_input_raises_on_directory_instead_of_file(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
