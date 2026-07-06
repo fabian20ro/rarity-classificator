@@ -54,6 +54,7 @@ class BatchSizeAdapter:
         self.low_threshold = low_threshold
         self.high_threshold = high_threshold
         self.step_count = 0
+        self.total_records = 0
         self._size_changes: list[tuple[int, int]] = [(0, initial_size)]
 
     def __repr__(self) -> str:
@@ -99,6 +100,7 @@ class BatchSizeAdapter:
             "window_usage": len(self.outcomes),
             "window_size": self.window_size,
             "step_count": self.step_count,
+            "total_records": self.total_records,
         }
 
     def recommended_size(self) -> int:
@@ -126,6 +128,7 @@ class BatchSizeAdapter:
         self.outcomes.clear()
         self.current_size = self.initial_size
         self.step_count = 0
+        self.total_records = 0
         self._size_changes = [(0, self.initial_size)]
 
     def success_rate(self) -> float:
@@ -140,6 +143,7 @@ class BatchSizeAdapter:
     def _adjust_size(self) -> None:
         rate = self.success_rate()
         old_size = self.current_size
+        self.total_records += 1
         if rate < self.low_threshold:
             self.current_size = max(self.min_size, (self.current_size * 2) // 3)
         elif rate > self.high_threshold:

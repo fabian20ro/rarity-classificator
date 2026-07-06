@@ -19,6 +19,10 @@ def build_retry_input(
         raise IsADirectoryError(f"Base CSV is a directory: {base_csv}")
     if output_csv.is_dir():
         raise IsADirectoryError(f"Output CSV path is a directory: {output_csv}")
+    if output_csv.exists() and not output_csv.is_dir():
+        raise FileExistsError(
+            f"Output CSV already exists (refusing to overwrite): {output_csv}"
+        )
 
     wanted_ids: set[int] = set()
     with failed_jsonl.open("r", encoding="utf-8") as handle:
