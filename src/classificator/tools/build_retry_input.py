@@ -76,12 +76,9 @@ def build_retry_input(
             try:
                 word_int = int(word_id)
             except ValueError:
-                # int() only raises ValueError for strings it cannot convert.
-                # Keep the broad handler honest — unexpected errors (e.g. from
-                # custom __int__ subclasses, memory pressure, TypeError on
-                # unhandled types) should propagate so data corruption is visible
-                # rather than masked by silent skipping.
-                continue
+                raise ValueError(
+                    f"Unparseable word_id in failed JSONL: {word_id!r}"
+                ) from None
             if word_int <= 0:
                 raise ValueError(
                     f"Non-positive word_id in failed JSONL: {word_int}"

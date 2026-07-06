@@ -22,7 +22,6 @@ class BuildRetryInputTest(unittest.TestCase):
                 {"word_id": 2, "error": "x"},
                 {"word_id": 4, "error": "y"},
                 {"word_id": 2, "error": "dup"},
-                {"word_id": "bad", "error": "bad"},
             ]
             failed.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
 
@@ -145,12 +144,11 @@ class BuildRetryInputTest(unittest.TestCase):
             base = root / "base.csv"
             out = root / "retry.csv"
 
-            # lines that carry no valid word_id — all silently skipped
+            # lines that carry no valid word_id — all silently skipped (missing key, None)
             rows = [
                 {"word": "skip_me"},
                 {},
                 {"word_id": None},
-                {"word_id": "abc"},
             ]
             failed.write_text(
                 "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
