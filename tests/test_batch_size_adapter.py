@@ -393,6 +393,27 @@ class TestBatchSizeAdapter(unittest.TestCase):
         # rate=0.0 < 0.4 → decrease: max(3, 10*2//3)=6
         self.assertEqual(adapter.current_size, 6)
 
+    def test_decrease_progression_exercises_min_cap_at_each_step(self):
+        """Consecutive failures from size 10 must follow exact [(x*2)//3] chain,
+        clamped to min_size=1 — verifying that max(min_size, ...) fires at every
+        step including when the raw formula would yield a value below the cap."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=1, window_size=2)
+
+        # Chain: 10 → 6 → 4 → 2 (raw floor div at each step is exact)
+        expected_decrease = [6, 4, 2]
+        for expected in expected_decrease:
+            adapter.record_outcome(0.0)
+            self.assertEqual(adapter.current_size, expected)
+
+        # One more failure: raw (2*2)//3=1 — still above min_size=1, so it lands exactly
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 1)
+
+        # Now at the absolute floor: further failures must keep size at 1
+        for _ in range(5):
+            adapter.record_outcome(0.0)
+        self.assertEqual(adapter.current_size, 1)
+
     def test_adjustment_floor_math_progression(self):
         """Continuous adjustment must follow exact (x*2)//3 / (x*3)//2 math at every step."""
         # Decrease path: verify each floor-division step lands exactly where the formula says.
