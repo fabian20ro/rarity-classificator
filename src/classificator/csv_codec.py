@@ -37,6 +37,11 @@ class CsvCodec:
         headers = [str(x) for x in rows[0]]
         if not headers:
             raise CsvFormatError(f"CSV has empty header row: {path}")
+        for i, cell in enumerate(headers):
+            if not cell:
+                raise CsvFormatError(
+                    f"CSV {path} header column {i + 1} is empty"
+                )
 
         records: list[CsvRecord] = []
         for i, row in enumerate(rows[1:], start=2):
