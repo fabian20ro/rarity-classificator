@@ -43,6 +43,13 @@ def test_matches_length_diff_limit():
     # diff 3
     assert matches("cat", "caaaaa") is False
 
+def test_matches_normalize_then_length_reject():
+    """Length-diff short-circuit fires even with diacritic normalization."""
+    # "ăăăă" -> norm "aaaa"; "b" -> norm "b"; diff=3 > 2 → short-circuit reject
+    assert matches("ăăăă", "b") is False
+    # "țțțț" -> norm "tttt"; "x" -> norm "x"; diff=3 > 2 → short-circuit reject
+    assert matches("țțțț", "x") is False
+
 if __name__ == "__main__":
     import unittest
     unittest.main()

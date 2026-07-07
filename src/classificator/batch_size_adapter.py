@@ -145,10 +145,11 @@ class BatchSizeAdapter:
         old_size = self.current_size
         self.total_records += 1
         if rate < self.low_threshold:
-            self.current_size = max(self.min_size, (self.current_size * 2) // 3)
+            new_size = max(self.min_size, (self.current_size * 2) // 3)
         elif rate > self.high_threshold:
-            self.current_size = min(self.max_size, (self.current_size * 3) // 2)
+            new_size = min(self.max_size, (self.current_size * 3) // 2)
         else:
             return
-        if self.current_size != old_size:
-            self._size_changes.append((self.step_count, self.current_size))
+        if new_size != old_size:
+            self.current_size = new_size
+            self._size_changes.append((self.step_count, new_size))
