@@ -37,6 +37,31 @@ REBALANCE_COMMON_LEVEL_PLACEHOLDER = "{{COMMON_LEVEL}}"
 REBALANCE_COMMON_COUNT_PLACEHOLDER = "{{COMMON_COUNT}}"
 USER_INPUT_PLACEHOLDER = "{{INPUT_JSON}}"
 
+_RE = __import__("re").compile(r"^\{\{[A-Z_]+\}\}$")
+
+_PLACEHOLDER_NAMES = (
+    "REBALANCE_FROM_LEVEL_PLACEHOLDER",
+    "REBALANCE_TO_LEVEL_PLACEHOLDER",
+    "REBALANCE_OTHER_LEVEL_PLACEHOLDER",
+    "REBALANCE_TARGET_COUNT_PLACEHOLDER",
+    "REBALANCE_COMMON_LEVEL_PLACEHOLDER",
+    "REBALANCE_COMMON_COUNT_PLACEHOLDER",
+    "USER_INPUT_PLACEHOLDER",
+)
+
+
+def _validate_placeholders() -> None:
+    for name in _PLACEHOLDER_NAMES:
+        value = globals()[name]
+        if not _RE.match(value):
+            raise ValueError(
+                f"Placeholder '{value}' defined as {name} does not match the "
+                f"expected format (must be double-brace, uppercase token)."
+            )
+
+
+_validate_placeholders()
+
 BASE_CSV_HEADERS = ["word_id", "word", "type"]
 RUN_CSV_HEADERS = [
     "word_id",
