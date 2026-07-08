@@ -44,12 +44,4 @@ def levenshtein(a: str, b: str) -> int:
 
 
 def matches(expected: str, actual: str) -> bool:
-    if expected == actual:
-        return True
-    norm_expected = normalize(expected)
-    norm_actual = normalize(actual)
-    if norm_expected == norm_actual:
-        return True
-    if abs(len(norm_expected) - len(norm_actual)) > MAX_EDIT_DISTANCE:
-        return False
-    return levenshtein(norm_expected, norm_actual) <= MAX_EDIT_DISTANCE
+    return levenshtein(normalize(expected), normalize(actual)) <= MAX_EDIT_DISTANCE
