@@ -13,6 +13,23 @@ def repair(raw: str) -> str:
     return _remove_trailing_commas(s3)
 
 
+def _track_string(in_string: bool, escaped: bool, ch: str) -> tuple[bool, bool]:
+    """Update string/escape state for a single character. Returns (in_string, escaped)."""
+    if in_string:
+        if escaped:
+            return False, False
+        if ch == "\\":
+            return True, True
+        if ch == '"':
+            return False, False
+        return True, False
+
+    if ch == '"':
+        return True, False
+
+    return in_string, escaped
+
+
 def _remove_line_comments(input_text: str) -> str:
     out: list[str] = []
     in_string = False
@@ -20,33 +37,16 @@ def _remove_line_comments(input_text: str) -> str:
     i = 0
     while i < len(input_text):
         ch = input_text[i]
-        if in_string:
-            out.append(ch)
-            if escaped:
-                escaped = False
-            elif ch == "\\":
-                escaped = True
-            elif ch == '"':
-                in_string = False
-            i += 1
-            continue
-
-        if ch == '"':
-            in_string = True
-            out.append(ch)
-            i += 1
-            continue
-
-        if ch == "/" and i + 1 < len(input_text) and input_text[i + 1] == "/":
+        if not in_string and ch == "/" and i + 1 < len(input_text) and input_text[i + 1] == "/":
             while out and out[-1] == " ":
                 out.pop()
             j = input_text.find("\n", i)
             if j == -1:
                 break
             i = j
-            continue
-
-        out.append(ch)
+        else:
+            in_string, escaped = _track_string(in_string, escaped, ch)
+            out.append(ch)
         i += 1
 
     return "".join(out)
@@ -57,27 +57,21 @@ def _fix_trailing_decimal_points(input_text: str) -> str:
     in_string = False
     escaped = False
     for i, ch in enumerate(input_text):
-        if in_string:
-            out.append(ch)
-            if escaped:
-                escaped = False
-            elif ch == "\\":
-                escaped = True
-            elif ch == '"':
-                in_string = False
-            continue
-
-        if ch == '"':
-            in_string = True
+        if in_string or ch != ".":
+            in_string, escaped = _track_string(in_string, escaped, ch)
             out.append(ch)
             continue
 
-        if ch == "." and i > 0 and input_text[i - 1].isdigit():
+        if i > 0 and input_text[i - 1].isdigit():
             nxt = input_text[i + 1] if i + 1 < len(input_text) else None
             if nxt is None or not nxt.isdigit():
+                in_string, escaped = _track_string(in_string, escaped, ch)
                 out.append(".0")
                 continue
+
+        in_string, escaped = _track_string(in_string, escaped, ch)
         out.append(ch)
+
     return "".join(out)
 
 
@@ -121,42 +115,27 @@ def _remove_trailing_commas(input_text: str) -> str:
     pending_comma = False
 
     for ch in input_text:
-        if in_string:
-            out.append(ch)
-            if escaped:
-                escaped = False
-            elif ch == "\\":
-                escaped = True
-            elif ch == '"':
-                in_string = False
-            continue
-
-        if ch == '"':
+        if not in_string and ch == '"':
             if pending_comma:
                 out.append(",")
                 pending_comma = False
-            in_string = True
+            in_string, escaped = True, False
             out.append(ch)
-            continue
-
-        if ch == ",":
+        elif ch == ",":
             pending_comma = True
-            continue
-
-        if ch in "]}":
+        elif ch in "]}":
             pending_comma = False
+            in_string, escaped = _track_string(in_string, escaped, ch)
             out.append(ch)
-            continue
+        else:
+            if pending_comma and ch.isspace():
+                pass
+            elif pending_comma:
+                out.append(",")
+                pending_comma = False
 
-        if pending_comma and ch.isspace():
+            in_string, escaped = _track_string(in_string, escaped, ch)
             out.append(ch)
-            continue
-
-        if pending_comma:
-            out.append(",")
-            pending_comma = False
-
-        out.append(ch)
 
     if pending_comma:
         out.append(",")
