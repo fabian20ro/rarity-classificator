@@ -438,7 +438,24 @@ def _resolve_step5_transitions(args) -> list[LevelTransition]:
     from_level_high = args.from_level_high
     to_level = args.to_level
 
-    if from_level is not None or to_level is not None:
+    if from_level is not None or to_level is not None or from_level_high is not None:
+        missing = [name for name, val in [
+            ("--from-level", from_level),
+            ("--to-level", to_level),
+            ("--from-level-high", from_level_high),
+        ] if val is None]
+        # When --from-level-high is given but neither from/to level is set → specific error.
+        if from_level_high is not None and from_level is None:
+            raise ValueError(
+                "Step5 requires both --from-level and --to-level when using --from-level-high; "
+                f"missing flags: {', '.join(missing)}"
+            )
+        # When only some of the base pair are given → specific error.
+        if (from_level is not None) != (to_level is not None):
+            raise ValueError(
+                f"Step5 requires both --from-level and --to-level together; "
+                f"missing flags: {', '.join(missing)}"
+            )
         if from_level is None or to_level is None:
             raise ValueError("Step5 requires both --from-level and --to-level when one is provided")
         if from_level_high is not None:
