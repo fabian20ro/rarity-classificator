@@ -178,9 +178,12 @@ class LmStudioResponseParser:
             pending_by_word_type.setdefault((row.word, row.type), []).append(row)
 
         scored: list[ScoreResult] = []
-        for node in results:
-            candidate = self._parse_score_candidate(node)
+        reject_reasons: list[str] = []
+        for idx, node in enumerate(results):
+            candidate, reason = self._parse_score_candidate(node)
             if candidate is None:
+                if reason is not None:
+                    reject_reasons.append(f"Node {idx}: {reason}")
                 continue
             matched = self._match_candidate(candidate, pending_by_id, pending_by_word_type)
             if matched is None:
@@ -198,32 +201,39 @@ class LmStudioResponseParser:
 
         unresolved = sorted(pending_by_id.values(), key=lambda r: r.word_id)
         if not scored and len(unresolved) == len(batch):
-            raise RuntimeError(
+            detail = (
                 f"No valid results parsed from {len(results)} result nodes for batch of {len(batch)}"
             )
+            if reject_reasons:
+                raise RuntimeError(f"{detail} — rejected reasons:\n" + "\n".join(reject_reasons))
+            raise RuntimeError(detail)
         if unresolved and self.metrics:
             self.metrics.record_error("WORD_MISMATCH")
         return ParsedBatch(scores=scored, unresolved=unresolved)
 
-    def _parse_score_candidate(self, node: object) -> ScoreCandidate | None:
+    def _parse_score_candidate(self, node: object) -> tuple[ScoreCandidate | None, str | None]:
         if not isinstance(node, dict):
-            return None
+            return None, f"type={type(node).__name__} (expected dict)"
         rarity = _to_int(node.get("rarity_level"))
         if rarity not in {1, 2, 3, 4, 5}:
-            return None
+            return None, f"invalid rarity_level={rarity!r}"
 
         wid = _to_int(node.get("word_id"))
         if wid is None:
-            return None
+            raw = node.get("word_id")
+            return None, f"missing or invalid word_id={raw!r}"
 
         confidence = _normalize_confidence(node.get("confidence"))
-        return ScoreCandidate(
-            word_id=wid,
-            word=_to_str_or_none(node.get("word")),
-            type=_to_str_or_none(node.get("type")),
-            rarity_level=rarity,
-            tag=str(node.get("tag") or "uncertain"),
-            confidence=confidence,
+        return (
+            ScoreCandidate(
+                word_id=wid,
+                word=_to_str_or_none(node.get("word")),
+                type=_to_str_or_none(node.get("type")),
+                rarity_level=rarity,
+                tag=str(node.get("tag") or "uncertain"),
+                confidence=confidence,
+            ),
+            None,
         )
 
     def _match_candidate(
