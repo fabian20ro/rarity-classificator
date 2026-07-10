@@ -37,6 +37,15 @@ class CliHelpTest(unittest.TestCase):
         self.assertIn("Alias of review-low-confidence", alias_help_text)
         self.assertIn("--include-undecided", alias_help_text)
 
+    def test_step5_help_mentions_dry_run(self):
+        parser = _build_parser()
+        subparsers = next(action for action in parser._actions if isinstance(action, argparse._SubParsersAction))
+        help_text = subparsers.choices["step5-rebalance"].format_help()
+        alias_help_text = subparsers.choices["step5"].format_help()
+        self.assertIn("--dry-run", help_text)
+        self.assertIn("Simulate the run without writing", help_text)
+        self.assertIn("--dry-run", alias_help_text)
+
 
 if __name__ == "__main__":
     unittest.main()
