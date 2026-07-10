@@ -121,5 +121,65 @@ class RequestBuilderTest(unittest.TestCase):
         self.assertEqual(payload["reasoning_effort"], "high")
         self.assertEqual(payload["chat_template_kwargs"]["enable_thinking"], True)
 
+    def test_reasoning_controls_preserves_all_fields_when_multiple_set(self):
+        config = LmModelConfig(
+            model_id="test-model",
+            reasoning_effort="medium",
+            enable_thinking=True,
+            thinking_type="disabled",
+        )
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=True,
+                config=config,
+                max_tokens=512,
+                expected_items=1,
+                schema_kind=JsonSchemaKind.SCORE_RESULTS,
+            )
+        )
+        self.assertEqual(payload["reasoning_effort"], "medium")
+        kwargs = payload["chat_template_kwargs"]
+        self.assertTrue(kwargs["enable_thinking"])
+        self.assertEqual(kwargs["thinking_type"], "disabled")
+
+    def test_selected_word_ids_schema_rejects_non_positive_expected_items(self):
+        with self.assertRaises(ValueError):
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_SCHEMA,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=512,
+                expected_items=0,
+                schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
+            )
+
+    def test_selected_word_ids_schema_accepts_positive_expected_items(self):
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch * 5,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_SCHEMA,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=512,
+                expected_items=5,
+                schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
+            )
+        )
+        schema = payload["response_format"]["json_schema"]["schema"]
+        self.assertEqual(schema["minItems"], 5)
+        self.assertEqual(schema["maxItems"], 5)
+
 if __name__ == "__main__":
     unittest.main()
