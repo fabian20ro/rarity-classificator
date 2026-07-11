@@ -111,6 +111,28 @@ class ScoringOutputModeEnumTest(unittest.TestCase):
             ScoringOutputMode.SELECTED_WORD_IDS.value, "selected_word_ids"
         )
 
+    def test_parse_defaults_to_score_results(self):
+        self.assertIs(ScoringOutputMode.parse(None), ScoringOutputMode.SCORE_RESULTS)
+        self.assertIs(ScoringOutputMode.parse(""), ScoringOutputMode.SCORE_RESULTS)
+        self.assertIs(ScoringOutputMode.parse(" score_results "), ScoringOutputMode.SCORE_RESULTS)
+
+    def test_parse_accepts_selected_word_ids(self):
+        self.assertIs(
+            ScoringOutputMode.parse("selected_word_ids"),
+            ScoringOutputMode.SELECTED_WORD_IDS,
+        )
+
+    def test_parse_case_insensitive_and_strips_whitespace(self):
+        self.assertIs(ScoringOutputMode.parse("SCORE_RESULTS"), ScoringOutputMode.SCORE_RESULTS)
+        self.assertIs(
+            ScoringOutputMode.parse(" Selected_Word_Ids "),
+            ScoringOutputMode.SELECTED_WORD_IDS,
+        )
+
+    def test_parse_rejects_unknown_value(self):
+        with self.assertRaises(ValueError):
+            ScoringOutputMode.parse("unexpected")
+
 
 if __name__ == "__main__":
     unittest.main()
