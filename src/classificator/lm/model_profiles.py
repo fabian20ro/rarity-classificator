@@ -58,5 +58,10 @@ DEFAULTS = {
 
 
 def resolve_model_config(model: str) -> LmModelConfig:
-    cfg = DEFAULTS.get(model.strip().lower(), DEFAULT_FALLBACK)
+    key = model.strip().lower()
+    if not key:
+        raise ValueError(
+            f"Invalid model ID (empty or whitespace-only): {model!r}"
+        )
+    cfg = DEFAULTS.get(key, DEFAULT_FALLBACK)
     return replace(cfg, model_id=model)

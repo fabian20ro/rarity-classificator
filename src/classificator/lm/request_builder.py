@@ -97,11 +97,13 @@ class LmStudioRequestBuilder:
         if include_reasoning_controls:
             if config.reasoning_effort is not None:
                 payload["reasoning_effort"] = config.reasoning_effort
+            kwargs: dict[str, object] = {}
             if config.enable_thinking is not None:
-                payload["chat_template_kwargs"] = {"enable_thinking": config.enable_thinking}
+                kwargs["enable_thinking"] = config.enable_thinking
             if config.thinking_type is not None:
-                payload["chat_template_kwargs"] = payload.get("chat_template_kwargs", {})
-                payload["chat_template_kwargs"]["thinking_type"] = config.thinking_type
+                kwargs["thinking_type"] = config.thinking_type
+            if kwargs:
+                payload["chat_template_kwargs"] = kwargs
 
         if schema_kind == JsonSchemaKind.SELECTED_WORD_IDS:
             if expected_items is None:
@@ -148,13 +150,14 @@ def _score_results_schema(expected_items: int) -> dict[str, object]:
 
 
 def _selected_word_ids_schema(expected_items: int, max_local_id: int) -> dict[str, object]:
-    expected = max(1, expected_items)
+    if expected_items is None or expected_items <= 0:
+        raise ValueError("expected_items must be positive")
     bounded_max = max(1, max_local_id)
     schema = {
         "type": "array",
         "items": {"type": "integer", "minimum": 1, "maximum": bounded_max},
-        "minItems": expected,
-        "maxItems": expected,
+        "minItems": expected_items,
+        "maxItems": expected_items,
         "uniqueItems": True,
     }
     return {"type": "json_schema", "json_schema": {"name": "selected_word_ids", "schema": schema}}

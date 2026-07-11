@@ -190,6 +190,45 @@ class QualityAuditTest(unittest.TestCase):
             self.assertEqual(result.l1_candidate_size, 2)
             self.assertEqual(result.l1_reference_size, 0)
 
+    def test_invalid_level_below_one_raises_value_error(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            headers = ["word_id", "word", "type", "final_level"]
+            self._write_csv(candidate, headers, [["1", "om", "N", "0"]])
+
+            with self.assertRaises(ValueError):
+                run_quality_audit(
+                    candidate_csv=candidate,
+                    repo=self.repo,
+                )
+
+    def test_invalid_level_above_five_raises_value_error(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            headers = ["word_id", "word", "type", "final_level"]
+            self._write_csv(candidate, headers, [["1", "om", "N", "6"]])
+
+            with self.assertRaises(ValueError):
+                run_quality_audit(
+                    candidate_csv=candidate,
+                    repo=self.repo,
+                )
+
+    def test_missing_level_column_raises_value_error(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            headers = ["word_id", "word", "type"]
+            self._write_csv(candidate, headers, [["1", "om", "N"]])
+
+            with self.assertRaises(ValueError):
+                run_quality_audit(
+                    candidate_csv=candidate,
+                    repo=self.repo,
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -119,6 +119,10 @@ class LmStudioClient:
             )
 
         base_url = (base_url_option or DEFAULT_LMSTUDIO_BASE_URL).strip().rstrip("/")
+        if not base_url:
+            raise ValueError(
+                "Neither endpoint nor base URL is provided; pass a valid LM API base URL."
+            )
         return self._detect_from_base(base_url, source="auto")
 
     def preflight(self, resolved_endpoint: ResolvedEndpoint, model: str) -> None:

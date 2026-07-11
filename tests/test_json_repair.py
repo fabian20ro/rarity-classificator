@@ -27,3 +27,20 @@ def test_removes_line_comment():
 
 def test_removes_trailing_commas_in_object():
     assert repair('{"a": 1,}') == '{"a": 1}'
+
+
+def test_line_comment_at_eof_without_newline():
+    assert repair('{"a": 1 // comment') == '{"a": 1}'
+
+
+def test_nested_unclosed_objects_and_arrays():
+    result = repair('[{"x": [')
+    assert result == '[{"x": []}]' or result == '[{"x":[]}]'
+
+
+def test_multiple_trailing_commas_in_array():
+    assert repair("[1, 2,,]") in {"[1, 2]", "[1,2]"}
+
+
+def test_decimal_inside_string_preserved():
+    assert repair('{"key": "3.14"}') == '{"key": "3.14"}'
