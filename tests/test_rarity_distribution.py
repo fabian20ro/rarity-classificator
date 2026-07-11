@@ -135,9 +135,6 @@ class RarityDistributionTest(unittest.TestCase):
                 run_rarity_distribution(csv_path=path, repo=self.repo)
             self.assertIn("Invalid rarity_level '' at row 3", str(cm.exception))
 
-if __name__ == "__main__":
-    unittest.main()
-
     def test_requested_level_column_missing_raises(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
