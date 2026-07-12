@@ -27,6 +27,7 @@ class Step3Options:
     outlier_threshold: int = DEFAULT_OUTLIER_THRESHOLD
     confidence_threshold: float = DEFAULT_CONFIDENCE_THRESHOLD
     merge_strategy: Step3MergeStrategy = Step3MergeStrategy.MEDIAN
+    dry_run: bool = False
 
 
 def run_step3(options: Step3Options, *, repo: RunCsvRepository) -> None:
@@ -46,8 +47,11 @@ def run_step3(options: Step3Options, *, repo: RunCsvRepository) -> None:
         if row["is_outlier"]:
             outlier_rows.append(_to_outlier_csv(row))
 
-    repo.write_rows(options.output_csv_path, COMPARISON_CSV_HEADERS, comparison_rows)
-    repo.write_rows(options.outliers_csv_path, OUTLIERS_CSV_HEADERS, outlier_rows)
+    if not options.dry_run:
+        repo.write_rows(options.output_csv_path, COMPARISON_CSV_HEADERS, comparison_rows)
+        repo.write_rows(options.outliers_csv_path, OUTLIERS_CSV_HEADERS, outlier_rows)
+    else:
+        print(f"Dry-run mode: Skipping writing output to {options.output_csv_path}")
 
     print(f"Step 3 complete. Outliers={len(outlier_rows)}")
     print(f"Step 3 final {dist.format()}")
