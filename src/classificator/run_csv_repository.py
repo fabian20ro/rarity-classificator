@@ -55,6 +55,10 @@ class RunCsvRepository:
                 model=row.get("model", ""),
                 run_slug=row.get("run_slug", ""),
             )
+            if parsed.word_id in by_id:
+                raise CsvFormatError(
+                    f"Duplicate word_id={parsed.word_id} at {path}:{rec.line_number}"
+                )
             by_id[parsed.word_id] = parsed
 
         return sorted(by_id.values(), key=lambda r: r.word_id)

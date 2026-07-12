@@ -99,6 +99,18 @@ class RarityDistributionTest(unittest.TestCase):
         self.assertEqual(dist.count(1), 1)
         self.assertEqual(dist.count(3), 1)
 
+    def test_increment_silent_duplicate_inflates_counts(self):
+        dist = RarityDistribution()
+        dist.increment(3)
+        dist.increment(3)
+        self.assertEqual(dist.count(3), 2)
+        self.assertEqual(dist.total, 2)
+
+    def test_from_levels_allows_duplicates(self):
+        dist = RarityDistribution.from_levels([1, 1, 1])
+        self.assertEqual(dist.count(1), 3)
+        self.assertEqual(dist.total, 3)
+
     def test_run_rarity_distribution_missing_column_raises(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

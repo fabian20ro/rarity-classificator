@@ -39,7 +39,7 @@ class TestStep1Export(unittest.TestCase):
     def test_run_step1_success(self):
         options = Step1Options(output_csv_path=self.output_csv)
         result_path = run_step1(options, word_store=self.mock_word_store, repo=self.mock_repo)
-        
+
         self.assertEqual(result_path, self.output_csv)
         self.mock_repo.write_rows.assert_called_once()
         # Check headers and data
@@ -50,6 +50,18 @@ class TestStep1Export(unittest.TestCase):
         self.assertEqual(len(rows), 2)
         self.assertEqual(rows[0], ["1", "apple", "fruit"])
         self.assertEqual(rows[1], ["2", "banana", "fruit"])
+
+    def test_run_step1_empty_input(self):
+        empty_store = MockWordStore([])
+        options = Step1Options(output_csv_path=self.output_csv)
+        result_path = run_step1(options, word_store=empty_store, repo=self.mock_repo)
+
+        self.assertEqual(result_path, self.output_csv)
+        args, _ = self.mock_repo.write_rows.call_args
+        headers, rows = args[1], args[2]
+        self.assertEqual(headers, ["word_id", "word", "type"])
+        self.assertEqual(rows, [])
+
 
 if __name__ == "__main__":
     unittest.main()

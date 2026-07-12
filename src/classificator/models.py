@@ -42,6 +42,15 @@ class ScoringOutputMode(str, Enum):
     SCORE_RESULTS = "score_results"
     SELECTED_WORD_IDS = "selected_word_ids"
 
+    @classmethod
+    def parse(cls, value: str | None) -> "ScoringOutputMode":
+        v = (value or "score_results").strip().lower()
+        if v in {"score_results", ""}:
+            return cls.SCORE_RESULTS
+        if v == "selected_word_ids":
+            return cls.SELECTED_WORD_IDS
+        raise ValueError(f"Invalid scoring output mode: {value}")
+
 
 @dataclass(frozen=True)
 class BaseWordRow:

@@ -96,6 +96,8 @@ def categorize_error(message: str | None) -> str:
         return "MODEL_CRASH"
     if "timed out" in lower or "connection refused" in lower or ("connect" in lower and "fail" in lower):
         return "CONNECTIVITY"
+    if any(x in lower for x in ["rate limit", "too many requests", "throttl"]):
+        return "RATE_LIMIT"
     return "OTHER"
 
 

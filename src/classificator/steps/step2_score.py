@@ -161,7 +161,6 @@ def _score_pending_batches(
         min_size=min_adaptive,
         window_size=options.batch_window,
     )
-    distribution.increment(row.rarity_level)
     scoring_ctx = ScoringContext(
         run_slug=run_slug,
         model=options.model,
