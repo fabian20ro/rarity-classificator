@@ -88,3 +88,43 @@ class RequestBuilderTest(unittest.TestCase):
             )
         )
         self.assertEqual(payload["max_tokens"], 50)
+
+    def test_selected_word_ids_schema_multi_item_bounds(self):
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_SCHEMA,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=512,
+                expected_items=2,
+                schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
+            )
+        )
+
+        schema = payload["response_format"]["json_schema"]["schema"]
+        self.assertEqual(schema["minItems"], 2)
+        self.assertEqual(schema["maxItems"], 2)
+        self.assertTrue(schema["uniqueItems"])
+        self.assertEqual(schema["items"], {"type": "integer", "minimum": 1, "maximum": 2})
+
+    def test_json_object_mode_produces_no_json_schema_key(self):
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_OBJECT,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=512,
+                expected_items=1,
+                schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
+            )
+        )
+
+        self.assertEqual(payload["response_format"], {"type": "json_object"})
