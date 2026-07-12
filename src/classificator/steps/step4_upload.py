@@ -102,18 +102,11 @@ def _build_full_fallback_plan(
     final_levels: dict[int, int],
     db_levels: dict[int, WordLevel],
 ) -> tuple[dict[int, int], list[list[str]], dict[int, str]]:
-    updates: dict[int, int] = {}
-    report_rows: list[list[str]] = []
-
-    for existing in sorted(db_levels.values(), key=lambda x: x.word_id):
-        in_final = existing.word_id in final_levels
-        new_level = final_levels.get(existing.word_id, FALLBACK_RARITY_LEVEL)
-        source = "final_csv" if in_final else "fallback_4"
-        updates[existing.word_id] = new_level
-        report_rows.append([str(existing.word_id), str(existing.rarity_level), str(new_level), source])
-
-    status = {
-        word_id: "uploaded"
-        for word_id in updates.keys()
-    }
+    rows = [
+        (existing.word_id, existing.rarity_level, final_levels.get(existing.word_id, FALLBACK_RARITY_LEVEL))
+        for existing in sorted(db_levels.values(), key=lambda x: x.word_id)
+    ]
+    updates = {wid: lvl for wid, _, lvl in rows}
+    report_rows = [[str(wid), str(old_lvl), str(new_lvl), "final_csv" if wid in final_levels else "fallback_4"] for wid, old_lvl, new_lvl in rows]
+    status = {wid: "uploaded" for wid, _, _ in rows}
     return updates, report_rows, status
