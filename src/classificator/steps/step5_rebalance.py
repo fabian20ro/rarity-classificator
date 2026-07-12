@@ -366,48 +366,7 @@ def _select_stratified_batch(
         return []
 
     batch_size = min(max_batch_size, total_remaining)
-    if len(source_levels) == 1:
-        quotas = {source_levels[0]: batch_size}
-    else:
-        total_initial = float(sum(initial_source_counts.values()))
-        quotas = {}
-        for level in source_levels:
-            quotas[level] = int(batch_size * ((initial_source_counts.get(level, 0) / total_initial)))
-
-        unassigned = batch_size - sum(quotas.values())
-        fractions = sorted(
-            source_levels,
-            key=lambda level: (batch_size * ((initial_source_counts.get(level, 0) / total_initial))) - quotas[level],
-            reverse=True,
-        )
-        for level in fractions:
-            if unassigned <= 0:
-                break
-            quotas[level] += 1
-            unassigned -= 1
-
-    missing = 0
-    for level in source_levels:
-        available = len(remaining_by_source_level.get(level, []))
-        planned = quotas.get(level, 0)
-        if planned > available:
-            missing += planned - available
-            quotas[level] = available
-
-    while missing > 0:
-        candidates = [
-            level
-            for level in source_levels
-            if quotas.get(level, 0) < len(remaining_by_source_level.get(level, []))
-        ]
-        if not candidates:
-            break
-        candidate = max(
-            candidates,
-            key=lambda level: len(remaining_by_source_level.get(level, [])) - quotas.get(level, 0),
-        )
-        quotas[candidate] += 1
-        missing -= 1
+    quotas = _allocate_quota(source_levels, initial_source_counts, batch_size, remaining_by_source_level)
 
     batch: list[RebalanceWord] = []
     for level in source_levels:
@@ -419,6 +378,52 @@ def _select_stratified_batch(
 
     rng.shuffle(batch)
     return batch
+
+
+def _allocate_quota(
+    source_levels: list[int],
+    initial_source_counts: dict[int, int],
+    target_size: int,
+    remaining_by_source_level: dict[int, list[RebalanceWord]],
+) -> dict[int, int]:
+    """Compute per-source quotas honoring stratified proportions and availability caps."""
+    if len(source_levels) == 1:
+        return {source_levels[0]: target_size}
+
+    total_initial = float(sum(initial_source_counts.values()))
+    quotas: dict[int, int] = {}
+    for level in source_levels:
+        quotas[level] = int(target_size * (initial_source_counts.get(level, 0) / total_initial))
+
+    unassigned = target_size - sum(quotas.values())
+    fractions = sorted(
+        source_levels,
+        key=lambda level: (target_size * (initial_source_counts.get(level, 0) / total_initial)) - quotas[level],
+        reverse=True,
+    )
+    for level in fractions:
+        if unassigned <= 0:
+            break
+        quotas[level] += 1
+        unassigned -= 1
+
+    overflow = 0
+    for level in source_levels:
+        available = len(remaining_by_source_level.get(level, []))
+        planned = quotas.get(level, 0)
+        if planned > available:
+            overflow += planned - available
+            quotas[level] = available
+
+    while overflow > 0:
+        candidates = [level for level in source_levels if quotas.get(level, 0) < len(remaining_by_source_level.get(level, []))]
+        if not candidates:
+            break
+        best = max(candidates, key=lambda lvl: len(remaining_by_source_level.get(lvl, [])) - quotas.get(lvl, 0))
+        quotas[best] += 1
+        overflow -= 1
+
+    return quotas
 
 
 def _compute_adaptive_target_count(
