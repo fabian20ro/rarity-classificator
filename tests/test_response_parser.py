@@ -138,5 +138,20 @@ class ResponseParserTest(unittest.TestCase):
                 expected_items=None,
             )
 
+class NormalizeSelectionWordTest(unittest.TestCase):
+    def test_normalize_strips_edge_punctuation_after_lowercase(self):
+        from classificator.lm.response_parser import _normalize_selection_word as norm
+
+        self.assertEqual(norm("OM!"), "om")
+        self.assertEqual(norm("  casă...  "), "casă")
+        self.assertEqual(norm("'om'"), "om")
+
+    def test_normalize_returns_empty_for_whitespace_only(self):
+        from classificator.lm.response_parser import _normalize_selection_word as norm
+
+        self.assertEqual(norm(""), "")
+        self.assertEqual(norm("   "), "")
+
+
 if __name__ == "__main__":
     unittest.main()

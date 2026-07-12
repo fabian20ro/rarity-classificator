@@ -93,15 +93,16 @@ class TestChainRebalance(unittest.TestCase):
             _get_level_count(Path("dummy.csv"), 1, MockRepo())
         self.assertIn("final_level or rarity_level", str(cm.exception))
 
-    def test_get_level_count_skips_invalid_values(self):
+    def test_get_level_count_handles_malformed_values_gracefully(self):
         from src.classificator.tools.chain_rebalance_target_dist import _get_level_count
 
         class MockTable:
             headers = ["word_id", "rarity_level"]
             records = [
                 MagicMock(values=["1", "2"]),
-                MagicMock(values=["2", "not_a_number"]),
-                MagicMock(values=["3", "2"]),
+                MagicMock(values=["2", "abc"]),  # non-numeric value
+                MagicMock(values=["3", "3.5"]),   # float string in int column
+                MagicMock(values=["4", "2"]),
             ]
 
         class MockRepo(RunCsvRepository):
@@ -111,7 +112,26 @@ class TestChainRebalance(unittest.TestCase):
                 return []
 
         count = _get_level_count(Path("dummy.csv"), 2, MockRepo())
-        self.assertEqual(count, 2)
+        self.assertEqual(count, 2)  # Records 0 and 3 have rarity_level == "2"
+
+    def test_get_level_count_non_numeric_skips_record(self):
+        from src.classificator.tools.chain_rebalance_target_dist import _get_level_count
+
+        class MockTable:
+            headers = ["word_id", "rarity_level"]
+            records = [
+                MagicMock(values=["1", "not_a_number"]),  # invalid value
+                MagicMock(values=["2", "1"]),
+            ]
+
+        class MockRepo(RunCsvRepository):
+            def read_table(self, path):
+                return MockTable()
+            def load_run_rows(self, path):
+                return []
+
+        count = _get_level_count(Path("dummy.csv"), 1, MockRepo())
+        self.assertEqual(count, 1)  # Only record 1 has rarity_level == 1; invalid skipped
 
     def test_sanitize_slug_strips_special_chars(self):
         from src.classificator.tools.chain_rebalance_target_dist import _sanitize_slug
