@@ -38,12 +38,7 @@ def run_quality_audit(
     l1_intersection = None
     l1_reference_size = None
 
-    print(f"candidate_csv={candidate_csv}")
-    print(f"candidate_level_column={candidate['level_column']}")
     dist = candidate["distribution"]
-    print(
-        f"candidate_distribution=[1:{dist[1]} 2:{dist[2]} 3:{dist[3]} 4:{dist[4]} 5:{dist[5]}] total={candidate['total_rows']}"
-    )
 
     if reference_csv is not None:
         reference = _load_run(reference_csv, repo)
@@ -53,10 +48,6 @@ def run_quality_audit(
         l1_jaccard = jaccard
         l1_intersection = inter
         l1_reference_size = len(reference["l1_word_ids"])
-        print(
-            f"l1_jaccard={jaccard:.4f} intersection={inter} candidate_l1={len(candidate['l1_word_ids'])} "
-            f"reference_l1={len(reference['l1_word_ids'])}"
-        )
         if min_l1_jaccard is not None and jaccard < min_l1_jaccard:
             failures.append(f"l1_jaccard {jaccard:.4f} < min {min_l1_jaccard:.4f}")
 
@@ -69,23 +60,12 @@ def run_quality_audit(
         recall = _ratio(inter, len(anchors))
         anchor_precision = precision
         anchor_recall = recall
-        print(
-            f"anchor_l1_precision={precision:.4f} ({inter}/{len(candidate['l1_words'])}) "
-            f"anchor_l1_recall={recall:.4f} ({inter}/{len(anchors)})"
-        )
         if min_anchor_l1_precision is not None and precision < min_anchor_l1_precision:
             failures.append(f"anchor_l1_precision {precision:.4f} < min {min_anchor_l1_precision:.4f}")
         if min_anchor_l1_recall is not None and recall < min_anchor_l1_recall:
             failures.append(f"anchor_l1_recall {recall:.4f} < min {min_anchor_l1_recall:.4f}")
 
     passed = not failures
-    if passed:
-        print("quality_gate=PASS")
-    else:
-        print("quality_gate=FAIL")
-        for f in failures:
-            print(f"- {f}")
-
     return QualityAuditResult(
         distribution=dist,
         total_rows=candidate["total_rows"],
