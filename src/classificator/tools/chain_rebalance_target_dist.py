@@ -199,7 +199,7 @@ def _get_level_count(csv_path: Path, level: int, repo: RunCsvRepository) -> int:
         try:
             if int(rec.values[idx]) == level:
                 count += 1
-        except Exception:
+        except (ValueError, TypeError):
             continue
     return count
 
