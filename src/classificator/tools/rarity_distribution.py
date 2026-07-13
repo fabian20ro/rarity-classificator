@@ -39,11 +39,9 @@ def run_rarity_distribution(
             raise ValueError(f"Missing {resolved_level_col} at row {rec.line_number} in {csv_path}")
         raw_level = vals[idx_level].strip()
         try:
-            level = int(raw_level)
-        except Exception as exc:
-            raise ValueError(f"Invalid {resolved_level_col} '{raw_level}' at row {rec.line_number} in {csv_path}") from exc
-        if level < 1 or level > 5:
-            raise ValueError(f"Invalid {resolved_level_col} {level} at row {rec.line_number} in {csv_path}")
+            level = _validate_level(raw_level, resolved_level_col, rec.line_number)
+        except ValueError as exc:
+            raise exc
         distribution[level] += 1
 
     mode = max(distribution, key=distribution.get)
@@ -78,6 +76,16 @@ def _resolve_level_column(headers: list[str], level_column: str | None) -> str:
         if col in headers:
             return col
     raise ValueError("CSV missing level column: final_level/rarity_level/median_level")
+
+
+def _validate_level(raw_level: str, col_name: str, line_number: int) -> int:
+    try:
+        level = int(raw_level)
+    except Exception as exc:
+        raise ValueError(f"Invalid {col_name} '{raw_level}' at row {line_number}") from exc
+    if level < 1 or level > 5:
+        raise ValueError(f"Invalid {col_name} {level} at row {line_number}")
+    return level
 
 
 def _pct(part: int, total: int) -> float:
