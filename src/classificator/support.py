@@ -4,11 +4,19 @@ from pathlib import Path
 
 
 def sanitize_run_slug(raw: str) -> str:
+    if not isinstance(raw, str):
+        raise TypeError(
+            f"sanitize_run_slug expects str, got {type(raw).__name__}"
+        )
     normalized = raw.strip().lower().replace("-", "_")
     valid = "".join(ch for ch in normalized if ch.isalnum() or ch == "_")
-    if not (1 <= len(valid) <= 40):
+    if not valid:
         raise ValueError(
-            f"Invalid run slug '{raw}'. Allowed: lowercase alnum + underscore, max 40 chars"
+            f"Invalid run slug '{raw}'. Result is empty after sanitization."
+        )
+    if len(valid) > 40:
+        raise ValueError(
+            f"Invalid run slug '{raw}'. Length {len(valid)} exceeds maximum of 40 chars"
         )
     return valid
 
