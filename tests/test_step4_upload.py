@@ -96,6 +96,53 @@ class TestStep4Upload(unittest.TestCase):
             found_3 = next(r for r in rows if r['word_id'] == '3')
             self.assertEqual(found_3['new_level'], '4')
 
+    def test_partial_missing_db_word(self):
+        # word_id 2 is in CSV but missing from db_levels → reported as missing_db_word, no update emitted
+        self.mock_word_store.fetch_all_word_levels.return_value = [
+            WordLevel(word_id=1, rarity_level=1),
+        ]
+
+        options = Step4Options(
+            final_csv_path=self.final_csv,
+            mode=UploadMode.PARTIAL,
+            report_path=self.report_csv,
+            upload_batch_id="test-batch",
+        )
+
+        run_step4(options, word_store=self.mock_word_store, repo=self.mock_repo, marker_writer=self.mock_marker_writer)
+
+        # Only word 1 should be in updates; word 2 absent from DB
+        self.assertEqual(set(self.mock_word_store.update_rarity_levels_chunked.call_args[0][0].keys()), {1})
+        with open(self.report_csv, "r") as f:
+            reader = csv.DictReader(f)
+            rows = list(reader)
+            sources = [r["source"] for r in rows]
+            self.assertIn("missing_db_word", sources)
+
+    def test_partial_audit_gate_blocks_upload(self):
+        # When reference_csv is provided and quality audit fails, run_step4 must raise RuntimeError
+        options = Step4Options(
+            final_csv_path=self.final_csv,
+            mode=UploadMode.PARTIAL,
+            report_path=self.report_csv,
+            upload_batch_id="test-batch",
+            reference_csv=self.test_dir / "ref.csv",
+        )
+
+        from unittest.mock import patch
+
+        with patch("classificator.tools.quality_audit.run_quality_audit") as mock_audit:
+            mock_result = MagicMock()
+            mock_result.passed = False
+            mock_result.failures = ["jaccard too low"]
+            mock_audit.return_value = mock_result
+
+            with self.assertRaises(RuntimeError) as ctx:
+                run_step4(options, word_store=self.mock_word_store, repo=self.mock_repo, marker_writer=self.mock_marker_writer)
+            self.assertIn("Quality audit failed", str(ctx.exception))
+            # Upload must not have been executed before the gate raised
+            self.assertFalse(self.mock_word_store.update_rarity_levels_chunked.called)
+
     def tearDown(self):
         self.temp_dir.cleanup()
 
