@@ -347,3 +347,13 @@ Each entry should follow this structure:
 **Outcome:** Success. Local tests pass; the branch now has a workflow for GitHub to report in the PR status rollup.
 **Insight:** Compound gate cannot turn green for a repo with an open PR and no GitHub Actions workflow because the PR status rollup stays empty.
 **Promoted to Lessons Learned:** Yes
+
+---
+
+### [2026-07-13] Reduced Compound unittest progress noise
+
+**Context:** Compound local-green used unittest verbose mode for the full suite, producing hundreds of per-test lines even when successful.
+**What happened:** Changed the central roster command and preferred-check hint from `-v` to `-q`. Project CI remains unchanged and failures still retain unittest tracebacks and summaries.
+**Outcome:** Focused runtime-config and quiet/full-suite verification passed.
+**Insight:** Runner verbosity belongs in central orchestration when project CI already uses a concise command.
+**Promoted to Lessons Learned:** No
