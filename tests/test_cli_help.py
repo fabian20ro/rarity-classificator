@@ -47,5 +47,17 @@ class CliHelpTest(unittest.TestCase):
         self.assertIn("--dry-run", alias_help_text)
 
 
+class AllSubcommandHelpTest(unittest.TestCase):
+    def test_all_subcommands_have_non_empty_help(self):
+        parser = _build_parser()
+        subparsers = next(action for action in parser._actions if isinstance(action, argparse._SubParsersAction))
+        missing = []
+        for name, cmd_parser in sorted(subparsers.choices.items()):
+            help_text = cmd_parser.format_help().strip()
+            if not help_text:
+                missing.append(name)
+        self.assertEqual(missing, [], f"subcommands with empty help text: {missing}")
+
+
 if __name__ == "__main__":
     unittest.main()
