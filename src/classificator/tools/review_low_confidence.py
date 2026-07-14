@@ -44,6 +44,7 @@ def run_review_low_confidence(
     only_levels: set[int] | None = None,
     max_items: int = 200,
     include_undecided: bool = False,
+    skip_count: int = 0,
 ) -> None:
     items = load_review_items(
         csv_path=csv_path,
@@ -56,10 +57,13 @@ def run_review_low_confidence(
     queue = build_review_queue(items, latest, include_undecided=include_undecided)
     if max_items > 0:
         queue = queue[:max_items]
+    skipped = 0
+    if skip_count > 0 and queue:
+        queue, skipped = queue[skip_count:], len(queue) - len(queue[skip_count:])
 
     print(f"input_csv={csv_path}")
     print(f"labels_csv={labels_csv}")
-    print(f"queue_size={len(queue)} include_undecided={str(include_undecided).lower()} max_items={max_items}")
+    print(f"queue_size={len(queue)} include_undecided={str(include_undecided).lower()} max_items={max_items} skipped={skipped}")
     print("labels: 1 | 2 | 3 | u=unknown(4/5) | d=undecided | s=skip | q=quit")
 
     if not queue:
