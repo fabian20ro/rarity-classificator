@@ -79,5 +79,56 @@ class TransitionsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_transition_set([])
 
+    # -- LevelTransition utility methods -----------------------------------
+
+    def test_describe_sources_single(self):
+        t = LevelTransition(from_level=3, to_level=2)
+        self.assertEqual(t.describe_sources(), "3")
+
+    def test_describe_sources_pair(self):
+        t = LevelTransition(from_level=3, from_level_upper=4, to_level=3)
+        self.assertEqual(t.describe_sources(), "3-4")
+
+    def test_other_level_downgrade(self):
+        # 3:2 downgrade → other is the source level (from_level != to_level).
+        t = LevelTransition(from_level=3, to_level=2)
+        self.assertEqual(t.other_level(), 3)
+
+    def test_other_level_same_level(self):
+        # Same-level transition returns min(5, to_level + 1).
+        t = LevelTransition(from_level=4, to_level=4)
+        self.assertEqual(t.other_level(), 5)
+
+    def test_other_level_pair_target_lower(self):
+        # Pair 2-3→2: source_levels=[2,3], target is 2 → other is 3.
+        t = LevelTransition(from_level=2, from_level_upper=3, to_level=2)
+        self.assertEqual(t.other_level(), 3)
+
+    def test_other_level_pair_target_upper(self):
+        # Pair 2-3→3: source_levels=[2,3], target is 3 → other is 2.
+        t = LevelTransition(from_level=2, from_level_upper=3, to_level=3)
+        self.assertEqual(t.other_level(), 2)
+
+    def test_parse_transitions_duplicates_rejected(self):
+        # Duplicates are caught by validate_transition_set before dedup runs.
+        with self.assertRaises(ValueError):
+            parse_transitions("3:2, 3:2, 4:3")
+
+    def test_parse_transitions_sort_order(self):
+        # Verify ordering by (from_level, from_level_upper or from_level, to_level).
+        parsed = parse_transitions("5:4, 3-4:3, 1:1")
+        self.assertEqual(
+            [(t.from_level, t.to_level) for t in parsed],
+            [(1, 1), (3, 3), (5, 4)],
+        )
+
+    def test_parse_transitions_single_dedup(self):
+        # Single token with no duplicates: parse → validate passes → dedup dict
+        # preserves it. Order is deterministic.
+        parsed = parse_transitions("4:3")
+        self.assertEqual(len(parsed), 1)
+        self.assertEqual(parsed[0].from_level, 4)
+        self.assertEqual(parsed[0].to_level, 3)
+
 if __name__ == "__main__":
     unittest.main()
