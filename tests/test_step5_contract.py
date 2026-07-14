@@ -74,5 +74,36 @@ class TestStep5Contract(unittest.TestCase):
                 # We check that it's not 0.
                 self.assertNotEqual(int(row['word_id']), 0)
 
+    @patch('classificator.lm.client._load_requests')
+    @patch('classificator.lm.client.LmStudioClient.score_batch_resilient')
+    @patch('classificator.lm.client.LmStudioClient.preflight')
+    @patch('classificator.lm.client.LmStudioClient.resolve_endpoint')
+    def test_dry_run_skips_output_csv(self, mock_load_requests, mock_resolve, mock_preflight, mock_score):
+        """When dry_run=True, no output CSV should be written."""
+        mock_requests = MagicMock()
+        mock_load_requests.return_value = mock_requests
+        mock_resolve.return_value = MagicMock(endpoint="http://localhost:1234", flavor="local", source="test")
+
+        # Simulate scoring word 2 for transition.
+        mock_results = [MagicMock(word_id=2, rarity_level=1)]
+        mock_score.return_value = mock_results
+
+        options = Step5Options(
+            run_slug="dry_run_test",
+            model="test-model",
+            input_csv_path=self.input_csv,
+            output_csv_path=self.output_csv,
+            transitions=[LevelTransition(from_level=2, to_level=1)],
+            dry_run=True  # dry_run=True: no output written
+        )
+
+        repo = RunCsvRepository()
+        lm_client = LmStudioClient(api_key="dummy")
+
+        run_step5(options, repo=repo, lm_client=lm_client, output_dir=self.test_dir)
+
+        self.assertFalse(self.output_csv.exists(), "output CSV must not exist in dry-run mode")
+
+
 if __name__ == "__main__":
     unittest.main()
