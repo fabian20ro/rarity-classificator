@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 
 from .constants import UPLOAD_MARKER_HEADERS
 from .models import UploadMarkerResult
 from .run_csv_repository import RunCsvRepository
+
+
+logger = logging.getLogger(__name__)
 
 
 class UploadMarkerWriter:
@@ -34,6 +38,10 @@ class UploadMarkerWriter:
                 uploaded_at=uploaded_at,
             )
         except PermissionError:
+            logger.info(
+                "Cannot write markers in-place to %s (permission denied); writing companion file instead",
+                final_csv_path,
+            )
             return self._write_companion(
                 final_csv_path=final_csv_path,
                 uploaded_levels=uploaded_levels,
