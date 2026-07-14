@@ -97,5 +97,61 @@ class TestStep5Logic(unittest.TestCase):
         )
         self.assertEqual(result, 1)
 
+    def test_ratio_zero_allocates_none(self):
+        # ratio=0 means desired_cumulative=0 regardless of processed count
+        result = _compute_adaptive_target_count(
+            processed_before_batch=100,
+            assigned_before_batch=0,
+            batch_size=50,
+            ratio=0.0,
+            expected_total=50
+        )
+        self.assertEqual(result, 0)
+
+    def test_ratio_one_full_allocation(self):
+        # ratio=1 with no prior assignments should want to fill the whole batch
+        result = _compute_adaptive_target_count(
+            processed_before_batch=0,
+            assigned_before_batch=0,
+            batch_size=20,
+            ratio=1.0,
+            expected_total=30
+        )
+        self.assertEqual(result, 20)
+
+    def test_assigned_at_expected_total_no_more(self):
+        # If we already assigned at the cap, delta is zero or negative → result must be 0
+        result = _compute_adaptive_target_count(
+            processed_before_batch=10,
+            assigned_before_batch=5,
+            batch_size=10,
+            ratio=0.5,
+            expected_total=5
+        )
+        self.assertEqual(result, 0)
+
+    def test_assigned_exceeds_expected_total(self):
+        # Over-allocated: desired_cumulative may exceed but cap keeps it; delta becomes negative → clamped to 0
+        result = _compute_adaptive_target_count(
+            processed_before_batch=50,
+            assigned_before_batch=60,
+            batch_size=10,
+            ratio=0.5,
+            expected_total=40
+        )
+        self.assertEqual(result, 0)
+
+    def test_large_batch_with_partial_assignment(self):
+        # Standard mid-run scenario: many already processed and assigned, target is to reach a distribution
+        result = _compute_adaptive_target_count(
+            processed_before_batch=100,
+            assigned_before_batch=30,
+            batch_size=200,
+            ratio=0.4,
+            expected_total=60
+        )
+        # processed_after=300, desired=int(300*0.4+0.5)=120, cap min(60,120)=60, delta=60-30=30, capped at batch_size 200 → 30
+        self.assertEqual(result, 30)
+
 if __name__ == "__main__":
     unittest.main()
