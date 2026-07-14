@@ -78,6 +78,30 @@ class WordStoreTest(unittest.TestCase):
 
         store._connect.assert_not_called()
 
+    def test_update_rarity_levels_non_chunked_sends_single_batch(self):
+        store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
+        fake_cursor = _FakeCursor()
+        fake_conn = _FakeConnection(fake_cursor)
+        store._connect = MagicMock(return_value=fake_conn)
+
+        updates = {10: 3, 20: 1}
+        store.update_rarity_levels(updates)
+
+        self.assertEqual(len(fake_cursor.executemany_calls), 1)
+        sql, payload = fake_cursor.executemany_calls[0]
+        self.assertEqual(sql, "UPDATE words SET rarity_level = %s WHERE id = %s")
+        # Items iteration order is insertion-ordered in modern CPython; accept any ordering.
+        self.assertEqual(set(payload), {(3, 10), (1, 20)})
+        self.assertEqual(fake_conn.commit_calls, 1)
+
+    def test_update_rarity_levels_empty_updates_skips_connection(self):
+        store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
+        store._connect = MagicMock()
+
+        store.update_rarity_levels({})
+
+        store._connect.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()
