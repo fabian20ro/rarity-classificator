@@ -1,6 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from classificator.run_csv_repository import RunCsvRepository
 from classificator.tools.review_low_confidence import (
@@ -12,6 +13,7 @@ from classificator.tools.review_low_confidence import (
     load_latest_review_labels,
     load_review_items,
     parse_only_levels,
+    run_review_low_confidence,
 )
 
 
@@ -176,6 +178,96 @@ class ReviewLowConfidenceTest(unittest.TestCase):
             csv_path.write_text(content, encoding="utf-8")
             result = load_latest_review_labels(csv_path)
             self.assertEqual(result[10].label.strip(), "2".strip())
+
+
+class ReviewSkipCountTest(unittest.TestCase):
+    def setUp(self):
+        self.repo = RunCsvRepository()
+
+    def _write_csv(self, path: Path, headers: list[str], rows: list[list[str]]):
+        self.repo.write_rows(path, headers, rows)
+
+    @patch("builtins.print")
+    @patch("builtins.input", side_effect=["1"] * 4 + ["q"])
+    def test_skip_count_slices_from_front(self, mock_input, mock_print):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / "run.csv"
+            labels_csv = root / "labels.csv"
+            self._write_csv(
+                csv_path,
+                ["word_id", "word", "type", "rarity_level", "confidence"],
+                [
+                    ["1", "a", "N", "1", "0.1"],
+                    ["2", "b", "N", "1", "0.2"],
+                    ["3", "c", "N", "1", "0.3"],
+                    ["4", "d", "N", "1", "0.4"],
+                ],
+            )
+            load_latest_review_labels(labels_csv)  # create empty labels file
+            run_review_low_confidence(
+                csv_path=csv_path,
+                labels_csv=labels_csv,
+                repo=self.repo,
+                skip_count=2,
+            )
+            print_calls = [str(c.args[0]) for c in mock_print.call_args_list]
+            queue_line = next((c for c in print_calls if "queue_size" in c), None)
+            self.assertIsNotNone(queue_line)
+            self.assertIn("skipped=2", queue_line)
+
+    @patch("builtins.print")
+    @patch("builtins.input", side_effect=lambda *a, **kw: "q")
+    def test_skip_count_zero_no_effect(self, mock_input, mock_print):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / "run.csv"
+            labels_csv = root / "labels.csv"
+            self._write_csv(
+                csv_path,
+                ["word_id", "word", "type", "rarity_level", "confidence"],
+                [
+                    ["1", "a", "N", "1", "0.1"],
+                    ["2", "b", "N", "1", "0.2"],
+                ],
+            )
+            load_latest_review_labels(labels_csv)  # create empty labels file
+            run_review_low_confidence(
+                csv_path=csv_path,
+                labels_csv=labels_csv,
+                repo=self.repo,
+                skip_count=0,
+            )
+            print_calls = [str(c.args[0]) for c in mock_print.call_args_list]
+            queue_line = next((c for c in print_calls if "queue_size" in c), None)
+            self.assertIsNotNone(queue_line)
+            self.assertIn("skipped=0", queue_line)
+
+    @patch("builtins.print")
+    def test_skip_count_exceeds_queue_clips_to_empty(self, mock_print):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / "run.csv"
+            labels_csv = root / "labels.csv"
+            self._write_csv(
+                csv_path,
+                ["word_id", "word", "type", "rarity_level", "confidence"],
+                [
+                    ["1", "a", "N", "1", "0.1"],
+                ],
+            )
+            load_latest_review_labels(labels_csv)  # create empty labels file
+            run_review_low_confidence(
+                csv_path=csv_path,
+                labels_csv=labels_csv,
+                repo=self.repo,
+                skip_count=10,
+            )
+            print_calls = [str(c.args[0]) for c in mock_print.call_args_list]
+            queue_line = next((c for c in print_calls if "queue_size" in c), None)
+            self.assertIsNotNone(queue_line)
+            self.assertIn("queue_size=0", queue_line)
+            self.assertIn("skipped=1", queue_line)
 
 
 if __name__ == "__main__":

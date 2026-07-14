@@ -33,12 +33,16 @@ class LevelTransition:
 
 
 def require_valid_transition(from_level: int, to_level: int) -> None:
-    valid_range = 1 <= from_level <= 5 and 1 <= to_level <= 5
-    valid_relation = to_level == from_level - 1 or to_level == from_level
-    invalid_top_self_split = from_level == 5 and to_level == 5
-    if not (valid_range and valid_relation and not invalid_top_self_split):
+    if not (1 <= from_level <= 5 and 1 <= to_level <= 5):
         raise ValueError(
-            f"Invalid transition '{from_level}:{to_level}'. Allowed: one-step downgrade (3:2) or keep+promote split (2:2); 5:5 forbidden."
+            f"Transition levels must be in range 1..5 (got {from_level}:{to_level})"
+        )
+    if from_level == 5 and to_level == 5:
+        raise ValueError("Transition 5:5 is forbidden")
+    if not (to_level == from_level - 1 or to_level == from_level):
+        raise ValueError(
+            f"Transition {from_level}:{to_level} must be one-step downgrade "
+            f"(e.g. 3:2) or same-level (e.g. 4:4)"
         )
 
 
