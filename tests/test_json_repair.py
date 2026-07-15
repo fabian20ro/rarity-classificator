@@ -44,3 +44,27 @@ def test_multiple_trailing_commas_in_array():
 
 def test_decimal_inside_string_preserved():
     assert repair('{"key": "3.14"}') == '{"key": "3.14"}'
+
+
+def test_comment_does_not_consume_next_line():
+    result = repair('{"a": 1 // comment\n{"b": 2}')
+    assert '"b"' in result
+    assert '2' in result
+
+
+def test_already_valid_json_passthrough():
+    import json as _json
+    original = '{"x": [1, 2], "y": {"z": true}}'
+    result = repair(original)
+    parsed = _json.loads(result)
+    assert parsed == {"x": [1, 2], "y": {"z": True}}
+
+
+def test_empty_input_handled():
+    result = repair("")
+    assert isinstance(result, str)
+
+
+def test_mixed_comment_and_unclosed_structure():
+    result = repair('{"a": 1 // comment\n"b":')
+    assert '"b"' in result
