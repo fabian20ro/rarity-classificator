@@ -229,6 +229,50 @@ class QualityAuditTest(unittest.TestCase):
                     repo=self.repo,
                 )
 
+    def test_rarity_level_column_is_accepted(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            headers = ["word_id", "word", "type", "rarity_level"]
+            cand_rows = [
+                ["1", "om", "N", "1"],
+                ["2", "casă", "N", "3"],
+                ["3", "rarissim", "A", "5"],
+            ]
+            self._write_csv(candidate, headers, cand_rows)
+
+            result = run_quality_audit(
+                candidate_csv=candidate,
+                repo=self.repo,
+            )
+            self.assertTrue(result.passed)
+            self.assertEqual(result.level_column, "rarity_level")
+            self.assertEqual(result.total_rows, 3)
+            self.assertEqual(result.distribution[1], 1)
+            self.assertEqual(result.distribution[3], 1)
+            self.assertEqual(result.distribution[5], 1)
+
+    def test_blank_row_is_skipped(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            headers = ["word_id", "word", "type", "final_level"]
+            cand_rows = [
+                ["1", "om", "N", "1"],
+                ["", "", "", ""],
+                ["2", "casă", "N", "2"],
+            ]
+            self._write_csv(candidate, headers, cand_rows)
+
+            result = run_quality_audit(
+                candidate_csv=candidate,
+                repo=self.repo,
+            )
+            self.assertTrue(result.passed)
+            self.assertEqual(result.total_rows, 2)
+            self.assertEqual(result.distribution[1], 1)
+            self.assertEqual(result.distribution[2], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

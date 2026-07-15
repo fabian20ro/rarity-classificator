@@ -147,3 +147,52 @@ class RarityDistributionTest(unittest.TestCase):
             with self.assertRaises(ValueError) as cm:
                 run_rarity_distribution(csv_path=path, level_column="invalid_col", repo=self.repo)
             self.assertIn("CSV missing requested level column 'invalid_col'", str(cm.exception))
+
+    def test_auto_detects_final_level_preferred_over_rarity_level(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "both.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "rarity_level", "final_level"],
+                [["1", "om", "3", "1"], ["2", "casă", "5", "2"]],
+            )
+            result = run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertEqual(result.level_column, "final_level")
+            self.assertEqual(result.distribution[1], 1)
+            self.assertEqual(result.distribution[2], 1)
+
+    def test_empty_csv_without_level_column_raises(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "empty.csv"
+            self._write_csv(path, ["word_id", "word"], [])
+            with self.assertRaises(ValueError) as cm:
+                run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertIn("CSV missing level column", str(cm.exception))
+
+    def test_blank_rarity_level_raises(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "blanks.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "rarity_level"],
+                [["1", "om", ""], ["2", "casă", ""]],
+            )
+            with self.assertRaises(ValueError) as cm:
+                run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertIn("Invalid rarity_level '' at row 2", str(cm.exception))
+
+    def test_mode_for_single_record(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "single.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "rarity_level"],
+                [["1", "rar", "5"]],
+            )
+            result = run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertEqual(result.mode, 5)
+            self.assertEqual(result.total_rows, 1)

@@ -119,5 +119,65 @@ class TestLmStudioRequestBuilder(unittest.TestCase):
             )
         self.assertIn("cannot exceed batch size", str(cm.exception))
 
+    def test_config_passthrough_includes_top_k_and_repeat_penalty(self):
+        import json
+
+        config = LmModelConfig(
+            model_id="test-model", temperature=0.0, top_k=42, repeat_penalty=1.5
+        )
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="system",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_OBJECT,
+                include_reasoning_controls=False,
+                config=config,
+                max_tokens=100,
+            )
+        )
+        self.assertEqual(payload["top_k"], 42)
+        self.assertEqual(payload["repeat_penalty"], 1.5)
+
+    def test_include_reasoning_controls_injects_effort_and_kwargs(self):
+        config = LmModelConfig(
+            model_id="test-model", temperature=0.0, reasoning_effort="high"
+        )
+        import json
+
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="system",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_OBJECT,
+                include_reasoning_controls=True,
+                config=config,
+                max_tokens=100,
+            )
+        )
+        self.assertEqual(payload["reasoning_effort"], "high")
+
+    def test_user_template_without_placeholder_appends_entries(self):
+        import json
+
+        user_template = "Analyze these words."
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="system",
+                user_template=user_template,
+                response_format_mode=ResponseFormatMode.JSON_OBJECT,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=100,
+            )
+        )
+        content = payload["messages"][1]["content"]
+        self.assertIn("apple", content)
+
 if __name__ == "__main__":
     unittest.main()

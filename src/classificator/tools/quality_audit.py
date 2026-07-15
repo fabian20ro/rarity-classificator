@@ -106,7 +106,7 @@ def _load_run(path: Path, repo: RunCsvRepository) -> dict[str, object]:
 
     for rec in table.records:
         vals = rec.values
-        if len(vals) == 1 and vals[0] == "":
+        if not any(v.strip() for v in vals):
             continue
         total_rows += 1
         word_id = int(vals[idx_word_id])
