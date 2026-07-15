@@ -1,4 +1,32 @@
 import unittest
+from pathlib import Path
+
+
+class TestTopLevelExports(unittest.TestCase):
+    """Verify that key runtime classes and options resolve from the package namespace."""
+
+    def test_run_csv_repository_reexported(self):
+        from classificator import RunCsvRepository
+
+        self.assertTrue(callable(RunCsvRepository))
+
+    def test_word_store_reexported(self):
+        from classificator import WordStore
+
+        store = WordStore()
+        self.assertIsNotNone(store)
+
+    def test_step1_options_reexported(self):
+        from classificator import Step1Options
+
+        opts = Step1Options(output_csv_path=Path("test.csv"))
+        self.assertEqual(opts.output_csv_path, Path("test.csv"))
+
+    def test_step2_options_reexported(self):
+        from classificator import Step2Options
+
+        opts = Step2Options(run_slug="t", model="x", base_csv_path=Path("base.csv"), output_csv_path=Path("out.csv"))
+        self.assertEqual(opts.run_slug, "t")
 
 
 class TestPackageIntegrity(unittest.TestCase):
