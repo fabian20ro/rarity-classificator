@@ -55,8 +55,9 @@ def _validate_placeholders() -> None:
         value = globals()[name]
         if not _RE.match(value):
             raise ValueError(
-                f"Placeholder '{value}' defined as {name} does not match the "
-                f"expected format (must be double-brace, uppercase token)."
+                f"Placeholder '{name}' has invalid format: "
+                f"'{value}' — expected double-brace uppercase token "
+                f"(e.g. '{{{{FROM_LEVEL}}}}')."
             )
 
 

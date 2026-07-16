@@ -181,5 +181,26 @@ class RequestBuilderTest(unittest.TestCase):
         self.assertEqual(schema["minItems"], 5)
         self.assertEqual(schema["maxItems"], 5)
 
+    def test_user_template_without_placeholder_uses_input_prefix(self):
+        config = LmModelConfig(model_id="test-model")
+        user_template = "Clasifică aceste cuvinte:"
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template=user_template,
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=config,
+                max_tokens=512,
+                expected_items=2,
+                schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
+            )
+        )
+        user_content = payload["messages"][1]["content"]
+        self.assertIn(user_template + "\n\nIntrări:", user_content)
+
+
 if __name__ == "__main__":
     unittest.main()
