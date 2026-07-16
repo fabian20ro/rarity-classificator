@@ -138,6 +138,60 @@ class ResponseParserTest(unittest.TestCase):
                 expected_items=None,
             )
 
+    def test_selected_word_ids_strips_code_fences_from_model_content(self):
+        # _extract_model_content must strip ```json fences around content so LM-
+        # wrapped JSON isn't silently rejected. Regression guard for silent parse
+        # failures when the LLM returns fenced JSON.
+        body = self._wrap_content("```json\n[1]\n```")
+        parsed = self.parser.parse(
+            batch=self.batch,
+            response_body=body,
+            output_mode=ScoringOutputMode.SELECTED_WORD_IDS,
+            forced_rarity_level=1,
+            expected_items=1,
+        )
+        self.assertEqual(len(parsed.scores), 1)
+        self.assertEqual(parsed.scores[0].word_id, 101)
+
+    def test_selected_word_ids_multi_selection_via_dict_nodes(self):
+        # End-to-end path for multi-word selection using dict-format nodes with
+        # local_id. Used by Step5 when the LM returns structured selections.
+        batch = [
+            BaseWordRow(word_id=201, word="a", type="N"),
+            BaseWordRow(word_id=202, word="b", type="N"),
+            BaseWordRow(word_id=203, word="c", type="N"),
+        ]
+        body = self._wrap_content(
+            '[{"local_id": 1, "word": "a"}, {"local_id": 3, "word": "c"}]'
+        )
+        parsed = self.parser.parse(
+            batch=batch,
+            response_body=body,
+            output_mode=ScoringOutputMode.SELECTED_WORD_IDS,
+            forced_rarity_level=2,
+            expected_items=2,
+        )
+        returned_ids = sorted(s.word_id for s in parsed.scores)
+        self.assertEqual(returned_ids, [201, 203])
+
+    def test_score_results_propagates_invalid_rarity_as_error(self):
+        # _parse_score_candidate rejects rarity_level not in {1..5} → candidate
+        # is None. When ALL candidates are invalid the lenient path raises via
+        # "No valid results parsed". Confirms silent-skip transitions to a hard
+        # error, preventing silent corruption from malformed LM output.
+        body = self._wrap_content(
+            '[{"word_id": 102, "word": "casă", "type": "N", "rarity_level": 99}]'
+        )
+        with self.assertRaises(RuntimeError) as ctx:
+            self.parser.parse(
+                batch=self.batch,
+                response_body=body,
+                output_mode=ScoringOutputMode.SCORE_RESULTS,
+                forced_rarity_level=None,
+                expected_items=None,
+            )
+        self.assertIn("No valid results parsed", str(ctx.exception))
+
 class NormalizeSelectionWordTest(unittest.TestCase):
     def test_normalize_strips_edge_punctuation_after_lowercase(self):
         from classificator.lm.response_parser import _normalize_selection_word as norm
