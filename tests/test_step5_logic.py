@@ -153,5 +153,62 @@ class TestStep5Logic(unittest.TestCase):
         # processed_after=300, desired=int(300*0.4+0.5)=120, cap min(60,120)=60, delta=60-30=30, capped at batch_size 200 → 30
         self.assertEqual(result, 30)
 
+    def test_negative_batch_size_returns_zero(self):
+        # Guard clause: negative batch_size must return 0, not crash or produce nonsense
+        result = _compute_adaptive_target_count(
+            processed_before_batch=10,
+            assigned_before_batch=0,
+            batch_size=-5,
+            ratio=0.5,
+            expected_total=10
+        )
+        self.assertEqual(result, 0)
+
+    def test_expected_total_zero_allocates_none(self):
+        # expected_total=0 means no allocation regardless of ratio or batch size
+        result = _compute_adaptive_target_count(
+            processed_before_batch=0,
+            assigned_before_batch=0,
+            batch_size=100,
+            ratio=0.5,
+            expected_total=0
+        )
+        self.assertEqual(result, 0)
+
+    def test_exact_boundary_rounding(self):
+        # int(x * ratio + 0.5) at exact integer boundary: 4 * 0.25 + 0.5 = 1.5 -> int(1.5)=1
+        result = _compute_adaptive_target_count(
+            processed_before_batch=0,
+            assigned_before_batch=0,
+            batch_size=4,
+            ratio=0.25,
+            expected_total=10
+        )
+        self.assertEqual(result, 1)
+
+    def test_very_large_expected_total_clamped_by_batch(self):
+        # When desired_cumulative far exceeds batch, result is capped at batch_size
+        result = _compute_adaptive_target_count(
+            processed_before_batch=0,
+            assigned_before_batch=0,
+            batch_size=5,
+            ratio=1.0,
+            expected_total=1000000
+        )
+        # desired=int(5*1.0+0.5)=5, cap min(1000000, 5)=5, delta=5-0=5, clamped to batch_size=5 → 5
+        self.assertEqual(result, 5)
+
+    def test_delta_negative_clamped_to_zero(self):
+        # When assigned_before_batch > desired_cumulative, delta is negative → must clamp to 0
+        result = _compute_adaptive_target_count(
+            processed_before_batch=10,
+            assigned_before_batch=8,
+            batch_size=5,
+            ratio=0.2,
+            expected_total=10
+        )
+        # processed_after=15, desired=int(3.0+0.5)=3, cap min(10, 3)=3, delta=3-8=-5, max(0, -5)=0
+        self.assertEqual(result, 0)
+
 if __name__ == "__main__":
     unittest.main()
