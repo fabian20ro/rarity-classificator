@@ -42,6 +42,12 @@ class LmStudioRequestBuilder:
         expected_items: int | None = None,
         schema_kind: JsonSchemaKind = JsonSchemaKind.SCORE_RESULTS,
     ) -> str:
+        if not batch:
+            raise ValueError("batch must contain at least one word")
+
+        if max_tokens <= 0:
+            raise ValueError("max_tokens must be positive")
+
         if schema_kind == JsonSchemaKind.SCORE_RESULTS:
             entries = [
                 {"word_id": row.word_id, "word": row.word, "type": row.type}
