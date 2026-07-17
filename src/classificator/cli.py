@@ -62,6 +62,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.command in {"step2-score", "step2"}:
         metrics = Step2Metrics()
         lm_client = LmStudioClient(api_key=os.getenv("LMSTUDIO_API_KEY"), metrics=metrics)
+
+        if args.dry_run:
+            source_csv = Path(args.input) if args.input else Path(args.base_csv)
+            pending_count = _count_pending(source_csv, Path(args.output_csv), args.force)
+            print(f"Step 2 dry-run: would score {pending_count} words with model '{args.model}' from '{source_csv}' → '{Path(args.output_csv)}'")
+            return 0
+
         run_step2(
             Step2Options(
                 run_slug=args.run,
@@ -378,6 +385,7 @@ def _add_step2_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--base-url")
     parser.add_argument("--system-prompt-file", default="prompts/system_prompt_ro.txt")
     parser.add_argument("--user-template-file", default="prompts/user_prompt_template_ro.txt")
+    parser.add_argument("--dry-run", action="store_true", help="Simulate the run without calling the LM or writing output CSVs")
 
 
 def _add_step3_args(parser: argparse.ArgumentParser) -> None:
@@ -431,6 +439,28 @@ def _add_step5_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--system-prompt-file", default="prompts/rebalance_system_prompt_ro.txt")
     parser.add_argument("--user-template-file", default="prompts/rebalance_user_prompt_template_ro.txt")
     parser.add_argument("--dry-run", action="store_true", help="Simulate the run without writing the output CSV")
+
+
+def _count_pending(source_csv: Path, output_csv: Path, force: bool = False) -> int:
+    """Count words in source CSV not yet scored in the output CSV."""
+    try:
+        import csv as _csv
+
+        with open(source_csv, newline="", encoding="utf-8") as f:
+            reader = _csv.DictReader(f)
+            word_ids_in_source = {row.get("word_id", "") for row in reader}
+    except (FileNotFoundError, KeyError):
+        return 0
+
+    scored = set()
+    try:
+        with open(output_csv, newline="", encoding="utf-8") as f:
+            reader = _csv.DictReader(f)
+            scored = {row.get("word_id", "") for row in reader}
+    except FileNotFoundError:
+        pass
+
+    return sum(1 for wid in word_ids_in_source if force or wid not in scored)
 
 
 def _resolve_step5_transitions(args) -> list[LevelTransition]:
