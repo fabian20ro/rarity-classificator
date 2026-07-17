@@ -62,6 +62,27 @@ class TestStep1Export(unittest.TestCase):
         self.assertEqual(headers, ["word_id", "word", "type"])
         self.assertEqual(rows, [])
 
+    def test_run_step1_sorts_by_word_id(self):
+        unsorted_words = [
+            MockWord(3, "cherry", "fruit"),
+            MockWord(1, "apple", "fruit"),
+            MockWord(2, "banana", "fruit"),
+        ]
+        store = MockWordStore(unsorted_words)
+        options = Step1Options(output_csv_path=self.output_csv)
+        result_path = run_step1(options, word_store=store, repo=self.mock_repo)
+
+        self.assertEqual(result_path, self.output_csv)
+        args, _ = self.mock_repo.write_rows.call_args
+        headers = args[1]
+        rows = args[2]
+        self.assertEqual(headers, ["word_id", "word", "type"])
+        self.assertEqual(len(rows), 3)
+        # Verify sorted by word_id ascending (attrgetter contract)
+        self.assertEqual(rows[0], ["1", "apple", "fruit"])
+        self.assertEqual(rows[1], ["2", "banana", "fruit"])
+        self.assertEqual(rows[2], ["3", "cherry", "fruit"])
+
 
 if __name__ == "__main__":
     unittest.main()
