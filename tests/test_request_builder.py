@@ -181,6 +181,34 @@ class RequestBuilderTest(unittest.TestCase):
         self.assertEqual(schema["minItems"], 5)
         self.assertEqual(schema["maxItems"], 5)
 
+    def test_build_request_rejects_empty_batch(self):
+        with self.assertRaises(ValueError) as ctx:
+            self.builder.build_request(
+                model="test-model",
+                batch=[],
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=512,
+            )
+        self.assertIn("batch must contain at least one word", str(ctx.exception))
+
+    def test_build_request_rejects_non_positive_max_tokens(self):
+        with self.assertRaises(ValueError) as ctx:
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=0,
+            )
+        self.assertIn("max_tokens must be positive", str(ctx.exception))
+
     def test_user_template_without_placeholder_uses_input_prefix(self):
         config = LmModelConfig(model_id="test-model")
         user_template = "Clasifică aceste cuvinte:"

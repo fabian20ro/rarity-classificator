@@ -66,6 +66,12 @@ def test_matches_normalize_then_length_reject():
     assert matches("țțțț", "x") is False
 
 
+def test_matches_length_short_circuit():
+    """Length-diff > MAX_EDIT_DISTANCE must reject regardless of content."""
+    assert matches("aaaa", "b") is False
+    assert matches("ab", "zzzzz") is False
+
+
 def test_max_edit_distance_constant():
     """MAX_EDIT_DISTANCE must equal 2 — the threshold used by normalize and matches."""
     assert MAX_EDIT_DISTANCE == 2

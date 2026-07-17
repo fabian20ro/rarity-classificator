@@ -70,13 +70,13 @@ class TestCsvCodec(unittest.TestCase):
         self.assertEqual(table.headers, headers)
         self.assertEqual(len(table.records), 2)
 
-    def test_read_table_whitespace_header_cell_accepted(self):
+    def test_read_table_whitespace_header_cell_rejected(self):
         path = self.test_dir / "ws_header.csv"
         with open(path, "w", encoding="utf-8", newline="") as f:
             f.write(" ,name\n1,test_name")
-        # Current codec only checks `if not cell`, so whitespace passes.
-        table = self.codec.read_table(path)
-        self.assertEqual(table.headers[0], " ")
+        with self.assertRaises(CsvFormatError) as cm:
+            self.codec.read_table(path)
+        self.assertIn("header column 1 is empty", str(cm.exception))
 
     def test_write_table_success(self):
         path = self.test_dir / "out.csv"

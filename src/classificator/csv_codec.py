@@ -38,7 +38,7 @@ class CsvCodec:
         if not headers:
             raise CsvFormatError(f"CSV has empty header row: {path}")
         for i, cell in enumerate(headers):
-            if not cell:
+            if not cell.strip():
                 raise CsvFormatError(
                     f"CSV {path} header column {i + 1} is empty"
                 )
