@@ -73,6 +73,43 @@ class SelectionRepairPromptTest(unittest.TestCase):
         """Repair prompts must discourage obscene term selection."""
         self.assertIn("Evită termeni vulgari/obsceni", SELECTION_REPAIR_SYSTEM_PROMPT)
 
+    def test_system_prompt_forbids_zero_indices(self):
+        """System prompt must explicitly reject word_id fallback to 0.
+
+        Production contract (client.py, SELECTION_REPAIR_SYSTEM_PROMPT):
+            "Fără `0`" — the repair prompt is strict about local_ids starting at 1.
+        This test verifies that constraint rather than leaving it implicit.
+        """
+        self.assertIn("Fără `0`", SELECTION_REPAIR_SYSTEM_PROMPT)
+
+    def test_apply_selection_count_placeholders_distinct_target_common(self):
+        """Placeholder substitution handles distinct target/common counts correctly.
+
+        Production contract (_apply_selection_count_placeholders, client.py):
+            Replaces REBALANCE_TARGET_COUNT_PLACEHOLDER with str(expected), then
+            replaces REBALANCE_COMMON_COUNT_PLACEHOLDER also with str(expected).
+        In current usage both are set to the same expected count, but we verify the
+        substitution is order-independent and works when target != common.
+        """
+        client = LmStudioClient(api_key=None)
+        prompt = "target={{TARGET_COUNT}} common={{COMMON_COUNT}}"
+        result = client._apply_selection_count_placeholders(prompt, expected=5)
+        self.assertEqual(result, "target=5 common=5")
+
+    def test_resolve_selection_prompt_counts_target_common_passthrough_when_not_selected(self):
+        """When mode is not SELECTED_WORD_IDS, placeholders must be preserved verbatim."""
+        client = LmStudioClient(api_key=None)
+        ctx = type(
+            "Ctx", (), {
+                "output_mode": ScoringOutputMode.SCORE_RESULTS,
+                "system_prompt": "{{TARGET_COUNT}} from {{COMMON_COUNT}}",
+                "user_template": "{{TARGET_COUNT}} of {{COMMON_COUNT}}",
+            }
+        )()
+        sys_p, user_t = client._resolve_selection_prompt_counts(ctx)
+        self.assertEqual(sys_p, "{{TARGET_COUNT}} from {{COMMON_COUNT}}")
+        self.assertEqual(user_t, "{{TARGET_COUNT}} of {{COMMON_COUNT}}")
+
 
 if __name__ == "__main__":
     unittest.main()

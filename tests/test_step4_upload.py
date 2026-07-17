@@ -143,6 +143,33 @@ class TestStep4Upload(unittest.TestCase):
             # Upload must not have been executed before the gate raised
             self.assertFalse(self.mock_word_store.update_rarity_levels_chunked.called)
 
+    def test_partial_audit_pass_allows_upload(self):
+        # When reference_csv is provided and quality audit passes, run_step4 proceeds normally
+        options = Step4Options(
+            final_csv_path=self.final_csv,
+            mode=UploadMode.PARTIAL,
+            report_path=self.report_csv,
+            upload_batch_id="test-batch",
+            reference_csv=self.test_dir / "ref.csv",
+        )
+
+        from unittest.mock import patch
+
+        with patch("classificator.tools.quality_audit.run_quality_audit") as mock_audit:
+            mock_result = MagicMock()
+            mock_result.passed = True
+            mock_result.failures = []
+            mock_audit.return_value = mock_result
+
+            run_step4(options, word_store=self.mock_word_store, repo=self.mock_repo, marker_writer=self.mock_marker_writer)
+
+            # Upload must have been executed after the gate passed
+            self.assertTrue(self.mock_word_store.update_rarity_levels_chunked.called)
+            with open(self.report_csv, 'r') as f:
+                reader = csv.DictReader(f)
+                rows = list(reader)
+                self.assertEqual(len(rows), 2)
+
     def tearDown(self):
         self.temp_dir.cleanup()
 
