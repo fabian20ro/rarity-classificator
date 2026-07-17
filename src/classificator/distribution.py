@@ -32,14 +32,18 @@ class RarityDistribution:
     def set_level(self, previous_level: int | None, new_level: int) -> None:
         if previous_level is not None:
             self._validate_level(previous_level)
-            if self._counts[previous_level] > 0:
+            count = self[previous_level]
+            if count > 0:
                 self._counts[previous_level] -= 1
         self._validate_level(new_level)
         self._counts[new_level] += 1
 
-    def count(self, level: int) -> int:
+    def __getitem__(self, level: int) -> int:
         self._validate_level(level)
         return self._counts[level]
+
+    def count(self, level: int) -> int:
+        return self.__getitem__(level)
 
     @property
     def total(self) -> int:
@@ -49,7 +53,7 @@ class RarityDistribution:
         total = self.total
         parts = []
         for level in range(1, 6):
-            count = self._counts[level]
+            count = self[level]
             pct = (count * 100.0 / total) if total > 0 else 0.0
             parts.append(f"{level}:{count}({pct:.1f}%)")
         return f"distribution=[{' '.join(parts)}]"
