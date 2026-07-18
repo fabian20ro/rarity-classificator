@@ -129,6 +129,11 @@ class RunCsvRepository:
         self.csv.write_table_atomic(path, headers, rows)
 
     def _serialize_for_headers(self, row: RunCsvRow, headers: list[str]) -> list[str]:
+        missing = set(RUN_CSV_HEADERS) - set(headers)
+        if missing:
+            raise ValueError(
+                f"_serialize_for_headers: missing required columns {sorted(missing)} in provided headers"
+            )
         base = {
             "word_id": str(row.word_id),
             "word": row.word,
