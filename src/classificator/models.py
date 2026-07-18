@@ -10,18 +10,28 @@ class LmApiFlavor(str, Enum):
     LMSTUDIO_REST = "lmstudio_rest"
 
 
+def _parse_value_to_enum(cls, value: str | None, default_name: str, alias_map: dict[str, str]):
+    v = (value or default_name).strip().lower()
+    if v in {default_name.lower(), ""}:
+        return getattr(cls, default_name.upper())
+    # normalize hyphens → underscores in both input and keys for comparison
+    normalized_aliases = {k.lower().replace("-", "_") for k in alias_map}
+    if v.replace("-", "_") in normalized_aliases:
+        target_key = next(k for k in alias_map if k.lower().replace("-", "_") == v.replace("-", "_"))
+        return getattr(cls, alias_map[target_key])
+    raise ValueError(f"Invalid {cls.__name__.lower()} value: {value}")
+
+
 class UploadMode(str, Enum):
     PARTIAL = "partial"
     FULL_FALLBACK = "full-fallback"
 
     @classmethod
     def parse(cls, value: str | None) -> "UploadMode":
-        v = (value or "partial").strip().lower()
-        if v in {"partial", ""}:
-            return cls.PARTIAL
-        if v in {"full-fallback", "full_fallback"}:
-            return cls.FULL_FALLBACK
-        raise ValueError(f"Invalid upload mode: {value}")
+        return _parse_value_to_enum(
+            cls, value, "PARTIAL",
+            {"FULL-FALLBACK": "FULL_FALLBACK", "FULL_FALLBACK": "FULL_FALLBACK"}
+        )
 
 
 class Step3MergeStrategy(str, Enum):
@@ -30,12 +40,15 @@ class Step3MergeStrategy(str, Enum):
 
     @classmethod
     def parse(cls, value: str | None) -> "Step3MergeStrategy":
-        v = (value or "median").strip().lower()
-        if v in {"median", ""}:
-            return cls.MEDIAN
-        if v in {"any-extremes", "any_extremes", "three-any-extremes", "three_any_extremes"}:
-            return cls.ANY_EXTREMES
-        raise ValueError(f"Invalid merge strategy: {value}")
+        return _parse_value_to_enum(
+            cls, value, "MEDIAN",
+            {
+                "ANY-EXTREMES": "ANY_EXTREMES",
+                "ANY_EXTREMES": "ANY_EXTREMES",
+                "THREE-ANY-EXTREMES": "ANY_EXTREMES",
+                "THREE_ANY_EXTREMES": "ANY_EXTREMES",
+            }
+        )
 
 
 class ScoringOutputMode(str, Enum):
@@ -44,12 +57,9 @@ class ScoringOutputMode(str, Enum):
 
     @classmethod
     def parse(cls, value: str | None) -> "ScoringOutputMode":
-        v = (value or "score_results").strip().lower()
-        if v in {"score_results", ""}:
-            return cls.SCORE_RESULTS
-        if v == "selected_word_ids":
-            return cls.SELECTED_WORD_IDS
-        raise ValueError(f"Invalid scoring output mode: {value}")
+        return _parse_value_to_enum(
+            cls, value, "SCORE_RESULTS", {"SELECTED_WORD_IDS": "SELECTED_WORD_IDS"}
+        )
 
 
 @dataclass(frozen=True)

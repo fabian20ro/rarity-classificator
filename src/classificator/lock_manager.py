@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import fcntl
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -17,8 +18,6 @@ def acquire_output_lock(output_csv_path: Path):
     handle = lock_path.open("a+b")
     try:
         try:
-            import fcntl
-
             fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError as exc:
             raise RuntimeError(
@@ -27,8 +26,6 @@ def acquire_output_lock(output_csv_path: Path):
         yield
     finally:
         try:
-            import fcntl
-
             fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
         except Exception:
             pass
