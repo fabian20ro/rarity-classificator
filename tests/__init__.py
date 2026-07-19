@@ -52,21 +52,14 @@ class TestValidateSteps(unittest.TestCase):
         self.assertEqual(errors, [])
 
     def test_first_param_is_options_for_all_steps(self):
-        from inspect import signature, isfunction
+        from inspect import signature
 
-        from classificator.steps import (
-            _run_step1,
-            _run_step2,
-            _run_step3,
-            _run_step4,
-            _run_step5,
-            _STEPS,
-        )
+        from classificator.steps import _STEPS
+
         for name, _, func in _STEPS:
-            self.assertTrue(isfunction(func))
             sig = signature(func)
-            # Just verify they're callable functions
-            self.assertTrue(callable(func), f"{name} should be callable")
+            params = list(sig.parameters.keys())
+            self.assertEqual(params[0], "options", f"{name}: first param must be 'options', got {params}")
 
     def test_validate_raises_with_invalid_entry(self):
         from classificator.steps import validate_steps as _validate_steps
