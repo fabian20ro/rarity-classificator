@@ -36,6 +36,19 @@ class TestStep1Export(unittest.TestCase):
         if self.output_csv.exists():
             self.output_csv.unlink()
 
+    def test_fetch_all_words_raises_propagates(self):
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.side_effect = RuntimeError("db down")
+        options = Step1Options(output_csv_path=self.output_csv)
+        with self.assertRaises(RuntimeError, msg="fetch error must propagate"):
+            run_step1(options, word_store=store, repo=self.mock_repo)
+
+    def test_write_rows_raises_propagates(self):
+        options = Step1Options(output_csv_path=self.output_csv)
+        self.mock_repo.write_rows.side_effect = PermissionError("denied")
+        with self.assertRaises(PermissionError, msg="write error must propagate"):
+            run_step1(options, word_store=self.mock_word_store, repo=self.mock_repo)
+
     def test_run_step1_success(self):
         options = Step1Options(output_csv_path=self.output_csv)
         result_path = run_step1(options, word_store=self.mock_word_store, repo=self.mock_repo)
