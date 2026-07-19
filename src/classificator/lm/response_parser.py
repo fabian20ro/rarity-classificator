@@ -338,7 +338,13 @@ class LmStudioResponseParser:
                 val = content_json.get(key)
                 if isinstance(val, list):
                     return val
+            # Fallback: pick up a top-level list value but NOT a nested dict
+            # (which would indicate unrelated metadata structure). Prevents the
+            # parser from silently returning an unrelated array when the LM's
+            # response shape is wrong.
             for val in content_json.values():
+                if isinstance(val, dict):
+                    continue
                 if isinstance(val, list):
                     return val
             keys = ",".join(content_json.keys())
