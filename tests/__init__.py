@@ -100,6 +100,37 @@ class TestValidateSteps(unittest.TestCase):
         finally:
             steps_mod._STEPS = tuple(original)
 
+    def test_validate_detects_wrong_first_parameter(self):
+        from unittest.mock import MagicMock
+
+        from classificator.steps import _validate_step_modules as _vm
+        from classificator.steps import _STEPS
+
+        fake_func = MagicMock()
+        fake_func.__name__ = "fake_run"
+        fake_func.__call__.__self__ = None
+        fake_sig_params = {"x": 1, "y": 2}
+        type(fake_sig_params["x"]).__class__
+        import inspect
+
+        fake_func.__signature__ = inspect.Signature(
+            [inspect.Parameter("x", inspect.Parameter.POSITIONAL_OR_KEYWORD),
+             inspect.Parameter("y", inspect.Parameter.POSITIONAL_OR_KEYWORD)]
+        )
+
+        original = list(_STEPS)
+        modified = [(name, label, fake_func if name == "step1" else func) for name, label, func in original]
+        import classificator.steps as steps_mod
+
+        steps_mod._STEPS = tuple(modified)
+
+        try:
+            errors = _vm()
+            self.assertEqual(len(errors), 1)
+            self.assertIn("options", str(errors[0]))
+        finally:
+            steps_mod._STEPS = tuple(original)
+
 
 if __name__ == "__main__":
     unittest.main()
