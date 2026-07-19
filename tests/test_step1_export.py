@@ -42,6 +42,8 @@ class TestStep1Export(unittest.TestCase):
         options = Step1Options(output_csv_path=self.output_csv)
         with self.assertRaises(RuntimeError, msg="fetch error must propagate"):
             run_step1(options, word_store=store, repo=self.mock_repo)
+        # write_rows must not be called before the fetch failure occurs
+        self.mock_repo.write_rows.assert_not_called()
 
     def test_write_rows_raises_propagates(self):
         options = Step1Options(output_csv_path=self.output_csv)
