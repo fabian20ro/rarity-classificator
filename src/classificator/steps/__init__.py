@@ -21,6 +21,28 @@ _STEPS = (
 )
 
 
+def _validate_step_structure() -> list[str]:
+    """Validate the _STEPS tuple structure itself.
+
+    Returns:
+        List of structural error messages (empty if valid).
+    """
+    errors = []
+    if len(_STEPS) != 5:
+        errors.append(f"_STEPS must have exactly 5 entries, got {len(_STEPS)}")
+        return errors
+    seen_names = set()
+    for entry in _STEPS:
+        if not isinstance(entry, tuple) or len(entry) != 3:
+            errors.append("_STEPS entries must be (name, label, callable) 3-tuples")
+            break
+        name, _, func = entry
+        if name in seen_names:
+            errors.append(f"duplicate step name: {name}")
+        seen_names.add(name)
+    return errors
+
+
 def _validate_step_modules() -> list[str]:
     """Validate all step modules export callable entry points.
 
@@ -28,16 +50,21 @@ def _validate_step_modules() -> list[str]:
         List of validation error messages (empty if valid).
     """
     errors = []
+    errors.extend(_validate_step_structure())
     for name, _, func in _STEPS:
-        if not inspect.isfunction(func):
-            errors.append(f"{name}: expected callable, got {type(func).__name__}")
-            continue
-        sig = inspect.signature(func)
-        params = list(sig.parameters.keys())
-        if len(params) < 1 or params[0] != "options":
-            errors.append(
-                f"{name}: expected 'options' as first parameter, got {params}"
-            )
+        try:
+            import inspect as _inspect_mod
+            if not _inspect_mod.isfunction(func):
+                errors.append(f"{name}: expected callable, got {type(func).__name__}")
+                continue
+            sig = _inspect_mod.signature(func)
+            params = list(sig.parameters.keys())
+            if len(params) < 1 or params[0] != "options":
+                errors.append(
+                    f"{name}: expected 'options' as first parameter, got {params}"
+                )
+        except Exception as exc:
+            errors.append(f"{name}: validation error ({exc})")
     return errors
 
 
