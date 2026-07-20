@@ -78,10 +78,13 @@ class TestStep1Export(unittest.TestCase):
         self.assertEqual(rows, [])
 
     def test_run_step1_sorts_by_word_id(self):
+        # Multi-digit IDs: string sort would give 1,10,2,20; int sort gives 1,2,10,20.
+        # This makes the check failure-specific to attrgetter("word_id").
         unsorted_words = [
-            MockWord(3, "cherry", "fruit"),
-            MockWord(1, "apple", "fruit"),
+            MockWord(20, "pear", "fruit"),
+            MockWord(10, "grape", "fruit"),
             MockWord(2, "banana", "fruit"),
+            MockWord(1, "apple", "fruit"),
         ]
         store = MockWordStore(unsorted_words)
         options = Step1Options(output_csv_path=self.output_csv)
@@ -92,11 +95,12 @@ class TestStep1Export(unittest.TestCase):
         headers = args[1]
         rows = args[2]
         self.assertEqual(headers, ["word_id", "word", "type"])
-        self.assertEqual(len(rows), 3)
+        self.assertEqual(len(rows), 4)
         # Verify sorted by word_id ascending (attrgetter contract)
         self.assertEqual(rows[0], ["1", "apple", "fruit"])
         self.assertEqual(rows[1], ["2", "banana", "fruit"])
-        self.assertEqual(rows[2], ["3", "cherry", "fruit"])
+        self.assertEqual(rows[2], ["10", "grape", "fruit"])
+        self.assertEqual(rows[3], ["20", "pear", "fruit"])
 
 
 if __name__ == "__main__":
