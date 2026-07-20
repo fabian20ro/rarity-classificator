@@ -102,6 +102,9 @@ class TestStep1Export(unittest.TestCase):
         self.assertEqual(rows[1], ["2", "banana", "fruit"])
         self.assertEqual(rows[2], ["10", "grape", "fruit"])
         self.assertEqual(rows[3], ["20", "pear", "fruit"])
+        # Explicit ascending invariant — catches any ordering regression, not just content coincidence.
+        word_ids = [int(r[0]) for r in rows]
+        self.assertEqual(word_ids, sorted(word_ids), msg="words must be sorted by word_id ascending")
 
 
 if __name__ == "__main__":
