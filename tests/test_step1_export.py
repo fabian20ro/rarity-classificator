@@ -42,6 +42,8 @@ class TestStep1Export(unittest.TestCase):
         options = Step1Options(output_csv_path=self.output_csv)
         with self.assertRaises(RuntimeError, msg="fetch error must propagate"):
             run_step1(options, word_store=store, repo=self.mock_repo)
+        # write_rows must not be called before the fetch failure occurs
+        self.mock_repo.write_rows.assert_not_called()
 
     def test_write_rows_raises_propagates(self):
         options = Step1Options(output_csv_path=self.output_csv)
@@ -55,8 +57,9 @@ class TestStep1Export(unittest.TestCase):
 
         self.assertEqual(result_path, self.output_csv)
         self.mock_repo.write_rows.assert_called_once()
-        # Check headers and data
+        # Check output path, headers and data
         args, _ = self.mock_repo.write_rows.call_args
+        self.assertEqual(args[0], self.output_csv)
         headers = args[1]
         rows = args[2]
         self.assertEqual(headers, ["word_id", "word", "type"])
@@ -75,11 +78,37 @@ class TestStep1Export(unittest.TestCase):
         self.assertEqual(headers, ["word_id", "word", "type"])
         self.assertEqual(rows, [])
 
+    def test_run_step1_sorts_by_word_id_not_other(self):
+        # Deliberately invert word ordering vs. word_id so sorting by any field
+        # other than attrgetter("word_id") produces a clearly wrong row order.
+        inverted_words = [
+            MockWord(20, "apple", "fruit"),   # id=20 but alphabetically first
+            MockWord(1,  "banana", "fruit"),   # id=1  but alphabetically second
+            MockWord(5,  "cherry", "fruit"),
+        ]
+        store = MockWordStore(inverted_words)
+        options = Step1Options(output_csv_path=self.output_csv)
+        result_path = run_step1(options, word_store=store, repo=self.mock_repo)
+
+        self.assertEqual(result_path, self.output_csv)
+        args, _ = self.mock_repo.write_rows.call_args
+        rows = args[2]
+        # Failure-specific: if sorted by "word" or any other attr, the first row would be apple (alphabetical).
+        # Only attrgetter("word_id") puts banana (id=1) first despite being alphabetically later.
+        self.assertEqual(rows[0], ["1", "banana", "fruit"], msg="sort key must be word_id, not word/type/other")
+        self.assertEqual(rows[1], ["5", "cherry", "fruit"])
+        self.assertEqual(rows[2], ["20", "apple", "fruit"])
+        # Monotonic ascending invariant — catches any ordering regression.
+        word_ids = [int(r[0]) for r in rows]
+        self.assertEqual(word_ids, sorted(word_ids), msg="words must be sorted by word_id ascending")
+
     def test_run_step1_sorts_by_word_id(self):
+        # Multi-digit IDs: string sort would give 1,10,2,20; int sort gives 1,2,10,20.
         unsorted_words = [
-            MockWord(3, "cherry", "fruit"),
-            MockWord(1, "apple", "fruit"),
+            MockWord(20, "pear", "fruit"),
+            MockWord(10, "grape", "fruit"),
             MockWord(2, "banana", "fruit"),
+            MockWord(1, "apple", "fruit"),
         ]
         store = MockWordStore(unsorted_words)
         options = Step1Options(output_csv_path=self.output_csv)
@@ -90,11 +119,15 @@ class TestStep1Export(unittest.TestCase):
         headers = args[1]
         rows = args[2]
         self.assertEqual(headers, ["word_id", "word", "type"])
-        self.assertEqual(len(rows), 3)
+        self.assertEqual(len(rows), 4)
         # Verify sorted by word_id ascending (attrgetter contract)
         self.assertEqual(rows[0], ["1", "apple", "fruit"])
         self.assertEqual(rows[1], ["2", "banana", "fruit"])
-        self.assertEqual(rows[2], ["3", "cherry", "fruit"])
+        self.assertEqual(rows[2], ["10", "grape", "fruit"])
+        self.assertEqual(rows[3], ["20", "pear", "fruit"])
+        # Explicit ascending invariant — catches any ordering regression, not just content coincidence.
+        word_ids = [int(r[0]) for r in rows]
+        self.assertEqual(word_ids, sorted(word_ids), msg="words must be sorted by word_id ascending")
 
 
 if __name__ == "__main__":
