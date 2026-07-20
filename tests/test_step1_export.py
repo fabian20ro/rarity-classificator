@@ -57,8 +57,9 @@ class TestStep1Export(unittest.TestCase):
 
         self.assertEqual(result_path, self.output_csv)
         self.mock_repo.write_rows.assert_called_once()
-        # Check headers and data
+        # Check output path, headers and data
         args, _ = self.mock_repo.write_rows.call_args
+        self.assertEqual(args[0], self.output_csv)
         headers = args[1]
         rows = args[2]
         self.assertEqual(headers, ["word_id", "word", "type"])
