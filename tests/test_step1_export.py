@@ -78,6 +78,14 @@ class TestStep1Export(unittest.TestCase):
         self.assertEqual(headers, ["word_id", "word", "type"])
         self.assertEqual(rows, [])
 
+    def test_run_step1_dry_run_skips_write(self):
+        options = Step1Options(output_csv_path=self.output_csv, dry_run=True)
+        result_path = run_step1(options, word_store=self.mock_word_store, repo=self.mock_repo)
+
+        self.assertIsNone(result_path)
+        self.assertFalse(self.output_csv.exists())
+        self.mock_repo.write_rows.assert_not_called()
+
     def test_run_step1_sorts_by_word_id_not_other(self):
         # Deliberately invert word ordering vs. word_id so sorting by any field
         # other than attrgetter("word_id") produces a clearly wrong row order.
