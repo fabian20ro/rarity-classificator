@@ -476,6 +476,40 @@ class BuildRetryInputTest(unittest.TestCase):
             )
         self.assertIn("does_not_exist.jsonl", str(ctx.exception))
 
+    def test_build_retry_input_raises_on_malformed_json_lines(self):
+        """Regression: malformed JSON in failed file must raise ValueError.
+
+        Previously, lines like `{invalid}` or truncated JSON could reach the parser
+        silently — json.loads would raise and we'd surface it as a clear error now,
+        so upstream corruption is visible rather than masked by silent skip.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            # Mix of valid line and malformed JSON lines
+            rows_raw = [
+                '{"word_id": 3, "error": "ok"}',
+                '{invalid json}',
+                '{"word_id": 1',  # truncated — never completes the brace
+            ]
+            failed.write_text("\n".join(rows_raw) + "\n", encoding="utf-8")
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["2", "two"]],
+            )
+
+            with self.assertRaises(ValueError):
+                build_retry_input(
+                    failed_jsonl=failed,
+                    base_csv=base,
+                    output_csv=out,
+                    repo=self.repo,
+                )
+
     def test_build_retry_input_dedup_uses_word_id_column_not_position_zero(self):
         """Regression: dedup must use the word_id column index, not row[0].
 

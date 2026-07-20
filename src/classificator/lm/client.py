@@ -442,7 +442,7 @@ class LmStudioClient:
                 flavor=LmApiFlavor.OPENAI_COMPAT,
                 source="explicit-endpoint",
             )
-        return None
+        raise ValueError(f"Unrecognized LM API endpoint path: {path!r} in URL {endpoint}")
 
     def _detect_from_base(self, base_url: str, source: str) -> ResolvedEndpoint:
         openai_models_url = f"{base_url}{OPENAI_MODELS_PATH}"
