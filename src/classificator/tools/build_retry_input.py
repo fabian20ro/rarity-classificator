@@ -78,13 +78,7 @@ def build_retry_input(
                 raise ValueError(
                     f"String word_id in failed JSONL: {word_id!r}"
                 )
-            # Float-like strings ("3.0", "1,5") must raise — they indicate data
-            # corruption or mis-typed IDs. The base-CSV path rejects these too;
-            # consistency demands the same behavior here.
-            if isinstance(word_id, str) and any(c in word_id.strip() for c in (".", ",")):
-                raise ValueError(
-                    f"Float-like word_id string in failed JSONL: {word_id!r}"
-                )
+
             try:
                 word_int = int(word_id)
             except ValueError:
