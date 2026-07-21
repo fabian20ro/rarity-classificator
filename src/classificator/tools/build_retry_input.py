@@ -70,6 +70,14 @@ def build_retry_input(
             # because it signals upstream corruption, not a benign parse miss.
             if word_id is None or (isinstance(word_id, str) and word_id.strip() == ""):
                 continue
+            # String-encoded integers ("5") are rejected — they indicate upstream
+            # schema drift where the producer emits strings instead of ints. Fail
+            # fast so corruption surfaces rather than being silently accepted by
+            # int().
+            if isinstance(word_id, str):
+                raise ValueError(
+                    f"String word_id in failed JSONL: {word_id!r}"
+                )
             # Float-like strings ("3.0", "1,5") must raise — they indicate data
             # corruption or mis-typed IDs. The base-CSV path rejects these too;
             # consistency demands the same behavior here.
