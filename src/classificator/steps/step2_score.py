@@ -155,10 +155,9 @@ def _score_pending_batches(
     for row in ctx.existing_rows.values():
         distribution.increment(row.rarity_level)
 
-    min_adaptive = max(5, min(options.batch_size, options.batch_size // 5))
     adapter = BatchSizeAdapter(
         initial_size=options.batch_size,
-        min_size=min_adaptive,
+        min_size=max(5, options.batch_size // 5),
         window_size=options.batch_window,
     )
     scoring_ctx = ScoringContext(

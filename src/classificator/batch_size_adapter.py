@@ -36,12 +36,13 @@ class BatchSizeAdapter:
             raise ValueError("window_size must be >= 1")
         if max_size is not None and max_size < initial_size:
             raise ValueError("max_size must be >= initial_size")
-        if not (0.0 <= success_threshold <= 1.0):
-            raise ValueError("success_threshold must be between 0.0 and 1.0")
-        if not (0.0 <= low_threshold <= 1.0):
-            raise ValueError("low_threshold must be between 0.0 and 1.0")
-        if not (0.0 <= high_threshold <= 1.0):
-            raise ValueError("high_threshold must be between 0.0 and 1.0")
+        for name, value in (
+            ("success_threshold", success_threshold),
+            ("low_threshold", low_threshold),
+            ("high_threshold", high_threshold),
+        ):
+            if not (0.0 <= value <= 1.0):
+                raise ValueError(f"{name} must be between 0.0 and 1.0")
         if low_threshold >= high_threshold:
             raise ValueError("low_threshold must be < high_threshold")
         self.initial_size = initial_size

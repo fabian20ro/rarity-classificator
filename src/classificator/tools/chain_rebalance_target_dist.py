@@ -39,16 +39,17 @@ def run_chain_rebalance(*, options: ChainOptions, repo: RunCsvRepository, lm_cli
     if not options.input_csv.exists():
         raise FileNotFoundError(f"Missing input CSV: {options.input_csv}")
 
-    transitions = [
-        (1, LevelTransition(from_level=1, from_level_upper=2, to_level=1)),
-        (2, LevelTransition(from_level=1, from_level_upper=2, to_level=1)),
-        (3, LevelTransition(from_level=1, from_level_upper=2, to_level=1)),
-        (4, LevelTransition(from_level=2, from_level_upper=3, to_level=2)),
-        (5, LevelTransition(from_level=2, from_level_upper=3, to_level=2)),
-        (6, LevelTransition(from_level=3, from_level_upper=4, to_level=3)),
-        (7, LevelTransition(from_level=3, from_level_upper=4, to_level=3)),
-        (8, LevelTransition(from_level=4, from_level_upper=5, to_level=4)),
+    unique_transitions: list[tuple[int, int, LevelTransition]] = [
+        (1, 3, LevelTransition(from_level=1, from_level_upper=2, to_level=1)),   # steps 1..3
+        (4, 5, LevelTransition(from_level=2, from_level_upper=3, to_level=2)),   # steps 4..5
+        (6, 7, LevelTransition(from_level=3, from_level_upper=4, to_level=3)),   # steps 6..7
+        (8, 8, LevelTransition(from_level=4, from_level_upper=5, to_level=4)),   # step 8
     ]
+
+    transitions: list[tuple[int, LevelTransition]] = []
+    for start, end, t in unique_transitions:
+        for step_idx in range(start, end + 1):
+            transitions.append((step_idx, t))
 
     current_csv = options.input_csv
     last_completed = 0
