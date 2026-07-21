@@ -91,6 +91,11 @@ def _build_partial_plan(
             status[word_id] = "missing_db_word"
             continue
 
+        if existing.rarity_level == level:
+            report_rows.append([str(word_id), str(existing.rarity_level), str(level), "already_matched"])
+            status[word_id] = "already_matched"
+            continue
+
         updates[word_id] = level
         report_rows.append([str(word_id), str(existing.rarity_level), str(level), "final_csv"])
         status[word_id] = "uploaded"
