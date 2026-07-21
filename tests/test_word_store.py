@@ -7,6 +7,8 @@ from classificator.word_store import WordStore
 class _FakeCursor:
     def __init__(self):
         self.executemany_calls: list[tuple[str, list[tuple[int, int]]]] = []
+        self._execute_sql: str | None = None
+        self.fetchall_rows: list[list] = []
 
     def __enter__(self):
         return self
@@ -16,6 +18,12 @@ class _FakeCursor:
 
     def executemany(self, sql: str, payload: list[tuple[int, int]]) -> None:
         self.executemany_calls.append((sql, payload))
+
+    def execute(self, sql: str) -> None:
+        self._execute_sql = sql
+
+    def fetchall(self) -> list[list]:
+        return self.fetchall_rows
 
 
 class _FakeConnection:
@@ -101,6 +109,49 @@ class WordStoreTest(unittest.TestCase):
         store.update_rarity_levels({})
 
         store._connect.assert_not_called()
+
+    def test_fetch_all_words_parses_rows_into_base_word_rows(self):
+        store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
+        fake_cursor = _FakeCursor()
+        fake_conn = _FakeConnection(fake_cursor)
+        store._connect = MagicMock(return_value=fake_conn)
+        fake_cursor.fetchall_rows = [[1, "alpha", "noun"], [2, "beta", "verb"]]
+
+        words = store.fetch_all_words()
+
+        self.assertEqual(len(words), 2)
+        self.assertEqual(words[0].word_id, 1)
+        self.assertEqual(words[0].word, "alpha")
+        self.assertEqual(words[0].type, "noun")
+        self.assertEqual(words[1].word_id, 2)
+        self.assertEqual(words[1].word, "beta")
+        self.assertEqual(words[1].type, "verb")
+
+    def test_fetch_all_word_levels_parses_rows_into_word_level_objects(self):
+        store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
+        fake_cursor = _FakeCursor()
+        fake_conn = _FakeConnection(fake_cursor)
+        store._connect = MagicMock(return_value=fake_conn)
+        fake_cursor.fetchall_rows = [[10, 3], [20, 5]]
+
+        levels = store.fetch_all_word_levels()
+
+        self.assertEqual(len(levels), 2)
+        self.assertEqual(levels[0].word_id, 10)
+        self.assertEqual(levels[0].rarity_level, 3)
+        self.assertEqual(levels[1].word_id, 20)
+        self.assertEqual(levels[1].rarity_level, 5)
+
+    def test_fetch_all_words_empty_table_returns_empty_list(self):
+        store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
+        fake_cursor = _FakeCursor()
+        fake_conn = _FakeConnection(fake_cursor)
+        store._connect = MagicMock(return_value=fake_conn)
+        fake_cursor.fetchall_rows = []
+
+        words = store.fetch_all_words()
+
+        self.assertEqual(words, [])
 
 
 if __name__ == "__main__":
