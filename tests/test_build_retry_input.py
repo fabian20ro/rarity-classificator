@@ -476,6 +476,43 @@ class BuildRetryInputTest(unittest.TestCase):
             )
         self.assertIn("does_not_exist.jsonl", str(ctx.exception))
 
+    def test_build_retry_input_rejects_string_word_ids_in_failed_jsonl(self):
+        """Regression: string-encoded word_id in failed JSONL must raise.
+
+        Previously "5" parsed via int() to 5 and was silently accepted, masking
+        upstream data corruption (e.g. a JSON producer emitting strings instead
+        of integers). Now we fail fast so the pipeline break is visible.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            rows = [
+                {"word_id": 3, "error": "ok"},
+                {"word_id": "5"},        # string-encoded positive int — must raise
+            ]
+            failed.write_text(
+                "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
+            )
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1", "one"]],
+            )
+
+            with self.assertRaises(ValueError) as ctx:
+                build_retry_input(
+                    failed_jsonl=failed,
+                    base_csv=base,
+                    output_csv=out,
+                    repo=self.repo,
+                )
+            exc_str = str(ctx.exception)
+            # Must identify the offending value for debugging
+            self.assertIn("'5'", exc_str)
+
     def test_build_retry_input_raises_on_malformed_json_lines(self):
         """Regression: malformed JSON in failed file must raise ValueError.
 

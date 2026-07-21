@@ -3,7 +3,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 import csv
 
-from classificator.steps.step4_upload import run_step4, Step4Options
+from classificator.steps.step4_upload import run_step4, Step4Options, _build_partial_plan, _build_full_fallback_plan
 from classificator.models import UploadMode, WordLevel
 from classificator.run_csv_repository import RunCsvRepository
 from classificator.word_store import WordStore
@@ -170,8 +170,130 @@ class TestStep4Upload(unittest.TestCase):
                 rows = list(reader)
                 self.assertEqual(len(rows), 2)
 
+    def _build_full_fallback_plan(self, final_levels, db_levels):
+        return _build_full_fallback_plan(final_levels, db_levels)
+
+class TestBuildPartialPlan(unittest.TestCase):
+    """Direct unit test for _build_partial_plan — verifying the equality guard contract."""
+
+    def test_matching_levels_are_skipped_with_already_matched_status(self):
+        # DB has words 1,2; final CSV also has 1,2 with matching levels → both should be already_matched, no updates
+        final_levels = {1: 1, 2: 1}
+        db_levels = {
+            1: WordLevel(word_id=1, rarity_level=1),
+            2: WordLevel(word_id=2, rarity_level=1),
+        }
+
+        updates, report_rows, status = _build_partial_plan(final_levels, db_levels)
+
+        # No words should be in updates — all levels already match
+        self.assertEqual(set(updates.keys()), set())
+
+        # Status: both "already_matched"
+        self.assertEqual(status[1], "already_matched")
+        self.assertEqual(status[2], "already_matched")
+
+        # Report rows: sorted by word_id, with correct source marker
+        self.assertEqual(len(report_rows), 2)
+        for i, wid in enumerate([1, 2]):
+            row = report_rows[i]
+            self.assertEqual(row[0], str(wid))  # word_id
+            self.assertEqual(row[1], "1")  # old level (from db_levels)
+            self.assertEqual(row[2], "1")  # new level (same as old)
+            self.assertEqual(row[3], "already_matched")
+
+    def test_mixed_matching_and_changing_levels(self):
+        # DB has words 1,2; word 1 matches, word 2 changes → one already_matched, one uploaded
+        final_levels = {1: 1, 2: 3}
+        db_levels = {
+            1: WordLevel(word_id=1, rarity_level=1),
+            2: WordLevel(word_id=2, rarity_level=1),
+        }
+
+        updates, report_rows, status = _build_partial_plan(final_levels, db_levels)
+
+        # Only word 2 should be in updates (level changes from 1→3)
+        self.assertEqual(set(updates.keys()), {2})
+        self.assertEqual(updates[2], 3)
+
+        # Status: mixed statuses
+        self.assertEqual(status[1], "already_matched")
+        self.assertEqual(status[2], "uploaded")
+
+        # Report rows: sorted by word_id, correct sources
+        self.assertEqual(len(report_rows), 2)
+        sources = [row[3] for row in report_rows]
+        self.assertIn("already_matched", sources)
+        self.assertIn("final_csv", sources)
+
+
+class TestBuildFullFallbackPlan(unittest.TestCase):
+    """Direct unit test for _build_full_fallback_plan — verifying the fallback contract independently."""
+
+    def test_extra_db_words_get_fallback_level(self):
+        # DB has words 1,2,3; final_csv only has words 1,2 → word 3 should get FALLBACK_RARITY_LEVEL (4)
+        final_levels = {1: 2, 2: 3}
+        db_levels = {
+            1: WordLevel(word_id=1, rarity_level=1),
+            2: WordLevel(word_id=2, rarity_level=1),
+            3: WordLevel(word_id=3, rarity_level=1),
+        }
+
+        updates, report_rows, status = _build_full_fallback_plan(final_levels, db_levels)
+
+        # All DB words should be in updates with their final or fallback level
+        self.assertEqual(set(updates.keys()), {1, 2, 3})
+        self.assertEqual(updates[1], 2)
+        self.assertEqual(updates[2], 3)
+        self.assertEqual(updates[3], 4)  # FALLBACK_RARITY_LEVEL
+
+        # Status: all "uploaded"
+        self.assertEqual(status[1], "uploaded")
+        self.assertEqual(status[2], "uploaded")
+        self.assertEqual(status[3], "uploaded")
+
+        # Report rows: sorted by word_id, with correct source marker
+        self.assertEqual(len(report_rows), 3)
+        for i, wid in enumerate([1, 2, 3]):
+            row = report_rows[i]
+            self.assertEqual(row[0], str(wid))  # word_id
+            self.assertEqual(row[1], "1")  # old level (from db_levels)
+            if wid == 3:
+                self.assertEqual(row[2], "4")  # fallback level
+                self.assertEqual(row[3], "fallback_4")
+            else:
+                self.assertEqual(row[2], str(final_levels[wid]))
+                self.assertEqual(row[3], "final_csv")
+
+    def test_empty_final_levels_returns_all_fallback(self):
+        final_levels = {}
+        db_levels = {
+            1: WordLevel(word_id=1, rarity_level=2),
+            2: WordLevel(word_id=2, rarity_level=3),
+        }
+
+        updates, report_rows, status = _build_full_fallback_plan(final_levels, db_levels)
+
+        # All DB words should get fallback level (4) since final_levels is empty
+        self.assertEqual(set(updates.keys()), {1, 2})
+        for wid in [1, 2]:
+            self.assertEqual(updates[wid], 4)
+            self.assertEqual(status[wid], "uploaded")
+
+        # All rows should have fallback_4 as source
+        sources = {row[3] for row in report_rows}
+        self.assertEqual(sources, {"fallback_4"})
+
+
+class TestStep4Upload(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.test_dir = Path(self.temp_dir.name)
+
     def tearDown(self):
         self.temp_dir.cleanup()
+
 
 if __name__ == "__main__":
     unittest.main()
