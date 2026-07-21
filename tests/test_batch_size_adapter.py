@@ -1311,6 +1311,54 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter.reset()
         self.assertEqual(adapter.total_records, 0)
 
+    def test_size_history_captures_initial_and_adjustments(self):
+        """size_history returns the initial state at step 0 plus every adjustment."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)
+        history = adapter.size_history()
+        self.assertEqual(history[0], (0, 10))
+
+        # Two successes → increase: (10*3)//2 = 15; capped at max_size=None → initial=10.
+        # No size change so _size_changes is not extended — history stays [(0, 10)].
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(1.0)
+        history = adapter.size_history()
+        self.assertEqual(history[-1], (0, 10))
+
+        # Now produce an actual size change to verify entries are appended:
+        adapter2 = BatchSizeAdapter(initial_size=4, min_size=1, window_size=2, max_size=50)
+        adapter2.record_outcome(1.0)  # increase: (4*3)//2 = 6
+        adapter2.record_outcome(1.0)  # increase: (6*3)//2 = 9
+        history2 = adapter2.size_history()
+        self.assertEqual(history2[0], (0, 4))
+        self.assertEqual(history2[-1], (2, 9))
+
+        # Reset and test decrease path: size drops each failure until min_size.
+        adapter.reset()
+        for _ in range(4):
+            adapter.record_outcome(0.0)
+        history = adapter.size_history()
+        # Steps: 0→init(10), 1→6, 2→4, 3→3 (clamped by min_size=3).
+        self.assertEqual(history[1], (1, 6))
+        self.assertEqual(history[2], (2, 4))
+        self.assertEqual(history[3], (3, 3))
+
+    def test_history_returns_plain_list_newest_last(self):
+        """history() returns outcomes as a plain list with newest last."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        self.assertEqual(adapter.history(), [])
+
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.history(), [True, False, True])
+
+        # After more records than window_size, oldest are evicted.
+        for _ in range(5):
+            adapter.record_outcome(0.0)
+        h = adapter.history()
+        self.assertEqual(len(h), 5)
+        self.assertFalse(h[0])  # oldest recorded (the second outcome was a failure)
+
 
 if __name__ == "__main__":
     unittest.main()
