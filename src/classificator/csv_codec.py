@@ -55,8 +55,12 @@ class CsvCodec:
 
         return CsvTable(headers=headers, records=records)
 
-    def write_table(self, path: Path, headers: list[str], rows: list[list[str]]) -> None:
+    def _ensure_dir(self, path: Path) -> None:
+        """Create the parent directory of `path` if it does not already exist."""
         path.parent.mkdir(parents=True, exist_ok=True)
+
+    def write_table(self, path: Path, headers: list[str], rows: list[list[str]]) -> None:
+        self._ensure_dir(path)
         with path.open("w", encoding="utf-8", newline="") as handle:
             writer = csv.writer(handle, quoting=csv.QUOTE_ALL)
             writer.writerow(headers)
@@ -68,7 +72,6 @@ class CsvCodec:
                 writer.writerow(row)
 
     def write_table_atomic(self, path: Path, headers: list[str], rows: list[list[str]]) -> None:
-        path.parent.mkdir(parents=True, exist_ok=True)
         tmp = path.with_name(f"{path.name}.tmp")
         self.write_table(tmp, headers, rows)
         os.replace(tmp, path)
