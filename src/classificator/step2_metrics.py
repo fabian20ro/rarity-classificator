@@ -57,10 +57,11 @@ class Step2Metrics:
         return timedelta(seconds=seconds)
 
     def format_progress(self, remaining: int, effective_batch_size: int) -> str:
+        partial = self.partial_extraction_count > 0 and f"partial={self.partial_extraction_count}" or ""
         return (
             f"scored={self.total_scored} failed={self.total_failed} remaining={remaining} "
             f"wpm={self.words_per_minute():.1f} eta={format_duration(self.eta(remaining))} "
-            f"batch_size={effective_batch_size} success_rate={self.success_rate() * 100:.0f}%"
+            f"batch_size={effective_batch_size} success_rate={self.success_rate() * 100:.0f}% {partial}".strip()
         )
 
     def format_summary(self) -> str:
