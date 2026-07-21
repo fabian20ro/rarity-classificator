@@ -109,6 +109,14 @@ class TransitionsTest(unittest.TestCase):
         t = LevelTransition(from_level=2, from_level_upper=3, to_level=3)
         self.assertEqual(t.other_level(), 2)
 
+    def test_source_levels_single(self):
+        t = LevelTransition(from_level=4, to_level=3)
+        self.assertEqual(t.source_levels(), [4])
+
+    def test_source_levels_pair(self):
+        t = LevelTransition(from_level=3, from_level_upper=4, to_level=3)
+        self.assertEqual(t.source_levels(), [3, 4])
+
     def test_parse_transitions_duplicates_rejected(self):
         # Duplicates are caught by validate_transition_set before dedup runs.
         with self.assertRaises(ValueError):

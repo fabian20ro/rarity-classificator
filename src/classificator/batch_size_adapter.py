@@ -134,7 +134,7 @@ class BatchSizeAdapter:
     def success_rate(self) -> float:
         if not self.outcomes:
             return 1.0
-        return sum(1 for ok in self.outcomes if ok) / len(self.outcomes)
+        return sum(self.outcomes) / len(self.outcomes)
 
     def history(self) -> list[bool]:
         """Return outcomes as a plain list (newest last)."""
