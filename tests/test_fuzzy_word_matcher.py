@@ -76,6 +76,67 @@ def test_max_edit_distance_constant():
     """MAX_EDIT_DISTANCE must equal 2 — the threshold used by normalize and matches."""
     assert MAX_EDIT_DISTANCE == 2
 
+
+def test_normalize_empty_and_single_char():
+    """normalize must handle empty string and single characters deterministically."""
+    assert normalize("") == ""
+    assert normalize("ă") == "a"
+    assert normalize("Î") == "i"
+    # round-trip: diacritic char -> normalized -> lowercase is idempotent
+    assert normalize(normalize("Ăn")) == normalize("Ăn")
+
+
+def test_matches_empty_strings():
+    """matches must behave deterministically for empty-string inputs."""
+    assert matches("", "") is True  # levenshtein("", "") == 0
+    assert matches("a", "") is True  # len diff=1, edit dist=1 <= MAX_EDIT_DISTANCE
+    assert matches("", "ab") is True  # len diff=2, edit dist=2 <= MAX_EDIT_DISTANCE
+    assert matches("", "abc") is False  # len diff=3 > MAX_EDIT_DISTANCE → short-circuit
+
+
+def test_matches_single_char_edge():
+    """Single-char comparison: exact + one-edit-distance determinism."""
+    assert matches("a", "a") is True  # exact after normalization
+    assert matches("ă", "a") is True  # diacritic fold to same normalized form
+    assert matches("abc", "d") is False  # len diff=2 OK, but edit dist > 2
+
+
+def test_matches_prefix_short_circuit():
+    """Common-prefix short-circuit: ≥(prefix_len-1) chars match AND len diff ≤1 → accept.
+
+    This makes near-matches with suffix typos deterministic without full edit-distance computation.
+    """
+    # "cat" vs "cax": 2/3 prefix match, same length → accept via prefix short-circuit
+    assert matches("cat", "cax") is True
+    # "test" vs "text": 2/4 prefix match (t,e match), len diff=0 → accept
+    assert matches("test", "text") is True
+    # "abcde" vs "abxde": 2/5 prefix match, len diff=0 → accept
+    assert matches("abcde", "abxde") is True
+
+
+def test_matches_short_string_overlap():
+    """Short strings (≤2 chars) with any character overlap should be accepted.
+
+    This provides deterministic signal for very short words where edit distance alone
+    may not reliably distinguish noise from real near-matches.
+    """
+    # "ab" vs "ac": share 'a' → accept via short-string overlap path
+    assert matches("ab", "ac") is True
+    # "xy" vs "xz": share 'x' → accept
+    assert matches("xy", "xz") is True
+    # "ab" vs "cd": no overlap, len ≤2 but empty intersection → reject (edit dist=2 boundary)
+    assert matches("ab", "cd") is False
+
+
+def test_matches_prefix_short_circuit_reject():
+    """Prefix short-circuit must NOT accept when prefix match is insufficient or length diff > 1."""
+    # "cat" vs "xyz": 0/3 prefix match → prefix check fails, edit dist=3 > 2 → reject
+    assert matches("cat", "xyz") is False
+    # "abcde" vs "abxyz": 2/5 prefix match but len diff=0; common_prefix < 3-1=2? No — 2>=2.
+    # Actually common_prefix=2 >= 2, len_diff=0 → should accept via prefix short-circuit
+    assert matches("abcde", "abxyz") is True
+
+
 if __name__ == "__main__":
     import unittest
     unittest.main()
