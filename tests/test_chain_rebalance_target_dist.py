@@ -280,5 +280,38 @@ class TestChainRebalance(unittest.TestCase):
             if Path("dummy_runs").exists(): import shutil; shutil.rmtree("dummy_runs")
             if Path("dummy_output").exists(): import shutil; shutil.rmtree("dummy_output")
 
+    def test_state_file_roundtrip_preserves_step_and_csv(self):
+        from src.classificator.tools.chain_rebalance_target_dist import _load_state, _write_state
+
+        state_path = Path("test_state_rt.txt")
+        csv_path = Path("output.csv")
+        options = ChainOptions(
+            input_csv=Path("dummy.csv"), model="m", run_base="rb", runs_dir=Path("."),
+            state_file=state_path, resume=False, final_output_csv=None, batch_size=10,
+            max_tokens=100, timeout_seconds=10, max_retries=0,
+            system_prompt_file=Path("dummy_system_prompt.txt"), user_template_file=Path("dummy_user_template.txt"),
+            reference_csv=None, anchor_l1_file=None, min_l1_jaccard=None,
+            min_anchor_l1_precision=None, min_anchor_l1_recall=None, endpoint_option=None, base_url_option=None,
+        )
+
+        _write_state(state_path, step=4, current_csv=csv_path, options=options)
+        loaded = _load_state(state_path)
+
+        self.assertEqual(loaded["last_completed_step"], 4)
+        self.assertEqual(loaded["current_csv"], str(csv_path))
+
+        if state_path.exists(): state_path.unlink()
+
+    def test_load_state_invalid_missing_key_raises(self):
+        from src.classificator.tools.chain_rebalance_target_dist import _load_state
+
+        bad = Path("bad_state.txt")
+        bad.write_text("only_a_field\t1\n", encoding="utf-8")
+
+        with self.assertRaises(ValueError) as cm:
+            _load_state(bad)
+        self.assertIn("Invalid state file", str(cm.exception))
+        if bad.exists(): bad.unlink()
+
 if __name__ == "__main__":
     unittest.main()
