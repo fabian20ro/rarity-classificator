@@ -14,6 +14,7 @@ from .steps.step2_score import Step2Options as _Step2Options
 from .transitions import LevelTransition, parse_transitions, validate_transition_set
 from .word_store import WordStore
 from .run_csv_repository import RunCsvRepository
+import sys as _sys
 
 __all__ = [
     "__version__",
@@ -34,4 +35,14 @@ __all__ = [
 Step1Options = _Step1Options
 Step2Options = _Step2Options
 del _Step1Options, _Step2Options
+
+def _assert_exports_resolved() -> None:
+    """Verify every name in ``__all__`` resolves from this module's namespace."""
+    missing = [name for name in __all__ if not hasattr(_sys.modules[__name__], name)]
+    if missing:
+        raise ImportError(f"Unresolved exports in classificator.__all__: {missing}")
+
+
 __version__ = "0.1.0"
+
+_assert_exports_resolved()
