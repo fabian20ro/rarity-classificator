@@ -76,6 +76,30 @@ def test_max_edit_distance_constant():
     """MAX_EDIT_DISTANCE must equal 2 — the threshold used by normalize and matches."""
     assert MAX_EDIT_DISTANCE == 2
 
+
+def test_normalize_empty_and_single_char():
+    """normalize must handle empty string and single characters deterministically."""
+    assert normalize("") == ""
+    assert normalize("ă") == "a"
+    assert normalize("Î") == "i"
+    # round-trip: diacritic char -> normalized -> lowercase is idempotent
+    assert normalize(normalize("Ăn")) == normalize("Ăn")
+
+
+def test_matches_empty_strings():
+    """matches must behave deterministically for empty-string inputs."""
+    assert matches("", "") is True  # levenshtein("", "") == 0
+    assert matches("a", "") is True  # len diff=1, edit dist=1 <= MAX_EDIT_DISTANCE
+    assert matches("", "ab") is True  # len diff=2, edit dist=2 <= MAX_EDIT_DISTANCE
+    assert matches("", "abc") is False  # len diff=3 > MAX_EDIT_DISTANCE → short-circuit
+
+
+def test_matches_single_char_edge():
+    """Single-char comparison: exact + one-edit-distance determinism."""
+    assert matches("a", "a") is True  # exact after normalization
+    assert matches("ă", "a") is True  # diacritic fold to same normalized form
+    assert matches("abc", "d") is False  # len diff=2 OK, but edit dist > 2
+
 if __name__ == "__main__":
     import unittest
     unittest.main()
