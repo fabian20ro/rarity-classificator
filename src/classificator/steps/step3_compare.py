@@ -103,15 +103,38 @@ def _build_comparison_row(
 
 
 def _resolve_final_level(levels: list[int], median_level: int, strategy: Step3MergeStrategy) -> tuple[int, str]:
+    """Resolve final rarity level using merge rules.
+
+    Priority order (highest to lowest):
+    - Level 1 present → always assign 1 (critical for rare words)
+    - Median >= 3 and level 2 present → assign 2 (conservative upgrade)
+    - Median in {3,4} and level 5 present → assign 5 (rare word confirmation)
+    - Otherwise → use median
+
+    Args:
+        levels: List of rarity levels from different runs
+        median_level: Calculated median of all levels
+        strategy: Merge strategy to apply
+
+    Returns:
+        Tuple of (final_level, rule_applied)
+    """
     if strategy == Step3MergeStrategy.MEDIAN:
         return median_level, "median"
 
+    # Critical: any level 1 means the word is rare in at least one run
     if any(x == 1 for x in levels):
         return 1, "any_level_1"
+
+    # Conservative upgrade when median supports it
     if median_level >= 3 and any(x == 2 for x in levels):
         return 2, "any_level_2_over_median"
+
+    # Strong signal: level 5 with supporting median
     if median_level in {3, 4} and any(x == 5 for x in levels):
         return 5, "any_level_5_over_median"
+
+    # Fallback to median when no rules trigger
     return median_level, "median_fallback"
 
 
