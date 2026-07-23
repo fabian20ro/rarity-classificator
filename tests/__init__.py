@@ -28,6 +28,13 @@ class TestTopLevelExports(unittest.TestCase):
         opts = Step2Options(run_slug="t", model="x", base_csv_path=Path("base.csv"), output_csv_path=Path("out.csv"))
         self.assertEqual(opts.run_slug, "t")
 
+    def test_capability_state_reexported(self):
+        from classificator.lm import CapabilityState
+
+        state = CapabilityState()
+        self.assertIsNotNone(state)
+        self.assertTrue(state.reasoning_controls_supported)
+
 
 class TestPackageIntegrity(unittest.TestCase):
     def test_batch_size_adapter_import(self):
