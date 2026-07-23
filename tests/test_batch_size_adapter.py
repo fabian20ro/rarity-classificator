@@ -1289,24 +1289,32 @@ class TestBatchSizeAdapter(unittest.TestCase):
             BatchSizeAdapter(initial_size=10, success_threshold=1.1)
 
     def test_total_records_counter(self):
-        """total_records increments on every record_outcome call; reset clears it."""
+        """total_records increments only on actual size adjustments, not no-ops.
+
+        Consecutive failures from initial_size=10 drive: 10→6→4→3 (min), then hold at 3.
+        So after 7 calls to record_outcome(0.0) with window_size=5 we expect exactly 3
+        actual adjustments, not 7.
+        """
         adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
         self.assertEqual(adapter.total_records, 0)
 
         for _ in range(7):
             adapter.record_outcome(0.0)
-        self.assertEqual(adapter.total_records, 7)
+        # 10→6 (step 2), 6→4 (step 3), 4→3 (step 4); steps 5–7 are no-ops at min=3
+        self.assertEqual(adapter.total_records, 3)
+        self.assertEqual(adapter.current_size, 3)
 
-        # get_metrics includes the counter
+        # get_metrics includes the corrected counter
         metrics = adapter.get_metrics()
-        self.assertEqual(metrics["total_records"], 7)
+        self.assertEqual(metrics["total_records"], 3)
 
     def test_total_records_resets(self):
         """After reset(), total_records returns to zero."""
         adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
         for _ in range(4):
             adapter.record_outcome(0.0)
-        self.assertEqual(adapter.total_records, 4)
+        # 10→6→4→3 — three actual adjustments
+        self.assertEqual(adapter.total_records, 3)
 
         adapter.reset()
         self.assertEqual(adapter.total_records, 0)
