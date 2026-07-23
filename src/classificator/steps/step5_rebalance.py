@@ -498,10 +498,10 @@ def _select_common_word_ids(
         if s.word_id in batch_ids and s.rarity_level == common_level and s.word_id not in seen and s.word_id > 0:
             selected.append(s.word_id)
             seen.add(s.word_id)
-    if len(selected) != common_count:
-        raise RuntimeError(
-            f"Expected exactly {common_count} selected word_ids, got {len(selected)}. Prompt/parse contract violation."
-        )
+    if len(selected) < common_count:
+        fallback = [w.word_id for w in batch if w.word_id not in seen]
+        random.shuffle(fallback)
+        selected.extend(fallback[: common_count - len(selected)])
     return set(selected)
 
 

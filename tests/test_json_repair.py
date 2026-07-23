@@ -68,3 +68,14 @@ def test_empty_input_handled():
 def test_mixed_comment_and_unclosed_structure():
     result = repair('{"a": 1 // comment\n"b":')
     assert '"b"' in result
+
+
+def test_escape_in_string_preserves_subsequent_slashes():
+    # Regression: _track_string must keep in_string=True after a backslash
+    # inside a JSON string; otherwise the "//" would be stripped as a comment.
+    assert repair('{"url": "http://x.com/a\\n//b"}') == '{"url": "http://x.com/a\\n//b"}'
+
+
+def test_mixed_comment_and_unclosed_structure():
+    result = repair('{"a": 1 // comment\n"b":')
+    assert '"b"' in result
