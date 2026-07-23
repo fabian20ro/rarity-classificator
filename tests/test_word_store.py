@@ -102,6 +102,14 @@ class WordStoreTest(unittest.TestCase):
         self.assertEqual(set(payload), {(3, 10), (1, 20)})
         self.assertEqual(fake_conn.commit_calls, 1)
 
+    def test_update_rarity_levels_chunked_invalid_chunk_size_raises(self):
+        store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
+
+        with self.assertRaises(ValueError):
+            store.update_rarity_levels_chunked({1: 2}, chunk_size=0)
+        with self.assertRaises(ValueError):
+            store.update_rarity_levels_chunked({1: 2}, chunk_size=-5)
+
     def test_update_rarity_levels_empty_updates_skips_connection(self):
         store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
         store._connect = MagicMock()
@@ -110,7 +118,7 @@ class WordStoreTest(unittest.TestCase):
 
         store._connect.assert_not_called()
 
-    def test_fetch_all_words_parses_rows_into_base_word_rows(self):
+    def test_update_rarity_levels_non_chunked_sends_single_batch(self):
         store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
         fake_cursor = _FakeCursor()
         fake_conn = _FakeConnection(fake_cursor)

@@ -50,6 +50,8 @@ class WordStore:
             conn.commit()
 
     def update_rarity_levels_chunked(self, updates: dict[int, int], chunk_size: int = 5000) -> None:
+        if chunk_size <= 0:
+            raise ValueError("chunk_size must be positive")
         if not updates:
             return
         items = list(updates.items())
