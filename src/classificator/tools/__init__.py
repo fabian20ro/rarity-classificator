@@ -41,19 +41,6 @@ def _validate_tool_modules() -> list[str]:
     return errors
 
 
-def validate_tools() -> None:
-    """Raise ValueError with all validation errors found.
-
-    Raises:
-        ValueError: With error details if any tool module fails validation.
-    """
-    errors = _validate_tool_modules()
-    if errors:
-        raise ValueError(
-            f"Tool module validation failed:\n  " + "\n  ".join(errors)
-        )
-
-
 __all__ = [
     "_TOOL_MODULES",
     "_validate_tool_modules",
@@ -64,5 +51,4 @@ __all__ = [
     "parse_only_levels",
     "run_l1_review_check",
     "run_review_low_confidence",
-    "validate_tools",
 ]

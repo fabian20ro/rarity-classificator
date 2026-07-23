@@ -502,4 +502,82 @@ def _resolve_step5_transitions(args) -> list[LevelTransition]:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    import argparse as _argparse
+    import unittest as _unittest
+
+    class _Step5TransitionResolutionTest(_unittest.TestCase):
+        """Contract tests for cli._resolve_step5_transitions.
+
+        These cover the validation boundaries of step5's transition resolution:
+        - missing flag pair → raises ValueError
+        - partial flags (only one given) → raises ValueError with specific message
+        - --from-level-high without --from-level → specific error
+        - valid single transition from CLI args → correct LevelTransition list
+        - valid pair transition with from_level_high → correct upper bound
+        """
+
+        def _make_args(self, **overrides):
+            defaults = {
+                "from_level": None,
+                "from_level_high": None,
+                "to_level": None,
+                "transitions": None,
+            }
+            defaults.update(overrides)
+            return _argparse.Namespace(**defaults)
+
+        def test_missing_to_level_raises_requires_both(self):
+            args = self._make_args(from_level=3)
+            with self.assertRaises(ValueError) as ctx:
+                _resolve_step5_transitions(args)
+            self.assertIn("requires both --from-level and --to-level together", str(ctx.exception))
+
+        def test_missing_from_level_raises_requires_both(self):
+            args = self._make_args(to_level=2)
+            with self.assertRaises(ValueError) as ctx:
+                _resolve_step5_transitions(args)
+            self.assertIn("requires both --from-level and --to-level together", str(ctx.exception))
+
+        def test_from_level_high_without_from_level_raises_specific(self):
+            args = self._make_args(from_level_high=3, to_level=2)
+            with self.assertRaises(ValueError) as ctx:
+                _resolve_step5_transitions(args)
+            err = str(ctx.exception)
+            self.assertIn("--from-level and --to-level", err)
+
+        def test_valid_single_transition_returns_correct_list(self):
+            args = self._make_args(from_level=3, to_level=2)
+            transitions = _resolve_step5_transitions(args)
+            self.assertEqual(len(transitions), 1)
+            t = transitions[0]
+            self.assertIsInstance(t, LevelTransition)
+            self.assertEqual(t.from_level, 3)
+            self.assertEqual(t.to_level, 2)
+            self.assertIsNone(t.from_level_upper)
+
+        def test_valid_pair_transition_with_from_level_high(self):
+            args = self._make_args(from_level=3, from_level_high=4, to_level=2)
+            transitions = _resolve_step5_transitions(args)
+            self.assertEqual(len(transitions), 1)
+            t = transitions[0]
+            self.assertIsInstance(t, LevelTransition)
+            self.assertEqual(t.from_level, 3)
+            self.assertEqual(t.from_level_upper, 4)
+            self.assertEqual(t.to_level, 2)
+
+        def test_same_level_transition_allowed(self):
+            args = self._make_args(from_level=4, to_level=4)
+            transitions = _resolve_step5_transitions(args)
+            self.assertEqual(len(transitions), 1)
+            t = transitions[0]
+            self.assertEqual(t.from_level, 4)
+            self.assertEqual(t.to_level, 4)
+
+
+if __name__ == "__main__":
+    import sys as _sys
+    if len(_sys.argv) > 1 and _sys.argv[1] in {"--cli", "--entry"}:
+        sys.exit(main())
+    else:
+        import unittest as _unittest
+        _unittest.main(argv=_sys.argv[:1], verbosity=2)

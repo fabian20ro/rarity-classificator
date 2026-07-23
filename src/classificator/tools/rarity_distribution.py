@@ -38,10 +38,7 @@ def run_rarity_distribution(
         if idx_level >= len(vals):
             raise ValueError(f"Missing {resolved_level_col} at row {rec.line_number} in {csv_path}")
         raw_level = vals[idx_level].strip()
-        try:
-            level = _validate_level(raw_level, resolved_level_col, rec.line_number)
-        except ValueError as exc:
-            raise exc
+        level = _validate_level(raw_level, resolved_level_col, rec.line_number)
         distribution[level] += 1
 
     mode = max(distribution, key=distribution.get)

@@ -294,18 +294,17 @@ def _print_l1_summary(latest: dict[int, ReviewLabel]) -> None:
     print(f"l1_precision={stats.precision:.4f}")
 
 
+_LABEL_MAP: dict[str, str] = {
+    "1": "1", "2": "2", "3": "3",
+    "u": "unknown_4_5", "unknown": "unknown_4_5",
+    "d": "undecided", "undecided": "undecided",
+    "s": "skip",
+    "q": "quit", "quit": "quit", "exit": "quit",
+}
+
+
 def _map_input_to_label(raw: str) -> str | None:
-    if raw in {"1", "2", "3"}:
-        return raw
-    if raw in {"u", "unknown"}:
-        return "unknown_4_5"
-    if raw in {"d", "undecided"}:
-        return "undecided"
-    if raw in {"s", "skip"}:
-        return "skip"
-    if raw in {"q", "quit", "exit"}:
-        return "quit"
-    return None
+    return _LABEL_MAP.get(raw)
 
 
 def _resolve_level_column(headers: list[str], level_column: str | None) -> str:
