@@ -63,48 +63,83 @@ def _validate_placeholders() -> None:
 
 _validate_placeholders()
 
-BASE_CSV_HEADERS = ["word_id", "word", "type"]
-RUN_CSV_HEADERS = [
-    "word_id",
-    "word",
-    "type",
-    "rarity_level",
-    "tag",
-    "confidence",
-    "scored_at",
-    "model",
-    "run_slug",
-]
-COMPARISON_CSV_HEADERS = [
-    "word_id",
-    "word",
-    "type",
-    "run_a_level",
-    "run_a_confidence",
-    "run_b_level",
-    "run_b_confidence",
-    "run_c_level",
-    "run_c_confidence",
-    "median_level",
-    "spread",
-    "is_outlier",
-    "reason",
-    "merge_strategy",
-    "merge_rule",
-    "final_level",
-]
-OUTLIERS_CSV_HEADERS = [
-    "word_id",
-    "word",
-    "type",
-    "run_a_level",
-    "run_b_level",
-    "run_c_level",
-    "spread",
-    "reason",
-]
-UPLOAD_REPORT_HEADERS = ["word_id", "previous_level", "new_level", "source"]
-UPLOAD_MARKER_HEADERS = ["uploaded_at", "uploaded_level", "upload_status", "upload_batch_id"]
+_CSV_HEADERS = {
+    "base": ["word_id", "word", "type"],
+    "run": [
+        "word_id",
+        "word",
+        "type",
+        "rarity_level",
+        "tag",
+        "confidence",
+        "scored_at",
+        "model",
+        "run_slug",
+    ],
+    "comparison": [
+        "word_id",
+        "word",
+        "type",
+        "run_a_level",
+        "run_a_confidence",
+        "run_b_level",
+        "run_b_confidence",
+        "run_c_level",
+        "run_c_confidence",
+        "median_level",
+        "spread",
+        "is_outlier",
+        "reason",
+        "merge_strategy",
+        "merge_rule",
+        "final_level",
+    ],
+    "outliers": [
+        "word_id",
+        "word",
+        "type",
+        "run_a_level",
+        "run_b_level",
+        "run_c_level",
+        "spread",
+        "reason",
+    ],
+    "upload_report": ["word_id", "previous_level", "new_level", "source"],
+    "upload_marker": [
+        "uploaded_at",
+        "uploaded_level",
+        "upload_status",
+        "upload_batch_id",
+    ],
+}
+
+CSV_HEADERS = _CSV_HEADERS
+
+
+def ensure_csv_headers() -> None:
+    """Ensure every documented header alias is present and non-empty."""
+    required_keys = (
+        "base",
+        "run",
+        "comparison",
+        "outliers",
+        "upload_report",
+        "upload_marker",
+    )
+    for key in required_keys:
+        if not _CSV_HEADERS.get(key):
+            raise ValueError(f"CSV header group '{key}' is empty or missing")
+
+
+ensure_csv_headers()
+
+# Backward-compatible aliases — all consumers keep importing these names.
+BASE_CSV_HEADERS = _CSV_HEADERS["base"]
+RUN_CSV_HEADERS = _CSV_HEADERS["run"]
+COMPARISON_CSV_HEADERS = _CSV_HEADERS["comparison"]
+OUTLIERS_CSV_HEADERS = _CSV_HEADERS["outliers"]
+UPLOAD_REPORT_HEADERS = _CSV_HEADERS["upload_report"]
+UPLOAD_MARKER_HEADERS = _CSV_HEADERS["upload_marker"]
 
 
 def ensure_output_dir(root: Path | None = None) -> Path:
