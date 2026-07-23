@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import unicodedata
 from pathlib import Path
 
 
@@ -8,7 +9,8 @@ def sanitize_run_slug(raw: str) -> str:
         raise TypeError(
             f"sanitize_run_slug expects str, got {type(raw).__name__}"
         )
-    normalized = raw.strip().lower().replace("-", "_")
+    normalized = raw.strip().lower()
+    normalized = unicodedata.normalize("NFC", normalized).casefold()
     valid = "".join(ch for ch in normalized if ch.isalnum() or ch == "_")
     if not valid:
         raise ValueError(
