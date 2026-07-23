@@ -22,6 +22,10 @@ class RarityDistribution:
 
     @staticmethod
     def _validate_level(level: int) -> None:
+        if not isinstance(level, int):
+            raise TypeError(
+                f"Level must be an integer, got {type(level).__name__}"
+            )
         if not (1 <= level <= 5):
             raise ValueError(f"Level must be in range 1..5, got {level}")
 
