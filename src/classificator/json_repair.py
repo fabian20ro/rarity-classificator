@@ -17,7 +17,7 @@ def _track_string(in_string: bool, escaped: bool, ch: str) -> tuple[bool, bool]:
     """Update string/escape state for a single character. Returns (in_string, escaped)."""
     if in_string:
         if escaped:
-            return False, False
+            return True, False
         if ch == "\\":
             return True, True
         if ch == '"':
