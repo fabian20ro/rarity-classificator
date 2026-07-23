@@ -86,6 +86,14 @@ class TestCsvCodec(unittest.TestCase):
             self.codec.read_table(path)
         self.assertIn("header column 1 is empty", str(cm.exception))
 
+    def test_read_table_completely_blank_middle_row_raises(self):
+        path = self.test_dir / "blank_multi.csv"
+        with open(path, "w", encoding="utf-8", newline="") as f:
+            f.write("id,name\n1,test_id\n,,\n2,test_name")
+        with self.assertRaises(CsvFormatError) as cm:
+            self.codec.read_table(path)
+        self.assertIn("line 3 has 3 columns, expected 2", str(cm.exception))
+
     def test_write_table_success(self):
         path = self.test_dir / "out.csv"
         headers = ["id", "name"]
