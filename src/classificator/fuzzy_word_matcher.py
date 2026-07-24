@@ -49,14 +49,14 @@ def matches(expected: str, actual: str) -> bool:
     if abs(len(ne) - len(na)) > MAX_EDIT_DISTANCE:
         return False
 
-    # Common-prefix short-circuit: if the first few characters match exactly,
-    # and the remaining difference is small, accept as a match. This makes
+    # Common-prefix short-circuit: at most one mismatch in the first few characters,
+    # plus small length difference — accept without full edit-distance. This makes
     # failure-specific decisions more deterministic for near-matches that differ
     # only in suffix positions (e.g., typos at word endings).
     prefix_len = min(len(ne), len(na), 3)
-    common_prefix = sum(1 for i in range(prefix_len) if ne[i] == na[i])
+    mismatches = sum(1 for i in range(prefix_len) if ne[i] != na[i])
 
-    if common_prefix >= prefix_len - 1 and abs(len(ne) - len(na)) <= 1:
+    if mismatches <= 1 and abs(len(ne) - len(na)) <= 1:
         return True
 
     # If strings are very short (≤2 chars), exact character overlap is sufficient.
