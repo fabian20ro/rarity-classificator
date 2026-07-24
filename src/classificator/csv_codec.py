@@ -23,6 +23,15 @@ class CsvTable:
 
 
 class CsvCodec:
+    def _validate_headers(self, headers: list[str]) -> None:
+        if not headers:
+            raise CsvFormatError("write_table received empty headers")
+        for i, cell in enumerate(headers):
+            if not str(cell).strip():
+                raise CsvFormatError(
+                    f"write_table header column {i + 1} is empty"
+                )
+
     def read_table(self, path: Path) -> CsvTable:
         if not path.exists():
             raise FileNotFoundError(f"CSV file not found: {path}")

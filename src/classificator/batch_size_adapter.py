@@ -144,7 +144,6 @@ class BatchSizeAdapter:
     def _adjust_size(self) -> None:
         rate = self.success_rate()
         old_size = self.current_size
-        self.total_records += 1
         if rate < self.low_threshold:
             new_size = max(self.min_size, (self.current_size * 2) // 3)
         elif rate > self.high_threshold:
@@ -152,5 +151,6 @@ class BatchSizeAdapter:
         else:
             return
         if new_size != old_size:
+            self.total_records += 1
             self.current_size = new_size
             self._size_changes.append((self.step_count, new_size))
