@@ -102,10 +102,7 @@ def test_matches_single_char_edge():
 
 
 def test_matches_prefix_short_circuit():
-    """Common-prefix short-circuit: ≥(prefix_len-1) chars match AND len diff ≤1 → accept.
-
-    This makes near-matches with suffix typos deterministic without full edit-distance computation.
-    """
+    """Common-prefix short-circuit: ≤1 mismatch in first 3 chars AND len diff ≤1 → accept."""
     # "cat" vs "cax": 2/3 prefix match, same length → accept via prefix short-circuit
     assert matches("cat", "cax") is True
     # "test" vs "text": 2/4 prefix match (t,e match), len diff=0 → accept
