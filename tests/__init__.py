@@ -35,6 +35,16 @@ class TestTopLevelExports(unittest.TestCase):
         self.assertIsNotNone(state)
         self.assertTrue(state.reasoning_controls_supported)
 
+    def test_lm_package_exports_all_canonical_names(self):
+        """Every name in lm.__all__ must resolve to a callable class via top-level import."""
+        from classificator.lm import __all__ as exported
+
+        canonical = {"LmStudioClient", "ScoringContext", "CapabilityState"}
+        self.assertEqual(set(exported), canonical, f"lm.__all__ drifted: {set(exported)}")
+        for name in sorted(canonical):
+            cls = getattr(__import__("classificator.lm", fromlist=[name]), name)
+            self.assertTrue(callable(cls), f"{name} is not callable")
+
 
 class TestPackageIntegrity(unittest.TestCase):
     def test_batch_size_adapter_import(self):
