@@ -463,6 +463,7 @@ class LmStudioClient:
                 source=f"{source}-lmstudio",
             )
 
+        print(f"Warning: no LM probe succeeded for {base_url}; falling back to OpenAI-compatible endpoint.")
         return ResolvedEndpoint(
             endpoint=f"{base_url}{OPENAI_CHAT_COMPLETIONS_PATH}",
             models_endpoint=openai_models_url,
