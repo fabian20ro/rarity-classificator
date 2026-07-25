@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from operator import attrgetter
+from operator import itemgetter
 from pathlib import Path
 
 from ..constants import BASE_CSV_HEADERS
@@ -16,8 +16,8 @@ class Step1Options:
 
 
 def run_step1(options: Step1Options, *, word_store: WordStore, repo: RunCsvRepository) -> Path | None:
-    words = sorted(word_store.fetch_all_words(), key=attrgetter("word_id"))
-    rows = [[str(w.word_id), w.word, w.type] for w in words]
+    words = sorted(word_store.fetch_all_words(), key=itemgetter(0))
+    rows = [[str(w[0]), w[1], w[2]] for w in words]
     if options.dry_run:
         print(f"Step 1 dry-run. Would export {len(words)} words to {options.output_csv_path}")
         return None
