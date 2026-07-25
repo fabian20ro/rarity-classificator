@@ -20,8 +20,10 @@ class ModelsTest(unittest.TestCase):
         self.assertIs(UploadMode.parse("full_fallback"), UploadMode.FULL_FALLBACK)
 
     def test_upload_mode_parse_rejects_unknown_value(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as err:
             UploadMode.parse("unexpected")
+        self.assertIn("uploadmode", str(err.exception).lower())
+        self.assertIn("unexpected", str(err.exception))
 
     def test_step3_merge_strategy_parse_accepts_aliases(self):
         self.assertIs(Step3MergeStrategy.parse(None), Step3MergeStrategy.MEDIAN)
@@ -43,8 +45,10 @@ class ModelsTest(unittest.TestCase):
         )
 
     def test_step3_merge_strategy_parse_rejects_unknown_value(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as err:
             Step3MergeStrategy.parse("unexpected")
+        self.assertIn("step3mergestrategy", str(err.exception).lower())
+        self.assertIn("unexpected", str(err.exception))
 
     def test_lm_model_config_reasoning_controls(self):
         assert (
@@ -130,8 +134,10 @@ class ScoringOutputModeEnumTest(unittest.TestCase):
         )
 
     def test_parse_rejects_unknown_value(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as err:
             ScoringOutputMode.parse("unexpected")
+        self.assertIn("scoringoutputmode", str(err.exception).lower())
+        self.assertIn("unexpected", str(err.exception))
 
 
 if __name__ == "__main__":
