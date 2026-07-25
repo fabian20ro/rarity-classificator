@@ -48,6 +48,12 @@ class LmStudioRequestBuilder:
         if max_tokens <= 0:
             raise ValueError("max_tokens must be positive")
 
+        if schema_kind == JsonSchemaKind.SELECTED_WORD_IDS:
+            if expected_items is None or expected_items <= 0:
+                raise ValueError("expected_items is required for selected-word-id mode")
+            if expected_items > len(batch):
+                raise ValueError("expected_items cannot exceed batch size in selected-word-id mode")
+
         if schema_kind == JsonSchemaKind.SCORE_RESULTS:
             entries = [
                 {"word_id": row.word_id, "word": row.word, "type": row.type}
@@ -110,14 +116,6 @@ class LmStudioRequestBuilder:
                 kwargs["thinking_type"] = config.thinking_type
             if kwargs:
                 payload["chat_template_kwargs"] = kwargs
-
-        if schema_kind == JsonSchemaKind.SELECTED_WORD_IDS:
-            if expected_items is None:
-                raise ValueError("expected_items is required")
-            if expected_items <= 0:
-                raise ValueError("expected_items is required")
-            if expected_items > len(batch):
-                raise ValueError("expected_items cannot exceed batch size in selected-word-id mode")
 
         if response_format_mode == ResponseFormatMode.JSON_OBJECT:
             payload["response_format"] = {"type": "json_object"}
