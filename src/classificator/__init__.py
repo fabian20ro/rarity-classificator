@@ -38,7 +38,15 @@ del _Step1Options, _Step2Options
 
 def _assert_exports_resolved() -> None:
     """Verify every name in ``__all__`` resolves from this module's namespace."""
-    missing = [name for name in __all__ if not hasattr(_sys.modules[__name__], name)]
+
+    def _is_missing(name: str) -> bool:
+        try:
+            getattr(_sys.modules[__name__], name)
+        except AttributeError:
+            return True
+        return False
+
+    missing = [name for name in __all__ if _is_missing(name)]
     if missing:
         raise ImportError(f"Unresolved exports in classificator.__all__: {missing}")
 
