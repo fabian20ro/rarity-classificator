@@ -20,8 +20,10 @@ class ModelsTest(unittest.TestCase):
         self.assertIs(UploadMode.parse("full_fallback"), UploadMode.FULL_FALLBACK)
 
     def test_upload_mode_parse_rejects_unknown_value(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as err:
             UploadMode.parse("unexpected")
+        self.assertIn("uploadmode", str(err.exception).lower())
+        self.assertIn("unexpected", str(err.exception))
 
     def test_step3_merge_strategy_parse_accepts_aliases(self):
         self.assertIs(Step3MergeStrategy.parse(None), Step3MergeStrategy.MEDIAN)
@@ -43,8 +45,26 @@ class ModelsTest(unittest.TestCase):
         )
 
     def test_step3_merge_strategy_parse_rejects_unknown_value(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as err:
             Step3MergeStrategy.parse("unexpected")
+        self.assertIn("step3mergestrategy", str(err.exception).lower())
+        self.assertIn("unexpected", str(err.exception))
+
+    def test_malformed_alias_target_raises_value_error(self):
+        """A misspelled alias target (one that doesn't exist on the class) must raise ValueError, not AttributeError."""
+        import classificator.models as models_mod
+
+        class FakeStrategy:
+            MEDIAN = "MEDIAN"
+            ANY_EXTREMES = "ANY_EXTREMES"
+
+        fake_alias_map = {
+            "ANY-EXTREMES": "ANY_EXTREMES",
+            "THREE_ANY_EXTREMES": "MISSPELLED_NAME",
+        }
+        with self.assertRaises(ValueError) as err:
+            models_mod._parse_value_to_enum(FakeStrategy, "three_any_extremes", "MEDIAN", fake_alias_map)
+        self.assertIn("alias target", str(err.exception).lower())
 
     def test_lm_model_config_reasoning_controls(self):
         assert (
@@ -130,8 +150,10 @@ class ScoringOutputModeEnumTest(unittest.TestCase):
         )
 
     def test_parse_rejects_unknown_value(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as err:
             ScoringOutputMode.parse("unexpected")
+        self.assertIn("scoringoutputmode", str(err.exception).lower())
+        self.assertIn("unexpected", str(err.exception))
 
 
 if __name__ == "__main__":

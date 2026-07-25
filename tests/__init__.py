@@ -53,6 +53,28 @@ class TestPackageIntegrity(unittest.TestCase):
         adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
         self.assertEqual(adapter.current_size, 10)
 
+    def test_assert_exports_resolved_passes_cleanly(self):
+        """Importing the package should leave _assert_exports_resolved intact."""
+        from classificator import __all__ as exported
+
+        missing = [n for n in exported if not hasattr(__import__("classificator"), n)]
+        self.assertEqual(missing, [], f"Missing exports at import time: {missing}")
+
+    def test_assert_exports_resolved_raises_on_missing_name(self):
+        """Patching a bad name into __all__ must trigger ImportError."""
+        import classificator as pkg_mod
+        from classificator import _assert_exports_resolved
+
+        original = list(pkg_mod.__all__)
+        pkg_mod.__all__ = original + ["_nonexistent_fake_export"]
+
+        try:
+            with self.assertRaises(ImportError) as ctx:
+                _assert_exports_resolved()
+            self.assertIn("_nonexistent_fake_export", str(ctx.exception))
+        finally:
+            pkg_mod.__all__ = tuple(original)
+
 
 class TestValidateSteps(unittest.TestCase):
     """Tests for steps/__init__.py validation functionality."""
