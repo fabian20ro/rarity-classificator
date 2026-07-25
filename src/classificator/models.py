@@ -18,7 +18,10 @@ def _parse_value_to_enum(cls, value: str | None, default_name: str, alias_map: d
     normalized_aliases = {k.lower().replace("-", "_") for k in alias_map}
     if v.replace("-", "_") in normalized_aliases:
         target_key = next(k for k in alias_map if k.lower().replace("-", "_") == v.replace("-", "_"))
-        return getattr(cls, alias_map[target_key])
+        resolved_name = alias_map[target_key]
+        if not hasattr(cls, resolved_name):
+            raise ValueError(f"Invalid {cls.__name__.lower()} alias target: {resolved_name}")
+        return getattr(cls, resolved_name)
     raise ValueError(f"Invalid {cls.__name__.lower()} value: {value}")
 
 

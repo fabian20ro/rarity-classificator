@@ -50,6 +50,22 @@ class ModelsTest(unittest.TestCase):
         self.assertIn("step3mergestrategy", str(err.exception).lower())
         self.assertIn("unexpected", str(err.exception))
 
+    def test_malformed_alias_target_raises_value_error(self):
+        """A misspelled alias target (one that doesn't exist on the class) must raise ValueError, not AttributeError."""
+        import classificator.models as models_mod
+
+        class FakeStrategy:
+            MEDIAN = "MEDIAN"
+            ANY_EXTREMES = "ANY_EXTREMES"
+
+        fake_alias_map = {
+            "ANY-EXTREMES": "ANY_EXTREMES",
+            "THREE_ANY_EXTREMES": "MISSPELLED_NAME",
+        }
+        with self.assertRaises(ValueError) as err:
+            models_mod._parse_value_to_enum(FakeStrategy, "three_any_extremes", "MEDIAN", fake_alias_map)
+        self.assertIn("alias target", str(err.exception).lower())
+
     def test_lm_model_config_reasoning_controls(self):
         assert (
             LmModelConfig(model_id="test", reasoning_effort="high").has_reasoning_controls()
