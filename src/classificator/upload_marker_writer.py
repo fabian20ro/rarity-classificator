@@ -37,10 +37,12 @@ class UploadMarkerWriter:
                 upload_batch_id=upload_batch_id,
                 uploaded_at=uploaded_at,
             )
-        except PermissionError:
+        except (PermissionError, FileNotFoundError) as e:
+            reason = "permission denied" if isinstance(e, PermissionError) else "file not found"
             logger.info(
-                "Cannot write markers in-place to %s (permission denied); writing companion file instead",
+                "Cannot write markers in-place to %s (%s); writing companion file instead",
                 final_csv_path,
+                reason,
             )
             return self._write_companion(
                 final_csv_path=final_csv_path,
