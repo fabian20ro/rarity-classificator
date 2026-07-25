@@ -50,7 +50,10 @@ class TestStep1Export(unittest.TestCase):
         self.mock_repo.write_rows.side_effect = PermissionError("denied")
         with self.assertRaises(PermissionError, msg="write error must propagate"):
             run_step1(options, word_store=self.mock_word_store, repo=self.mock_repo)
-
+        # write_rows was invoked once with correct args before failing — fetch succeeded, data reached write phase
+        self.mock_repo.write_rows.assert_called_once()
+        args, _ = self.mock_repo.write_rows.call_args
+        self.assertEqual(args[0], self.output_csv)
     def test_run_step1_success(self):
         options = Step1Options(output_csv_path=self.output_csv)
         result_path = run_step1(options, word_store=self.mock_word_store, repo=self.mock_repo)
