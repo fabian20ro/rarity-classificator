@@ -135,6 +135,19 @@ class RunCsvRepositoryTest(unittest.TestCase):
             levels = self.repo.load_final_levels(path)
             self.assertEqual(levels, {1: 5, 2: 3})
 
+    def test_load_final_levels_raises_when_no_level_column(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "levels.csv"
+            self.repo.write_rows(
+                path,
+                ["word_id", "word", "type"],
+                [
+                    ["1", "om", "N"],
+                ],
+            )
+            with self.assertRaises(CsvFormatError):
+                self.repo.load_final_levels(path)
+
 
 if __name__ == "__main__":
     unittest.main()
