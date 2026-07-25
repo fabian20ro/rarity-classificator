@@ -273,6 +273,86 @@ class QualityAuditTest(unittest.TestCase):
             self.assertEqual(result.distribution[1], 1)
             self.assertEqual(result.distribution[2], 1)
 
+    def test_median_level_column_is_accepted(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            headers = ["word_id", "word", "type", "median_level"]
+            cand_rows = [
+                ["1", "om", "N", "1"],
+                ["2", "casă", "N", "3"],
+                ["3", "rarissim", "A", "5"],
+            ]
+            self._write_csv(candidate, headers, cand_rows)
+
+            result = run_quality_audit(
+                candidate_csv=candidate,
+                repo=self.repo,
+            )
+            self.assertTrue(result.passed)
+            self.assertEqual(result.level_column, "median_level")
+            self.assertEqual(result.total_rows, 3)
+            self.assertEqual(result.distribution[1], 1)
+            self.assertEqual(result.distribution[3], 1)
+            self.assertEqual(result.distribution[5], 1)
+
+    def test_case_insensitive_l1_anchor_matching(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            reference = root / "reference.csv"
+            anchor = root / "anchor.txt"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            cand_rows = [
+                ["1", "OM", "N", "1"],
+                ["2", "Casă", "N", "1"],
+            ]
+            ref_rows = [
+                ["3", "om", "N", "1"],
+                ["4", "casă", "N", "1"],
+            ]
+
+            self._write_csv(candidate, headers, cand_rows)
+            self._write_csv(reference, headers, ref_rows)
+            anchor.write_text("om\ncasă\n", encoding="utf-8")
+
+            result = run_quality_audit(
+                candidate_csv=candidate,
+                reference_csv=reference,
+                anchor_l1_file=anchor,
+                repo=self.repo,
+            )
+            # Different word_ids → Jaccard 0; but case-insensitive L1 match is perfect.
+            self.assertEqual(result.l1_jaccard, 0.0)
+            self.assertEqual(result.anchor_precision, 1.0)
+            self.assertEqual(result.anchor_recall, 1.0)
+
+    def test_anchor_with_only_whitespace_raises_value_error(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            reference = root / "reference.csv"
+            anchor = root / "anchor.txt"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            cand_rows = [["1", "om", "N", "1"]]
+            ref_rows = [["1", "om", "N", "1"]]
+            self._write_csv(candidate, headers, cand_rows)
+            self._write_csv(reference, headers, ref_rows)
+            anchor.write_text("   \n\t\n  ", encoding="utf-8")
+
+            with self.assertRaises(ValueError):
+                run_quality_audit(
+                    candidate_csv=candidate,
+                    reference_csv=reference,
+                    anchor_l1_file=anchor,
+                    min_l1_jaccard=0.1,
+                    min_anchor_l1_precision=0.4,
+                    min_anchor_l1_recall=0.4,
+                    repo=self.repo,
+                )
+
 
 if __name__ == "__main__":
     unittest.main()
