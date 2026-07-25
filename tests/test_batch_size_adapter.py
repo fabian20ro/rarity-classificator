@@ -1367,6 +1367,21 @@ class TestBatchSizeAdapter(unittest.TestCase):
         self.assertEqual(len(h), 5)
         self.assertFalse(h[0])  # oldest recorded (the second outcome was a failure)
 
+    def test_iter_yields_outcomes(self):
+        """__iter__ yields the outcomes deque contents."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        self.assertEqual(list(adapter), [])
+
+        adapter.record_outcome(1.0)
+        adapter.record_outcome(0.0)
+        adapter.record_outcome(1.0)
+        self.assertEqual(list(adapter), [True, False, True])
+
+    def test_success_threshold_boundary_valid(self):
+        """success_threshold=0.0 and success_threshold=1.0 must both be accepted as valid boundaries."""
+        BatchSizeAdapter(initial_size=10, success_threshold=0.0)
+        BatchSizeAdapter(initial_size=10, success_threshold=1.0)
+
 
 if __name__ == "__main__":
     unittest.main()

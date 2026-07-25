@@ -341,12 +341,20 @@ class LmStudioResponseParser:
             # Fallback: pick up a top-level list value but NOT a nested dict
             # (which would indicate unrelated metadata structure). Prevents the
             # parser from silently returning an unrelated array when the LM's
-            # response shape is wrong.
+            # response shape is wrong. If multiple list-typed values exist,
+            # reject — picking one silently would corrupt data with no signal.
+            found_list: list[object] | None = None
             for val in content_json.values():
                 if isinstance(val, dict):
                     continue
                 if isinstance(val, list):
-                    return val
+                    if found_list is not None:
+                        raise RuntimeError(
+                            "LM content has multiple list values; cannot choose one"
+                        )
+                    found_list = val
+            if found_list is not None:
+                return found_list
             keys = ",".join(content_json.keys())
             raise RuntimeError(f"LM content has no results array. keys=[{keys}]")
         raise RuntimeError(f"LM content must be JSON object/array, got {type(content_json)!r}")

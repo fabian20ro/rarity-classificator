@@ -174,6 +174,25 @@ class ResponseParserTest(unittest.TestCase):
         returned_ids = sorted(s.word_id for s in parsed.scores)
         self.assertEqual(returned_ids, [201, 203])
 
+    def test_extract_results_array_rejects_multiple_list_values(self):
+        # When content_json dict has multiple list-typed top-level values but
+        # none match the named keys, the parser must reject instead of silently
+        # picking one — silent selection corrupts data when response shape is
+        # wrong. Regression guard for verification-hygiene: makes corruption
+        # visible.
+        body = self._wrap_content(
+            '{"foo": [1], "bar": ["extra"]}'
+        )
+        with self.assertRaises(RuntimeError) as ctx:
+            self.parser.parse(
+                batch=self.batch,
+                response_body=body,
+                output_mode=ScoringOutputMode.SCORE_RESULTS,
+                forced_rarity_level=None,
+                expected_items=None,
+            )
+        self.assertIn("multiple list values", str(ctx.exception))
+
     def test_score_results_propagates_invalid_rarity_as_error(self):
         # _parse_score_candidate rejects rarity_level not in {1..5} → candidate
         # is None. When ALL candidates are invalid the lenient path raises via
