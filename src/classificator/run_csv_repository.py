@@ -107,7 +107,10 @@ class RunCsvRepository:
         elif "median_level" in table.headers:
             level_col = "median_level"
         else:
-            raise ValueError("CSV must contain one of: final_level, rarity_level, median_level")
+            raise CsvFormatError(
+                f"CSV {path} missing required level column "
+                "(expected at least one of: final_level, rarity_level, median_level)"
+            )
 
         out: dict[int, int] = {}
         for rec in table.records:
