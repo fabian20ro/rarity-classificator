@@ -196,3 +196,15 @@ class RarityDistributionTest(unittest.TestCase):
             result = run_rarity_distribution(csv_path=path, repo=self.repo)
             self.assertEqual(result.mode, 5)
             self.assertEqual(result.total_rows, 1)
+
+    def test_mode_breaks_ties_returns_lowest_level(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "tied.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "rarity_level"],
+                [["1", "a", "2"], ["2", "b", "2"], ["3", "c", "4"], ["4", "d", "4"]],
+            )
+            result = run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertEqual(result.mode, 2)
