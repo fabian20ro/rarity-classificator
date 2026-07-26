@@ -57,6 +57,8 @@ DEFAULTS = {
     ),
 }
 
+KNOWN_MODELS: frozenset[str] = frozenset(DEFAULTS.keys())
+
 
 def resolve_model_config(model: str) -> LmModelConfig:
     key = model.strip().lower()
