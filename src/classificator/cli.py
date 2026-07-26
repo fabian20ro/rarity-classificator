@@ -106,6 +106,7 @@ def main(argv: list[str] | None = None) -> int:
                 outlier_threshold=args.outlier_threshold,
                 confidence_threshold=args.confidence_threshold,
                 merge_strategy=Step3MergeStrategy.parse(args.merge_strategy),
+                dry_run=args.dry_run,
             ),
             repo=repo,
         )
@@ -265,9 +266,16 @@ def _build_parser() -> argparse.ArgumentParser:
     p2a = sub.add_parser("step2", help="Alias of step2-score")
     _add_step2_args(p2a)
 
-    p3 = sub.add_parser("step3-compare", help="Compare 2-3 run CSVs and produce final_level")
+    p3 = sub.add_parser(
+        "step3-compare",
+        help="Compare 2-3 run CSVs and produce final_level (use --dry-run to preview without writing)",
+    )
     _add_step3_args(p3)
-    p3a = sub.add_parser("step3", help="Alias of step3-compare")
+    p3a = sub.add_parser(
+        "step3",
+        help="Alias of step3-compare (use --dry-run to preview without writing)",
+        description="Alias of step3-compare (use --dry-run to preview without writing)",
+    )
     _add_step3_args(p3a)
 
     p4 = sub.add_parser(
@@ -398,6 +406,10 @@ def _add_step3_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--outlier-threshold", type=int, default=DEFAULT_OUTLIER_THRESHOLD)
     parser.add_argument("--confidence-threshold", type=float, default=DEFAULT_CONFIDENCE_THRESHOLD)
     parser.add_argument("--merge-strategy", default="median")
+    parser.add_argument(
+        "--dry-run", action="store_true",
+        help="Preview without writing output CSVs or outliers file",
+    )
 
 
 def _add_step4_args(parser: argparse.ArgumentParser) -> None:
