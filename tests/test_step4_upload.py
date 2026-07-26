@@ -116,8 +116,19 @@ class TestStep4Upload(unittest.TestCase):
         with open(self.report_csv, "r") as f:
             reader = csv.DictReader(f)
             rows = list(reader)
-            sources = [r["source"] for r in rows]
-            self.assertIn("missing_db_word", sources)
+            self.assertEqual(len(rows), 2)
+
+            # word_id=1 → old=1, new=2, source="final_csv"
+            row_1 = next(r for r in rows if r["word_id"] == "1")
+            self.assertEqual(row_1["previous_level"], "1")
+            self.assertEqual(row_1["new_level"], "2")
+            self.assertEqual(row_1["source"], "final_csv")
+
+            # word_id=2 → missing from DB: empty old/new, source="missing_db_word"
+            row_2 = next(r for r in rows if r["word_id"] == "2")
+            self.assertEqual(row_2["previous_level"], "")
+            self.assertEqual(row_2["new_level"], "")
+            self.assertEqual(row_2["source"], "missing_db_word")
 
     def test_partial_audit_gate_blocks_upload(self):
         # When reference_csv is provided and quality audit fails, run_step4 must raise RuntimeError
