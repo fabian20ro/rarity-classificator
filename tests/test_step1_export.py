@@ -4,33 +4,21 @@ from unittest.mock import MagicMock
 from src.classificator.steps.step1_export import run_step1, Step1Options
 from src.classificator.run_csv_repository import RunCsvRepository
 from src.classificator.word_store import WordStore
-from dataclasses import dataclass
 
-@dataclass
-class MockWord:
-    word_id: int
-    word: str
-    type: str
-
-class MockWordStore(WordStore):
-    def __init__(self, words):
-        self.words = words
-    def fetch_all_words(self):
-        return self.words
 
 class TestStep1Export(unittest.TestCase):
     def setUp(self):
         self.output_csv = Path("test_output.csv")
         if self.output_csv.exists():
             self.output_csv.unlink()
-        
+
         self.mock_repo = MagicMock(spec=RunCsvRepository)
-        
+
+        # fetch_all_words returns tuples: (id, word, type)
         self.words = [
-            MockWord(1, "apple", "fruit"),
-            MockWord(2, "banana", "fruit"),
+            (1, "apple", "fruit"),
+            (2, "banana", "fruit"),
         ]
-        self.mock_word_store = MockWordStore(self.words)
 
     def tearDown(self):
         if self.output_csv.exists():
@@ -48,12 +36,19 @@ class TestStep1Export(unittest.TestCase):
     def test_write_rows_raises_propagates(self):
         options = Step1Options(output_csv_path=self.output_csv)
         self.mock_repo.write_rows.side_effect = PermissionError("denied")
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = self.words
         with self.assertRaises(PermissionError, msg="write error must propagate"):
-            run_step1(options, word_store=self.mock_word_store, repo=self.mock_repo)
-
+            run_step1(options, word_store=store, repo=self.mock_repo)
+        # write_rows was invoked once with correct args before failing — fetch succeeded, data reached write phase
+        self.mock_repo.write_rows.assert_called_once()
+        args, _ = self.mock_repo.write_rows.call_args
+        self.assertEqual(args[0], self.output_csv)
     def test_run_step1_success(self):
         options = Step1Options(output_csv_path=self.output_csv)
-        result_path = run_step1(options, word_store=self.mock_word_store, repo=self.mock_repo)
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = self.words
+        result_path = run_step1(options, word_store=store, repo=self.mock_repo)
 
         self.assertEqual(result_path, self.output_csv)
         self.mock_repo.write_rows.assert_called_once()
@@ -68,9 +63,10 @@ class TestStep1Export(unittest.TestCase):
         self.assertEqual(rows[1], ["2", "banana", "fruit"])
 
     def test_run_step1_empty_input(self):
-        empty_store = MockWordStore([])
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = []
         options = Step1Options(output_csv_path=self.output_csv)
-        result_path = run_step1(options, word_store=empty_store, repo=self.mock_repo)
+        result_path = run_step1(options, word_store=store, repo=self.mock_repo)
 
         self.assertEqual(result_path, self.output_csv)
         args, _ = self.mock_repo.write_rows.call_args
@@ -80,7 +76,9 @@ class TestStep1Export(unittest.TestCase):
 
     def test_run_step1_dry_run_skips_write(self):
         options = Step1Options(output_csv_path=self.output_csv, dry_run=True)
-        result_path = run_step1(options, word_store=self.mock_word_store, repo=self.mock_repo)
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = self.words
+        result_path = run_step1(options, word_store=store, repo=self.mock_repo)
 
         self.assertIsNone(result_path)
         self.assertFalse(self.output_csv.exists())
@@ -88,13 +86,14 @@ class TestStep1Export(unittest.TestCase):
 
     def test_run_step1_sorts_by_word_id_not_other(self):
         # Deliberately invert word ordering vs. word_id so sorting by any field
-        # other than attrgetter("word_id") produces a clearly wrong row order.
+        # other than itemgetter(0) produces a clearly wrong row order.
         inverted_words = [
-            MockWord(20, "apple", "fruit"),   # id=20 but alphabetically first
-            MockWord(1,  "banana", "fruit"),   # id=1  but alphabetically second
-            MockWord(5,  "cherry", "fruit"),
+            (20, "apple", "fruit"),   # id=20 but alphabetically first
+            (1,  "banana", "fruit"),   # id=1  but alphabetically second
+            (5,  "cherry", "fruit"),
         ]
-        store = MockWordStore(inverted_words)
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = inverted_words
         options = Step1Options(output_csv_path=self.output_csv)
         result_path = run_step1(options, word_store=store, repo=self.mock_repo)
 
@@ -113,12 +112,13 @@ class TestStep1Export(unittest.TestCase):
     def test_run_step1_sorts_by_word_id(self):
         # Multi-digit IDs: string sort would give 1,10,2,20; int sort gives 1,2,10,20.
         unsorted_words = [
-            MockWord(20, "pear", "fruit"),
-            MockWord(10, "grape", "fruit"),
-            MockWord(2, "banana", "fruit"),
-            MockWord(1, "apple", "fruit"),
+            (20, "pear", "fruit"),
+            (10, "grape", "fruit"),
+            (2, "banana", "fruit"),
+            (1, "apple", "fruit"),
         ]
-        store = MockWordStore(unsorted_words)
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = unsorted_words
         options = Step1Options(output_csv_path=self.output_csv)
         result_path = run_step1(options, word_store=store, repo=self.mock_repo)
 

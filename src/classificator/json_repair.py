@@ -119,7 +119,7 @@ def _remove_trailing_commas(input_text: str) -> str:
             if pending_comma:
                 out.append(",")
                 pending_comma = False
-            in_string, escaped = True, False
+            in_string, escaped = _track_string(in_string, escaped, ch)
             out.append(ch)
         elif ch == ",":
             pending_comma = True

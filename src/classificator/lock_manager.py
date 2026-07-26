@@ -7,10 +7,6 @@ from pathlib import Path
 
 @contextmanager
 def acquire_output_lock(output_csv_path: Path):
-    if not output_csv_path.suffix:
-        raise ValueError(
-            f"output_csv_path must be a file path (has no extension): {output_csv_path}"
-        )
     output_csv_path.parent.mkdir(parents=True, exist_ok=True)
     lock_path = output_csv_path.with_name(f"{output_csv_path.name}.lock")
     lock_path.parent.mkdir(parents=True, exist_ok=True)
