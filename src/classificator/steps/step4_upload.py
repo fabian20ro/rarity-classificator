@@ -49,12 +49,13 @@ def run_step4(options: Step4Options, *, word_store: WordStore, repo: RunCsvRepos
     word_store.update_rarity_levels_chunked(updates)
     repo.write_rows(options.report_path, UPLOAD_REPORT_HEADERS, report_rows)
 
+    now = datetime.now(tz=timezone.utc)
     marker = marker_writer.mark_uploaded_rows(
         final_csv_path=options.final_csv_path,
         uploaded_levels=updates,
         status_by_word_id=status_by_word_id,
-        upload_batch_id=options.upload_batch_id or f"upload_{int(datetime.now(tz=timezone.utc).timestamp() * 1000)}",
-        uploaded_at=datetime.now(tz=timezone.utc).isoformat(),
+        upload_batch_id=options.upload_batch_id or f"upload_{int(now.timestamp() * 1000)}",
+        uploaded_at=now.isoformat(),
     )
 
     print(f"Step 4 complete. mode={options.mode.value} updated={len(updates)}")
