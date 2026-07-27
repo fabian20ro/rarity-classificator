@@ -35,11 +35,12 @@ def _validate_step_structure() -> list[str]:
     for entry in _STEPS:
         if not isinstance(entry, tuple) or len(entry) != 3:
             errors.append("_STEPS entries must be (name, label, callable) 3-tuples")
-            break
+            continue
         name, _, func = entry
         if name in seen_names:
             errors.append(f"duplicate step name: {name}")
-        seen_names.add(name)
+        else:
+            seen_names.add(name)
     return errors
 
 
