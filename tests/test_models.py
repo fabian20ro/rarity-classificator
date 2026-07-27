@@ -133,6 +133,16 @@ class Step3MergeStrategyEdgeTest(unittest.TestCase):
                     Step3MergeStrategy.parse(bad)
 
 
+class ScoringOutputModeEdgeTest(unittest.TestCase):
+    """Negative-path coverage for scoring output mode parsing."""
+
+    def test_rejects_garbage_values(self):
+        for bad in ("0", "1", "random", "score_results-extra", "selected_word_ids-extra"):
+            with self.subTest(bad=bad):
+                with self.assertRaises(ValueError):
+                    ScoringOutputMode.parse(bad)
+
+
 class LmApiFlavorEnumTest(unittest.TestCase):
     """Confirm enum members and string values match the source-of-truth."""
 
