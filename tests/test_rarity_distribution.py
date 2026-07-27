@@ -208,3 +208,41 @@ class RarityDistributionTest(unittest.TestCase):
             )
             result = run_rarity_distribution(csv_path=path, repo=self.repo)
             self.assertEqual(result.mode, 2)
+
+    def test_invalid_level_raises_specific_message(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "bad.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "rarity_level"],
+                [["1", "om", "abc"]],
+            )
+            with self.assertRaises(ValueError) as cm:
+                run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertIn("not a number", str(cm.exception))
+
+    def test_range_invalid_raises_specific_message(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "bad.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "rarity_level"],
+                [["1", "om", "0"]],
+            )
+            with self.assertRaises(ValueError) as cm:
+                run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertIn("must be between 1 and 5", str(cm.exception))
+
+    def test_non_string_level_raises_type_error(self):
+        from classificator.tools.rarity_distribution import _validate_level
+
+        with self.assertRaises(TypeError) as cm:
+            _validate_level(None, "test_col", 1)  # type: ignore[arg-type]
+        self.assertIn("Expected string level for test_col", str(cm.exception))
+
+    def test_validate_level_accepts_valid_string(self):
+        from classificator.tools.rarity_distribution import _validate_level
+
+        self.assertEqual(_validate_level("3", "test_col", 1), 3)
