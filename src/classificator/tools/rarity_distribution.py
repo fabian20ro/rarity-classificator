@@ -76,12 +76,14 @@ def _resolve_level_column(headers: list[str], level_column: str | None) -> str:
 
 
 def _validate_level(raw_level: str, col_name: str, line_number: int) -> int:
+    if not isinstance(raw_level, str):
+        raise TypeError(f"Expected string level for {col_name} at row {line_number}, got {type(raw_level).__name__}")
     try:
         level = int(raw_level)
-    except Exception as exc:
-        raise ValueError(f"Invalid {col_name} '{raw_level}' at row {line_number}") from exc
+    except ValueError as exc:
+        raise ValueError(f"Invalid {col_name} '{raw_level}' at row {line_number}: not a number") from exc
     if level < 1 or level > 5:
-        raise ValueError(f"Invalid {col_name} {level} at row {line_number}")
+        raise ValueError(f"Invalid {col_name} {level} at row {line_number}: must be between 1 and 5")
     return level
 
 
