@@ -26,9 +26,6 @@ class SelectionCandidate:
     word: str | None
 
 
-SELECTION_EDGE_PUNCTUATION = re.compile(r"^[^\w\d]+|[^\w\d]+$")
-
-
 class LmStudioResponseParser:
     def __init__(self, metrics: Step2Metrics | None = None) -> None:
         self.metrics = metrics
@@ -577,13 +574,6 @@ def _extract_top_level_object_slices(array_slice: str) -> list[str]:
                     slices.append(array_slice[start : i + 1])
                     start = -1
     return slices
-
-
-def _normalize_selection_word(value: str) -> str:
-    if not value.strip():
-        return ""
-    lowered = value.lower().strip().replace("’", "'")
-    return SELECTION_EDGE_PUNCTUATION.sub("", lowered)
 
 
 def _excerpt(content: str, max_chars: int = 500) -> str:
