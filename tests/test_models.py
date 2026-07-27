@@ -51,8 +51,27 @@ class ModelsTest(unittest.TestCase):
         self.assertIn("unexpected", str(err.exception))
 
     def test_malformed_alias_target_raises_value_error(self):
-        """A misspelled alias target (one that doesn't exist on the class) must raise ValueError, not AttributeError."""
+        """A misspelled alias target (one that doesn't exist on the class) must raise ValueError, not AttributeError.
+
+        Parametrized across every real enum in models.py to make the guard deterministic, then verified
+        against a FakeStrategy covering the same path as the original single-test history.
+        """
         import classificator.models as models_mod
+
+        _malicious_map = {
+            "ANY-EXTREMES": "VALID_ALIAS",
+            "MALFORMED_ALIAS": "MISSPELLED_NAME",
+        }
+
+        for enum_cls in (UploadMode, Step3MergeStrategy, ScoringOutputMode):
+            with self.subTest(enum=enum_cls.__name__):
+                with self.assertRaises(ValueError) as err:
+                    models_mod._parse_value_to_enum(
+                        enum_cls, "MALFORMED_ALIAS", "PARTIAL", _malicious_map
+                    )
+                exc_str = str(err.exception).lower()
+                self.assertIn("alias target", exc_str)
+                self.assertIn(enum_cls.__name__.lower(), exc_str)
 
         class FakeStrategy:
             MEDIAN = "MEDIAN"
