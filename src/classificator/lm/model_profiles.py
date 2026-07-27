@@ -68,9 +68,11 @@ def resolve_model_config(model: str) -> LmModelConfig:
         )
     cfg = DEFAULTS.get(key, DEFAULT_FALLBACK)
     if cfg is DEFAULT_FALLBACK:
+        known = ', '.join(sorted(KNOWN_MODELS))
         print(
             f"Warning: unknown model '{model}' — using default fallback profile "
-            f"(temperature=0.0). Configure an explicit entry in model_profiles.py to pin decoding params.",
+            f"(temperature=0.0). Known models: {known}. "
+            f"Configure an explicit entry in model_profiles.py to pin decoding params.",
             file=sys.stderr,
         )
     return replace(cfg, model_id=model)
