@@ -273,6 +273,27 @@ class QualityAuditTest(unittest.TestCase):
             self.assertEqual(result.distribution[1], 1)
             self.assertEqual(result.distribution[2], 1)
 
+    def test_ambiguous_level_columns_raises_value_error(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+
+            headers = ["word_id", "word", "type", "final_level", "rarity_level"]
+            cand_rows = [
+                ["1", "om", "N", "1", ""],
+                ["2", "casă", "N", "3", ""],
+            ]
+            self._write_csv(candidate, headers, cand_rows)
+
+            with self.assertRaises(ValueError) as ctx:
+                run_quality_audit(
+                    candidate_csv=candidate,
+                    repo=self.repo,
+                )
+            self.assertIn("ambiguous level columns", str(ctx.exception))
+            self.assertIn("final_level", str(ctx.exception))
+            self.assertIn("rarity_level", str(ctx.exception))
+
     def test_median_level_column_is_accepted(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

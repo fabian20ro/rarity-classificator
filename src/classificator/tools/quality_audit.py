@@ -85,14 +85,15 @@ def _load_run(path: Path, repo: RunCsvRepository) -> dict[str, object]:
     table = repo.read_table(path)
     if "word_id" not in table.headers or "word" not in table.headers:
         raise ValueError(f"CSV must contain word_id and word: {path}")
-    if "final_level" in table.headers:
-        level_col = "final_level"
-    elif "rarity_level" in table.headers:
-        level_col = "rarity_level"
-    elif "median_level" in table.headers:
-        level_col = "median_level"
-    else:
+    _level_candidates = ("final_level", "rarity_level", "median_level")
+    present = [c for c in _level_candidates if c in table.headers]
+    if len(present) > 1:
+        raise ValueError(
+            f"CSV has ambiguous level columns ({', '.join(present)}): {path}"
+        )
+    if not present:
         raise ValueError("CSV missing level column: final_level/rarity_level/median_level")
+    level_col = present[0]
 
     distribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
     l1_word_ids: set[int] = set()

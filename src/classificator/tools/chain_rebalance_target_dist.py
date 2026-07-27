@@ -192,8 +192,10 @@ def _get_level_count(csv_path: Path, level: int, repo: RunCsvRepository) -> int:
         col = "final_level"
     elif "rarity_level" in table.headers:
         col = "rarity_level"
+    elif "median_level" in table.headers:
+        col = "median_level"
     else:
-        raise ValueError("CSV must contain final_level or rarity_level")
+        raise ValueError("CSV must contain one of final_level/rarity_level/median_level")
     idx = table.headers.index(col)
     count = 0
     for rec in table.records:
