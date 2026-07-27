@@ -9,6 +9,12 @@ class LmApiFlavor(str, Enum):
     OPENAI_COMPAT = "openai_compat"
     LMSTUDIO_REST = "lmstudio_rest"
 
+    @classmethod
+    def parse(cls, value: str | None) -> "LmApiFlavor":
+        return _parse_value_to_enum(
+            cls, value, "OPENAI_COMPAT", {"LMSTUDIO_REST": "LMSTUDIO_REST"}
+        )
+
 
 def _parse_value_to_enum(cls, value: str | None, default_name: str, alias_map: dict[str, str]):
     v = (value or default_name).strip().lower()
