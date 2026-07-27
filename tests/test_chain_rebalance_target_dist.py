@@ -91,7 +91,7 @@ class TestChainRebalance(unittest.TestCase):
 
         with self.assertRaises(ValueError) as cm:
             _get_level_count(Path("dummy.csv"), 1, MockRepo())
-        self.assertIn("final_level or rarity_level", str(cm.exception))
+        self.assertIn("final_level/rarity_level/median_level", str(cm.exception))
 
     def test_get_level_count_handles_malformed_values_gracefully(self):
         from src.classificator.tools.chain_rebalance_target_dist import _get_level_count
@@ -132,6 +132,27 @@ class TestChainRebalance(unittest.TestCase):
 
         count = _get_level_count(Path("dummy.csv"), 1, MockRepo())
         self.assertEqual(count, 1)  # Only record 1 has rarity_level == 1; invalid skipped
+
+    def test_get_level_count_median_level_column(self):
+        from src.classificator.tools.chain_rebalance_target_dist import _get_level_count
+
+        class MockTable:
+            headers = ["word_id", "median_level"]
+            records = [
+                MagicMock(values=["1", "3"]),
+                MagicMock(values=["2", "3"]),
+                MagicMock(values=["3", "5"]),
+                MagicMock(values=["4", "3"]),
+            ]
+
+        class MockRepo(RunCsvRepository):
+            def read_table(self, path):
+                return MockTable()
+            def load_run_rows(self, path):
+                return []
+
+        count = _get_level_count(Path("dummy.csv"), 3, MockRepo())
+        self.assertEqual(count, 3)
 
     def test_sanitize_slug_strips_special_chars(self):
         from src.classificator.tools.chain_rebalance_target_dist import _sanitize_slug
