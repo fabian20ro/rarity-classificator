@@ -391,6 +391,9 @@ def _allocate_quota(
         return {source_levels[0]: target_size}
 
     total_initial = float(sum(initial_source_counts.values()))
+    if total_initial <= 0:
+        return {level: 0 for level in source_levels}
+
     quotas: dict[int, int] = {}
     for level in source_levels:
         quotas[level] = int(target_size * (initial_source_counts.get(level, 0) / total_initial))
