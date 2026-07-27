@@ -59,6 +59,16 @@ def run_step3(options: Step3Options, *, repo: RunCsvRepository) -> None:
     print(f"Outliers: {options.outliers_csv_path}")
 
 
+def _extract_levels(run_a: RunCsvRow | None, run_b: RunCsvRow | None, run_c: RunCsvRow | None) -> list[int]:
+    raw = [r.rarity_level for r in (run_a, run_b, run_c) if r is not None]
+    return raw
+
+
+def _extract_confidences(run_a: RunCsvRow | None, run_b: RunCsvRow | None, run_c: RunCsvRow | None) -> list[float]:
+    raw = [r.confidence for r in (run_a, run_b, run_c) if r is not None]
+    return raw
+
+
 def _build_comparison_row(
     base: BaseWordRow,
     run_a: RunCsvRow | None,
@@ -66,11 +76,11 @@ def _build_comparison_row(
     run_c: RunCsvRow | None,
     options: Step3Options,
 ) -> dict[str, object]:
-    levels = [x for x in [run_a.rarity_level if run_a else None, run_b.rarity_level if run_b else None, run_c.rarity_level if run_c else None] if x is not None]
+    levels = _extract_levels(run_a, run_b, run_c)
     median_level = FALLBACK_RARITY_LEVEL if not levels else median([int(x) for x in levels])
     spread = 0 if len(levels) < 2 else max(levels) - min(levels)
 
-    confidences = [x for x in [run_a.confidence if run_a else None, run_b.confidence if run_b else None, run_c.confidence if run_c else None] if x is not None]
+    confidences = _extract_confidences(run_a, run_b, run_c)
     low_confidence = any(x < options.confidence_threshold for x in confidences)
     is_outlier = len(levels) >= 2 and (spread >= options.outlier_threshold or low_confidence)
 

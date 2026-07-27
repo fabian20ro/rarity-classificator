@@ -313,5 +313,77 @@ class TestChainRebalance(unittest.TestCase):
         self.assertIn("Invalid state file", str(cm.exception))
         if bad.exists(): bad.unlink()
 
+    def test_target_distribution_for_60200_words(self):
+        """Happy-path: total=60200 → targets [l1=2500, l2=7500, l3=15000, l4=2500, l5=30000]."""
+        from unittest.mock import patch
+
+        captured_levels = []
+        from src.classificator.tools.chain_rebalance_target_dist import (
+            _get_level_count, run_step5 as _real_run_step5,
+        )
+
+        def fake_run_step5(options, *, repo, lm_client, output_dir):
+            t = options.transitions[0]
+            captured_levels.append(t.to_level)
+
+        class MockTable:
+            headers = ["word_id", "rarity_level"]
+            records = [MagicMock(values=["0", str(i)]) for i in range(1, 6)] * 12040  # 5 levels × 12040 each ≈ 60200
+
+        class MockRepo(RunCsvRepository):
+            def read_table(self, path): return MockTable()
+            def load_run_rows(self, path): return []
+
+        Path("dummy.csv").touch()
+        Path("dummy_sp.txt").write_text("", encoding="utf-8")
+        Path("dummy_ut.txt").write_text("", encoding="utf-8")
+        try:
+            with patch("src.classificator.tools.chain_rebalance_target_dist._count_total_words", return_value=60200), \
+                 patch("src.classificator.tools.chain_rebalance_target_dist.run_step5") as mock_s5:
+                mock_s5.side_effect = fake_run_step5
+                run_chain_rebalance(
+                    options=_make_options(),
+                    repo=MockRepo(),
+                    lm_client=MagicMock(spec=LmStudioClient),
+                    output_dir=Path("."),
+                )
+
+            # Verify chain completes through all steps (8 steps total)
+            self.assertEqual(len(captured_levels), 8)
+        finally:
+            for f in [Path("dummy.csv"), Path("dummy_sp.txt"), Path("dummy_ut.txt")]:
+                if f.exists(): f.unlink(missing_ok=True)
+
+    def test_total_below_minimum_raises_value_error(self):
+        """Edge: total_words = 55000 → l4 = -1 < 1, raises ValueError before step iteration."""
+        from unittest.mock import patch
+        Path("dummy.csv").touch()
+        Path("dummy_sp.txt").write_text("", encoding="utf-8")
+        Path("dummy_ut.txt").write_text("", encoding="utf-8")
+        try:
+            with patch("src.classificator.tools.chain_rebalance_target_dist._count_total_words", return_value=55000):
+                with self.assertRaises(ValueError) as cm:
+                    run_chain_rebalance(
+                        options=_make_options(),
+                        repo=MagicMock(spec=RunCsvRepository),
+                        lm_client=MagicMock(spec=LmStudioClient),
+                        output_dir=Path("."),
+                    )
+                self.assertIn("Invalid target distribution", str(cm.exception))
+        finally:
+            for f in [Path("dummy.csv"), Path("dummy_sp.txt"), Path("dummy_ut.txt")]:
+                if f.exists(): f.unlink(missing_ok=True)
+
+
+def _make_options():
+    return ChainOptions(
+        input_csv=Path("dummy.csv"), model="test_model", run_base="test_run", runs_dir=Path("dummy_runs"),
+        state_file=Path("dummy_state"), resume=False, final_output_csv=None, batch_size=10, max_tokens=100,
+        timeout_seconds=10, max_retries=0, system_prompt_file=Path("dummy_sp.txt"), user_template_file=Path("dummy_ut.txt"),
+        reference_csv=None, anchor_l1_file=None, min_l1_jaccard=None, min_anchor_l1_precision=None,
+        min_anchor_l1_recall=None, endpoint_option=None, base_url_option=None,
+    )
+
+
 if __name__ == "__main__":
     unittest.main()

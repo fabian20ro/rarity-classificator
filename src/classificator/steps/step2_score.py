@@ -99,8 +99,6 @@ def run_step2(options: Step2Options, *, repo: RunCsvRepository, lm_client: LmStu
 def _prepare_files(output_dir: Path, run_slug: str) -> Step2Files:
     runs_dir = output_dir / "runs"
     failed_dir = output_dir / "failed_batches"
-    runs_dir.mkdir(parents=True, exist_ok=True)
-    failed_dir.mkdir(parents=True, exist_ok=True)
     return Step2Files(
         run_log_path=runs_dir / f"{run_slug}.jsonl",
         failed_log_path=failed_dir / f"{run_slug}.failed.jsonl",
