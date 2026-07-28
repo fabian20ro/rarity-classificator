@@ -23,10 +23,8 @@ class LevelTransition:
 
     def other_level(self) -> int:
         if self.from_level_upper is not None:
-            for level in self.source_levels():
-                if level != self.to_level:
-                    return level
-            raise ValueError("Invalid pair transition")
+            # Pair transition: target is one of the two source levels (guaranteed by validation).
+            return self.from_level_upper if self.to_level == self.from_level else self.from_level
         if self.to_level == self.from_level:
             return min(5, self.to_level + 1)
         return self.from_level
