@@ -33,6 +33,12 @@ def median(values: list[int]) -> int:
     return round((sorted_vals[mid - 1] + sorted_vals[mid]) / 2.0)
 
 
+def mean(values: list[float]) -> float:
+    if not values:
+        raise ValueError("mean() requires non-empty values")
+    return sum(values) / len(values)
+
+
 def load_prompt(path: Path) -> str:
     if not path.exists():
         raise FileNotFoundError(f"Prompt file does not exist: {path}")

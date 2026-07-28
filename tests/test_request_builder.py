@@ -195,6 +195,22 @@ class RequestBuilderTest(unittest.TestCase):
             )
         self.assertIn("batch must contain at least one word", str(ctx.exception))
 
+    def test_score_results_mode_requires_positive_expected_items_when_specified(self):
+        with self.assertRaises(ValueError) as ctx:
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_SCHEMA,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=512,
+                expected_items=-1,
+                schema_kind=JsonSchemaKind.SCORE_RESULTS,
+            )
+        self.assertIn("expected_items must be positive", str(ctx.exception))
+
     def test_build_request_rejects_non_positive_max_tokens(self):
         with self.assertRaises(ValueError) as ctx:
             self.builder.build_request(
