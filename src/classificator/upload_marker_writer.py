@@ -99,7 +99,9 @@ class UploadMarkerWriter:
         upload_batch_id: str,
         uploaded_at: str,
     ) -> UploadMarkerResult:
-        companion = final_csv_path.with_name(f"{final_csv_path.name}.upload_markers.csv")
+        companion = final_csv_path.with_stem(
+            f"{final_csv_path.stem}_upload_markers"
+        )
         headers = ["word_id", *UPLOAD_MARKER_HEADERS]
         rows = []
         for word_id, status in sorted(status_by_word_id.items()):
