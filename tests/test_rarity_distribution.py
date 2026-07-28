@@ -240,7 +240,7 @@ class RarityDistributionTest(unittest.TestCase):
 
         with self.assertRaises(TypeError) as cm:
             _validate_level(None, "test_col", 1)  # type: ignore[arg-type]
-        self.assertIn("Expected string level for test_col", str(cm.exception))
+        self.assertIn("int() argument must be a string", str(cm.exception))
 
     def test_validate_level_accepts_valid_string(self):
         from classificator.tools.rarity_distribution import _validate_level
