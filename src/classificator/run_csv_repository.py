@@ -180,7 +180,7 @@ class RunCsvRepository:
         raw = row.get(key, "")
         try:
             return int(raw)
-        except Exception as exc:
+        except ValueError as exc:
             raise CsvFormatError(f"Invalid {key} at {path}:{line}") from exc
 
     def _parse_float(self, path: Path, line: int, row: dict[str, str], key: str) -> float:
