@@ -54,11 +54,10 @@ def _validate_step_modules() -> list[str]:
     errors.extend(_validate_step_structure())
     for name, _, func in _STEPS:
         try:
-            import inspect as _inspect_mod
-            if not _inspect_mod.isfunction(func):
+            if not inspect.isfunction(func):
                 errors.append(f"{name}: expected callable, got {type(func).__name__}")
                 continue
-            sig = _inspect_mod.signature(func)
+            sig = inspect.signature(func)
             params = list(sig.parameters.keys())
             if len(params) < 1 or params[0] != "options":
                 errors.append(
