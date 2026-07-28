@@ -53,28 +53,25 @@ def build_retry_input(
                 )
 
             word_id = node.get("word_id")
+            # Type guard — every branch raises or skips with a unique, actionable
+            # message; tests assert specific substrings per check. None/empty-string
+            # are skipped silently (missing data). All other non-int types raise
+            # because they signal upstream corruption rather than benign parse miss.
             if isinstance(word_id, bool):
                 raise ValueError(
                     f"Boolean word_id in failed JSONL: {node}"
                 )
-            if isinstance(word_id, (list, dict)):
-                raise ValueError(
-                    f"Unsupported word_id type in failed JSONL ({type(word_id).__name__}): {word_id!r}"
-                )
-            if isinstance(word_id, float):
+            elif isinstance(word_id, float):
                 raise ValueError(
                     f"Non-integer word_id in failed JSONL (float): {node}"
                 )
-            # None and empty-string are missing data — skip silently. Anything
-            # else that int() can't convert (custom objects, weird types) raises
-            # because it signals upstream corruption, not a benign parse miss.
-            if word_id is None or (isinstance(word_id, str) and word_id.strip() == ""):
+            elif isinstance(word_id, (list, dict)):
+                raise ValueError(
+                    f"Unsupported word_id type in failed JSONL ({type(word_id).__name__}): {word_id!r}"
+                )
+            elif word_id is None or (isinstance(word_id, str) and word_id.strip() == ""):
                 continue
-            # String-encoded integers ("5") are rejected — they indicate upstream
-            # schema drift where the producer emits strings instead of ints. Fail
-            # fast so corruption surfaces rather than being silently accepted by
-            # int().
-            if isinstance(word_id, str):
+            elif isinstance(word_id, str):
                 raise ValueError(
                     f"String word_id in failed JSONL: {word_id!r}"
                 )
