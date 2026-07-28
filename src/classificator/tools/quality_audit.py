@@ -121,7 +121,6 @@ def _load_run(path: Path, repo: RunCsvRepository) -> dict[str, object]:
             l1_words.add(word.lower())
 
     return {
-        "path": str(path),
         "level_column": level_col,
         "total_rows": total_rows,
         "distribution": distribution,
