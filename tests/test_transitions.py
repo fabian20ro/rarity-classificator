@@ -138,5 +138,27 @@ class TransitionsTest(unittest.TestCase):
         self.assertEqual(parsed[0].from_level, 4)
         self.assertEqual(parsed[0].to_level, 3)
 
+    def test_other_level_same_level_at_lower_boundary(self):
+        # Same-level at level 1 should return min(5, 2) = 2 — the upward candidate.
+        t = LevelTransition(from_level=1, to_level=1)
+        self.assertEqual(t.other_level(), 2)
+
+    def test_other_level_same_level_at_cap(self):
+        # Same-level at level 4 returns 5 (capped); level 3 returns 4; etc.
+        for from_ in range(1, 5):
+            t = LevelTransition(from_level=from_, to_level=from_)
+            expected = min(5, from_ + 1)
+            self.assertEqual(t.other_level(), expected)
+
+    def test_parse_transitions_whitespace_only_uses_default(self):
+        # raw="" is falsy → falls back to DEFAULT_REBALANCE_TRANSITIONS.
+        parsed = parse_transitions("")
+        self.assertGreater(len(parsed), 0)
+
+    def test_parse_transitions_empty_after_strip_raises(self):
+        # " " strips to "" then splits to [""] which fails the from:to check.
+        with self.assertRaises(ValueError):
+            parse_transitions(" ")
+
 if __name__ == "__main__":
     unittest.main()
