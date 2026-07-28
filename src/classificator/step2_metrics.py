@@ -103,6 +103,8 @@ def categorize_error(message: str | None) -> str:
         return "CONNECTIVITY"
     if any(x in lower for x in ["rate limit", "too many requests", "throttl"]):
         return "RATE_LIMIT"
+    if any(x in lower for x in ["empty content", "no content", "null response", "empty response", "empty result"]):
+        return "EMPTY_CONTENT"
     return "OTHER"
 
 
