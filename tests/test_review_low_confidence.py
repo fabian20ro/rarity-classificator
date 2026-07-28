@@ -48,6 +48,21 @@ class ReviewLowConfidenceTest(unittest.TestCase):
             items = load_review_items(csv_path=path, repo=self.repo, only_levels={1})
             self.assertEqual([x.word_id for x in items], [11, 10])
 
+    def test_load_items_skips_blank_word_rows(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "run.csv"
+            content = (
+                "word_id,word,type,rarity_level,confidence\n"
+                "1,,N,1,0.9\n"
+                "2,  ,N,1,0.8\n"
+                "3,cuvant3,N,1,0.7\n"
+            )
+            path.write_text(content, encoding="utf-8")
+            items = load_review_items(csv_path=path, repo=self.repo)
+            self.assertEqual([x.word_id for x in items], [3])
+            self.assertEqual(items[0].word, "cuvant3")
+
     def test_queue_skips_labeled_unless_undecided_enabled(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
