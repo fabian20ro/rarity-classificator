@@ -32,12 +32,9 @@ def _validate_tool_modules() -> list[str]:
         if not inspect.isfunction(func):
             errors.append(f"{name}: expected callable, got {type(func).__name__}")
             continue
-        sig = inspect.signature(func)
-        params = list(sig.parameters.keys())
-        if len(params) < 1 or params[0] != "options":
-            # Tool modules use varied signatures — only flag if no params at all.
-            if len(params) == 0:
-                errors.append(f"{name}: expected at least one parameter, got {params}")
+        params = list(inspect.signature(func).parameters.keys())
+        if not params:
+            errors.append(f"{name}: expected at least one parameter")
     return errors
 
 
