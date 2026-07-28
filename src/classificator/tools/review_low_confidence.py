@@ -159,6 +159,8 @@ def load_review_items(
             continue
         word_id = _parse_int(vals[idx_word_id], f"word_id at row {rec.line_number} in {csv_path}")
         word = vals[idx_word].strip()
+        if not word:
+            continue
         wtype = vals[idx_type].strip() if idx_type is not None else ""
         level = _parse_int(vals[idx_level], f"{level_col} at row {rec.line_number} in {csv_path}")
         if level < 1 or level > 5:
