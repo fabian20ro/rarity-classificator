@@ -118,6 +118,47 @@ class ReviewLowConfidenceTest(unittest.TestCase):
         self.assertIsNone(_map_input_to_label("4"))
         self.assertIsNone(_map_input_to_label("u1"))
 
+    def test_queue_excludes_decided_labels_regardless_of_flag(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "run.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "type", "rarity_level", "confidence"],
+                [
+                    ["1", "a", "N", "1", "0.1"],
+                    ["2", "b", "N", "1", "0.2"],
+                    ["3", "c", "N", "1", "0.3"],
+                ],
+            )
+            items = load_review_items(csv_path=path, repo=self.repo)
+            labels = {
+                1: ReviewLabel(word_id=1, predicted_level=1, label="2"),
+            }
+            queue_no_flag = build_review_queue(items, labels, include_undecided=False)
+            self.assertEqual([x.word_id for x in queue_no_flag], [2, 3])
+            queue_yes_flag = build_review_queue(items, labels, include_undecided=True)
+            self.assertEqual([x.word_id for x in queue_yes_flag], [2, 3])
+
+    def test_queue_includes_unlabeled_items(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "run.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "type", "rarity_level", "confidence"],
+                [
+                    ["1", "a", "N", "1", "0.1"],
+                    ["2", "b", "N", "1", "0.2"],
+                ],
+            )
+            items = load_review_items(csv_path=path, repo=self.repo)
+            labels: dict[int, ReviewLabel] = {}
+            queue_default = build_review_queue(items, labels, include_undecided=False)
+            self.assertEqual([x.word_id for x in queue_default], [1, 2])
+            queue_with_flag = build_review_queue(items, labels, include_undecided=True)
+            self.assertEqual([x.word_id for x in queue_with_flag], [1, 2])
+
     def test_resolve_level_column_explicit_wins(self):
         headers = ["word_id", "rarity_level", "final_level"]
         result = _resolve_level_column(headers, level_column="final_level")

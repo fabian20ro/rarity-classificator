@@ -237,15 +237,15 @@ class TestChainRebalance(unittest.TestCase):
             if Path("dummy_output").exists(): import shutil; shutil.rmtree("dummy_output")
 
     def test_step1_pool_too_small_raises_value_error(self):
-        """Pool of 1 record should raise ValueError before any LLM call."""
-        from src.classificator.tools.chain_rebalance_target_dist import run_chain_rebalance
+        """Pool of 5 level-5 records raises ValueError at step 1 (l1+l2=0 → pool too small)."""
+        from unittest.mock import patch
 
         class MockTable:
             headers = ["word_id", "word", "type", "rarity_level", "confidence"]
             # All records at level 5; with valid total, step1 pool (l1+l2) is 0 -> too small.
             records = [
                 MagicMock(values=["1", "test", "test", "5", "1.0"], line_number=2)
-                for _ in range(60000)
+                for _ in range(5)
             ]
 
         class MockRepo(RunCsvRepository):
@@ -257,29 +257,6 @@ class TestChainRebalance(unittest.TestCase):
         repo = MockRepo()
         lm_client = MagicMock(spec=LmStudioClient)
 
-        options = ChainOptions(
-            input_csv=Path("dummy.csv"),
-            model="test_model",
-            run_base="test_run",
-            runs_dir=Path("dummy_runs"),
-            state_file=Path("dummy_state"),
-            resume=False,
-            final_output_csv=None,
-            batch_size=1,
-            max_tokens=100,
-            timeout_seconds=10,
-            max_retries=0,
-            system_prompt_file=Path("dummy_system_prompt.txt"),
-            user_template_file=Path("dummy_user_template.txt"),
-            reference_csv=None,
-            anchor_l1_file=None,
-            min_l1_jaccard=None,
-            min_anchor_l1_precision=None,
-            min_anchor_l1_recall=None,
-            endpoint_option=None,
-            base_url_option=None,
-        )
-
         Path("dummy_system_prompt.txt").touch()
         Path("dummy_user_template.txt").touch()
         Path("dummy.csv").touch()
@@ -287,14 +264,41 @@ class TestChainRebalance(unittest.TestCase):
         Path("dummy_state").touch()
 
         try:
-            with self.assertRaises(ValueError) as cm:
+            with patch("src.classificator.tools.chain_rebalance_target_dist._count_total_words", return_value=60000), \
+                 self.assertRaises(ValueError) as cm:
+
+                options = ChainOptions(
+                    input_csv=Path("dummy.csv"),
+                    model="test_model",
+                    run_base="test_run",
+                    runs_dir=Path("dummy_runs"),
+                    state_file=Path("dummy_state"),
+                    resume=False,
+                    final_output_csv=None,
+                    batch_size=1,
+                    max_tokens=100,
+                    timeout_seconds=10,
+                    max_retries=0,
+                    system_prompt_file=Path("dummy_system_prompt.txt"),
+                    user_template_file=Path("dummy_user_template.txt"),
+                    reference_csv=None,
+                    anchor_l1_file=None,
+                    min_l1_jaccard=None,
+                    min_anchor_l1_precision=None,
+                    min_anchor_l1_recall=None,
+                    endpoint_option=None,
+                    base_url_option=None,
+                )
+
                 run_chain_rebalance(
                     options=options,
                     repo=repo,
                     lm_client=lm_client,
                     output_dir=Path("dummy_output")
                 )
-            self.assertIn("pool too small", str(cm.exception))
+            msg = str(cm.exception)
+            self.assertIn("[step 1]", msg, "should fail at step 1 specifically")
+            self.assertIn("levels 1+2", msg, f"should name levels 1+2, got: {msg}")
         finally:
             for f in ["dummy.csv", "dummy_system_prompt.txt", "dummy_user_template.txt", "dummy_state"]:
                 if Path(f).exists(): Path(f).unlink()
@@ -335,17 +339,21 @@ class TestChainRebalance(unittest.TestCase):
         if bad.exists(): bad.unlink()
 
     def test_target_distribution_for_60200_words(self):
-        """Happy-path: total=60200 → targets [l1=2500, l2=7500, l3=15000, l4=2500, l5=30000]."""
+        """Happy-path: total=60200 → targets [l1=2500, l2=7500, l3=15000, l4=2500, l5=30000].
+
+        Verifies each step's exact transition mapping appears exactly once — failure
+        is specific to the wrong transition or missing step instead of a generic count.
+        """
         from unittest.mock import patch
 
-        captured_levels = []
+        captured_transitions = []
         from src.classificator.tools.chain_rebalance_target_dist import (
             _get_level_count, run_step5 as _real_run_step5,
         )
 
         def fake_run_step5(options, *, repo, lm_client, output_dir):
             t = options.transitions[0]
-            captured_levels.append(t.to_level)
+            captured_transitions.append((t.from_level, t.from_level_upper, t.to_level))
 
         class MockTable:
             headers = ["word_id", "rarity_level"]
@@ -369,8 +377,20 @@ class TestChainRebalance(unittest.TestCase):
                     output_dir=Path("."),
                 )
 
-            # Verify chain completes through all steps (8 steps total)
-            self.assertEqual(len(captured_levels), 8)
+            # Steps 1..3: source levels 1+2 → target level 1
+            # Steps 4..5: source levels 2+3 → target level 2
+            # Steps 6..7: source levels 3+4 → target level 3
+            # Step   8:   source levels 4+5 → target level 4
+            expected = (
+                [(1, 2, 1)] * 3 +
+                [(2, 3, 2)] * 2 +
+                [(3, 4, 3)] * 2 +
+                [(4, 5, 4)] * 1
+            )
+            self.assertEqual(
+                captured_transitions, expected,
+                f"step-to-transition mapping mismatch: got {captured_transitions}, expected {expected}"
+            )
         finally:
             for f in [Path("dummy.csv"), Path("dummy_sp.txt"), Path("dummy_ut.txt")]:
                 if f.exists(): f.unlink(missing_ok=True)
