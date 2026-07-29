@@ -294,7 +294,9 @@ class TestChainRebalance(unittest.TestCase):
                     lm_client=lm_client,
                     output_dir=Path("dummy_output")
                 )
-            self.assertIn("pool too small", str(cm.exception))
+            msg = str(cm.exception)
+            self.assertIn("[step 1]", msg, "should fail at step 1 specifically")
+            self.assertIn("levels 1+2", msg, f"should name levels 1+2, got: {msg}")
         finally:
             for f in ["dummy.csv", "dummy_system_prompt.txt", "dummy_user_template.txt", "dummy_state"]:
                 if Path(f).exists(): Path(f).unlink()
