@@ -116,6 +116,7 @@ def _resolve_final_level(levels: list[int], median_level: int, strategy: Step3Me
     """Resolve final rarity level using merge rules.
 
     Priority order (highest to lowest):
+    - Single run present → return that median with "single_run" rule
     - Level 1 present → always assign 1 (critical for rare words)
     - Median >= 3 and level 2 present → assign 2 (conservative upgrade)
     - Median in {3,4} and level 5 present → assign 5 (rare word confirmation)
@@ -131,6 +132,10 @@ def _resolve_final_level(levels: list[int], median_level: int, strategy: Step3Me
     """
     if strategy == Step3MergeStrategy.MEDIAN:
         return median_level, "median"
+
+    # Single run — merge rules need multiple runs to be meaningful
+    if len(levels) < 2:
+        return median_level, "single_run"
 
     # Critical: any level 1 means the word is rare in at least one run
     if any(x == 1 for x in levels):
