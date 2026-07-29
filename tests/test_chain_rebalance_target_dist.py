@@ -237,15 +237,15 @@ class TestChainRebalance(unittest.TestCase):
             if Path("dummy_output").exists(): import shutil; shutil.rmtree("dummy_output")
 
     def test_step1_pool_too_small_raises_value_error(self):
-        """Pool of 1 record should raise ValueError before any LLM call."""
-        from src.classificator.tools.chain_rebalance_target_dist import run_chain_rebalance
+        """Pool of 5 level-5 records raises ValueError at step 1 (l1+l2=0 → pool too small)."""
+        from unittest.mock import patch
 
         class MockTable:
             headers = ["word_id", "word", "type", "rarity_level", "confidence"]
             # All records at level 5; with valid total, step1 pool (l1+l2) is 0 -> too small.
             records = [
                 MagicMock(values=["1", "test", "test", "5", "1.0"], line_number=2)
-                for _ in range(60000)
+                for _ in range(5)
             ]
 
         class MockRepo(RunCsvRepository):
@@ -257,29 +257,6 @@ class TestChainRebalance(unittest.TestCase):
         repo = MockRepo()
         lm_client = MagicMock(spec=LmStudioClient)
 
-        options = ChainOptions(
-            input_csv=Path("dummy.csv"),
-            model="test_model",
-            run_base="test_run",
-            runs_dir=Path("dummy_runs"),
-            state_file=Path("dummy_state"),
-            resume=False,
-            final_output_csv=None,
-            batch_size=1,
-            max_tokens=100,
-            timeout_seconds=10,
-            max_retries=0,
-            system_prompt_file=Path("dummy_system_prompt.txt"),
-            user_template_file=Path("dummy_user_template.txt"),
-            reference_csv=None,
-            anchor_l1_file=None,
-            min_l1_jaccard=None,
-            min_anchor_l1_precision=None,
-            min_anchor_l1_recall=None,
-            endpoint_option=None,
-            base_url_option=None,
-        )
-
         Path("dummy_system_prompt.txt").touch()
         Path("dummy_user_template.txt").touch()
         Path("dummy.csv").touch()
@@ -287,7 +264,32 @@ class TestChainRebalance(unittest.TestCase):
         Path("dummy_state").touch()
 
         try:
-            with self.assertRaises(ValueError) as cm:
+            with patch("src.classificator.tools.chain_rebalance_target_dist._count_total_words", return_value=60000), \
+                 self.assertRaises(ValueError) as cm:
+
+                options = ChainOptions(
+                    input_csv=Path("dummy.csv"),
+                    model="test_model",
+                    run_base="test_run",
+                    runs_dir=Path("dummy_runs"),
+                    state_file=Path("dummy_state"),
+                    resume=False,
+                    final_output_csv=None,
+                    batch_size=1,
+                    max_tokens=100,
+                    timeout_seconds=10,
+                    max_retries=0,
+                    system_prompt_file=Path("dummy_system_prompt.txt"),
+                    user_template_file=Path("dummy_user_template.txt"),
+                    reference_csv=None,
+                    anchor_l1_file=None,
+                    min_l1_jaccard=None,
+                    min_anchor_l1_precision=None,
+                    min_anchor_l1_recall=None,
+                    endpoint_option=None,
+                    base_url_option=None,
+                )
+
                 run_chain_rebalance(
                     options=options,
                     repo=repo,
