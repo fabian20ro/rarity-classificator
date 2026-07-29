@@ -463,12 +463,21 @@ class LmStudioClient:
                 source=f"{source}-lmstudio",
             )
 
-        print(f"Warning: no LM probe succeeded for {base_url}; falling back to OpenAI-compatible endpoint.")
-        return ResolvedEndpoint(
-            endpoint=f"{base_url}{OPENAI_CHAT_COMPLETIONS_PATH}",
-            models_endpoint=openai_models_url,
-            flavor=LmApiFlavor.OPENAI_COMPAT,
-            source=f"{source}-fallback",
+        fallback_chat = f"{base_url}{OPENAI_CHAT_COMPLETIONS_PATH}"
+        if self._probe(fallback_chat):
+            print(
+                f"Warning: models probe failed but chat completions reachable at {fallback_chat}; using as fallback."
+            )
+            return ResolvedEndpoint(
+                endpoint=fallback_chat,
+                models_endpoint=openai_models_url,
+                flavor=LmApiFlavor.OPENAI_COMPAT,
+                source=f"{source}-fallback",
+            )
+
+        raise RuntimeError(
+            f"No reachable LM API at {base_url}: probes to {openai_models_url} and {lm_models_url} both failed. "
+            f"Check that the base URL is correct and the server is running."
         )
 
     def _probe(self, url: str) -> bool:
