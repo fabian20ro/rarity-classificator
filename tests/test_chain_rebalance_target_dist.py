@@ -337,17 +337,21 @@ class TestChainRebalance(unittest.TestCase):
         if bad.exists(): bad.unlink()
 
     def test_target_distribution_for_60200_words(self):
-        """Happy-path: total=60200 → targets [l1=2500, l2=7500, l3=15000, l4=2500, l5=30000]."""
+        """Happy-path: total=60200 → targets [l1=2500, l2=7500, l3=15000, l4=2500, l5=30000].
+
+        Verifies each step's exact transition mapping appears exactly once — failure
+        is specific to the wrong transition or missing step instead of a generic count.
+        """
         from unittest.mock import patch
 
-        captured_levels = []
+        captured_transitions = []
         from src.classificator.tools.chain_rebalance_target_dist import (
             _get_level_count, run_step5 as _real_run_step5,
         )
 
         def fake_run_step5(options, *, repo, lm_client, output_dir):
             t = options.transitions[0]
-            captured_levels.append(t.to_level)
+            captured_transitions.append((t.from_level, t.from_level_upper, t.to_level))
 
         class MockTable:
             headers = ["word_id", "rarity_level"]
@@ -371,8 +375,20 @@ class TestChainRebalance(unittest.TestCase):
                     output_dir=Path("."),
                 )
 
-            # Verify chain completes through all steps (8 steps total)
-            self.assertEqual(len(captured_levels), 8)
+            # Steps 1..3: source levels 1+2 → target level 1
+            # Steps 4..5: source levels 2+3 → target level 2
+            # Steps 6..7: source levels 3+4 → target level 3
+            # Step   8:   source levels 4+5 → target level 4
+            expected = (
+                [(1, 2, 1)] * 3 +
+                [(2, 3, 2)] * 2 +
+                [(3, 4, 3)] * 2 +
+                [(4, 5, 4)] * 1
+            )
+            self.assertEqual(
+                captured_transitions, expected,
+                f"step-to-transition mapping mismatch: got {captured_transitions}, expected {expected}"
+            )
         finally:
             for f in [Path("dummy.csv"), Path("dummy_sp.txt"), Path("dummy_ut.txt")]:
                 if f.exists(): f.unlink(missing_ok=True)
