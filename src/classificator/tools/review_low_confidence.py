@@ -221,21 +221,25 @@ def load_latest_review_labels(labels_csv: Path) -> dict[int, ReviewLabel]:
     return latest
 
 
+def _should_include_item(
+    item: ReviewItem,
+    latest_labels: dict[int, ReviewLabel],
+    *,
+    include_undecided: bool,
+) -> bool:
+    label = latest_labels.get(item.word_id)
+    if label is None:
+        return True
+    return include_undecided and label.label == "undecided"
+
+
 def build_review_queue(
     items: list[ReviewItem],
     latest_labels: dict[int, ReviewLabel],
     *,
     include_undecided: bool,
 ) -> list[ReviewItem]:
-    out: list[ReviewItem] = []
-    for item in items:
-        label = latest_labels.get(item.word_id)
-        if label is None:
-            out.append(item)
-            continue
-        if include_undecided and label.label == "undecided":
-            out.append(item)
-    return out
+    return [item for item in items if _should_include_item(item, latest_labels, include_undecided=include_undecided)]
 
 
 def append_review_label(*, labels_csv: Path, run_csv: Path, item: ReviewItem, label: str) -> None:

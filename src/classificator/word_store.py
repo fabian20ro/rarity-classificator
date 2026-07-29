@@ -37,16 +37,12 @@ class WordStore:
             rows = cur.fetchall()
         return [WordLevel(word_id=r[0], rarity_level=r[1]) for r in rows]
 
-    def _exec_update(self, cur, payload: list[tuple[int, int]]) -> None:
-        """Execute a single batch of rarity-level updates on an open cursor."""
-        cur.executemany("UPDATE words SET rarity_level = %s WHERE id = %s", payload)
-
     def update_rarity_levels(self, updates: dict[int, int]) -> None:
         if not updates:
             return
         with self._connect() as conn, conn.cursor() as cur:
             payload = [(level, word_id) for word_id, level in updates.items()]
-            self._exec_update(cur, payload)
+            cur.executemany("UPDATE words SET rarity_level = %s WHERE id = %s", payload)
             conn.commit()
 
     def update_rarity_levels_chunked(self, updates: dict[int, int], chunk_size: int = 5000) -> None:
@@ -59,5 +55,5 @@ class WordStore:
             for i in range(0, len(items), chunk_size):
                 chunk = items[i : i + chunk_size]
                 payload = [(lvl, wid) for wid, lvl in chunk]
-                self._exec_update(cur, payload)
+                cur.executemany("UPDATE words SET rarity_level = %s WHERE id = %s", payload)
             conn.commit()

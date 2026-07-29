@@ -82,9 +82,6 @@ class UploadMarkerWriter:
                 row["upload_status"] = status
                 row["upload_batch_id"] = upload_batch_id
                 marked += 1
-            else:
-                for k in UPLOAD_MARKER_HEADERS:
-                    row.setdefault(k, "")
             rows.append([row.get(h, "") for h in headers])
 
         self.repo.write_table_atomic(final_csv_path, headers, rows)

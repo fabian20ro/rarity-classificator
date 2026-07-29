@@ -27,6 +27,7 @@ class LevelTransition:
             return self.from_level_upper if self.to_level == self.from_level else self.from_level
         if self.to_level == self.from_level:
             return min(5, self.to_level + 1)
+        # Downgrade transition: return source level.
         return self.from_level
 
 

@@ -76,8 +76,6 @@ def _resolve_level_column(headers: list[str], level_column: str | None) -> str:
 
 
 def _validate_level(raw_level: str, col_name: str, line_number: int) -> int:
-    if not isinstance(raw_level, str):
-        raise TypeError(f"Expected string level for {col_name} at row {line_number}, got {type(raw_level).__name__}")
     try:
         level = int(raw_level)
     except ValueError as exc:
