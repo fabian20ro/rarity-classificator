@@ -374,6 +374,23 @@ class QualityAuditTest(unittest.TestCase):
                     repo=self.repo,
                 )
 
+    def test_missing_anchor_file_propagates_filenotfounderror(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            anchor = root / "anchor.txt"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            cand_rows = [["1", "om", "N", "1"]]
+            self._write_csv(candidate, headers, cand_rows)
+
+            with self.assertRaises(FileNotFoundError):
+                run_quality_audit(
+                    candidate_csv=candidate,
+                    anchor_l1_file=anchor / "does_not_exist.txt",
+                    repo=self.repo,
+                )
+
 
 if __name__ == "__main__":
     unittest.main()
