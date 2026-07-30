@@ -116,6 +116,18 @@ def run_chain_rebalance(*, options: ChainOptions, repo: RunCsvRepository, lm_cli
                 f"[step {step_idx}] invalid target={target_to_level} for pool={pool} (levels {from_low}+{from_high})"
             )
 
+        min_per_source = max(10, target_to_level // 10)
+        if count_low < min_per_source:
+            raise ValueError(
+                f"[step {step_idx}] source level {from_low} has only {count_low} records "
+                f"(need at least {min_per_source})"
+            )
+        if from_high != from_low and count_high < min_per_source:
+            raise ValueError(
+                f"[step {step_idx}] source level {from_high} has only {count_high} records "
+                f"(need at least {min_per_source})"
+            )
+
         ratio = target_to_level / pool
         if not (0.01 <= ratio <= 0.99):
             raise ValueError(f"[step {step_idx}] ratio out of range 0.01..0.99: ratio={ratio}")

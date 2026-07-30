@@ -464,5 +464,96 @@ def _make_options():
     )
 
 
-if __name__ == "__main__":
-    unittest.main()
+def _make_options_small():
+    return ChainOptions(
+        input_csv=Path("dummy.csv"), model="test_model", run_base="test_run", runs_dir=Path("dummy_runs"),
+        state_file=Path("dummy_state"), resume=False, final_output_csv=None, batch_size=10, max_tokens=100,
+        timeout_seconds=10, max_retries=0, system_prompt_file=Path("dummy_sp.txt"), user_template_file=Path("dummy_ut.txt"),
+        reference_csv=None, anchor_l1_file=None, min_l1_jaccard=None, min_anchor_l1_precision=None,
+        min_anchor_l1_recall=None, endpoint_option=None, base_url_option=None,
+    )
+
+
+class TestStep8DoubleCountingFix(unittest.TestCase):
+    """Verifies the per-source-level minimum check prevents silent acceptance of l4→l4 steps with inflated pools.
+
+    When from_low == from_high (e.g., step 8: levels 4+5 → target level 4), _get_level_count is called twice
+    on identical source levels, producing pool = 2×actual_l4_records. Without per-source validation, a tiny
+    l4 population can pass the ratio gate (0.01..0.99) silently because the inflated denominator masks the
+    actual scarcity of source-level records.
+
+    This test ensures that step 8 with only ~5 l4 records fails at the new minimum-per-source check
+    rather than passing through to an invalid ratio computation or silent acceptance.
+    """
+
+    def setUp(self):
+        for f in ["dummy.csv", "dummy_sp.txt", "dummy_ut.txt"]:
+            if Path(f).exists():
+                Path(f).unlink()
+        if Path("dummy_runs").exists():
+            import shutil
+            shutil.rmtree("dummy_runs")
+
+    def test_step1_per_source_minimum_fires_before_ratio_gate(self):
+        """Step 1 (l1→l2 target l1) with critically small level-1 population fails per-source check.
+
+        Step 1 transitions levels 1+2 → target level 1. Production code:
+            count_low = _get_level_count(csv, 1, repo)   # returns N_l1
+            count_high = _get_level_count(csv, 2, repo)  # returns N_l2 (distinct!)
+            pool = N_l1 + N_l2
+
+        The new per-source-level check requires min_per_source=max(10, target_to_level//10)=max(10,250)=250.
+        If level-1 has only 50 records while level-2 is large (e.g. 5000), the total pool=5050 passes all
+        prior checks but would silently accept an invalid rebalance where the source-level imbalance makes
+        the target unreachable without massive reclassification of l2 words.
+
+        This test ensures that step 1 with only ~50 level-1 records fails at the per-source check,
+        preventing silent acceptance of skewed distributions where one source level is critically small.
+        """
+        from unittest.mock import patch
+
+        def fake_get_level_count(csv_path, level, repo):
+            """Returns controlled counts: l1=50 (small), l2=5000 (large) → per-source check fires on l1."""
+            if level == 1:
+                return 50   # < min_per_source=250 — triggers per-source failure
+            if level == 2:
+                return 5000
+            return 0
+
+        class MockTable:
+            headers = ["word_id", "word", "type", "rarity_level", "confidence"]
+            records = [MagicMock(values=["1", "test", "test", "4", "1.0"], line_number=2)]
+
+        class MockRepo(RunCsvRepository):
+            def read_table(self, path):
+                return MockTable()
+            def load_run_rows(self, path):
+                return []
+
+        Path("dummy_sp.txt").write_text("", encoding="utf-8")
+        Path("dummy_ut.txt").write_text("", encoding="utf-8")
+        Path("dummy.csv").touch()
+
+        try:
+            with patch("src.classificator.tools.chain_rebalance_target_dist._count_total_words", return_value=60050), \
+                 self.assertRaises(ValueError) as cm, \
+                 patch("src.classificator.tools.chain_rebalance_target_dist.run_step5"), \
+                 patch("src.classificator.tools.chain_rebalance_target_dist._get_level_count", side_effect=fake_get_level_count):
+                run_chain_rebalance(
+                    options=_make_options_small(),
+                    repo=MockRepo(),
+                    lm_client=MagicMock(spec=LmStudioClient),
+                    output_dir=Path("."),
+                )
+
+            msg = str(cm.exception)
+            self.assertIn("[step 1]", msg, f"should fail at step 1, got: {msg}")
+            # Step 1 transition is from_level=1, from_high=2 → count_low=l1_count=50 < min_per_source=250
+            self.assertIn("source level 1", msg, f"should name source level 1 (count_low), got: {msg}")
+        finally:
+            for f in ["dummy.csv", "dummy_sp.txt", "dummy_ut.txt"]:
+                if Path(f).exists():
+                    Path(f).unlink()
+            if Path("dummy_runs").exists():
+                import shutil
+                shutil.rmtree("dummy_runs")
