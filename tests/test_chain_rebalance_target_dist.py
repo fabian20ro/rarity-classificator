@@ -93,6 +93,33 @@ class TestChainRebalance(unittest.TestCase):
             _get_level_count(Path("dummy.csv"), 1, MockRepo())
         self.assertIn("final_level/rarity_level/median_level", str(cm.exception))
 
+    def test_get_level_count_prioritizes_final_level_over_rarity_level(self):
+        """When both final_level and rarity_level exist, column selection uses final_level.
+
+        The production _get_level_count picks the first matching header in order:
+        final_level → rarity_level → median_level. A CSV with both columns must
+        count by final_level — a silent fallback to rarity_level would mask
+        stale or duplicated columns that should no longer be trusted.
+        """
+        from src.classificator.tools.chain_rebalance_target_dist import _get_level_count
+
+        class MockTable:
+            headers = ["word_id", "final_level", "rarity_level"]
+            records = [
+                MagicMock(values=["1", "5", "2"]),   # l5 via final_level, l2 via rarity_level
+                MagicMock(values=["2", "3", "3"]),   # l3 both
+                MagicMock(values=["3", "5", "4"]),   # l5 via final_level, l4 via rarity_level
+            ]
+
+        class MockRepo(RunCsvRepository):
+            def read_table(self, path):
+                return MockTable()
+            def load_run_rows(self, path):
+                return []
+
+        count = _get_level_count(Path("dummy.csv"), 5, MockRepo())
+        self.assertEqual(count, 2)  # only records 0 and 2 have final_level=5; rarity_level is ignored
+
     def test_get_level_count_handles_malformed_values_gracefully(self):
         from src.classificator.tools.chain_rebalance_target_dist import _get_level_count
 
