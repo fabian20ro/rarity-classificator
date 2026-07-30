@@ -110,7 +110,12 @@ def _load_run(path: Path, repo: RunCsvRepository) -> dict[str, object]:
         if not any(v.strip() for v in vals):
             continue
         total_rows += 1
-        word_id = int(vals[idx_word_id])
+        try:
+            word_id = int(vals[idx_word_id])
+        except ValueError:
+            raise ValueError(
+                f"Non-numeric word_id at row {rec.line_number} in {path}"
+            ) from None
         level = int(vals[idx_level])
         if level < 1 or level > 5:
             raise ValueError(f"Invalid level at row {rec.line_number} in {path}")
