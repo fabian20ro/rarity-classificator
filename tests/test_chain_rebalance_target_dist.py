@@ -111,8 +111,19 @@ class TestChainRebalance(unittest.TestCase):
             def load_run_rows(self, path):
                 return []
 
+        records = MockTable.records
         count = _get_level_count(Path("dummy.csv"), 2, MockRepo())
-        self.assertEqual(count, 2)  # Records 0 and 3 have rarity_level == "2"
+        self.assertEqual(count, 2)
+        # Failure-specific: verify which indices matched, not just the total.
+        # If skip behavior changes silently (e.g. float string accepted), only "how many" is wrong.
+        matched = []
+        for i, r in enumerate(records):
+            try:
+                if int(r.values[1]) == 2:
+                    matched.append(i)
+            except (ValueError, TypeError):
+                continue
+        self.assertEqual(matched, [0, 3])
 
     def test_get_level_count_non_numeric_skips_record(self):
         from src.classificator.tools.chain_rebalance_target_dist import _get_level_count
