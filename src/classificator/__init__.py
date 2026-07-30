@@ -14,6 +14,7 @@ from .steps.step2_score import Step2Options as _Step2Options
 from .transitions import LevelTransition, parse_transitions, validate_transition_set
 from .word_store import WordStore
 from .run_csv_repository import RunCsvRepository
+from .steps import _STEPS as _STEPS
 import sys as _sys
 
 __all__ = [
