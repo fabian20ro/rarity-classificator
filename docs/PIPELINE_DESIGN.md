@@ -12,7 +12,7 @@ Classify Romanian lexical rarity (`1..5`) with robust offline orchestration:
 ## Repository Boundary
 
 This repository is the source of truth for offline rarity classification.
-`fabian20ro/propozitii-nostime` consumes `words.rarity_level` at runtime, but does not host classifier runtime code, prompts, or orchestration.
+`fabian20ro/propozitii-absurde` consumes `words.rarity_level` at runtime, but does not host classifier runtime code, prompts, or orchestration.
 
 ## Why Python
 

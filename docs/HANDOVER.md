@@ -4,7 +4,7 @@
 
 This Python project replaces only the rarity/classification tooling. Backend API/runtime apps remain unchanged.
 
-`fabian20ro/propozitii-nostime` is a consumer of DB rarity output only (`words.rarity_level` via `minRarity`/`rarity` filters). Classifier orchestration, prompts, and audits live in this repository.
+`fabian20ro/propozitii-absurde` is a consumer of DB rarity output only (`words.rarity_level` via `minRarity`/`rarity` filters). Classifier orchestration, prompts, and audits live in this repository.
 
 ## Non-Negotiable Contracts
 

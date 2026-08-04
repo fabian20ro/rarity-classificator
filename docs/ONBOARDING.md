@@ -4,7 +4,7 @@
 
 1. Read `README.md` and `AGENTS.md`.
 2. Read `docs/PIPELINE_DESIGN.md` and `docs/RUNBOOK.md`.
-3. Internalize integration boundary: this repo owns classifier runtime; `propozitii-nostime` only consumes `words.rarity_level`.
+3. Internalize integration boundary: this repo owns classifier runtime; `propozitii-absurde` only consumes `words.rarity_level`.
 4. Install deps:
 
 ```bash

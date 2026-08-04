@@ -1,13 +1,13 @@
-# classificator
+# Rarity Classificator
 
 Standalone Python reimplementation of the Romanian rarity classification pipeline.
 
-This repository is the active home of the offline rarity-classification system previously hosted inside `fabian20ro/propozitii-nostime`.
+This repository is the active home of the offline rarity-classification system previously hosted inside `fabian20ro/propozitii-absurde`.
 It reads words from Supabase PostgreSQL, writes intermediary CSV/JSONL artifacts, runs LM scoring/rebalancing, and uploads final levels back to Supabase.
 
 ## Integration Boundary
 
-Downstream app `fabian20ro/propozitii-nostime` does not run classifier steps at runtime.
+Downstream app `fabian20ro/propozitii-absurde` does not run classifier steps at runtime.
 It only consumes `words.rarity_level` via `minRarity`/`rarity` query parameters.
 
 Contract this repository must preserve:

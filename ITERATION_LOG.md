@@ -357,3 +357,13 @@ Each entry should follow this structure:
 **Outcome:** Focused runtime-config and quiet/full-suite verification passed.
 **Insight:** Runner verbosity belongs in central orchestration when project CI already uses a concise command.
 **Promoted to Lessons Learned:** No
+
+---
+
+### [2026-08-04] Migrate repository to Rarity Classificator
+
+**Context:** Git transport for `word-rarity-classifier` was disabled, so the repository was recovered into `rarity-classificator` from a verified full-ref bundle.
+**What happened:** Updated the product title, current repository ownership references, and downstream links to the already-migrated `propozitii-absurde` identity. Preserved the Python package and CLI name `classificator` as the stable executable contract.
+**Outcome:** Success. Ruff and all 372 unit tests pass from the replacement repository.
+**Insight:** A repository rename should update current integration-boundary documentation while preserving stable CLI/package identifiers and historical iteration records.
+**Promoted to Lessons Learned:** No

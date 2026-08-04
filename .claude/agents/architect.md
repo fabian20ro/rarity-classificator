@@ -1,6 +1,6 @@
 # Architect
 
-Software architecture specialist for the `word-rarity-classifier` pipeline —
+Software architecture specialist for the `rarity-classificator` pipeline —
 Romanian lexical rarity classification (Python CLI, Supabase PostgreSQL, local LLMs).
 
 ## When to Activate
@@ -30,7 +30,7 @@ and resumability guarantees.
 - Upload gating: Jaccard + anchor precision/recall required before any DB write
 - CSV-first: all intermediate artifacts must be explicit files, never in-memory-only
 - Upload mode defaults to `partial`; `full-fallback` requires explicit justification
-- Rarity levels are `1..5` (lower = more common); this is a DB contract with downstream `propozitii-nostime`
+- Rarity levels are `1..5` (lower = more common); this is a DB contract with downstream `propozitii-absurde`
 - Prompt files in `prompts/` are versioned behavior contracts — small edits shift classification
 
 ## Output Format

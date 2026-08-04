@@ -48,7 +48,7 @@ same conventions.
 
 - **UX/Frontend agent** — backend-only CLI pipeline, no frontend
 - **CI/CD agent** — no CI/CD pipeline configured; tests are run manually
-- **Database migration agent** — schema is owned by `propozitii-nostime`; this project only reads/writes `rarity_level`
+- **Database migration agent** — schema is owned by `propozitii-absurde`; this project only reads/writes `rarity_level`
 
 ## Validation Checklist
 

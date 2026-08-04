@@ -29,7 +29,7 @@ move it to the Archive section at the bottom with a date and reason.
 
 <!-- Insights about system design, patterns that work/don't work in this codebase -->
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
-**[2026-02-14]** Classifier/consumer boundary must stay explicit — `word-rarity-classifier` owns pipeline runtime and artifacts; downstream apps only consume `words.rarity_level`.
+**[2026-02-14]** Classifier/consumer boundary must stay explicit — `rarity-classificator` owns pipeline runtime and artifacts; downstream apps only consume `words.rarity_level`.
 **[2026-02-14]** CSV-first orchestration is a reliability feature — reproducible step artifacts plus checkpoints are required for multi-hour recovery and auditability.
 
 ## Code Patterns & Pitfalls
