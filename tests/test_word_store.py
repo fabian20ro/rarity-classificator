@@ -118,7 +118,7 @@ class WordStoreTest(unittest.TestCase):
 
         store._connect.assert_not_called()
 
-    def test_update_rarity_levels_non_chunked_sends_single_batch(self):
+    def test_fetch_all_words_parses_rows_into_word_objects(self):
         store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
         fake_cursor = _FakeCursor()
         fake_conn = _FakeConnection(fake_cursor)
