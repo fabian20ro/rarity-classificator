@@ -54,15 +54,32 @@ class CsvCodec:
 
         records: list[CsvRecord] = []
         for i, row in enumerate(rows[1:], start=2):
-            if len(row) == 1 and row[0] == "":
-                continue
-            if len(row) != len(headers):
-                raise CsvFormatError(
-                    f"CSV {path} line {i} has {len(row)} columns, expected {len(headers)}"
-                )
+            self._validate_row(row, len(headers), f"CSV {path} line {i}")
             records.append(CsvRecord(line_number=i, values=[str(x) for x in row]))
 
         return CsvTable(headers=headers, records=records)
+
+    def _validate_row_length(self, row_len: int, expected: int, label: str) -> None:
+        """Raise CsvFormatError when `row_len` does not match `expected`.
+
+        The `label` argument carries the context-specific prefix so that
+        read_table and write_table each produce their historical error text.
+        """
+        if row_len != expected:
+            raise CsvFormatError(
+                f"{label} has {row_len} columns, expected {expected}"
+            )
+
+    def _validate_row(self, row: list[str], expected: int, label: str) -> None:
+        """Skip blank rows; validate column count via `_validate_row_length`.
+
+        A row is considered blank when it contains a single empty string
+        (e.g. the csv reader produced [''] for an entirely-empty line). All
+        other length mismatches raise CsvFormatError using the provided label.
+        """
+        if len(row) == 1 and row[0] == "":
+            return
+        self._validate_row_length(len(row), expected, label)
 
     def _ensure_dir(self, path: Path) -> None:
         """Create the parent directory of `path` if it does not already exist."""
@@ -74,10 +91,7 @@ class CsvCodec:
             writer = csv.writer(handle, quoting=csv.QUOTE_ALL)
             writer.writerow(headers)
             for row in rows:
-                if len(row) != len(headers):
-                    raise CsvFormatError(
-                        f"Attempted to write {len(row)} columns, expected {len(headers)}"
-                    )
+                self._validate_row(row, len(headers), "Attempted to write")
                 writer.writerow(row)
 
     def write_table_atomic(self, path: Path, headers: list[str], rows: list[list[str]]) -> None:
