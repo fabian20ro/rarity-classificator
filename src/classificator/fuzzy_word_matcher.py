@@ -46,7 +46,9 @@ def levenshtein(a: str, b: str) -> int:
 def matches(expected: str, actual: str) -> bool:
     ne = normalize(expected)
     na = normalize(actual)
-    if abs(len(ne) - len(na)) > MAX_EDIT_DISTANCE:
+    length_diff = abs(len(ne) - len(na))
+
+    if length_diff > MAX_EDIT_DISTANCE:
         return False
 
     # Common-prefix short-circuit: at most one mismatch in the first few characters,
@@ -56,7 +58,7 @@ def matches(expected: str, actual: str) -> bool:
     prefix_len = min(len(ne), len(na), 3)
     mismatches = sum(1 for i in range(prefix_len) if ne[i] != na[i])
 
-    if mismatches <= 1 and abs(len(ne) - len(na)) <= 1:
+    if mismatches <= 1 and length_diff <= 1:
         return True
 
     # If strings are very short (≤2 chars), exact character overlap is sufficient.
