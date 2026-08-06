@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 
 from ..run_csv_repository import RunCsvRepository
+
+
+log = logging.getLogger(__name__)
 
 
 def build_retry_input(

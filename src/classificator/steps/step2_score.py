@@ -61,7 +61,15 @@ class Step2Counters:
     failed_count: int
 
 
+def _validate_output_path(path: Path) -> None:
+    if not path.parent.exists():
+        raise FileNotFoundError(f"Output directory does not exist: {path.parent}")
+    if not path.parent.is_dir():
+        raise NotADirectoryError(f"Output parent is not a directory: {path.parent}")
+
+
 def run_step2(options: Step2Options, *, repo: RunCsvRepository, lm_client: LmStudioClient, output_dir: Path) -> None:
+    _validate_output_path(options.output_csv_path)
     run_slug = sanitize_run_slug(options.run_slug)
     files = _prepare_files(output_dir, run_slug)
     metrics = lm_client.metrics

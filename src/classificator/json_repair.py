@@ -86,9 +86,9 @@ def _close_unclosed_structures(input_text: str) -> str:
             elif ch == "\\":
                 escaped = True
             elif ch == '"':
-                in_string = False
                 if stack and stack[-1] == '"':
                     stack.pop()
+                in_string = False
             continue
 
         if ch == '"':
