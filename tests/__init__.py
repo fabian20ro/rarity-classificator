@@ -45,6 +45,23 @@ class TestTopLevelExports(unittest.TestCase):
             cls = getattr(__import__("classificator.lm", fromlist=[name]), name)
             self.assertTrue(callable(cls), f"{name} is not callable")
 
+    def test_lm_package_exports_no_drift_from_all(self):
+        """lm.__all__ must match the module's public symbol set exactly.
+
+        Production contract (classificator.lm.__init__.py):
+            The re-export surface declared in __all__ must equal the visible
+            public names on the package — catches drift when a new class is
+            imported into lm/__init__.py without being added to __all__, or
+            when a name is removed from both places inconsistently.
+
+        Negative test: if any symbol appears in dir(module) that isn't in
+        __all__, or vice versa, the contract has drifted and must fail.
+        """
+        import classificator.lm as lm_pkg
+        exported = set(lm_pkg.__all__)
+        public_names = {n for n in dir(lm_pkg) if not n.startswith("_") and callable(getattr(lm_pkg, n))}
+        self.assertEqual(exported, public_names, f"lm exports drift: declared={sorted(exported)}, visible={sorted(public_names)}")
+
 
 class TestPackageIntegrity(unittest.TestCase):
     def test_batch_size_adapter_import(self):
