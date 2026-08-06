@@ -171,5 +171,56 @@ class TestValidateSteps(unittest.TestCase):
             steps_mod._STEPS = tuple(original)
 
 
+class TestScoringContextContract(unittest.TestCase):
+    """Verify ScoringContext is constructable through the lm package surface."""
+
+    def test_scoring_context_constructs_via_lm_reexport(self):
+        from classificator.lm import ScoringContext
+        from classificator.models import LmApiFlavor
+
+        ctx = ScoringContext(
+            run_slug="test_run",
+            model="qwen2.5:14b",
+            endpoint="http://localhost:1234/v1/chat/completions",
+            max_retries=3,
+            timeout_seconds=60,
+            run_log_path=Path("/tmp/run.jsonl"),
+            failed_log_path=Path("/tmp/failed.jsonl"),
+            system_prompt="test prompt",
+            user_template="test template",
+            flavor=LmApiFlavor.LMSTUDIO_REST,
+            max_tokens=1000,
+        )
+
+        self.assertEqual(ctx.run_slug, "test_run")
+        self.assertEqual(ctx.model, "qwen2.5:14b")
+        self.assertEqual(ctx.max_retries, 3)
+        self.assertEqual(ctx.timeout_seconds, 60)
+        self.assertEqual(ctx.max_tokens, 1000)
+        self.assertEqual(ctx.flavor, LmApiFlavor.LMSTUDIO_REST)
+
+    def test_scoring_context_is_frozen(self):
+        """Frozen dataclass must reject attribute assignment."""
+        from classificator.lm import ScoringContext
+        from classificator.models import LmApiFlavor
+
+        ctx = ScoringContext(
+            run_slug="test_run",
+            model="qwen2.5:14b",
+            endpoint="http://localhost:1234/v1/chat/completions",
+            max_retries=3,
+            timeout_seconds=60,
+            run_log_path=Path("/tmp/run.jsonl"),
+            failed_log_path=Path("/tmp/failed.jsonl"),
+            system_prompt="test prompt",
+            user_template="test template",
+            flavor=LmApiFlavor.LMSTUDIO_REST,
+            max_tokens=1000,
+        )
+
+        with self.assertRaises(AttributeError):
+            ctx.run_slug = "mutated"
+
+
 if __name__ == "__main__":
     unittest.main()
