@@ -42,10 +42,13 @@ def _assert_exports_resolved() -> None:
 
     def _is_missing(name: str) -> bool:
         try:
-            getattr(_sys.modules[__name__], name)
+            obj = getattr(_sys.modules[__name__], name)
         except AttributeError:
             return True
-        return False
+        if isinstance(obj, str):
+            # __version__ is a string constant, not callable — skip callability check.
+            return False
+        return not callable(obj)
 
     missing = [name for name in __all__ if _is_missing(name)]
     if missing:
