@@ -66,3 +66,15 @@ def matches(expected: str, actual: str) -> bool:
         return True
 
     return levenshtein(ne, na) <= MAX_EDIT_DISTANCE
+
+
+def matches_with_distance(expected: str, actual: str) -> tuple[bool, int]:
+    """Return (match_result, edit_distance) for fuzzy comparison.
+
+    Useful when callers need to apply their own threshold beyond the
+    hardcoded MAX_EDIT_DISTANCE or want diagnostic distance info.
+    """
+    ne = normalize(expected)
+    na = normalize(actual)
+    dist = levenshtein(ne, na)
+    return (dist <= MAX_EDIT_DISTANCE, dist)
