@@ -1048,6 +1048,69 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter._adjust_size()
         self.assertEqual(adapter.current_size, before)
 
+    def test_total_records_tracks_actual_adjustments(self):
+        """total_records must count only actual size changes — blocked adjustments are excluded."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=2, max_size=50,
+        )
+        # Initial state: no adjustments yet.
+        self.assertEqual(adapter.total_records, 0)
+
+        # First success on empty window → rate=1.0 > high_threshold=0.9 → increase; (10*3)//2 = 15 ≤ max=50 → actual change.
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 15)
+        self.assertEqual(adapter.total_records, 1)
+
+        # Second success: rate=1.0 > 0.9 → increase; (15*3)//2 = 22 ≤ 50 → actual change.
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 22)
+        self.assertEqual(adapter.total_records, 2)
+
+        # Third success: rate=1.0 > 0.9 → increase; (22*3)//2 = 33 ≤ 50 → actual change.
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.current_size, 33)
+        self.assertEqual(adapter.total_records, 3)
+
+    def test_total_records_resets_with_reset(self):
+        """reset() must clear total_records to zero alongside other state."""
+        adapter = BatchSizeAdapter(initial_size=20, min_size=5, window_size=3, max_size=100)
+        # Drive size changes.
+        for _ in range(6):
+            adapter.record_outcome(1.0)
+        self.assertGreater(adapter.total_records, 0)
+
+        before_reset = adapter.total_records
+        adapter.reset()
+        self.assertEqual(adapter.total_records, 0)
+        self.assertNotEqual(before_reset, 0)
+
+    def test_total_records_excludes_blocked_adjustments(self):
+        """When size is pinned at max/min across consecutive records, total_records must not increment."""
+        # Pin at max_size: consecutive successes that would increase beyond cap.
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=2, max_size=10,
+        )
+        self.assertEqual(adapter.total_records, 0)
+
+        for _ in range(6):
+            adapter.record_outcome(1.0)
+        # Size pinned at initial (max) → no actual changes logged.
+        history_len = len(adapter.size_history())
+        self.assertGreaterEqual(history_len, 1)
+        self.assertEqual(adapter.total_records, 0)
+
+    def test_total_records_in_metrics(self):
+        """get_metrics must reflect total_records as a numeric field."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2, max_size=50)
+        metrics = adapter.get_metrics()
+        self.assertEqual(metrics["total_records"], 0)
+
+        # Drive one actual adjustment.
+        for _ in range(3):
+            adapter.record_outcome(1.0)
+        metrics = adapter.get_metrics()
+        self.assertGreaterEqual(metrics["total_records"], 1)
+
     def test_adjust_size_max_cap_enforced_direct(self):
         """_adjust_size increase must clamp to max_size even when formula exceeds it."""
         adapter = BatchSizeAdapter(

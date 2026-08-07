@@ -36,7 +36,7 @@ class CsvCodec:
         if not path.exists():
             raise FileNotFoundError(f"CSV file not found: {path}")
 
-        with path.open("r", encoding="utf-8", newline="") as handle:
+        with path.open("r", encoding="utf-8-sig", newline="") as handle:
             reader = csv.reader(handle)
             rows = list(reader)
 

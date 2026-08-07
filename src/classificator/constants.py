@@ -39,7 +39,8 @@ USER_INPUT_PLACEHOLDER = "{{INPUT_JSON}}"
 
 _RE = __import__("re").compile(r"^\{\{[A-Z_]+\}\}$")
 
-_PLACEHOLDER_DEFS = (
+# Validate all placeholder constants at import time.
+for _name, _value in (
     ("REBALANCE_FROM_LEVEL_PLACEHOLDER", REBALANCE_FROM_LEVEL_PLACEHOLDER),
     ("REBALANCE_TO_LEVEL_PLACEHOLDER", REBALANCE_TO_LEVEL_PLACEHOLDER),
     ("REBALANCE_OTHER_LEVEL_PLACEHOLDER", REBALANCE_OTHER_LEVEL_PLACEHOLDER),
@@ -47,20 +48,13 @@ _PLACEHOLDER_DEFS = (
     ("REBALANCE_COMMON_LEVEL_PLACEHOLDER", REBALANCE_COMMON_LEVEL_PLACEHOLDER),
     ("REBALANCE_COMMON_COUNT_PLACEHOLDER", REBALANCE_COMMON_COUNT_PLACEHOLDER),
     ("USER_INPUT_PLACEHOLDER", USER_INPUT_PLACEHOLDER),
-)
-
-
-def _validate_placeholders() -> None:
-    for name, value in _PLACEHOLDER_DEFS:
-        if not _RE.match(value):
-            raise ValueError(
-                f"Placeholder '{name}' has invalid format: "
-                f"'{value}' — expected double-brace uppercase token "
-                f"(e.g. '{{{{FROM_LEVEL}}}}')."
-            )
-
-
-_validate_placeholders()
+):
+    if not _RE.match(_value):
+        raise ValueError(
+            f"Placeholder '{_name}' has invalid format: "
+            f"'{_value}' — expected double-brace uppercase token "
+            f"(e.g. '{{{{FROM_LEVEL}}}}')."
+        )
 
 _CSV_HEADERS = {
     "base": ["word_id", "word", "type"],
