@@ -134,6 +134,73 @@ def test_matches_prefix_short_circuit_reject():
     assert matches("abcde", "abxyz") is True
 
 
+def test_matches_empty_string_asymmetry():
+    """Empty-string handling must be deterministic and asymmetric.
+
+    matches("", "") == True (zero edit distance).
+    matches("", "a") depends on len diff: 1→accept, 2→accept, >2→reject.
+    matches("a", "") is symmetric with matches("", "a").
+    """
+    assert matches("", "") is True
+    # len diff = 1 ≤ MAX_EDIT_DISTANCE → edit dist=1 → accept
+    assert matches("", "a") is True
+    # len diff = 2 == MAX_EDIT_DISTANCE boundary → accept
+    assert matches("", "ab") is True
+    # len diff = 3 > MAX_EDIT_DISTANCE → short-circuit reject
+    assert matches("", "abc") is False
+    # symmetric: "a" vs "" same as "" vs "a"
+    assert matches("a", "") is True
+
+
+def test_matches_diactritic_prefix_short_circuit():
+    """Prefix short-circuit must work correctly after diacritic normalization.
+
+    The function normalizes both strings before computing prefix mismatches,
+    so diacritics that fold to the same normalized form should not cause spurious mismatches.
+    """
+    # "ăa" vs "aa": normalize→("aa","aa"), 3/3 prefix match → accept
+    assert matches("ăa", "aa") is True
+    # "băt" vs "bat": normalize→("bat","bat"), 3/3 prefix match → accept
+    assert matches("băt", "bat") is True
+    # "înțeles" vs "ințeles": after norm both are "inteles"; first 3 chars differ (i/n mismatch at pos 0)
+    # So mismatches=1, len_diff=0 → prefix short-circuit accepts
+    assert matches("înțeles", "inteles") is True
+
+
+def test_matches_short_string_overlap_boundary():
+    """Short-string overlap path fires only when max(len(ne), len(na)) <= 2.
+
+    At length > 2 the overlap shortcut must NOT apply — edit distance decides instead.
+    """
+    # len=3: "abc" vs "abd" → share 'ab', but max len=3>2 so no short-string overlap;
+    # edit dist = 1 ≤ MAX_EDIT_DISTANCE → accept via full path
+    assert matches("abc", "abd") is True
+    # len=3: "cat" vs "xyz" → no overlap, edit dist=3 > MAX_EDIT_DISTANCE → reject
+    assert matches("cat", "xyz") is False
+    # len=2 boundary: max(len)=2 → overlap path; "cd" vs "ef" no overlap;
+    # but edit dist = 4 > 2 → still reject (overlap path skipped when set intersection empty)
+    assert matches("cd", "ef") is False
+
+
+def test_matches_single_char_exact_and_mismatch():
+    """Single character: exact match and single-edit-distance determinism."""
+    # Exact after normalization
+    assert matches("a", "a") is True
+    assert matches("ă", "a") is True  # diacritic fold
+    # Single-char mismatch: len=1 each, edit dist = 1 ≤ MAX_EDIT_DISTANCE → accept via edit distance
+    assert matches("a", "b") is True
+    # Empty vs single char: handled by length-diff path (already in test_matches_empty_string_asymmetry)
+
+
+def test_levenshtein_symmetric_and_zero_cost():
+    """Levenshtein must be symmetric and handle zero-cost substitutions correctly."""
+    assert levenshtein("abc", "axc") == 1  # one substitution
+    assert levenshtein("axc", "abc") == 1  # symmetric
+    # Repeated chars: "aab" vs "ab" → remove one 'a' (insertion cost)
+    assert levenshtein("aab", "ab") == 1
+    assert levenshtein("ab", "aab") == 1
+
+
 if __name__ == "__main__":
     import unittest
     unittest.main()
