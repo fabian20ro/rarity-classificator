@@ -37,7 +37,18 @@ class WordStore:
             rows = cur.fetchall()
         return [WordLevel(word_id=r[0], rarity_level=r[1]) for r in rows]
 
+    @staticmethod
+    def _validate_update_payload(updates: dict[int, int]) -> None:
+        for level in updates.values():
+            if not isinstance(level, int):
+                raise TypeError(
+                    f"Level must be an integer, got {type(level).__name__}"
+                )
+            if not (1 <= level <= 5):
+                raise ValueError(f"Level must be in range 1..5, got {level}")
+
     def update_rarity_levels(self, updates: dict[int, int]) -> None:
+        self._validate_update_payload(updates)
         if not updates:
             return
         with self._connect() as conn, conn.cursor() as cur:
@@ -48,6 +59,7 @@ class WordStore:
     def update_rarity_levels_chunked(self, updates: dict[int, int], chunk_size: int = 5000) -> None:
         if chunk_size <= 0:
             raise ValueError("chunk_size must be positive")
+        self._validate_update_payload(updates)
         if not updates:
             return
         items = list(updates.items())
