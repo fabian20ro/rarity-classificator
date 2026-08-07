@@ -256,6 +256,10 @@ class TestBatchSizeAdapter(unittest.TestCase):
         # success_rate returns 1.0 when outcomes empty (existing contract);
         # trend reflects that default → "increasing" under default thresholds
         self.assertEqual(adapter.success_rate(), 1.0)
+        # step_count, total_records, and size_history must also reset to initial state
+        self.assertEqual(adapter.step_count, 0)
+        self.assertEqual(adapter.total_records, 0)
+        self.assertEqual(adapter.size_history(), [(0, 10)])
 
     def test_reset_preserves_config(self):
         """reset() must not alter constructor-set parameters."""
