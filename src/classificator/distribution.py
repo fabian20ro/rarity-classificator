@@ -20,8 +20,7 @@ class RarityDistribution:
             d.increment(level)
         return d
 
-    @staticmethod
-    def _validate_level(level: int) -> None:
+    def _validate_level(self, level: int) -> None:
         if not isinstance(level, int):
             raise TypeError(
                 f"Level must be an integer, got {type(level).__name__}"
