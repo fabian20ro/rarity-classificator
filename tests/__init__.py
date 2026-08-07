@@ -45,6 +45,23 @@ class TestTopLevelExports(unittest.TestCase):
             cls = getattr(__import__("classificator.lm", fromlist=[name]), name)
             self.assertTrue(callable(cls), f"{name} is not callable")
 
+    def test_lm_package_exports_no_drift_from_all(self):
+        """lm.__all__ must match the module's public symbol set exactly.
+
+        Production contract (classificator.lm.__init__.py):
+            The re-export surface declared in __all__ must equal the visible
+            public names on the package — catches drift when a new class is
+            imported into lm/__init__.py without being added to __all__, or
+            when a name is removed from both places inconsistently.
+
+        Negative test: if any symbol appears in dir(module) that isn't in
+        __all__, or vice versa, the contract has drifted and must fail.
+        """
+        import classificator.lm as lm_pkg
+        exported = set(lm_pkg.__all__)
+        public_names = {n for n in dir(lm_pkg) if not n.startswith("_") and callable(getattr(lm_pkg, n))}
+        self.assertEqual(exported, public_names, f"lm exports drift: declared={sorted(exported)}, visible={sorted(public_names)}")
+
 
 class TestPackageIntegrity(unittest.TestCase):
     def test_batch_size_adapter_import(self):
@@ -169,6 +186,57 @@ class TestValidateSteps(unittest.TestCase):
             self.assertIn("options", str(errors[0]))
         finally:
             steps_mod._STEPS = tuple(original)
+
+
+class TestScoringContextContract(unittest.TestCase):
+    """Verify ScoringContext is constructable through the lm package surface."""
+
+    def test_scoring_context_constructs_via_lm_reexport(self):
+        from classificator.lm import ScoringContext
+        from classificator.models import LmApiFlavor
+
+        ctx = ScoringContext(
+            run_slug="test_run",
+            model="qwen2.5:14b",
+            endpoint="http://localhost:1234/v1/chat/completions",
+            max_retries=3,
+            timeout_seconds=60,
+            run_log_path=Path("/tmp/run.jsonl"),
+            failed_log_path=Path("/tmp/failed.jsonl"),
+            system_prompt="test prompt",
+            user_template="test template",
+            flavor=LmApiFlavor.LMSTUDIO_REST,
+            max_tokens=1000,
+        )
+
+        self.assertEqual(ctx.run_slug, "test_run")
+        self.assertEqual(ctx.model, "qwen2.5:14b")
+        self.assertEqual(ctx.max_retries, 3)
+        self.assertEqual(ctx.timeout_seconds, 60)
+        self.assertEqual(ctx.max_tokens, 1000)
+        self.assertEqual(ctx.flavor, LmApiFlavor.LMSTUDIO_REST)
+
+    def test_scoring_context_is_frozen(self):
+        """Frozen dataclass must reject attribute assignment."""
+        from classificator.lm import ScoringContext
+        from classificator.models import LmApiFlavor
+
+        ctx = ScoringContext(
+            run_slug="test_run",
+            model="qwen2.5:14b",
+            endpoint="http://localhost:1234/v1/chat/completions",
+            max_retries=3,
+            timeout_seconds=60,
+            run_log_path=Path("/tmp/run.jsonl"),
+            failed_log_path=Path("/tmp/failed.jsonl"),
+            system_prompt="test prompt",
+            user_template="test template",
+            flavor=LmApiFlavor.LMSTUDIO_REST,
+            max_tokens=1000,
+        )
+
+        with self.assertRaises(AttributeError):
+            ctx.run_slug = "mutated"
 
 
 if __name__ == "__main__":
