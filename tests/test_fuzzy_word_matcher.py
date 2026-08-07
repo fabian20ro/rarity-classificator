@@ -125,12 +125,24 @@ def test_matches_short_string_overlap():
     assert matches("ab", "cd") is False
 
 
-def test_matches_prefix_short_circuit_reject():
-    """Prefix short-circuit must NOT accept when prefix match is insufficient or length diff > 1."""
+def test_matches_prefix_short_circuit_insufficient_match_rejects():
+    """Prefix short-circuit must NOT accept when prefix match is insufficient.
+
+    When mismatches > 1 in the common prefix (or length diff > 1), the prefix
+    short-circuit does not trigger; full edit-distance decides. If edit distance
+    exceeds MAX_EDIT_DISTANCE, the result is False.
+    """
     # "cat" vs "xyz": 0/3 prefix match → prefix check fails, edit dist=3 > 2 → reject
     assert matches("cat", "xyz") is False
-    # "abcde" vs "abxyz": 2/5 prefix match but len diff=0; common_prefix < 3-1=2? No — 2>=2.
-    # Actually common_prefix=2 >= 2, len_diff=0 → should accept via prefix short-circuit
+
+
+def test_matches_prefix_short_circuit_sufficient_match_accepts():
+    """Prefix short-circuit must accept when ≥2 of first 3 chars match and len diff ≤1.
+
+    This verifies the acceptance path of the prefix short-circuit independently
+    from the rejection logic, so regressions in either direction are detectable.
+    """
+    # "abcde" vs "abxyz": common_prefix=2 (a,b), len_diff=0 → accept via prefix short-circuit
     assert matches("abcde", "abxyz") is True
 
 
