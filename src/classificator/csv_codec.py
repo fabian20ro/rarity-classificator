@@ -71,14 +71,13 @@ class CsvCodec:
             )
 
     def _validate_row(self, row: list[str], expected: int, label: str) -> None:
-        """Skip blank rows; validate column count via `_validate_row_length`.
+        """Validate column count via `_validate_row_length`.
 
-        A row is considered blank when it contains a single empty string
-        (e.g. the csv reader produced [''] for an entirely-empty line). All
-        other length mismatches raise CsvFormatError using the provided label.
+        A fully blank CSV line (single empty string from csv.reader) is no
+        longer silently accepted here — trailing-blank tolerance is handled
+        at the call site in `read_table` after all rows are collected. Middle
+        blanks must raise so corrupt data does not pass through silently.
         """
-        if len(row) == 1 and row[0] == "":
-            return
         self._validate_row_length(len(row), expected, label)
 
     def _ensure_dir(self, path: Path) -> None:
