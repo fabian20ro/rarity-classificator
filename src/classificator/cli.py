@@ -376,6 +376,11 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _add_prompt_files_args(parser, system_prompt_default="prompts/system_prompt_ro.txt", user_template_default="prompts/user_prompt_template_ro.txt"):
+    parser.add_argument("--system-prompt-file", default=system_prompt_default)
+    parser.add_argument("--user-template-file", default=user_template_default)
+
+
 def _add_step2_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--run", required=True)
     parser.add_argument("--model", required=True)
@@ -391,8 +396,7 @@ def _add_step2_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--force", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--endpoint")
     parser.add_argument("--base-url")
-    parser.add_argument("--system-prompt-file", default="prompts/system_prompt_ro.txt")
-    parser.add_argument("--user-template-file", default="prompts/user_prompt_template_ro.txt")
+    _add_prompt_files_args(parser)
     parser.add_argument("--dry-run", action="store_true", help="Simulate the run without calling the LM or writing output CSVs")
 
 
@@ -448,8 +452,7 @@ def _add_step5_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--to-level", type=int, help="Target level (required if --from-level is provided)")
     parser.add_argument("--transitions", default=DEFAULT_REBALANCE_TRANSITIONS)
 
-    parser.add_argument("--system-prompt-file", default="prompts/rebalance_system_prompt_ro.txt")
-    parser.add_argument("--user-template-file", default="prompts/rebalance_user_prompt_template_ro.txt")
+    _add_prompt_files_args(parser, system_prompt_default="prompts/rebalance_system_prompt_ro.txt", user_template_default="prompts/rebalance_user_prompt_template_ro.txt")
     parser.add_argument("--dry-run", action="store_true", help="Simulate the run without writing the output CSV")
 
 
