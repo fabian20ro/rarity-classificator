@@ -86,6 +86,19 @@ class TestCsvCodec(unittest.TestCase):
             self.codec.read_table(path)
         self.assertIn("header column 1 is empty", str(cm.exception))
 
+    def test_read_table_bom_stripped(self):
+        path = self.test_dir / "bom.csv"
+        # Write a CSV with a leading UTF-8 BOM (EF BB BF).
+        with open(path, "wb") as f:
+            f.write(b"\xef\xbb\xbf")
+            f.write("id,name\n1,test_id\n2,test_name".encode())
+
+        table = self.codec.read_table(path)
+        # First header must be clean — not "\ufeffid"
+        self.assertEqual(table.headers, ["id", "name"])
+        self.assertEqual(len(table.records), 2)
+        self.assertEqual(table.records[0].values, ["1", "test_id"])
+
     def test_read_table_completely_blank_middle_row_raises(self):
         path = self.test_dir / "blank_multi.csv"
         with open(path, "w", encoding="utf-8", newline="") as f:
