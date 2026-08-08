@@ -58,7 +58,7 @@ class ResponseParserTest(unittest.TestCase):
 
     def test_selected_word_ids_rejects_zero_based_positions(self):
         body = self._wrap_content("[0]")
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(RuntimeError) as ctx:
             self.parser.parse(
                 batch=self.batch,
                 response_body=body,
@@ -66,6 +66,7 @@ class ResponseParserTest(unittest.TestCase):
                 forced_rarity_level=1,
                 expected_items=1,
             )
+        self.assertIn("out of range", str(ctx.exception))
 
     def test_selected_word_ids_enforces_exact_count(self):
         body = self._wrap_content("[1]")
@@ -126,7 +127,7 @@ class ResponseParserTest(unittest.TestCase):
 
     def test_score_results_rejects_float_ids(self):
         body = self._wrap_content('[{"word_id": 102.5, "word": "casă", "type": "N", "rarity_level": 2, "tag": "test", "confidence": 1.0}]')
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(RuntimeError) as ctx:
             self.parser.parse(
                 batch=self.batch,
                 response_body=body,
@@ -134,6 +135,7 @@ class ResponseParserTest(unittest.TestCase):
                 forced_rarity_level=None,
                 expected_items=None,
             )
+        self.assertIn("missing or invalid word_id", str(ctx.exception))
 
     def test_selected_word_ids_strips_code_fences_from_model_content(self):
         body = self._wrap_content("```json\n[1]\n```")

@@ -12,13 +12,12 @@ def sanitize_run_slug(raw: str) -> str:
     normalized = raw.strip().lower()
     normalized = unicodedata.normalize("NFC", normalized).casefold()
     valid = "".join(ch for ch in normalized if ch.isalnum() or ch == "_")
-    if not valid:
+    if not valid or len(valid) > 40:
         raise ValueError(
-            f"Invalid run slug '{raw}'. Result is empty after sanitization."
-        )
-    if len(valid) > 40:
-        raise ValueError(
-            f"Invalid run slug '{raw}'. Length {len(valid)} exceeds maximum of 40 chars"
+            f"Invalid run slug '{raw}'."
+            + (" Result is empty after sanitization."
+               if not valid
+               else f" Length {len(valid)} exceeds maximum of 40 chars")
         )
     return valid
 

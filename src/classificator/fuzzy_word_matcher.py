@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import unicodedata
+
 MAX_EDIT_DISTANCE = 2
 DIACRITICS_MAP = str.maketrans(
     {
@@ -22,7 +24,9 @@ DIACRITICS_MAP = str.maketrans(
 
 
 def normalize(text: str) -> str:
-    return text.translate(DIACRITICS_MAP).lower()
+    decomposed = unicodedata.normalize("NFKD", text)
+    ascii_only = decomposed.encode("ascii", "ignore").decode("ascii")
+    return ascii_only.translate(DIACRITICS_MAP).lower()
 
 
 def levenshtein(a: str, b: str) -> int:
