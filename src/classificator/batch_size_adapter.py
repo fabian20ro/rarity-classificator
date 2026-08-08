@@ -117,6 +117,10 @@ class BatchSizeAdapter:
         return list(self._size_changes)
 
     def record_outcome(self, success_ratio: float) -> None:
+        if not isinstance(success_ratio, (int, float)):
+            raise TypeError(
+                f"success_ratio must be numeric, got {type(success_ratio).__name__}"
+            )
         normalized = max(0.0, min(1.0, success_ratio))
         success = normalized >= self.success_threshold
         self.outcomes.append(success)
