@@ -187,7 +187,7 @@ class RunCsvRepository:
         raw = row.get(key, "")
         try:
             return float(raw)
-        except Exception as exc:
+        except ValueError as exc:
             raise CsvFormatError(f"Invalid {key} at {path}:{line}") from exc
 
     def _require_non_blank(self, path: Path, line: int, row: dict[str, str], key: str) -> str:
