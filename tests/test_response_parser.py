@@ -58,7 +58,7 @@ class ResponseParserTest(unittest.TestCase):
 
     def test_selected_word_ids_rejects_zero_based_positions(self):
         body = self._wrap_content("[0]")
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(RuntimeError) as ctx:
             self.parser.parse(
                 batch=self.batch,
                 response_body=body,
@@ -66,6 +66,7 @@ class ResponseParserTest(unittest.TestCase):
                 forced_rarity_level=1,
                 expected_items=1,
             )
+        self.assertIn("out of range", str(ctx.exception))
 
     def test_selected_word_ids_enforces_exact_count(self):
         body = self._wrap_content("[1]")
