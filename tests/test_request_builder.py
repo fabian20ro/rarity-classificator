@@ -73,7 +73,7 @@ class RequestBuilderTest(unittest.TestCase):
             )
 
     def test_selected_word_ids_require_positive_expected_count_even_without_json_schema(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as ctx:
             self.builder.build_request(
                 model="test-model",
                 batch=self.batch,
@@ -83,9 +83,10 @@ class RequestBuilderTest(unittest.TestCase):
                 include_reasoning_controls=False,
                 config=self.config,
                 max_tokens=512,
-                expected_items=0,
+                expected_items=-1,
                 schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
             )
+        self.assertIn("expected_items is required for selected-word-id mode", str(ctx.exception))
 
     def test_selected_word_ids_reject_impossible_expected_count_even_without_json_schema(self):
         with self.assertRaises(ValueError):
@@ -210,6 +211,22 @@ class RequestBuilderTest(unittest.TestCase):
                 schema_kind=JsonSchemaKind.SCORE_RESULTS,
             )
         self.assertIn("expected_items must be positive", str(ctx.exception))
+
+    def test_score_results_mode_rejects_zero_expected_items_when_specified(self):
+        with self.assertRaises(ValueError) as ctx:
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_SCHEMA,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=512,
+                expected_items=0,
+                schema_kind=JsonSchemaKind.SCORE_RESULTS,
+            )
+        self.assertIn("must be positive", str(ctx.exception))
 
     def test_build_request_rejects_non_positive_max_tokens(self):
         with self.assertRaises(ValueError) as ctx:
