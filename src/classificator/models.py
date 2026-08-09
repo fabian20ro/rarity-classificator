@@ -158,6 +158,10 @@ class LmModelConfig:
     enable_thinking: bool | None = None
     thinking_type: str | None = None
 
+    def __post_init__(self) -> None:
+        if self.temperature < 0 or self.temperature > 1:
+            raise ValueError("temperature must be between 0 and 1")
+
     def has_reasoning_controls(self) -> bool:
         return any(
             [
