@@ -89,6 +89,8 @@ def _close_unclosed_structures(input_text: str) -> str:
                 if stack and stack[-1] == '"':
                     stack.pop()
                 in_string = False
+            else:
+                pass
             continue
 
         if ch == '"':
