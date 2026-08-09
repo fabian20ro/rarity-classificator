@@ -56,6 +56,8 @@ class LmStudioRequestBuilder:
         elif schema_kind == JsonSchemaKind.SCORE_RESULTS:
             if expected_items is not None and expected_items <= 0:
                 raise ValueError("expected_items must be positive when specified for score-results mode")
+            if expected_items is not None and expected_items > len(batch):
+                raise ValueError("expected_items cannot exceed batch size in score-results mode")
 
         if schema_kind == JsonSchemaKind.SCORE_RESULTS:
             entries = [
