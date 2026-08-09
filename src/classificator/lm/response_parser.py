@@ -297,7 +297,12 @@ class LmStudioResponseParser:
             if val:
                 return val
 
-        return _content_text(root.get("output_text"))
+        output_text = root.get("output_text")
+        if isinstance(output_text, str) and output_text.strip():
+            return output_text.strip()
+
+        # Reject empty/missing content explicitly rather than returning None silently
+        raise RuntimeError("LM response has no usable assistant content")
 
     def _parse_content_json(self, content: str) -> object:
         try:
