@@ -16,7 +16,7 @@ class Step1Options:
 
 
 def run_step1(options: Step1Options, *, word_store: WordStore, repo: RunCsvRepository) -> Path | None:
-    rows = [[str(w[0]), w[1], w[2]] for w in sorted(word_store.fetch_all_words(), key=itemgetter(0))]
+    rows = [[str(w_id), w_word, w_type] for w_id, w_word, w_type in sorted(word_store.fetch_all_words(), key=lambda w: w[0])]
     word_count = len(rows)
     if options.dry_run:
         print(f"Step 1 dry-run. Would export {word_count} words to {options.output_csv_path}")
