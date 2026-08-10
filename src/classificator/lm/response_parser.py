@@ -277,6 +277,10 @@ class LmStudioResponseParser:
             self.metrics.record_fuzzy_match()
         return row
 
+    def _record_repair(self, original: str, repaired: str) -> None:
+        if repaired != original and self.metrics:
+            self.metrics.record_json_repair()
+
     def _extract_model_content(self, root: object) -> str | None:
         if not isinstance(root, dict):
             return None
