@@ -134,8 +134,10 @@ class TestValidateSteps(unittest.TestCase):
         steps_mod._STEPS = tuple(modified)
 
         try:
-            with self.assertRaises(ValueError):
+            with self.assertRaises(ValueError) as ctx:
                 _validate_steps()
+            error_text = str(ctx.exception)
+            self.assertIn("not callable", error_text)
         finally:
             steps_mod._STEPS = tuple(original)
 
