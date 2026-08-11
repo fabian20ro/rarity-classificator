@@ -1449,6 +1449,55 @@ class TestBatchSizeAdapter(unittest.TestCase):
         BatchSizeAdapter(initial_size=10, success_threshold=0.0)
         BatchSizeAdapter(initial_size=10, success_threshold=1.0)
 
+    def test_step_count_vs_total_records(self):
+        """step_count increments per record_outcome; total_records only when size actually changes."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=2, max_size=100,
+        )
+        # Both counters start at 0.
+        self.assertEqual(adapter.step_count, 0)
+        self.assertEqual(adapter.total_records, 0)
+
+        # Record a success — rate=1.0 > high_threshold=0.9 → increase: (10*3)//2 = 15
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.step_count, 1)
+        self.assertEqual(adapter.total_records, 1)  # size changed from 10→15
+
+        # Record a failure — window=[T,F], rate=0.5 == stable → no adjust
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.step_count, 2)
+        self.assertEqual(adapter.total_records, 1)  # size unchanged (stable band)
+
+        # Another failure — window=[F,F], rate=0.0 < low_threshold=0.5 → decrease: max(3, 15*2//3)=10
+        adapter.record_outcome(0.0)
+        self.assertEqual(adapter.step_count, 3)
+        self.assertEqual(adapter.total_records, 2)  # size changed from 15→10
+
+    def test_step_count_vs_total_records_no_change(self):
+        """When window rate is stable (no adjustment), step_count advances but total_records stays put."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)
+
+        # Two records to fill the window so rate reflects them.
+        adapter.record_outcome(0.9)  # classified as success (>=0.9), rate=1.0 > high_threshold → no change at max cap
+        self.assertEqual(adapter.step_count, 1)
+        self.assertEqual(adapter.total_records, 0)
+
+        adapter.record_outcome(0.0)  # failure; window=[True,False], rate=0.5 == stable (low_threshold=0.5) → no adjust
+        self.assertEqual(adapter.step_count, 2)
+        self.assertEqual(adapter.total_records, 0)  # size unchanged
+
+    def test_total_records_reset(self):
+        """reset() zeroes total_records and step_count."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)
+        for _ in range(5):
+            adapter.record_outcome(0.0)
+        self.assertGreater(adapter.step_count, 0)
+        self.assertGreater(adapter.total_records, 0)
+
+        adapter.reset()
+        self.assertEqual(adapter.step_count, 0)
+        self.assertEqual(adapter.total_records, 0)
+
 
 if __name__ == "__main__":
     unittest.main()
