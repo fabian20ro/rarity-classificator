@@ -154,6 +154,7 @@ class TestValidateSteps(unittest.TestCase):
         try:
             errors = _vm()
             self.assertEqual(len(errors), 1)
+            self.assertIn("step1", str(errors[0]))
             self.assertIn("not callable", str(errors[0]))
         finally:
             steps_mod._STEPS = tuple(original)
