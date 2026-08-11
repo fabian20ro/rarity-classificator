@@ -406,6 +406,86 @@ class QualityAuditTest(unittest.TestCase):
                     repo=self.repo,
                 )
 
+    def test_non_l1_words_excluded_from_anchor_matching(self):
+        """Non-L1 words in anchors must not affect precision/recall — only L1 rows count."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            reference = root / "reference.csv"
+            anchor = root / "anchor.txt"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            cand_rows = [
+                # L1 words (level 1) — these participate in anchor matching
+                ["1", "mâncare", "N", "1"],
+                ["2", "casă", "N", "1"],
+                # Non-L1 words (level 3) — must NOT affect anchor precision/recall
+                ["3", "obscurantism", "N", "3"],
+                ["4", "quiddity", "A", "5"],
+            ]
+            ref_rows = [
+                ["10", "mâncare", "N", "2"],
+                ["11", "casă", "N", "2"],
+                ["12", "obscurantism", "N", "3"],
+                ["13", "quiddity", "A", "5"],
+            ]
+
+            self._write_csv(candidate, headers, cand_rows)
+            self._write_csv(reference, headers, ref_rows)
+            # Anchor file contains both L1 and non-L1 words.
+            # Anchor intersection uses candidate["l1_words"] (line 58 of quality_audit.py),
+            # so only "mâncare" and "casă" participate in the match.
+            anchor.write_text("mâncare\ncasă\nobscurantism\nquiddity", encoding="utf-8")
+
+            result = run_quality_audit(
+                candidate_csv=candidate,
+                reference_csv=reference,
+                anchor_l1_file=anchor,
+                repo=self.repo,
+            )
+
+            # Jaccard uses l1_word_ids (int IDs) — different word_ids → 0.
+            self.assertEqual(result.l1_jaccard, 0.0)
+            self.assertEqual(result.l1_intersection, 0)
+
+            # Anchor matching: candidate["l1_words"] = {"mâncare", "casă"}
+            # anchor words = {"mâncare", "casă", "obscurantism", "quiddity"}
+            # intersection = {"mâncare", "casă"}, size 2
+            # precision = 2 / len(candidate["l1_words"]) = 2 / 2 = 1.0
+            self.assertEqual(result.anchor_precision, 1.0)
+            # recall = 2 / len(anchors) = 2 / 4 = 0.5
+            self.assertAlmostEqual(result.anchor_recall, 0.5)
+
+    def test_distribution_counts_exact_for_multi_level_dataset(self):
+        """Distribution dict must count each level precisely; total_rows excludes blanks."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            cand_rows = [
+                # 3 words at level 1, 2 at level 2, 1 at level 3, none at 4 or 5.
+                ["1", "om", "N", "1"],
+                ["2", "casă", "N", "1"],
+                ["3", "apă", "N", "1"],
+                ["4", "muncă", "A", "2"],
+                ["5", "timp", "N", "2"],
+                ["6", "rarissim", "A", "3"],
+            ]
+            self._write_csv(candidate, headers, cand_rows)
+
+            result = run_quality_audit(
+                candidate_csv=candidate,
+                repo=self.repo,
+            )
+
+            self.assertTrue(result.passed)
+            # total_rows must count all non-blank rows exactly.
+            self.assertEqual(result.total_rows, 6)
+            # Distribution dict must be exact for every level.
+            expected = {1: 3, 2: 2, 3: 1, 4: 0, 5: 0}
+            self.assertEqual(result.distribution, expected)
+
 
 if __name__ == "__main__":
     unittest.main()
