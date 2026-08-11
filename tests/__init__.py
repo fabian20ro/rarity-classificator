@@ -178,6 +178,25 @@ class TestValidateSteps(unittest.TestCase):
         finally:
             steps_mod._STEPS = tuple(original)
 
+    def test_validate_raises_on_step3_invalid_entry(self):
+        from classificator.steps import validate_steps as _validate_steps
+        from classificator.steps import _STEPS
+
+        original = list(_STEPS)
+        modified = [(name, label, func if name != "step3" else None) for name, label, func in original]
+        import classificator.steps as steps_mod
+
+        steps_mod._STEPS = tuple(modified)
+
+        try:
+            with self.assertRaises(ValueError) as ctx:
+                _validate_steps()
+            error_text = str(ctx.exception)
+            self.assertIn("step3", error_text)
+            self.assertIn("not callable", error_text)
+        finally:
+            steps_mod._STEPS = tuple(original)
+
 
 class TestScoringContextContract(unittest.TestCase):
     """Verify ScoringContext is constructable through the lm package surface."""
