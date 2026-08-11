@@ -77,7 +77,10 @@ class LmStudioRequestBuilder:
             user_prompt = f"{user_template}\n\nIntrări:\n{entries_json}"
 
         if schema_kind == JsonSchemaKind.SCORE_RESULTS:
-            estimated = len(batch) * self.SCORE_TOKENS_PER_ITEM + self.SCORE_BASE_TOKENS
+            avg_chars = sum(len(row.word) for row in batch) / len(batch) if batch else 1
+            content_factor = max(0.5, min(2.0, avg_chars / 4))
+            adjusted_per_item = int(self.SCORE_TOKENS_PER_ITEM * content_factor)
+            estimated = len(batch) * adjusted_per_item + self.SCORE_BASE_TOKENS
             effective = max(self.SCORE_MIN_MAX_TOKENS, min(estimated, max_tokens))
         else:
             expected = max(1, expected_items or 1)

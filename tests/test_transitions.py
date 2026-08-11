@@ -160,5 +160,22 @@ class TransitionsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse_transitions(" ")
 
+    def test_parse_transitions_negative_number_rejected(self):
+        # Negative integers should be rejected at int-parse time or by validation.
+        with self.assertRaises((ValueError, Exception)):
+            parse_transitions("-1:0")
+
+    def test_require_valid_pair_transition_out_of_range_target(self):
+        # Target outside 1..5 is invalid even if sources are valid.
+        with self.assertRaises(ValueError):
+            require_valid_pair_transition(2, 3, 6)
+        with self.assertRaises(ValueError):
+            require_valid_pair_transition(2, 3, 0)
+
+    def test_require_valid_pair_transition_source_range(self):
+        # Source levels outside 1..5 are invalid.
+        with self.assertRaises(ValueError):
+            require_valid_pair_transition(-1, 0, 1)
+
 if __name__ == "__main__":
     unittest.main()
