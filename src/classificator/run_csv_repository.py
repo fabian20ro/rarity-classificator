@@ -178,6 +178,8 @@ class RunCsvRepository:
 
     def _parse_int(self, path: Path, line: int, row: dict[str, str], key: str) -> int:
         raw = row.get(key, "")
+        if not raw.strip():
+            raise CsvFormatError(f"Blank {key} at {path}:{line}")
         try:
             return int(raw)
         except ValueError as exc:
