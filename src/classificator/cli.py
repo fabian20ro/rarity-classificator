@@ -452,8 +452,13 @@ def _add_step5_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--to-level", type=int, help="Target level (required if --from-level is provided)")
     parser.add_argument("--transitions", default=DEFAULT_REBALANCE_TRANSITIONS)
 
-    _add_prompt_files_args(parser, system_prompt_default="prompts/rebalance_system_prompt_ro.txt", user_template_default="prompts/rebalance_user_prompt_template_ro.txt")
+    _add_step5_prompt_files_args(parser)
     parser.add_argument("--dry-run", action="store_true", help="Simulate the run without writing the output CSV")
+
+
+def _add_step5_prompt_files_args(parser, system_prompt_default="prompts/rebalance_system_prompt_ro.txt", user_template_default="prompts/rebalance_user_prompt_template_ro.txt"):
+    parser.add_argument("--system-prompt-file", default=system_prompt_default)
+    parser.add_argument("--user-template-file", default=user_template_default)
 
 
 def _count_pending(source_csv: Path, output_csv: Path, force: bool = False) -> int:
