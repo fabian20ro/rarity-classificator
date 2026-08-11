@@ -137,6 +137,32 @@ class TestStep1Export(unittest.TestCase):
         word_ids = [int(r[0]) for r in rows]
         self.assertEqual(word_ids, sorted(word_ids), msg="words must be sorted by word_id ascending")
 
+    def test_run_step1_sorts_by_word_id_mixed_sign(self):
+        # Mixed-sign IDs: negative/zero/positive. A string sort would put '-'
+        # before digits (wrong ordering). Only int-sort via itemgetter(0) gives
+        # the mathematically correct ascending order.
+        mixed_words = [
+            (1,   "zebra",  "animal"),  # id=1   positive
+            (-5,  "alpha",  "letter"),  # id=-5  negative
+            (0,   "middle", "symbol"),   # id=0   zero
+        ]
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = mixed_words
+        options = Step1Options(output_csv_path=self.output_csv)
+        result_path = run_step1(options, word_store=store, repo=self.mock_repo)
+
+        self.assertEqual(result_path, self.output_csv)
+        args, _ = self.mock_repo.write_rows.call_args
+        rows = args[2]
+        # Expected order by int-sort: -5, 0, 1
+        self.assertEqual(rows[0], ["-5", "alpha", "letter"])
+        self.assertEqual(rows[1], ["0", "middle", "symbol"])
+        self.assertEqual(rows[2], ["1", "zebra", "animal"])
+        # Monotonic ascending invariant — catches any ordering regression,
+        # including string-based sort that would break on negative signs.
+        word_ids = [int(r[0]) for r in rows]
+        self.assertEqual(word_ids, sorted(word_ids), msg="words must be sorted by word_id ascending (mixed-sign)")
+
 
 if __name__ == "__main__":
     unittest.main()
