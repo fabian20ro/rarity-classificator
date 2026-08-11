@@ -20,10 +20,10 @@ def _parse_value_to_enum(cls, value: str | None, default_name: str, alias_map: d
     v = (value or default_name).strip().lower()
     if v in {default_name.lower(), ""}:
         return getattr(cls, default_name.upper())
-    # normalize hyphens → underscores in both input and keys for comparison
-    normalized_aliases = {k.lower().replace("-", "_") for k in alias_map}
-    if v.replace("-", "_") in normalized_aliases:
-        target_key = next(k for k in alias_map if k.lower().replace("-", "_") == v.replace("-", "_"))
+    # normalize hyphens and underscores away for case-insensitive comparison
+    normalized_aliases = {k.lower().replace("-", "").replace("_", "") for k in alias_map}
+    if v.replace("-", "").replace("_", "") in normalized_aliases:
+        target_key = next(k for k in alias_map if k.lower().replace("-", "").replace("_", "") == v.replace("-", "").replace("_", ""))
         resolved_name = alias_map[target_key]
         if not hasattr(cls, resolved_name):
             raise ValueError(f"Invalid {cls.__name__.lower()} alias target: {resolved_name}")
