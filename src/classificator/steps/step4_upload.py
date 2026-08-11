@@ -20,9 +20,9 @@ class Step4Options:
     upload_batch_id: str | None
     reference_csv: Path | None = None
     anchor_l1_file: Path | None = None
-    min_l1_jaccard: float | None = None
-    min_anchor_l1_precision: float | None = None
-    min_anchor_l1_recall: float | None = None
+    min_l1_jaccard: float | None = 0.7
+    min_anchor_l1_precision: float | None = 0.8
+    min_anchor_l1_recall: float | None = 0.8
 
 
 def run_step4(options: Step4Options, *, word_store: WordStore, repo: RunCsvRepository, marker_writer: UploadMarkerWriter) -> None:
