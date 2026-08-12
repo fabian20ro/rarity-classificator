@@ -25,10 +25,11 @@ class LevelTransition:
         if self.from_level_upper is not None:
             # Pair transition: target is one of the two source levels (guaranteed by validation).
             return self.from_level_upper if self.to_level == self.from_level else self.from_level
-        if self.to_level == self.from_level:
-            return min(5, self.to_level + 1)
-        # Downgrade transition: return source level.
-        return self.from_level
+        if self.to_level != self.from_level:
+            # Downgrade transition: return source level.
+            return self.from_level
+        # Same-level transition: upward candidate capped at 5.
+        return min(5, self.to_level + 1)
 
 
 def require_valid_transition(from_level: int, to_level: int) -> None:
