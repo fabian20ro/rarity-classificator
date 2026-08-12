@@ -28,6 +28,12 @@ class TestCsvCodec(unittest.TestCase):
         with self.assertRaises(CsvFormatError):
             self.codec.read_table(path)
 
+    def test_read_table_file_not_found_raises(self):
+        path = self.test_dir / "missing.csv"
+        with self.assertRaises(FileNotFoundError) as cm:
+            self.codec.read_table(path)
+        self.assertIn("CSV file not found:", str(cm.exception))
+
     def test_read_table_mismatched_columns(self):
         path = self.test_dir / "mismatch.csv"
         with open(path, "w", encoding="utf-8", newline="") as f:
