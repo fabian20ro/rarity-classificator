@@ -213,6 +213,23 @@ class TestBuildPartialPlan(unittest.TestCase):
             self.assertEqual(row[2], "1")  # new level (same as old)
             self.assertEqual(row[3], "already_matched")
 
+    def test_db_only_words_are_dropped_from_partial_plan(self):
+        # _build_partial_plan iterates final_levels only — DB words absent from CSV must NOT appear in output
+        final_levels = {1: 2}
+        db_levels = {
+            1: WordLevel(word_id=1, rarity_level=1),
+            2: WordLevel(word_id=2, rarity_level=1),  # not in final_levels → silently dropped
+            3: WordLevel(word_id=3, rarity_level=1),  # not in final_levels → silently dropped
+        }
+
+        updates, report_rows, status = _build_partial_plan(final_levels, db_levels)
+
+        self.assertEqual(set(updates.keys()), {1})
+        self.assertEqual(updates[1], 2)
+        self.assertEqual(status, {1: "uploaded"})
+        self.assertEqual(len(report_rows), 1)
+        self.assertEqual(report_rows[0][3], "final_csv")
+
     def test_mixed_matching_and_changing_levels(self):
         # DB has words 1,2; word 1 matches, word 2 changes → one already_matched, one uploaded
         final_levels = {1: 1, 2: 3}
