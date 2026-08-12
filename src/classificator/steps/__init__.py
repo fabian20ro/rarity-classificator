@@ -21,16 +21,15 @@ _STEPS = (
 )
 
 
-def _validate_step_structure() -> list[str]:
-    """Validate the _STEPS tuple structure itself.
+def _validate_step_modules() -> list[str]:
+    """Validate all step modules export callable entry points.
 
     Returns:
-        List of structural error messages (empty if valid).
+        List of validation error messages (empty if valid).
     """
     errors = []
     if len(_STEPS) != 5:
         errors.append(f"_STEPS must have exactly 5 entries, got {len(_STEPS)}")
-        return errors
     seen_names = set()
     for entry in _STEPS:
         if not isinstance(entry, tuple) or len(entry) != 3:
@@ -41,17 +40,6 @@ def _validate_step_structure() -> list[str]:
             errors.append(f"duplicate step name: {name}")
         else:
             seen_names.add(name)
-    return errors
-
-
-def _validate_step_modules() -> list[str]:
-    """Validate all step modules export callable entry points.
-
-    Returns:
-        List of validation error messages (empty if valid).
-    """
-    errors = []
-    errors.extend(_validate_step_structure())
     for name, _, func in _STEPS:
         try:
             if not inspect.isfunction(func):
