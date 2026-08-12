@@ -76,6 +76,10 @@ def _resolve_level_column(headers: list[str], level_column: str | None) -> str:
 
 
 def _validate_level(raw_level: str, col_name: str, line_number: int) -> int:
+    if isinstance(raw_level, str) and (not raw_level or not raw_level.strip()):
+        raise ValueError(
+            f"Invalid {col_name} '{raw_level}' at row {line_number}: not a number"
+        ) from None
     try:
         level = int(raw_level)
     except ValueError as exc:
