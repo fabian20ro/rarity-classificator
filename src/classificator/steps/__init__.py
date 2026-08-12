@@ -38,9 +38,8 @@ def _validate_step_modules() -> list[str]:
         name, _, func = entry
         if name in seen_names:
             errors.append(f"duplicate step name: {name}")
-        else:
-            seen_names.add(name)
-    for name, _, func in _STEPS:
+            continue
+        seen_names.add(name)
         try:
             if not inspect.isfunction(func):
                 errors.append(f"{name}: expected callable, got {type(func).__name__}")
