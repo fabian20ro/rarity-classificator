@@ -58,14 +58,14 @@ class Step2Metrics:
 
     def format_progress(self, remaining: int, effective_batch_size: int) -> str:
         partial = (
-            f"partial={self.partial_extraction_count}"
+            f" partial={self.partial_extraction_count}"
             if self.partial_extraction_count > 0
             else ""
         )
         return (
             f"scored={self.total_scored} failed={self.total_failed} remaining={remaining} "
             f"wpm={self.words_per_minute():.1f} eta={format_duration(self.eta(remaining))} "
-            f"batch_size={effective_batch_size} success_rate={self.success_rate() * 100:.0f}% {partial}".strip()
+            f"batch_size={effective_batch_size} success_rate={self.success_rate() * 100:.0f}%{partial}"
         )
 
     def format_summary(self) -> str:
