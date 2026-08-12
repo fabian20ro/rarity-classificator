@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from operator import itemgetter
 from pathlib import Path
 
 from ..constants import BASE_CSV_HEADERS
