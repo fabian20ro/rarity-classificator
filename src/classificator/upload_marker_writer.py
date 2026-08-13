@@ -37,8 +37,13 @@ class UploadMarkerWriter:
                 upload_batch_id=upload_batch_id,
                 uploaded_at=uploaded_at,
             )
-        except (PermissionError, FileNotFoundError) as e:
-            reason = "permission denied" if isinstance(e, PermissionError) else "file not found"
+        except (PermissionError, FileNotFoundError, OSError) as e:
+            if isinstance(e, PermissionError):
+                reason = "permission denied"
+            elif isinstance(e, FileNotFoundError):
+                reason = "file not found"
+            else:
+                reason = f"I/O error ({type(e).__name__})"
             logger.info(
                 "Cannot write markers in-place to %s (%s); writing companion file instead",
                 final_csv_path,
