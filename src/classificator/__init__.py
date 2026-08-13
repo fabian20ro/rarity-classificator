@@ -37,8 +37,8 @@ Step1Options = _Step1Options
 Step2Options = _Step2Options
 del _Step1Options, _Step2Options
 
-def _assert_exports_resolved() -> None:
-    """Verify every name in ``__all__`` resolves from this module's namespace."""
+def _assert_exports_resolved() -> list[str]:
+    """Return names from ``__all__`` that are missing or non-callable; empty means OK."""
 
     def _is_missing(name: str) -> bool:
         try:
