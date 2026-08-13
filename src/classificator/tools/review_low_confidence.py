@@ -88,6 +88,7 @@ def run_review_low_confidence(
                 _print_l1_summary(latest)
                 return
             if mapped == "skip":
+                print(f"skipping word_id={item.word_id} confidence={item.predicted_confidence:.4f}")
                 break
             append_review_label(
                 labels_csv=labels_csv,
