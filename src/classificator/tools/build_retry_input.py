@@ -10,6 +10,32 @@ from ..run_csv_repository import RunCsvRepository
 log = logging.getLogger(__name__)
 
 
+def _validate_jsonl_word_id(value, record):
+    """Validate a word_id from JSONL; raise on corruption, return int or None to skip."""
+    if isinstance(value, bool):
+        raise ValueError(f"Boolean word_id in failed JSONL: {record}")
+    if isinstance(value, float):
+        raise ValueError(f"Non-integer word_id in failed JSONL (float): {record}")
+    if isinstance(value, (list, dict)):
+        raise ValueError(
+            f"Unsupported word_id type in failed JSONL ({type(value).__name__}): {value!r}"
+        )
+    if value is None or (isinstance(value, str) and value.strip() == ""):
+        return None  # missing data — skip silently per contract
+    if isinstance(value, str):
+        raise ValueError(f"String word_id in failed JSONL: {value!r}")
+
+    try:
+        word_int = int(value)
+    except ValueError:
+        raise ValueError(
+            f"Unparseable word_id in failed JSONL: {value!r}"
+        ) from None
+    if word_int <= 0:
+        raise ValueError(f"Non-positive word_id in failed JSONL: {word_int}")
+    return word_int
+
+
 def build_retry_input(
     failed_jsonl: Path, base_csv: Path, output_csv: Path, repo: RunCsvRepository
 ) -> int:
