@@ -162,23 +162,20 @@ class WordStoreTest(unittest.TestCase):
         self.assertEqual(words, [])
 
     def test_connect_raises_runtime_error_when_psycopg_missing(self):
-        import builtins
+        import sys
 
-        original_import = builtins.__import__
-
-        def failing_import(name, *args, **kwargs):
-            if name == "psycopg":
-                raise ModuleNotFoundError("no psycopg")
-            return original_import(name, *args, **kwargs)
-
+        prev_value = sys.modules.get("psycopg")
+        sys.modules["psycopg"] = None
         store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
-        builtins.__import__ = failing_import
         try:
             with self.assertRaises(RuntimeError) as ctx:
                 store._connect()
             self.assertIn("Missing dependency 'psycopg'", str(ctx.exception))
         finally:
-            builtins.__import__ = original_import
+            if prev_value is None:
+                sys.modules.pop("psycopg", None)
+            elif prev_value is not None:
+                sys.modules["psycopg"] = prev_value
 
     def test_connect_propagates_connection_error_via_sys_modules(self):
         import sys
