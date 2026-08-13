@@ -486,6 +486,61 @@ class QualityAuditTest(unittest.TestCase):
             expected = {1: 3, 2: 2, 3: 1, 4: 0, 5: 0}
             self.assertEqual(result.distribution, expected)
 
+    def test_non_numeric_level_value_raises_value_error(self):
+        """A non-numeric value in the level column must raise ValueError during audit."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            self._write_csv(
+                candidate,
+                headers,
+                [["1", "om", "N", "abc"]],
+            )
+
+            with self.assertRaises(ValueError):
+                run_quality_audit(
+                    candidate_csv=candidate,
+                    repo=self.repo,
+                )
+
+    def test_l1_words_excludes_empty_word_from_anchor_matching(self):
+        """An empty word at level 1 must not participate in anchor intersection."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            reference = root / "reference.csv"
+            anchor = root / "anchor.txt"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            cand_rows = [
+                ["1", "om", "N", "1"],
+                ["2", "", "N", "1"],
+                ["3", "casă", "N", "1"],
+            ]
+            ref_rows = [["4", "om", "N", "1"], ["5", "casă", "N", "1"]]
+
+            self._write_csv(candidate, headers, cand_rows)
+            self._write_csv(reference, headers, ref_rows)
+            # Anchor contains only one valid L1 word — the empty entry must be ignored.
+            anchor.write_text("om\n", encoding="utf-8")
+
+            result = run_quality_audit(
+                candidate_csv=candidate,
+                reference_csv=reference,
+                anchor_l1_file=anchor,
+                repo=self.repo,
+            )
+
+            # Candidate l1_words = {"om", "casă"} (empty string excluded by line 124 guard).
+            # Anchor words = {"om"}.
+            self.assertEqual(result.l1_candidate_size, 2)
+            # precision = |{om} ∩ {om, casă}| / |{om, casă}| = 1/2.
+            self.assertAlmostEqual(result.anchor_precision, 0.5)
+            # recall = |{om} ∩ {om, casă}| / |{"om"}| = 1/1.
+            self.assertEqual(result.anchor_recall, 1.0)
+
 
 if __name__ == "__main__":
     unittest.main()

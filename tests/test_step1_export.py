@@ -84,6 +84,20 @@ class TestStep1Export(unittest.TestCase):
         self.assertFalse(self.output_csv.exists())
         self.mock_repo.write_rows.assert_not_called()
 
+    def test_run_step1_single_word(self):
+        # Minimal boundary: exactly one word — verifies sorted() with single-element
+        # list and write_rows invocation at the lower bound of input cardinality.
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = [(42, "zebra", "animal")]
+        options = Step1Options(output_csv_path=self.output_csv)
+        result_path = run_step1(options, word_store=store, repo=self.mock_repo)
+
+        self.assertEqual(result_path, self.output_csv)
+        args, _ = self.mock_repo.write_rows.call_args
+        headers, rows = args[1], args[2]
+        self.assertEqual(headers, ["word_id", "word", "type"])
+        self.assertEqual(rows, [["42", "zebra", "animal"]])
+
     def test_run_step1_sorts_by_word_id_not_other(self):
         # Deliberately invert word ordering vs. word_id so sorting by any field
         # other than itemgetter(0) produces a clearly wrong row order.

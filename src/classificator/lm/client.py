@@ -542,12 +542,12 @@ def _is_connectivity_failure(exc: Exception) -> bool:
     requests_mod = _load_requests()
     if isinstance(exc, (requests_mod.Timeout, requests_mod.ConnectionError, socket.timeout, TimeoutError)):
         return True
-    msg = str(exc).lower()
+    msg = _error_text(exc)
     return "timed out" in msg or "connection refused" in msg or "couldn't connect" in msg
 
 
 def _is_model_crash(exc: Exception) -> bool:
-    msg = str(exc).lower()
+    msg = _error_text(exc)
     return ("model" in msg and "crash" in msg) or "exit code" in msg
 
 
