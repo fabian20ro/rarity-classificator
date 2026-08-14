@@ -196,6 +196,48 @@ class ResponseParserTest(unittest.TestCase):
             )
         self.assertIn("No valid results parsed", str(ctx.exception))
 
+    def test_content_text_accepts_list_content(self):
+        # message.content as a list of strings (common LM provider pattern)
+        payload = {"choices": [{"message": {"content": ["hello ", "world"]}}]}
+        body = json.dumps(payload, ensure_ascii=False)
+        with self.assertRaises(RuntimeError):
+            self.parser.parse(
+                batch=self.batch,
+                response_body=body,
+                output_mode=ScoringOutputMode.SCORE_RESULTS,
+                forced_rarity_level=None,
+                expected_items=None,
+            )
+
+    def test_normalize_confidence_clips_percentage_values(self):
+        from classificator.lm.response_parser import _normalize_confidence
+
+        # Values in [0..1] pass through unchanged.
+        self.assertAlmostEqual(_normalize_confidence(0.5), 0.5)
+        self.assertAlmostEqual(_normalize_confidence(1.0), 1.0)
+        self.assertAlmostEqual(_normalize_confidence(0.0), 0.0)
+
+    def test_normalize_confidence_divides_out_of_range_values(self):
+        from classificator.lm.response_parser import _normalize_confidence
+
+        # Values in (1..100] are divided by 100.
+        self.assertAlmostEqual(_normalize_confidence(50), 0.5)
+        self.assertAlmostEqual(_normalize_confidence(100), 1.0)
+
+    def test_normalize_confidence_falls_back_for_invalid_values(self):
+        from classificator.lm.response_parser import _normalize_confidence
+
+        # Negative and >100 values fall back to 0.5.
+        self.assertAlmostEqual(_normalize_confidence(-1.0), 0.5)
+        self.assertAlmostEqual(_normalize_confidence(200.0), 0.5)
+
+    def test_normalize_confidence_handles_nan(self):
+        from classificator.lm.response_parser import _normalize_confidence
+
+        # NaN (any source) falls back to 0.5.
+        self.assertAlmostEqual(_normalize_confidence(float("nan")), 0.5)
+        self.assertAlmostEqual(_normalize_confidence("not-a-number"), 0.5)
+
 
 if __name__ == "__main__":
     unittest.main()
