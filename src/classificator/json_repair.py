@@ -37,19 +37,60 @@ def _remove_line_comments(input_text: str) -> str:
     i = 0
     while i < len(input_text):
         ch = input_text[i]
+
         if not in_string and ch == "/" and i + 1 < len(input_text) and input_text[i + 1] == "/":
+            # Strip trailing whitespace before the comment.
             while out and out[-1] == " ":
                 out.pop()
             j = input_text.find("\n", i)
             if j == -1:
                 break
             i = j
+
+        elif not in_string and ch == "/" and i + 1 < len(input_text) and input_text[i + 1] == "*":
+            # Strip block comment /* ... */ including any newlines inside.
+            end = input_text.find("*/", i + 2)
+            if end != -1:
+                i = end + 2
+            else:
+                break
+
+        elif not in_string and ch == "}" and _has_unmatched_open_brace(input_text, i):
+            # End of document reached before any pending block comment was closed; stop.
+            out.append(ch)
+            i += 1
+
         else:
             in_string, escaped = _track_string(in_string, escaped, ch)
             out.append(ch)
         i += 1
 
     return "".join(out)
+
+
+def _has_unmatched_open_brace(text: str, start_index: int) -> bool:
+    """Return True if there is an unclosed '{' between `start_index` and end of text."""
+    depth = 0
+    in_string = False
+    escaped = False
+    for i in range(start_index + 1, len(text)):
+        ch = text[i]
+        if in_string:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+            continue
+        if ch == '"':
+            in_string = True
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+    return depth > 0
+
 
 
 def _fix_trailing_decimal_points(input_text: str) -> str:
