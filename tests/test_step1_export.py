@@ -82,6 +82,9 @@ class TestStep1Export(unittest.TestCase):
 
         self.assertIsNone(result_path)
         self.assertFalse(self.output_csv.exists())
+        # fetch_all_words is invoked before the dry_run branch — verifies the
+        # contract that dry-run still materialises row count for its status message.
+        store.fetch_all_words.assert_called_once()
         self.mock_repo.write_rows.assert_not_called()
 
     def test_run_step1_single_word(self):

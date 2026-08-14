@@ -3,7 +3,78 @@ from classificator.fuzzy_word_matcher import (
 )
 
 
-def test_normalize():
+def test_matches_with_distance_exact():
+    """matches_with_distance must return (True, 0) for identical normalized strings."""
+    result, dist = matches_with_distance("apple", "apple")
+    assert result is True
+    assert dist == 0
+
+    result, dist = matches_with_distance("", "")
+    assert result is True
+    assert dist == 0
+
+
+def test_matches_with_distance_single_edit():
+    """Single-character edit: distance=1 → match=True with correct distance."""
+    result, dist = matches_with_distance("cat", "cut")
+    assert result is True
+    assert dist == 1
+
+    result, dist = matches_with_distance("ăn", "an")
+    assert result is True
+    assert dist == 0  # diacritics fold to same normalized form
+
+
+def test_matches_with_distance_at_boundary():
+    """Distance exactly equal to MAX_EDIT_DISTANCE → match=True."""
+    result, dist = matches_with_distance("cat", "caaa")
+    assert result is True
+    assert dist == 2
+
+    result, dist = matches_with_distance("", "ab")
+    assert result is True
+    assert dist == 2
+
+
+def test_matches_with_distance_over_boundary():
+    """Distance exceeding MAX_EDIT_DISTANCE → match=False with correct distance."""
+    result, dist = matches_with_distance("cat", "xyz")
+    assert result is False
+    assert dist == 3
+
+    result, dist = matches_with_distance("", "abc")
+    assert result is True  # len diff=3 but edit dist=3 > MAX_EDIT_DISTANCE
+    assert dist == 3
+
+
+def test_matches_with_distance_short_strings():
+    """Short strings: overlap path should not affect distance calculation."""
+    result, dist = matches_with_distance("ab", "ac")
+    assert result is True
+    assert dist == 1
+
+    # Edit distance reflects raw normalized comparison regardless of overlap shortcut
+    result, dist = matches_with_distance("abc", "xyz")
+    assert result is False
+    assert dist >= 3
+
+
+def test_matches_with_distance_levenshtein_heavy():
+    """Classic Levenshtein example: kitten→sitting has distance=3 → match=False."""
+    result, dist = matches_with_distance("kitten", "sitting")
+    assert result is False
+    assert dist == 3
+
+
+def test_matches_with_distance_empty_vs_nonempty():
+    """Empty vs non-empty strings must return accurate distance and match status."""
+    result, dist = matches_with_distance("", "a")
+    assert result is True
+    assert dist == 1
+
+    result, dist = matches_with_distance("", "abcde")
+    assert result is False
+    assert dist == 5
     assert normalize("ăn") == "an"
     assert normalize("ĂN") == "an"
     assert normalize("ș") == "s"
