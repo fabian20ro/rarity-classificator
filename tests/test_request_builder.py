@@ -262,6 +262,127 @@ class RequestBuilderTest(unittest.TestCase):
         user_content = payload["messages"][1]["content"]
         self.assertIn(user_template + "\n\nIntrări:", user_content)
 
+    def test_token_estimation_respects_min_max_tokens_floor(self):
+        config = LmModelConfig(model_id="test-model")
+        # Small words → low content_factor → tiny computed tokens → clamped to floor (256)
+        short_batch = [BaseWordRow(word_id=1, word="a", type="N")]
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=short_batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=config,
+                max_tokens=4096,
+            )
+        )
+        self.assertEqual(payload["max_tokens"], 256)
+
+    def test_token_estimation_clamps_content_factor_range(self):
+        config = LmModelConfig(model_id="test-model")
+        # avg_chars=1 → content_factor=min(2.0, 1/4)=0.25, clamped to 0.5
+        short_batch = [BaseWordRow(word_id=1, word="a", type="N")]
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=short_batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=config,
+                max_tokens=10_000,
+            )
+        )
+        # computed: 1 * int(40*0.5) + 200 = 220 → clamped to min_max_tokens floor 256
+        self.assertEqual(payload["max_tokens"], 256)
+
+    def test_token_estimation_uses_high_content_factor_for_long_words(self):
+        config = LmModelConfig(model_id="test-model")
+        # avg_chars=10 → content_factor=min(2.0, 10/4)=2.0 (clamped at upper bound)
+        long_batch = [BaseWordRow(word_id=1, word="antidisestablishmentarianism", type="N")]
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=long_batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=config,
+                max_tokens=10_000,
+            )
+        )
+        # computed: 1 * int(40*2.0) + 200 = 280 → below cap so effective=280
+        self.assertEqual(payload["max_tokens"], 280)
+
+    def test_token_estimation_respects_config_max_tokens_cap(self):
+        config = LmModelConfig(model_id="test-model", max_tokens_cap=512)
+        long_batch = [BaseWordRow(word_id=1, word="antidisestablishmentarianism", type="N")]
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=long_batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=config,
+                max_tokens=10_000,
+            )
+        )
+        # computed effective=280, but cap is 512 → min(280, 512)=280 (cap not triggered)
+        self.assertEqual(payload["max_tokens"], 280)
+
+    def test_token_estimation_cap_overrides_effective_when_higher(self):
+        config = LmModelConfig(model_id="test-model", max_tokens_cap=200)
+        long_batch = [BaseWordRow(word_id=1, word="antidisestablishmentarianism", type="N")]
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=long_batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=config,
+                max_tokens=10_000,
+            )
+        )
+        # computed effective=280, cap=200 → min(280, 200)=200
+        self.assertEqual(payload["max_tokens"], 200)
+
+    def test_config_optional_fields_included_when_set(self):
+        config = LmModelConfig(
+            model_id="test-model",
+            top_k=4,
+            top_p=0.95,
+            min_p=0.1,
+            repeat_penalty=1.2,
+            frequency_penalty=0.5,
+            presence_penalty=0.3,
+        )
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=config,
+                max_tokens=512,
+            )
+        )
+        self.assertEqual(payload["top_k"], 4)
+        self.assertAlmostEqual(payload["top_p"], 0.95)
+        self.assertAlmostEqual(payload["min_p"], 0.1)
+        self.assertAlmostEqual(payload["repeat_penalty"], 1.2)
+        self.assertAlmostEqual(payload["frequency_penalty"], 0.5)
+        self.assertAlmostEqual(payload["presence_penalty"], 0.3)
+
 
 if __name__ == "__main__":
     unittest.main()
