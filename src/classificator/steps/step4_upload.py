@@ -43,7 +43,10 @@ def run_step4(options: Step4Options, *, word_store: WordStore, repo: RunCsvRepos
     db_levels = {wl.word_id: wl for wl in word_store.fetch_all_word_levels()}
 
     input_dist = RarityDistribution.from_levels(list(final_levels.values()))
-    updates, report_rows, status_by_word_id = _build_upload_plan(options.mode, final_levels, db_levels)
+    if options.mode == UploadMode.PARTIAL:
+        updates, report_rows, status_by_word_id = _build_partial_plan(final_levels, db_levels)
+    else:
+        updates, report_rows, status_by_word_id = _build_full_fallback_plan(final_levels, db_levels)
 
     uploaded_dist = RarityDistribution.from_levels(list(updates.values()))
     word_store.update_rarity_levels_chunked(updates)
@@ -65,16 +68,6 @@ def run_step4(options: Step4Options, *, word_store: WordStore, repo: RunCsvRepos
     print(
         f"Upload markers: {marker.marker_path} (companion={marker.used_companion_file}, marked_rows={marker.marked_rows})"
     )
-
-
-def _build_upload_plan(
-    mode: UploadMode,
-    final_levels: dict[int, int],
-    db_levels: dict[int, WordLevel],
-) -> tuple[dict[int, int], list[list[str]], dict[int, str]]:
-    if mode == UploadMode.PARTIAL:
-        return _build_partial_plan(final_levels, db_levels)
-    return _build_full_fallback_plan(final_levels, db_levels)
 
 
 def _build_partial_plan(
