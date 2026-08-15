@@ -52,7 +52,10 @@ def _assert_exports_resolved() -> list[str]:
 
     missing = [name for name in __all__ if _is_missing(name)]
     if missing:
-        raise ImportError(f"Unresolved exports in classificator.__all__: {missing}")
+        types_reported = [(n, type(getattr(_sys.modules[__name__], n)).__qualname__) for n in missing]
+        raise ImportError(
+            f"Unresolved exports in classificator.__all__: {types_reported}"
+        )
 
 
 __version__ = "0.1.0"
