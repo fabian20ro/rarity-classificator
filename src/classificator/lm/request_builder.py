@@ -101,18 +101,17 @@ class LmStudioRequestBuilder:
             ],
         }
 
-        if config.top_k is not None:
-            payload["top_k"] = config.top_k
-        if config.top_p is not None:
-            payload["top_p"] = config.top_p
-        if config.min_p is not None:
-            payload["min_p"] = config.min_p
-        if config.repeat_penalty is not None:
-            payload["repeat_penalty"] = config.repeat_penalty
-        if config.frequency_penalty is not None:
-            payload["frequency_penalty"] = config.frequency_penalty
-        if config.presence_penalty is not None:
-            payload["presence_penalty"] = config.presence_penalty
+        for attr, key in (
+            ("top_k", "top_k"),
+            ("top_p", "top_p"),
+            ("min_p", "min_p"),
+            ("repeat_penalty", "repeat_penalty"),
+            ("frequency_penalty", "frequency_penalty"),
+            ("presence_penalty", "presence_penalty"),
+        ):
+            value = getattr(config, attr)
+            if value is not None:
+                payload[key] = value
 
         if include_reasoning_controls:
             if config.reasoning_effort is not None:
