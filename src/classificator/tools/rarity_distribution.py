@@ -22,6 +22,7 @@ def run_rarity_distribution(
     csv_path: Path,
     repo: RunCsvRepository,
     level_column: str | None = None,
+    quiet: bool = False,
 ) -> RarityDistributionResult:
     table = repo.read_table(csv_path)
     resolved_level_col = _resolve_level_column(table.headers, level_column)
