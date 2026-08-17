@@ -272,7 +272,7 @@ class TestValidateToolModulesContract(unittest.TestCase):
             errors = _vm()
             self.assertEqual(len(errors), 1)
             self.assertIn("build_retry_input", str(errors[0]))
-            self.assertIn("not callable", str(errors[0]))
+            self.assertIn("expected callable", str(errors[0]))
         finally:
             tools_mod._TOOL_MODULES = tuple(original)
 
