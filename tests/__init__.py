@@ -240,28 +240,21 @@ class TestValidateToolModulesContract(unittest.TestCase):
         errors = _validate_tool_modules()
         self.assertEqual(errors, [])
 
-    def test_validate_raises_with_invalid_entry(self):
-        from classificator.tools import validate_tools as _validate_tools
+    def test_validate_returns_error_for_non_callable_entry(self):
+        from classificator.tools import _validate_tool_modules as _vm
         from classificator.tools import _TOOL_MODULES
 
         original = list(_TOOL_MODULES)
-        modified = []
-        for name, func in original:
-            if name == "build_retry_input":
-                modified.append((name, None))
-            else:
-                modified.append((name, func))
-
+        modified = [(name, None if name == "build_retry_input" else func) for name, func in original]
         import classificator.tools as tools_mod
 
         tools_mod._TOOL_MODULES = tuple(modified)
 
         try:
-            with self.assertRaises(ValueError) as ctx:
-                _validate_tools()
-            error_text = str(ctx.exception)
-            self.assertIn("build_retry_input", error_text)
-            self.assertIn("not callable", error_text)
+            errors = _vm()
+            self.assertEqual(len(errors), 1)
+            self.assertIn("build_retry_input", str(errors[0]))
+            self.assertIn("expected callable", str(errors[0]))
         finally:
             tools_mod._TOOL_MODULES = tuple(original)
 
@@ -279,7 +272,7 @@ class TestValidateToolModulesContract(unittest.TestCase):
             errors = _vm()
             self.assertEqual(len(errors), 1)
             self.assertIn("build_retry_input", str(errors[0]))
-            self.assertIn("not callable", str(errors[0]))
+            self.assertIn("expected callable", str(errors[0]))
         finally:
             tools_mod._TOOL_MODULES = tuple(original)
 
