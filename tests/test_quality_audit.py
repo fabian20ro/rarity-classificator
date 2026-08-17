@@ -238,11 +238,14 @@ class QualityAuditTest(unittest.TestCase):
             headers = ["word_id", "word", "type"]
             self._write_csv(candidate, headers, [["1", "om", "N"]])
 
-            with self.assertRaises(ValueError):
+            with self.assertRaises(ValueError) as ctx:
                 run_quality_audit(
                     candidate_csv=candidate,
                     repo=self.repo,
                 )
+            msg = str(ctx.exception)
+            self.assertIn("missing level column", msg)
+            self.assertIn("final_level", msg)
 
     def test_rarity_level_column_is_accepted(self):
         with tempfile.TemporaryDirectory() as td:
