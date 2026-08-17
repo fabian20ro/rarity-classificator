@@ -5,6 +5,38 @@ from pathlib import Path
 class TestTopLevelExports(unittest.TestCase):
     """Verify that key runtime classes and options resolve from the package namespace."""
 
+    def test_assert_lm_exports_resolved_raises_on_missing_name(self):
+        """Patching a bad name into lm.__all__ must trigger ImportError."""
+        import classificator.lm as lm_mod
+        from classificator.lm import _assert_lm_exports_resolved
+
+        original = list(lm_mod.__all__)
+        lm_mod.__all__ = original + ["_nonexistent_fake_export"]
+
+        try:
+            with self.assertRaises(ImportError) as ctx:
+                _assert_lm_exports_resolved()
+            self.assertIn("_nonexistent_fake_export", str(ctx.exception))
+        finally:
+            lm_mod.__all__ = tuple(original)
+
+    def test_assert_lm_exports_resolved_raises_on_non_callable(self):
+        """Patching a non-callable object into lm.__all__ must trigger ImportError."""
+        import classificator.lm as lm_mod
+        from classificator.lm import _assert_lm_exports_resolved
+
+        original = list(lm_mod.__all__)
+        lm_mod.LmStudioClient = "not_a_class"
+
+        try:
+            with self.assertRaises(ImportError) as ctx:
+                _assert_lm_exports_resolved()
+            self.assertIn("LmStudioClient", str(ctx.exception))
+            self.assertIn("Non-callable", str(ctx.exception))
+        finally:
+            lm_mod.__all__ = tuple(original)
+            lm_mod.LmStudioClient = "not_a_class"  # restore original reference
+
     def test_run_csv_repository_reexported(self):
         from classificator import RunCsvRepository
 

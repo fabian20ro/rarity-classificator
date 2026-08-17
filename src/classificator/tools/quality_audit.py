@@ -27,6 +27,7 @@ def run_quality_audit(
     reference_csv: Path | None = None,
     anchor_l1_file: Path | None = None,
     min_l1_jaccard: float | None = None,
+    min_l1_intersection: int | None = None,
     min_anchor_l1_precision: float | None = None,
     min_anchor_l1_recall: float | None = None,
     repo: RunCsvRepository,

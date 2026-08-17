@@ -162,8 +162,23 @@ class TransitionsTest(unittest.TestCase):
 
     def test_parse_transitions_negative_number_rejected(self):
         # Negative integers should be rejected at int-parse time or by validation.
-        with self.assertRaises((ValueError, Exception)):
+        with self.assertRaises(ValueError):
             parse_transitions("-1:0")
+
+    def test_other_level_same_level_at_5(self):
+        # Same-level at level 5 returns 5 (already at cap).
+        t = LevelTransition(from_level=5, to_level=5)
+        self.assertEqual(t.other_level(), 5)
+
+    def test_pair_transition_from_4_to_5_target_upper(self):
+        # Pair 4-5→5: source_levels=[4,5], target is 5 → other is 4.
+        t = LevelTransition(from_level=4, from_level_upper=5, to_level=5)
+        self.assertEqual(t.other_level(), 4)
+
+    def test_pair_transition_from_3_to_5_target_lower(self):
+        # Pair 3-4→3: source_levels=[3,4], target is 3 → other is 4.
+        t = LevelTransition(from_level=3, from_level_upper=4, to_level=3)
+        self.assertEqual(t.other_level(), 4)
 
     def test_require_valid_pair_transition_out_of_range_target(self):
         # Target outside 1..5 is invalid even if sources are valid.
