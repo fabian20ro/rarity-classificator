@@ -231,6 +231,59 @@ class TestValidateSteps(unittest.TestCase):
             steps_mod._STEPS = tuple(original)
 
 
+class TestValidateToolModulesContract(unittest.TestCase):
+    """Tests for tools/__init__.py _validate_tool_modules() validation functionality."""
+
+    def test_validate_returns_empty_on_valid_modules(self):
+        from classificator.tools import _validate_tool_modules
+
+        errors = _validate_tool_modules()
+        self.assertEqual(errors, [])
+
+    def test_validate_raises_with_invalid_entry(self):
+        from classificator.tools import validate_tools as _validate_tools
+        from classificator.tools import _TOOL_MODULES
+
+        original = list(_TOOL_MODULES)
+        modified = []
+        for name, func in original:
+            if name == "build_retry_input":
+                modified.append((name, None))
+            else:
+                modified.append((name, func))
+
+        import classificator.tools as tools_mod
+
+        tools_mod._TOOL_MODULES = tuple(modified)
+
+        try:
+            with self.assertRaises(ValueError) as ctx:
+                _validate_tools()
+            error_text = str(ctx.exception)
+            self.assertIn("build_retry_input", error_text)
+            self.assertIn("not callable", error_text)
+        finally:
+            tools_mod._TOOL_MODULES = tuple(original)
+
+    def test_validate_returns_errors_for_non_callable(self):
+        from classificator.tools import _validate_tool_modules as _vm
+        from classificator.tools import _TOOL_MODULES
+
+        original = list(_TOOL_MODULES)
+        modified = [(name, 42 if name == "build_retry_input" else func) for name, func in original]
+        import classificator.tools as tools_mod
+
+        tools_mod._TOOL_MODULES = tuple(modified)
+
+        try:
+            errors = _vm()
+            self.assertEqual(len(errors), 1)
+            self.assertIn("build_retry_input", str(errors[0]))
+            self.assertIn("not callable", str(errors[0]))
+        finally:
+            tools_mod._TOOL_MODULES = tuple(original)
+
+
 class TestScoringContextContract(unittest.TestCase):
     """Verify ScoringContext is constructable through the lm package surface."""
 
