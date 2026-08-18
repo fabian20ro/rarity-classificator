@@ -110,6 +110,32 @@ class WordStoreTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             store.update_rarity_levels_chunked({1: 2}, chunk_size=-5)
 
+    def test_validate_update_payload_rejects_non_integer_level(self):
+        store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
+
+        with self.assertRaises(TypeError):
+            WordStore._validate_update_payload({1: 2.0})
+        with self.assertRaises(TypeError):
+            WordStore._validate_update_payload({1: "three"})
+        with self.assertRaises(TypeError):
+            WordStore._validate_update_payload({1: None})
+
+    def test_validate_update_payload_rejects_out_of_range_levels(self):
+        store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
+
+        with self.assertRaises(ValueError):
+            WordStore._validate_update_payload({1: 0})
+        with self.assertRaises(ValueError):
+            WordStore._validate_update_payload({1: 6})
+
+    def test_validate_update_payload_accepts_valid_levels(self):
+        store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
+
+        # Must not raise for in-range integers.
+        WordStore._validate_update_payload({10: 1, 20: 3, 30: 5})
+        WordStore._validate_update_payload({1: 1})
+        WordStore._validate_update_payload({2: 5})
+
     def test_update_rarity_levels_empty_updates_skips_connection(self):
         store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
         store._connect = MagicMock()
