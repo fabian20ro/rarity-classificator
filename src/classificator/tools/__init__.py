@@ -33,11 +33,11 @@ def _validate_tool_modules() -> list[str]:
             errors.append(f"{name}: expected callable, got {type(func).__name__}")
             continue
         try:
-            params = list(inspect.signature(func).parameters.keys())
+            sig = inspect.signature(func).parameters
         except (TypeError, ValueError) as exc:
             errors.append(f"{name}: signature introspection failed ({exc})")
             continue
-        if not params:
+        if not sig:
             errors.append(f"{name}: expected at least one parameter")
     return errors
 
