@@ -43,6 +43,7 @@ class RarityDistribution:
         self._validate_and_increment(new_level)
 
     def __getitem__(self, level: int) -> int:
+        self._validate_level(level)
         return self._counts[level]
 
     def count(self, level: int) -> int:
