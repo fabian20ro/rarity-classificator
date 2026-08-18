@@ -40,6 +40,10 @@ class WordStore:
     @staticmethod
     def _validate_update_payload(updates: dict[int, int]) -> None:
         for level in updates.values():
+            if isinstance(level, bool):
+                raise TypeError(
+                    f"Level must be an integer, got {type(level).__name__}"
+                )
             if not isinstance(level, int):
                 raise TypeError(
                     f"Level must be an integer, got {type(level).__name__}"
