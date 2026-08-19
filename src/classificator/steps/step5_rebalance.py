@@ -259,6 +259,7 @@ def _apply_transition(
     switched_count = 0
     expected_target_total = int(eligible_count * options.lower_ratio + 0.5)
     batch_index = 0
+    common_level = min(transition.to_level, transition.other_level())
 
     while True:
         batch = _select_stratified_batch(
@@ -281,8 +282,6 @@ def _apply_transition(
         )
         processed += len(batch)
         batch_mix = _format_batch_source_mix(batch, runtime)
-
-        common_level = min(transition.to_level, transition.other_level())
         common_count = target_count if transition.to_level == common_level else (len(batch) - target_count)
 
         if common_count <= 0:
