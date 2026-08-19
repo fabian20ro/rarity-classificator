@@ -10,6 +10,16 @@ from ..steps.step5_rebalance import Step5Options, run_step5
 from ..tools.quality_audit import run_quality_audit
 from ..transitions import LevelTransition
 
+# Default rarity rebalance targets (word counts per level).
+# Level 4 is derived: total − sum(l1..l3,l5); computed at runtime.
+REBALANCE_TARGETS: dict[int, int | None] = {
+    1: 2500,   # rarest tier
+    2: 7500,   # uncommon
+    3: 15_000, # common
+    4: None,   # computed at runtime from total_words
+    5: 30_000, # most frequent
+}
+
 
 @dataclass(frozen=True)
 class ChainOptions:
