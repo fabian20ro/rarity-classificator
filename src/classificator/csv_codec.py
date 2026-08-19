@@ -57,6 +57,10 @@ class CsvCodec:
             self._validate_row(row, len(headers), f"CSV {path} line {i}")
             records.append(CsvRecord(line_number=i, values=[str(x) for x in row]))
 
+        # Tolerate trailing completely-blank rows at end of file.
+        while records and all(not v.strip() for v in records[-1].values):
+            records.pop()
+
         return CsvTable(headers=headers, records=records)
 
     def _validate_row_length(self, row_len: int, expected: int, label: str) -> None:
