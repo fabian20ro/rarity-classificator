@@ -70,7 +70,6 @@ def test_mixed_comment_and_unclosed_structure():
     assert '"b"' in result
 
 
-
 def test_escape_in_string_preserves_subsequent_slashes():
     # Regression: _track_string must keep in_string=True after a backslash
     # inside a JSON string; otherwise the "//" would be stripped as a comment.
@@ -91,8 +90,3 @@ def test_unclosed_string_gets_closing_quote():
     result = repair('{"key": "value')
     parsed = _json.loads(result)
     assert parsed == {"key": "value"}
-
-
-def test_mixed_comment_and_unclosed_structure():
-    result = repair('{"a": 1 // comment\n"b":')
-    assert '"b"' in result
