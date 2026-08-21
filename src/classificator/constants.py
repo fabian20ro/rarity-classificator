@@ -110,7 +110,7 @@ CSV_HEADERS = _CSV_HEADERS
 
 
 def ensure_csv_headers() -> None:
-    """Ensure every documented header alias is present and non-empty."""
+    """Ensure every documented header alias is present, non-empty, and unique."""
     required_keys = (
         "base",
         "run",
@@ -120,8 +120,15 @@ def ensure_csv_headers() -> None:
         "upload_marker",
     )
     for key in required_keys:
-        if not _CSV_HEADERS.get(key):
+        columns = _CSV_HEADERS.get(key) or []
+        if not columns:
             raise ValueError(f"CSV header group '{key}' is empty or missing")
+        if len(columns) != len(set(columns)):
+            dupes = [c for c in set(columns) if columns.count(c) > 1]
+            raise ValueError(
+                f"CSV header group '{key}' contains duplicate columns: "
+                f"{', '.join(sorted(dupes))}"
+            )
 
 
 ensure_csv_headers()
