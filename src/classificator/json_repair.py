@@ -75,20 +75,12 @@ def _has_unmatched_open_brace(text: str, start_index: int) -> bool:
     escaped = False
     for i in range(start_index + 1, len(text)):
         ch = text[i]
-        if in_string:
-            if escaped:
-                escaped = False
-            elif ch == "\\":
-                escaped = True
-            elif ch == '"':
-                in_string = False
-            continue
-        if ch == '"':
-            in_string = True
-        elif ch == "{":
-            depth += 1
-        elif ch == "}":
-            depth -= 1
+        if not in_string:
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+        in_string, escaped = _track_string(in_string, escaped, ch)
     return depth > 0
 
 
