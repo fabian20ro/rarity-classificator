@@ -10,7 +10,6 @@ from ..steps.step5_rebalance import Step5Options, run_step5
 from ..tools.quality_audit import run_quality_audit
 from ..transitions import LevelTransition
 
-
 @dataclass(frozen=True)
 class ChainOptions:
     input_csv: Path

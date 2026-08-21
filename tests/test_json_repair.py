@@ -76,6 +76,17 @@ def test_escape_in_string_preserves_subsequent_slashes():
     assert repair('{"url": "http://x.com/a\\n//b"}') == '{"url": "http://x.com/a\\n//b"}'
 
 
-def test_mixed_comment_and_unclosed_structure():
-    result = repair('{"a": 1 // comment\n"b":')
-    assert '"b"' in result
+def test_block_comment_stripped_by_repair():
+    # Regression: _remove_line_comments handles /* ... */ but no public-API test existed.
+    import json as _json
+    result = repair('{"a": 1 /* comment */\n}')
+    parsed = _json.loads(result)
+    assert parsed == {"a": 1}
+
+
+def test_unclosed_string_gets_closing_quote():
+    # Regression: _close_unclosed_structures appends a closing " for unmatched strings.
+    import json as _json
+    result = repair('{"key": "value')
+    parsed = _json.loads(result)
+    assert parsed == {"key": "value"}
