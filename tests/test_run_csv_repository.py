@@ -72,7 +72,9 @@ class RunCsvRepositoryTest(unittest.TestCase):
                     ["1", "om", "N", "1", "common", "0.9", "t2", "m", "r"],
                 ],
             )
-            with self.assertRaises(CsvFormatError):
+            with self.assertRaisesRegex(
+                CsvFormatError, r"Duplicate word_id=1 at .*:3"
+            ):
                 self.repo.load_run_rows(path)
 
     def test_load_run_rows_rejects_blank_word(self):
