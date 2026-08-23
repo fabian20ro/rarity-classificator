@@ -161,6 +161,8 @@ class LmModelConfig:
     def __post_init__(self) -> None:
         if self.temperature < 0 or self.temperature > 1:
             raise ValueError("temperature must be between 0 and 1")
+        if self.max_tokens_cap is not None and self.max_tokens_cap <= 0:
+            raise ValueError("max_tokens_cap must be positive")
 
     def has_reasoning_controls(self) -> bool:
         return any(

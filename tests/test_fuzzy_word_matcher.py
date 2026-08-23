@@ -43,7 +43,7 @@ def test_matches_with_distance_over_boundary():
     assert dist == 3
 
     result, dist = matches_with_distance("", "abc")
-    assert result is True  # len diff=3 but edit dist=3 > MAX_EDIT_DISTANCE
+    assert result is False  # edit dist=3 exceeds MAX_EDIT_DISTANCE → no match
     assert dist == 3
 
 
