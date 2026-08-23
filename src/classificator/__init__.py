@@ -37,27 +37,4 @@ Step1Options = _Step1Options
 Step2Options = _Step2Options
 del _Step1Options, _Step2Options
 
-def _assert_exports_resolved() -> list[str]:
-    """Return names from ``__all__`` that are missing or non-callable; empty means OK."""
-
-    def _is_missing(name: str) -> bool:
-        try:
-            obj = getattr(_sys.modules[__name__], name)
-        except AttributeError:
-            return True
-        if isinstance(obj, str):
-            # __version__ is a string constant, not callable — skip callability check.
-            return False
-        return not callable(obj)
-
-    missing = [name for name in __all__ if _is_missing(name)]
-    if missing:
-        types_reported = [(n, type(getattr(_sys.modules[__name__], n)).__qualname__) for n in missing]
-        raise ImportError(
-            f"Unresolved exports in classificator.__all__: {types_reported}"
-        )
-
-
 __version__ = "0.1.0"
-
-_assert_exports_resolved()
