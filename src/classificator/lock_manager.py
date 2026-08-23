@@ -16,17 +16,14 @@ def acquire_output_lock(output_csv_path):
     output_csv_path.parent.mkdir(parents=True, exist_ok=True)
     lock_path = output_csv_path.with_name(f"{output_csv_path.name}.lock")
     handle = lock_path.open("a+b")
+    fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB) or _raise_unavailable(output_csv_path)
+    yield
     try:
-        try:
-            fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError as exc:
-            raise RuntimeError(
-                f"Another step2 process is already writing to {output_csv_path}."
-            ) from exc
-        yield
-    finally:
-        try:
-            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
-        except Exception:
-            pass
-        handle.close()
+        fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+    except Exception:
+        pass
+    handle.close()
+
+
+def _raise_unavailable(path):
+    raise RuntimeError(f"Another step2 process is already writing to {path}.")

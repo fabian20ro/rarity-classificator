@@ -266,6 +266,15 @@ class LmStudioResponseParser:
             if t == candidate.type and rows and fuzzy_matches(w, candidate.word):
                 fuzzy_key = (w, t)
                 break
+
+        # Cross-type fallback: when same-type fuzzy fails, try all types.
+        # Prevents silent word drops caused by wrong LM-assigned type.
+        if fuzzy_key is None:
+            for (w, t), rows in pending_by_word_type.items():
+                if rows and fuzzy_matches(w, candidate.word):
+                    fuzzy_key = (w, t)
+                    break
+
         if fuzzy_key is None:
             return None
 
