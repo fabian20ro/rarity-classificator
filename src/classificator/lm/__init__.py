@@ -22,23 +22,20 @@ def _assert_lm_exports_resolved() -> None:
 
     import sys as _sys
 
-    def _is_missing(name: str) -> bool:
-        try:
-            getattr(_sys.modules[__name__], name)
-        except AttributeError:
-            return True
-        return False
-
-    missing = [name for name in __all__ if _is_missing(name)]
+    missing = []
     non_callable = []
+
     for name in __all__:
-        if not _is_missing(name):
-            try:
-                obj = getattr(_sys.modules[__name__], name)
-            except Exception:
-                continue
-            if not callable(obj):
-                non_callable.append((name, type(obj).__name__))
+        try:
+            obj = getattr(_sys.modules[__name__], name)
+        except AttributeError:
+            missing.append(name)
+            continue
+        except Exception:
+            continue
+
+        if not callable(obj):
+            non_callable.append((name, type(obj).__name__))
 
     errors: list[str] = []
     if missing:
