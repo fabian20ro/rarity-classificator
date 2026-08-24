@@ -100,13 +100,9 @@ class RunCsvRepository:
         if "word_id" not in table.headers:
             raise ValueError(f"CSV {path} missing required column 'word_id'")
 
-        if "final_level" in table.headers:
-            level_col = "final_level"
-        elif "rarity_level" in table.headers:
-            level_col = "rarity_level"
-        elif "median_level" in table.headers:
-            level_col = "median_level"
-        else:
+        level_candidates = ("final_level", "rarity_level", "median_level")
+        level_col = next((c for c in level_candidates if c in table.headers), None)
+        if level_col is None:
             raise CsvFormatError(
                 f"CSV {path} missing required level column "
                 "(expected at least one of: final_level, rarity_level, median_level)"
