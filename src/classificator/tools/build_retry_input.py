@@ -170,6 +170,15 @@ def build_retry_input(
             seen_ids.add(wid)
             deduped_rows.append(row)
 
+    if seen_ids != wanted_ids:
+        missing = sorted(wanted_ids - seen_ids)
+        log.warning(
+            "Retry input: %d requested word_id(s) not found in base CSV %s: %s",
+            len(missing),
+            base_csv,
+            missing,
+        )
+
     output_csv.parent.mkdir(parents=True, exist_ok=True)
     repo.write_rows(output_csv, table.headers, deduped_rows)
     return len(deduped_rows)
