@@ -468,8 +468,11 @@ def _count_pending(source_csv: Path, output_csv: Path, force: bool = False) -> i
 
         with open(source_csv, newline="", encoding="utf-8") as f:
             reader = _csv.DictReader(f)
+            fieldnames = reader.fieldnames
+            if fieldnames is not None and "word_id" not in fieldnames:
+                raise ValueError(f"Source CSV '{source_csv}' is missing required column 'word_id'")
             word_ids_in_source = {row.get("word_id", "") for row in reader}
-    except (FileNotFoundError, KeyError):
+    except FileNotFoundError:
         return 0
 
     scored = set()
