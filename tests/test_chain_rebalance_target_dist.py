@@ -138,19 +138,13 @@ class TestChainRebalance(unittest.TestCase):
             def load_run_rows(self, path):
                 return []
 
-        records = MockTable.records
         count = _get_level_count(Path("dummy.csv"), 2, MockRepo())
         self.assertEqual(count, 2)
-        # Failure-specific: verify which indices matched, not just the total.
-        # If skip behavior changes silently (e.g. float string accepted), only "how many" is wrong.
-        matched = []
-        for i, r in enumerate(records):
-            try:
-                if int(r.values[1]) == 2:
-                    matched.append(i)
-            except (ValueError, TypeError):
-                continue
-        self.assertEqual(matched, [0, 3])
+        # Failure-specific: "3.5" must be skipped, not parsed/truncated to level 3.
+        # A level-3 probe against production pins that the float-string record is
+        # ignored, which a count-only check on level 2 cannot detect.
+        count_level3 = _get_level_count(Path("dummy.csv"), 3, MockRepo())
+        self.assertEqual(count_level3, 0, "float-string '3.5' must be skipped, not counted")
 
     def test_get_level_count_non_numeric_skips_record(self):
         from src.classificator.tools.chain_rebalance_target_dist import _get_level_count
