@@ -119,8 +119,11 @@ class UploadModeEdgeTest(unittest.TestCase):
     def test_rejects_garbage_values(self):
         for bad in ("0", "1", "random", "partial-", "full-fallback-extra"):
             with self.subTest(bad=bad):
-                with self.assertRaises(ValueError):
+                with self.assertRaises(ValueError) as err:
                     UploadMode.parse(bad)
+                message = str(err.exception)
+                self.assertIn("invalid uploadmode value", message.lower())
+                self.assertIn(bad, message)
 
 
 class Step3MergeStrategyEdgeTest(unittest.TestCase):
