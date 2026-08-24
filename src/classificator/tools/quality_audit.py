@@ -100,6 +100,7 @@ def _load_run(path: Path, repo: RunCsvRepository) -> dict[str, object]:
     l1_word_ids: set[int] = set()
     l1_words: set[str] = set()
     total_rows = 0
+    seen_word_ids: set[int] = set()
 
     headers = table.headers
     idx_word_id = headers.index("word_id")
