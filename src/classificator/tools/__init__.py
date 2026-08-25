@@ -42,9 +42,23 @@ def _validate_tool_modules() -> list[str]:
     return errors
 
 
+def validate_tools() -> None:
+    """Raise ValueError with all validation errors found.
+
+    Raises:
+        ValueError: With error details if any tool validation fails.
+    """
+    errors = _validate_tool_modules()
+    if errors:
+        raise ValueError(
+            f"Tool module validation failed:\n  " + "\n  ".join(errors)
+        )
+
+
 __all__ = [
     "_TOOL_MODULES",
     "_validate_tool_modules",
+    "validate_tools",
     "build_retry_input",
     "run_chain_rebalance",
     "run_quality_audit",
