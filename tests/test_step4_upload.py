@@ -151,8 +151,12 @@ class TestStep4Upload(unittest.TestCase):
             with self.assertRaises(RuntimeError) as ctx:
                 run_step4(options, word_store=self.mock_word_store, repo=self.mock_repo, marker_writer=self.mock_marker_writer)
             self.assertIn("Quality audit failed", str(ctx.exception))
+            # The specific audit failure reason must be propagated in the error message
+            self.assertIn("jaccard too low", str(ctx.exception))
             # Upload must not have been executed before the gate raised
             self.assertFalse(self.mock_word_store.update_rarity_levels_chunked.called)
+            self.assertFalse(self.mock_repo.write_rows.called)
+            self.assertFalse(self.mock_marker_writer.mark_uploaded_rows.called)
 
     def test_partial_audit_pass_allows_upload(self):
         # When reference_csv is provided and quality audit passes, run_step4 proceeds normally
