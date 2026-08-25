@@ -246,3 +246,27 @@ class RarityDistributionTest(unittest.TestCase):
         from classificator.tools.rarity_distribution import _validate_level
 
         self.assertEqual(_validate_level("3", "test_col", 1), 3)
+
+    def test_whitespace_padded_level_is_stripped_and_counted(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "padded.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "rarity_level"],
+                [["1", "om", " 2 "], ["2", "rar", "5"]],
+            )
+            result = run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertEqual(result.total_rows, 2)
+            self.assertEqual(result.distribution[2], 1)
+            self.assertEqual(result.distribution[5], 1)
+
+    def test_header_only_csv_returns_zero_distribution_mode_one(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "headers_only.csv"
+            self._write_csv(path, ["word_id", "word", "rarity_level"], [])
+            result = run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertEqual(result.total_rows, 0)
+            self.assertEqual(result.distribution, {1: 0, 2: 0, 3: 0, 4: 0, 5: 0})
+            self.assertEqual(result.mode, 1)
