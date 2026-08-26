@@ -28,19 +28,17 @@ class RarityDistribution:
         if not (1 <= level <= 5):
             raise ValueError(f"Level must be in range 1..5, got {level}")
 
-    def _validate_and_increment(self, level: int) -> None:
+    def increment(self, level: int) -> None:
         self._validate_level(level)
         self._counts[level] += 1
-
-    def increment(self, level: int) -> None:
-        self._validate_and_increment(level)
 
     def set_level(self, previous_level: int | None, new_level: int) -> None:
         if previous_level is not None:
             count = self[previous_level]
             if count > 0:
                 self._counts[previous_level] -= 1
-        self._validate_and_increment(new_level)
+        self._validate_level(new_level)
+        self._counts[new_level] += 1
 
     def __getitem__(self, level: int) -> int:
         self._validate_level(level)
@@ -48,7 +46,7 @@ class RarityDistribution:
 
     def count(self, level: int) -> int:
         self._validate_level(level)
-        return self.__getitem__(level)
+        return self._counts[level]
 
     @property
     def total(self) -> int:

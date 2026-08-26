@@ -6,13 +6,16 @@ from unittest.mock import patch
 from classificator.run_csv_repository import RunCsvRepository
 from classificator.tools.review_low_confidence import (
     ReviewLabel,
+    ReviewItem,
     _map_input_to_label,
     _resolve_level_column,
+    append_review_label,
     build_review_queue,
     compute_l1_review_stats,
     load_latest_review_labels,
     load_review_items,
     parse_only_levels,
+    run_l1_review_check,
     run_review_low_confidence,
 )
 
@@ -234,6 +237,173 @@ class ReviewLowConfidenceTest(unittest.TestCase):
             csv_path.write_text(content, encoding="utf-8")
             result = load_latest_review_labels(csv_path)
             self.assertEqual(result[10].label.strip(), "2".strip())
+
+
+class LoadReviewItemsContractTest(unittest.TestCase):
+    def setUp(self):
+        self.repo = RunCsvRepository()
+
+    def _write_csv(self, path: Path, headers: list[str], rows: list[list[str]]):
+        self.repo.write_rows(path, headers, rows)
+
+    def test_missing_confidence_column_defaults_to_one(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "run.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "type", "rarity_level"],
+                [["1", "cuvant1", "N", "1"]],
+            )
+            items = load_review_items(csv_path=path, repo=self.repo)
+            self.assertEqual(len(items), 1)
+            self.assertEqual(items[0].predicted_confidence, 1.0)
+
+    def test_invalid_level_raises(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "run.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "type", "rarity_level", "confidence"],
+                [["1", "cuvant1", "N", "0", "0.5"]],
+            )
+            with self.assertRaises(ValueError) as cm:
+                load_review_items(csv_path=path, repo=self.repo)
+            self.assertIn("Invalid rarity_level 0", str(cm.exception))
+
+    def test_confidence_out_of_range_raises(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "run.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "type", "rarity_level", "confidence"],
+                [["1", "cuvant1", "N", "1", "1.5"]],
+            )
+            with self.assertRaises(ValueError) as cm:
+                load_review_items(csv_path=path, repo=self.repo)
+            self.assertIn("Invalid confidence 1.5", str(cm.exception))
+
+    def test_only_levels_filters_levels(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "run.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "type", "rarity_level", "confidence"],
+                [
+                    ["1", "a", "N", "1", "0.1"],
+                    ["2", "b", "N", "2", "0.2"],
+                    ["3", "c", "N", "3", "0.3"],
+                ],
+            )
+            items = load_review_items(csv_path=path, repo=self.repo, only_levels={1, 3})
+            self.assertEqual([x.word_id for x in items], [1, 3])
+
+    def test_explicit_level_column_not_in_headers_raises(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "run.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "type", "rarity_level", "confidence"],
+                [["1", "a", "N", "1", "0.1"]],
+            )
+            with self.assertRaises(ValueError) as cm:
+                load_review_items(csv_path=path, repo=self.repo, level_column="final_level")
+            self.assertIn("missing requested level column 'final_level'", str(cm.exception))
+
+
+class L1GateTest(unittest.TestCase):
+    def _write_labels(self, root: Path, rows: list[list[str]]) -> Path:
+        path = root / "labels.csv"
+        RunCsvRepository().write_rows(
+            path,
+            ["ts_utc", "run_csv", "word_id", "word", "type", "predicted_level", "predicted_confidence", "label"],
+            rows,
+        )
+        return path
+
+    def test_gate_pass_returns_stats(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            labels_csv = self._write_labels(
+                root,
+                [
+                    ["t", "r", "1", "a", "N", "1", "0.1", "1"],
+                    ["t", "r", "2", "b", "N", "1", "0.2", "1"],
+                ],
+            )
+            stats = run_l1_review_check(labels_csv=labels_csv, min_reviewed=2, min_precision=0.5)
+            self.assertEqual(stats.reviewed_decided, 2)
+            self.assertEqual(stats.accepted_level1, 2)
+            self.assertEqual(stats.precision, 1.0)
+
+    def test_gate_fail_on_low_precision_exits_one(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            labels_csv = self._write_labels(
+                root,
+                [
+                    ["t", "r", "1", "a", "N", "1", "0.1", "1"],
+                    ["t", "r", "2", "b", "N", "1", "0.2", "2"],
+                ],
+            )
+            with self.assertRaises(SystemExit) as cm:
+                run_l1_review_check(labels_csv=labels_csv, min_precision=0.9)
+            self.assertEqual(cm.exception.code, 1)
+
+    def test_gate_fail_on_low_reviewed_exits_one(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            labels_csv = self._write_labels(root, [["t", "r", "1", "a", "N", "1", "0.1", "2"]])
+            with self.assertRaises(SystemExit) as cm:
+                run_l1_review_check(labels_csv=labels_csv, min_reviewed=5)
+            self.assertEqual(cm.exception.code, 1)
+
+
+class AppendReviewLabelTest(unittest.TestCase):
+    def test_append_creates_header_then_row(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            labels_csv = root / "labels.csv"
+            run_csv = root / "run.csv"
+            item = ReviewItem(word_id=7, word="cuvant7", type="N", predicted_level=1, predicted_confidence=0.123456)
+            append_review_label(labels_csv=labels_csv, run_csv=run_csv, item=item, label="1")
+            append_review_label(labels_csv=labels_csv, run_csv=run_csv, item=item, label="2")
+            content = labels_csv.read_text(encoding="utf-8")
+            lines = content.strip().splitlines()
+            self.assertEqual(lines[0], "ts_utc,run_csv,word_id,word,type,predicted_level,predicted_confidence,label")
+            self.assertEqual(len(lines), 3)
+            latest = load_latest_review_labels(labels_csv)
+            self.assertEqual(latest[7].label, "2")
+            self.assertEqual(latest[7].predicted_level, 1)
+
+
+class EmptyQueueTest(unittest.TestCase):
+    def test_empty_queue_prints_l1_summary_and_returns(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / "run.csv"
+            labels_csv = root / "labels.csv"
+            RunCsvRepository().write_rows(
+                csv_path,
+                ["word_id", "word", "type", "rarity_level", "confidence"],
+                [["1", "a", "N", "1", "0.1"]],
+            )
+            # Pre-label the only item so the queue is empty
+            load_latest_review_labels(labels_csv)
+            from classificator.tools.review_low_confidence import ReviewItem as _RI
+
+            item = _RI(word_id=1, word="a", type="N", predicted_level=1, predicted_confidence=0.1)
+            append_review_label(labels_csv=labels_csv, run_csv=csv_path, item=item, label="1")
+            with patch("builtins.print") as mock_print:
+                run_review_low_confidence(csv_path=csv_path, labels_csv=labels_csv, repo=RunCsvRepository())
+            out = [str(c.args[0]) for c in mock_print.call_args_list]
+            self.assertTrue(any("queue_size=0" in line for line in out))
+            self.assertTrue(any("l1_reviewed_decided=1" in line for line in out))
+            self.assertTrue(any("l1_precision=1.0000" in line for line in out))
 
 
 class ReviewSkipCountTest(unittest.TestCase):

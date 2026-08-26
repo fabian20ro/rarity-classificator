@@ -60,7 +60,7 @@ class BatchSizeAdapter:
         self._size_changes: list[tuple[int, int]] = [(0, initial_size)]
 
     def __repr__(self) -> str:
-        return f"BatchSizeAdapter(size={self.current_size}, rate={self.success_rate():.2f}, trend={self.trend}, window={len(self.outcomes)}/{self.window_size}, min={self.min_size}, max={self.max_size}, threshold={self.success_threshold})"
+        return f"BatchSizeAdapter(size={self.current_size}, rate={self.success_rate():.2f}, trend={self.trend}, window={len(self.outcomes)}/{self.window_size}, min={self.min_size}, max={self.max_size}, threshold={self.success_threshold}, low={self.low_threshold}, high={self.high_threshold})"
 
     def __str__(self) -> str:
         return (
