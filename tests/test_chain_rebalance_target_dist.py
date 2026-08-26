@@ -447,6 +447,75 @@ class TestChainRebalance(unittest.TestCase):
             for f in [Path("dummy.csv"), Path("dummy_sp.txt"), Path("dummy_ut.txt")]:
                 if f.exists(): f.unlink(missing_ok=True)
 
+    def test_resume_consumes_state_file_and_skips_completed_steps(self):
+        """Resume with an existing state file must continue from the saved step.
+
+        Production contract (run_chain_rebalance):
+        - resume=True + state file → load last_completed_step and current_csv;
+          the saved CSV must exist or a FileNotFoundError is raised
+        - steps <= last_completed are skipped and their output CSVs must exist
+        - steps > last_completed execute; the final state write is step 8
+        """
+        from unittest.mock import patch
+        from dataclasses import replace
+        from src.classificator.tools.chain_rebalance_target_dist import _load_state, _write_state
+
+        captured_transitions = []
+
+        def fake_run_step5(step5_options, *, repo, lm_client, output_dir):
+            t = step5_options.transitions[0]
+            captured_transitions.append((t.from_level, t.from_level_upper, t.to_level))
+
+        class MockTable:
+            headers = ["word_id", "rarity_level"]
+            records = [MagicMock(values=["0", str(i)]) for i in range(1, 6)] * 12040
+
+        class MockRepo(RunCsvRepository):
+            def read_table(self, path):
+                return MockTable()
+            def load_run_rows(self, path):
+                return []
+
+        Path("dummy_sp.txt").write_text("", encoding="utf-8")
+        Path("dummy_ut.txt").write_text("", encoding="utf-8")
+        Path("dummy.csv").touch()
+        Path("dummy_runs").mkdir(exist_ok=True)
+        for step_idx in (1, 2, 3, 4):
+            (Path("dummy_runs") / f"test_run_step{step_idx}.csv").touch()
+
+        options = replace(_make_options(), resume=True)
+        state_path = Path("dummy_state")
+        saved_csv = Path("dummy_runs") / "test_run_step4.csv"
+        _write_state(state_path, 4, saved_csv, options)
+
+        try:
+            with patch("src.classificator.tools.chain_rebalance_target_dist._count_total_words", return_value=60200), \
+                 patch("src.classificator.tools.chain_rebalance_target_dist.run_step5", side_effect=fake_run_step5) as mock_s5:
+                run_chain_rebalance(
+                    options=options,
+                    repo=MockRepo(),
+                    lm_client=MagicMock(spec=LmStudioClient),
+                    output_dir=Path("."),
+                )
+
+            # Steps 1..4 are skipped; only steps 5..8 execute
+            self.assertEqual(mock_s5.call_count, 4)
+            self.assertEqual(
+                captured_transitions,
+                [(2, 3, 2), (3, 4, 3), (3, 4, 3), (4, 5, 4)],
+                f"resume must execute only steps 5..8, got {captured_transitions}",
+            )
+            final_state = _load_state(state_path)
+            self.assertEqual(final_state["last_completed_step"], 8)
+            self.assertEqual(final_state["current_csv"], str(Path("dummy_runs") / "test_run_step8.csv"))
+        finally:
+            for f in [Path("dummy.csv"), Path("dummy_sp.txt"), Path("dummy_ut.txt"), state_path]:
+                if f.exists():
+                    f.unlink()
+            if Path("dummy_runs").exists():
+                import shutil
+                shutil.rmtree("dummy_runs")
+
 
 def _make_options():
     return ChainOptions(
