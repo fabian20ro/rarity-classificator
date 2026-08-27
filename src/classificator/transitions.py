@@ -70,6 +70,15 @@ def validate_transition_set(transitions: list[LevelTransition]) -> None:
         raise ValueError(f"Transitions must not overlap source levels: {dup}")
 
 
+def _parse_level(value: str, token: str) -> int:
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise ValueError(
+            f"Invalid transition token '{token}': non-numeric level '{value}'"
+        ) from exc
+
+
 def parse_transitions(raw: str | None) -> list[LevelTransition]:
     input_text = (raw or DEFAULT_REBALANCE_TRANSITIONS).strip()
     out: list[LevelTransition] = []
@@ -78,15 +87,15 @@ def parse_transitions(raw: str | None) -> list[LevelTransition]:
         if len(parts) != 2:
             raise ValueError(f"Invalid transition token '{token}'. Expected from:to or from-from:to")
         src = parts[0].strip()
-        to_level = int(parts[1].strip())
+        to_level = _parse_level(parts[1].strip(), token)
         if "-" in src:
             lo_s, hi_s = src.split("-", 1)
-            lo = int(lo_s.strip())
-            hi = int(hi_s.strip())
+            lo = _parse_level(lo_s.strip(), token)
+            hi = _parse_level(hi_s.strip(), token)
             require_valid_pair_transition(lo, hi, to_level)
             out.append(LevelTransition(from_level=lo, from_level_upper=hi, to_level=to_level))
         else:
-            fr = int(src)
+            fr = _parse_level(src, token)
             require_valid_transition(fr, to_level)
             out.append(LevelTransition(from_level=fr, to_level=to_level))
 
