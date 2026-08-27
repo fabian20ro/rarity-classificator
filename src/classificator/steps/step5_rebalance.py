@@ -304,6 +304,7 @@ def _apply_transition(
                 scored=scored,
                 common_level=common_level,
                 common_count=common_count,
+                rng=rng,
             )
 
         switched_events = _apply_batch_assignments(
