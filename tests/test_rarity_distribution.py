@@ -66,8 +66,9 @@ class RarityDistributionTest(unittest.TestCase):
                 ["word_id", "word", "rarity_level"],
                 [["1", "om", "6"]],
             )
-            with self.assertRaises(ValueError):
+            with self.assertRaises(ValueError) as cm:
                 run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertIn("must be between 1 and 5", str(cm.exception))
 
     def test_count_validates_level_range(self):
         dist = RarityDistribution.from_levels([1, 2, 3])
