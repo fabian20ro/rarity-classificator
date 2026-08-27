@@ -1,8 +1,7 @@
 """Pipeline step modules.
 
-Package-level validation: verifies all step entry points are importable and
-callable. Enforced at import time (fail fast) and re-checkable on demand via
-_validate_step_modules().
+Package-level validation: verifies all step entry points are importable and callable.
+Run explicitly via _validate_step_modules() or on demand.
 """
 
 import inspect
