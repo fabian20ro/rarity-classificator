@@ -83,39 +83,13 @@ def build_retry_input(
                 )
 
             word_id = node.get("word_id")
-            # Type guard — every branch raises or skips with a unique, actionable
-            # message; tests assert specific substrings per check. None/empty-string
-            # are skipped silently (missing data). All other non-int types raise
-            # because they signal upstream corruption rather than benign parse miss.
-            if isinstance(word_id, bool):
-                raise ValueError(
-                    f"Boolean word_id in failed JSONL: {node}"
-                )
-            elif isinstance(word_id, float):
-                raise ValueError(
-                    f"Non-integer word_id in failed JSONL (float): {node}"
-                )
-            elif isinstance(word_id, (list, dict)):
-                raise ValueError(
-                    f"Unsupported word_id type in failed JSONL ({type(word_id).__name__}): {word_id!r}"
-                )
-            elif word_id is None or (isinstance(word_id, str) and word_id.strip() == ""):
+            # All word_id validation lives in `_validate_jsonl_word_id` so the
+            # documented boundary has a single source of truth: None/empty-string
+            # is skipped silently (missing data); every other malformed or
+            # non-positive value raises with a unique, actionable message.
+            word_int = _validate_jsonl_word_id(word_id, node)
+            if word_int is None:
                 continue
-            elif isinstance(word_id, str):
-                raise ValueError(
-                    f"String word_id in failed JSONL: {word_id!r}"
-                )
-
-            try:
-                word_int = int(word_id)
-            except ValueError:
-                raise ValueError(
-                    f"Unparseable word_id in failed JSONL: {word_id!r}"
-                ) from None
-            if word_int <= 0:
-                raise ValueError(
-                    f"Non-positive word_id in failed JSONL: {word_int}"
-                )
             wanted_ids.add(word_int)
 
     table = repo.read_table(base_csv)
