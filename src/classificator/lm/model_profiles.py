@@ -61,10 +61,9 @@ KNOWN_MODELS: frozenset[str] = frozenset(DEFAULTS.keys())
 
 # Cross-check imported MODEL_* constants against DEFAULTS — surfaces silent drift.
 _EXPECTED_KEYS = {name.lower() for name in (MODEL_GPT_OSS_20B, MODEL_GLM_47_FLASH, MODEL_MINISTRAL_3_8B, MODEL_EUROLLM_22B_MLX_4BIT, MODEL_EUROLLM_22B)}
-_actual_keys = {k.lower() for k in DEFAULTS.keys()}
-if _EXPECTED_KEYS != _actual_keys:
-    missing = ', '.join(sorted(_EXPECTED_KEYS - _actual_keys))
-    extra = ', '.join(sorted(_actual_keys - _EXPECTED_KEYS))
+if KNOWN_MODELS != _EXPECTED_KEYS:
+    missing = ', '.join(sorted(_EXPECTED_KEYS - KNOWN_MODELS))
+    extra = ', '.join(sorted(KNOWN_MODELS - _EXPECTED_KEYS))
     raise AssertionError(f"model_profiles drift: unregistered MODEL_* constants: {missing}; unexpected entries: {extra}")
 
 
