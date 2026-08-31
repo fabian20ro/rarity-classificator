@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -15,6 +16,7 @@ class RarityDistributionResult:
     total_rows: int
     distribution: dict[int, int]
     mode: int
+    std_dev: float
 
 
 def run_rarity_distribution(
@@ -43,6 +45,7 @@ def run_rarity_distribution(
         distribution[level] += 1
 
     mode = max(distribution, key=distribution.get)
+    std_dev = _weighted_std_dev(distribution, total_rows)
     print(
         f"input_csv={csv_path}",
         f"level_column={resolved_level_col}",
@@ -55,6 +58,7 @@ def run_rarity_distribution(
         + " ".join([f"{k}:{_pct(v, total_rows):.2f}%" for k, v in sorted(distribution.items())])
         + "]"
     )
+    print(f"std_dev={std_dev:.2f}")
 
     return RarityDistributionResult(
         csv_path=csv_path,
@@ -62,6 +66,7 @@ def run_rarity_distribution(
         total_rows=total_rows,
         distribution=distribution,
         mode=mode,
+        std_dev=std_dev,
     )
 
 
@@ -94,3 +99,11 @@ def _pct(part: int, total: int) -> float:
     if total <= 0:
         return 0.0
     return (part * 100.0) / total
+
+
+def _weighted_std_dev(distribution: dict[int, int], total_rows: int) -> float:
+    if total_rows <= 0:
+        return 0.0
+    mean = sum(level * count for level, count in distribution.items()) / total_rows
+    variance = sum(count * (level - mean) ** 2 for level, count in distribution.items()) / total_rows
+    return math.sqrt(variance)
