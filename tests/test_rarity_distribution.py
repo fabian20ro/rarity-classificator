@@ -271,3 +271,35 @@ class RarityDistributionTest(unittest.TestCase):
             self.assertEqual(result.total_rows, 0)
             self.assertEqual(result.distribution, {1: 0, 2: 0, 3: 0, 4: 0, 5: 0})
             self.assertEqual(result.mode, 1)
+
+    def test_std_dev_zero_when_all_rows_same_level(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "uniform.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "rarity_level"],
+                [["1", "a", "2"], ["2", "b", "2"], ["3", "c", "2"]],
+            )
+            result = run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertEqual(result.std_dev, 0.0)
+
+    def test_std_dev_positive_when_levels_mixed(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "mixed.csv"
+            self._write_csv(
+                path,
+                ["word_id", "word", "rarity_level"],
+                [["1", "a", "1"], ["2", "b", "5"]],
+            )
+            result = run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertGreater(result.std_dev, 0.0)
+
+    def test_std_dev_zero_when_total_rows_zero(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / "headers_only_stddev.csv"
+            self._write_csv(path, ["word_id", "word", "rarity_level"], [])
+            result = run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertEqual(result.std_dev, 0.0)
