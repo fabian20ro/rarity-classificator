@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from dataclasses import replace
+from dataclasses import fields, replace
 
 from ..constants import (
     MODEL_EUROLLM_22B,
