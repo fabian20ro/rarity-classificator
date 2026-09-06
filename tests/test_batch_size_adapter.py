@@ -1498,6 +1498,19 @@ class TestBatchSizeAdapter(unittest.TestCase):
         self.assertEqual(adapter.step_count, 0)
         self.assertEqual(adapter.total_records, 0)
 
+    def test_record_outcome_rejects_non_numeric(self):
+        """record_outcome raises TypeError for non-numeric input, state unchanged."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        adapter.record_outcome(1.0)
+        self.assertEqual(adapter.step_count, 1)
+
+        with self.assertRaises(TypeError):
+            adapter.record_outcome("0.5")
+
+        self.assertEqual(len(adapter.outcomes), 1)
+        self.assertEqual(adapter.step_count, 1)
+        self.assertEqual(adapter.current_size, adapter.current_size)
+
 
 if __name__ == "__main__":
     unittest.main()
