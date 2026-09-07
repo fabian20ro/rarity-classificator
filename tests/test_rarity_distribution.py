@@ -1,7 +1,11 @@
+import json
 import tempfile
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 
+from classificator.cli import main
 from classificator.distribution import RarityDistribution
 from classificator.run_csv_repository import RunCsvRepository
 from classificator.tools.rarity_distribution import run_rarity_distribution
