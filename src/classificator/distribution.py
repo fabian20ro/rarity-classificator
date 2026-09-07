@@ -52,6 +52,12 @@ class RarityDistribution:
     def total(self) -> int:
         return sum(self._counts[1:6])
 
+    def to_dict(self) -> dict[str, int]:
+        data: dict[str, int] = {"total": self.total}
+        for level in range(1, 6):
+            data[str(level)] = self[level]
+        return data
+
     def format(self) -> str:
         total = self.total
         parts = []

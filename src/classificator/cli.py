@@ -180,6 +180,7 @@ def main(argv: list[str] | None = None) -> int:
             csv_path=Path(args.csv),
             level_column=args.level_column,
             repo=repo,
+            json_output=args.json,
         )
         return 0
 
@@ -312,9 +313,11 @@ def _build_parser() -> argparse.ArgumentParser:
     rd = sub.add_parser("rarity-distribution", help="Print rarity level distribution for a CSV")
     rd.add_argument("--csv", required=True)
     rd.add_argument("--level-column", help="Optional explicit level column (e.g. rarity_level/final_level)")
+    rd.add_argument("--json", action="store_true", help="Print a single machine-readable JSON object instead of text")
     rda = sub.add_parser("dist", help="Alias of rarity-distribution")
     rda.add_argument("--csv", required=True)
     rda.add_argument("--level-column", help="Optional explicit level column (e.g. rarity_level/final_level)")
+    rda.add_argument("--json", action="store_true", help="Print a single machine-readable JSON object instead of text")
 
     rv = sub.add_parser(
         "review-low-confidence",

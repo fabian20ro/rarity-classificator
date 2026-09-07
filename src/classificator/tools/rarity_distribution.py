@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import json
 import math
 from dataclasses import dataclass
 from pathlib import Path
 
+from ..distribution import RarityDistribution
 from ..run_csv_repository import RunCsvRepository
 
 _DEFAULT_LEVEL_COLUMNS = ("final_level", "rarity_level", "median_level")
@@ -25,6 +27,7 @@ def run_rarity_distribution(
     repo: RunCsvRepository,
     level_column: str | None = None,
     quiet: bool = False,
+    json_output: bool = False,
 ) -> RarityDistributionResult:
     table = repo.read_table(csv_path)
     resolved_level_col = _resolve_level_column(table.headers, level_column)
@@ -46,19 +49,23 @@ def run_rarity_distribution(
 
     mode = max(distribution, key=distribution.get)
     std_dev = _weighted_std_dev(distribution, total_rows)
-    print(
-        f"input_csv={csv_path}",
-        f"level_column={resolved_level_col}",
-        f"mode={mode}",
-        f"distribution=[1:{distribution[1]} 2:{distribution[2]} 3:{distribution[3]} ",
-        f"4:{distribution[4]} 5:{distribution[5]}] total={total_rows}"
-    )
-    print(
-        "distribution_pct=["
-        + " ".join([f"{k}:{_pct(v, total_rows):.2f}%" for k, v in sorted(distribution.items())])
-        + "]"
-    )
-    print(f"std_dev={std_dev:.2f}")
+    if json_output:
+        levels = [level for level, count in distribution.items() for _ in range(count)]
+        print(json.dumps(RarityDistribution.from_levels(levels).to_dict()))
+    else:
+        print(
+            f"input_csv={csv_path}",
+            f"level_column={resolved_level_col}",
+            f"mode={mode}",
+            f"distribution=[1:{distribution[1]} 2:{distribution[2]} 3:{distribution[3]} ",
+            f"4:{distribution[4]} 5:{distribution[5]}] total={total_rows}"
+        )
+        print(
+            "distribution_pct=["
+            + " ".join([f"{k}:{_pct(v, total_rows):.2f}%" for k, v in sorted(distribution.items())])
+            + "]"
+        )
+        print(f"std_dev={std_dev:.2f}")
 
     return RarityDistributionResult(
         csv_path=csv_path,
