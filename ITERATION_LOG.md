@@ -367,3 +367,10 @@ Each entry should follow this structure:
 **Outcome:** Success. Ruff and all 372 unit tests pass from the replacement repository.
 **Insight:** A repository rename should update current integration-boundary documentation while preserving stable CLI/package identifiers and historical iteration records.
 **Promoted to Lessons Learned:** No
+
+### [2026-09-07] Complete JSON distribution acceptance
+
+**What happened:** Added executable known/empty distribution and CLI JSON acceptance tests, alias coverage, and an exact legacy text-output assertion. Reused the existing distribution accumulator during CSV traversal instead of expanding counts into a second list of individual levels.
+**Verification:** New no-re-expansion regression failed before the fix; all 35 focused tests passed after. Container-isolated local-green passed Ruff and all 437 unit tests.
+**Insight:** A changed test file is not proof of added coverage; assertions must exercise the promised behavior. JSON serialization needs only five aggregated counts, not another per-row allocation.
+**Promoted to Lessons Learned:** No

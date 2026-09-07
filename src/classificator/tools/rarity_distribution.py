@@ -33,7 +33,7 @@ def run_rarity_distribution(
     resolved_level_col = _resolve_level_column(table.headers, level_column)
     idx_level = table.headers.index(resolved_level_col)
 
-    distribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+    counts = RarityDistribution()
     total_rows = 0
 
     for rec in table.records:
@@ -45,13 +45,13 @@ def run_rarity_distribution(
             raise ValueError(f"Missing {resolved_level_col} at row {rec.line_number} in {csv_path}")
         raw_level = vals[idx_level].strip()
         level = _validate_level(raw_level, resolved_level_col, rec.line_number)
-        distribution[level] += 1
+        counts.increment(level)
 
+    distribution = {level: counts[level] for level in range(1, 6)}
     mode = max(distribution, key=distribution.get)
     std_dev = _weighted_std_dev(distribution, total_rows)
     if json_output:
-        levels = [level for level, count in distribution.items() for _ in range(count)]
-        print(json.dumps(RarityDistribution.from_levels(levels).to_dict()))
+        print(json.dumps(counts.to_dict()))
     else:
         print(
             f"input_csv={csv_path}",
