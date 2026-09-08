@@ -748,5 +748,51 @@ class BuildRetryInputTest(unittest.TestCase):
             self.assertIn("doi", words)
             self.assertIn("cinci", words)
 
+    def test_build_retry_input_warns_when_failed_ids_missing_from_base(self):
+        """Regression: requested word_ids absent from base CSV must log a module WARNING.
+
+        The missing-ids branch (fail-soft by design) writes the matched rows
+        and returns their count, but is only observable through the warning on
+        the module logger — no exception is raised and the output file is
+        still produced. Without asserting the log, a regression that drops
+        the warning (or fails loudly instead) would pass silently.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            # word_id 2 exists in base; 9 does not
+            rows = [{"word_id": 2, "error": "x"}, {"word_id": 9, "error": "y"}]
+            failed.write_text(
+                "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
+            )
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1", "unu"], ["2", "doi"], ["3", "trei"]],
+            )
+
+            with self.assertLogs(
+                "classificator.tools.build_retry_input", level="WARNING"
+            ) as cm:
+                count = build_retry_input(
+                    failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+                )
+
+            # Fail-soft: matched row still written and counted
+            self.assertEqual(count, 1)
+            table = self.repo.read_table(out)
+            self.assertEqual([int(rec.values[0]) for rec in table.records], [2])
+
+            # Exactly one warning, naming the missing id, the base CSV, and the count
+            self.assertEqual(len(cm.output), 1)
+            warning = cm.output[0]
+            self.assertIn("WARNING", warning)
+            self.assertIn("not found in base CSV", warning)
+            self.assertIn("base.csv", warning)
+            self.assertIn("[9]", warning)
+
     if __name__ == "__main__":
         unittest.main()
