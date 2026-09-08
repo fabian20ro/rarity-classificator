@@ -113,6 +113,14 @@ class TestCsvCodec(unittest.TestCase):
             self.codec.read_table(path)
         self.assertIn("line 3 has 3 columns, expected 2", str(cm.exception))
 
+    def test_write_table_mismatched_columns_raises(self):
+        path = self.test_dir / "bad_write.csv"
+        headers = ["id", "name"]
+        rows = [["1", "val1"], ["2"]]
+        with self.assertRaises(CsvFormatError) as cm:
+            self.codec.write_table(path, headers, rows)
+        self.assertIn("Attempted to write has 1 columns, expected 2", str(cm.exception))
+
     def test_write_table_success(self):
         path = self.test_dir / "out.csv"
         headers = ["id", "name"]
