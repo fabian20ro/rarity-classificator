@@ -4,6 +4,7 @@ import unittest
 from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
+from unittest.mock import patch
 
 from classificator.cli import main
 from classificator.distribution import RarityDistribution
@@ -17,6 +18,67 @@ class RarityDistributionTest(unittest.TestCase):
 
     def _write_csv(self, path: Path, headers: list[str], rows: list[list[str]]):
         self.repo.write_rows(path, headers, rows)
+
+    def test_to_dict_preserves_counts_and_returns_integers(self):
+        result = RarityDistribution.from_levels([1, 1, 2, 5]).to_dict()
+        self.assertEqual(result, {"total": 4, "1": 2, "2": 1, "3": 0, "4": 0, "5": 1})
+        self.assertTrue(all(type(value) is int for value in result.values()))
+
+    def test_to_dict_empty_distribution_contains_all_zero_counts(self):
+        self.assertEqual(
+            RarityDistribution().to_dict(),
+            {"total": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0},
+        )
+
+    def test_cli_json_outputs_one_object_for_command_and_alias(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "run.csv"
+            self._write_csv(path, ["rarity_level"], [["1"], ["1"], ["5"]])
+            for command in ("rarity-distribution", "dist"):
+                with self.subTest(command=command):
+                    output = StringIO()
+                    with redirect_stdout(output):
+                        exit_code = main([command, "--csv", str(path), "--json"])
+                    self.assertEqual(exit_code, 0)
+                    self.assertEqual(
+                        json.loads(output.getvalue()),
+                        {"total": 3, "1": 2, "2": 0, "3": 0, "4": 0, "5": 1},
+                    )
+
+    def test_cli_json_empty_csv(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "empty.csv"
+            self._write_csv(path, ["rarity_level"], [])
+            output = StringIO()
+            with redirect_stdout(output):
+                exit_code = main(["rarity-distribution", "--csv", str(path), "--json"])
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(json.loads(output.getvalue()), RarityDistribution().to_dict())
+
+    def test_cli_default_output_remains_human_readable(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "run.csv"
+            self._write_csv(path, ["rarity_level"], [["1"], ["1"], ["3"]])
+            output = StringIO()
+            with redirect_stdout(output):
+                exit_code = main(["rarity-distribution", "--csv", str(path)])
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(
+                output.getvalue(),
+                f"input_csv={path} level_column=rarity_level mode=1 "
+                "distribution=[1:2 2:0 3:1  4:0 5:0] total=3\n"
+                "distribution_pct=[1:66.67% 2:0.00% 3:33.33% 4:0.00% 5:0.00%]\n"
+                "std_dev=0.94\n",
+            )
+
+    def test_json_does_not_reexpand_counts_into_individual_levels(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "run.csv"
+            self._write_csv(path, ["rarity_level"], [["2"], ["2"], ["5"]])
+            with patch.object(RarityDistribution, "from_levels", side_effect=AssertionError("counts must not be expanded")):
+                with redirect_stdout(StringIO()) as output:
+                    result = run_rarity_distribution(csv_path=path, repo=self.repo, json_output=True)
+            self.assertEqual(json.loads(output.getvalue())["total"], result.total_rows)
 
     def test_auto_detects_rarity_level(self):
         with tempfile.TemporaryDirectory() as td:
