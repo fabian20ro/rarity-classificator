@@ -516,6 +516,72 @@ class TestChainRebalance(unittest.TestCase):
                 import shutil
                 shutil.rmtree("dummy_runs")
 
+    def test_resume_without_state_file_autodetects_contiguous_prefix_only(self):
+        """Resume without a state file must adopt only a contiguous prefix of step outputs.
+
+        Production contract (run_chain_rebalance, resume branch without state file):
+        - scan {run_base}_step{N}.csv for N = 1..8 in order
+        - last_completed = largest N such that steps 1..N all exist
+        - the scan stops at the first missing step; a later existing output (a gap)
+          must not extend last_completed, otherwise the skip loop raises
+          FileNotFoundError for the gapped step
+        """
+        from unittest.mock import patch
+        from dataclasses import replace
+
+        captured_transitions = []
+
+        def fake_run_step5(step5_options, *, repo, lm_client, output_dir):
+            t = step5_options.transitions[0]
+            captured_transitions.append((t.from_level, t.from_level_upper, t.to_level))
+
+        class MockTable:
+            headers = ["word_id", "rarity_level"]
+            records = [MagicMock(values=["0", str(i)]) for i in range(1, 6)] * 12040
+
+        class MockRepo(RunCsvRepository):
+            def read_table(self, path):
+                return MockTable()
+            def load_run_rows(self, path):
+                return []
+
+        Path("dummy_sp.txt").write_text("", encoding="utf-8")
+        Path("dummy_ut.txt").write_text("", encoding="utf-8")
+        Path("dummy.csv").touch()
+        Path("dummy_runs").mkdir(exist_ok=True)
+        # Contiguous prefix 1..2 exists, step 3 is missing, step 4 exists (gap).
+        # Autodetect must stop at step 2; the gapped step-4 output must not extend the prefix.
+        for step_idx in (1, 2, 4):
+            (Path("dummy_runs") / f"test_run_step{step_idx}.csv").touch()
+
+        options = replace(_make_options(), resume=True)
+        assert not options.state_file.exists()
+
+        try:
+            with patch("src.classificator.tools.chain_rebalance_target_dist._count_total_words", return_value=60200), \
+                 patch("src.classificator.tools.chain_rebalance_target_dist.run_step5", side_effect=fake_run_step5) as mock_s5:
+                run_chain_rebalance(
+                    options=options,
+                    repo=MockRepo(),
+                    lm_client=MagicMock(spec=LmStudioClient),
+                    output_dir=Path("."),
+                )
+
+            # last_completed = 2 → steps 3..8 execute (6 runs)
+            self.assertEqual(mock_s5.call_count, 6)
+            self.assertEqual(
+                captured_transitions,
+                [(1, 2, 1), (2, 3, 2), (2, 3, 2), (3, 4, 3), (3, 4, 3), (4, 5, 4)],
+                "autodetect must execute steps 3..8; a gapped later output (step 4) must not extend the contiguous prefix",
+            )
+        finally:
+            for f in [Path("dummy.csv"), Path("dummy_sp.txt"), Path("dummy_ut.txt"), options.state_file]:
+                if f.exists():
+                    f.unlink()
+            if Path("dummy_runs").exists():
+                import shutil
+                shutil.rmtree("dummy_runs")
+
 
 def _make_options():
     return ChainOptions(
