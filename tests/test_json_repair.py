@@ -90,3 +90,12 @@ def test_unclosed_string_gets_closing_quote():
     result = repair('{"key": "value')
     parsed = _json.loads(result)
     assert parsed == {"key": "value"}
+
+
+def test_unclosed_block_comment_drops_tail_and_still_parses():
+    # Regression: an unterminated /* ... must truncate the input (break), so the
+    # discarded tail cannot leave the document unparseable after closing.
+    import json as _json
+    result = repair('{"a": 1 /* unclosed')
+    assert "unclosed" not in result
+    assert _json.loads(result) == {"a": 1}
