@@ -26,6 +26,10 @@ def run_step1(options: Step1Options, *, word_store: WordStore, repo: RunCsvRepos
     word_count = len(rows)
     if options.dry_run:
         print(f"Step 1 dry-run. Would export {word_count} words to {options.output_csv_path}")
+        if word_count:
+            print(",".join(BASE_CSV_HEADERS))
+            for row in rows[:3]:
+                print(",".join(row))
         return None
     repo.write_rows(options.output_csv_path, BASE_CSV_HEADERS, rows)
     print(f"Step 1 complete. Exported {word_count} words to {options.output_csv_path}")

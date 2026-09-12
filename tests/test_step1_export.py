@@ -1,9 +1,12 @@
+import contextlib
+import io
 import unittest
 from pathlib import Path
 from unittest.mock import MagicMock
 from src.classificator.steps.step1_export import run_step1, Step1Options
 from src.classificator.run_csv_repository import RunCsvRepository
 from src.classificator.word_store import WordStore
+from src.classificator.constants import BASE_CSV_HEADERS
 
 
 class TestStep1Export(unittest.TestCase):
@@ -86,6 +89,63 @@ class TestStep1Export(unittest.TestCase):
         # contract that dry-run still materialises row count for its status message.
         store.fetch_all_words.assert_called_once()
         self.mock_repo.write_rows.assert_not_called()
+
+    def test_dry_run_prints_sample_rows(self):
+        # 3+ words: header line followed by exactly 3 sample data rows.
+        words = [
+            (3, "cherry", "fruit"),
+            (1, "apple", "fruit"),
+            (2, "banana", "fruit"),
+            (4, "date", "fruit"),
+        ]
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = words
+        options = Step1Options(output_csv_path=self.output_csv, dry_run=True)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            result_path = run_step1(options, word_store=store, repo=self.mock_repo)
+
+        self.assertIsNone(result_path)
+        self.mock_repo.write_rows.assert_not_called()
+        lines = buf.getvalue().splitlines()
+        # First line is the existing count message, then header, then <=3 rows.
+        self.assertIn("4 words", lines[0])
+        header_line = ",".join(BASE_CSV_HEADERS)
+        self.assertEqual(lines[1], header_line)
+        sample_lines = lines[2:]
+        self.assertEqual(len(sample_lines), 3)
+        self.assertEqual(sample_lines[0], "1,apple,fruit")
+        self.assertEqual(sample_lines[1], "2,banana,fruit")
+        self.assertEqual(sample_lines[2], "3,cherry,fruit")
+        self.assertNotIn("4,date,fruit", "\n".join(lines))
+
+    def test_dry_run_fewer_than_three_rows_prints_all(self):
+        # Fewer than 3 words: every row is printed, no padding.
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = [(7, "fig", "fruit")]
+        options = Step1Options(output_csv_path=self.output_csv, dry_run=True)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            run_step1(options, word_store=store, repo=self.mock_repo)
+
+        lines = buf.getvalue().splitlines()
+        self.assertEqual(lines[1], ",".join(BASE_CSV_HEADERS))
+        self.assertEqual(lines[2:], ["7,fig,fruit"])
+
+    def test_dry_run_empty_prints_count_only(self):
+        # Empty word list: only the count message — no header, no rows.
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = []
+        options = Step1Options(output_csv_path=self.output_csv, dry_run=True)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            result_path = run_step1(options, word_store=store, repo=self.mock_repo)
+
+        self.assertIsNone(result_path)
+        lines = buf.getvalue().splitlines()
+        self.assertEqual(len(lines), 1)
+        self.assertIn("0 words", lines[0])
+        self.assertNotIn(",".join(BASE_CSV_HEADERS), buf.getvalue())
 
     def test_run_step1_single_word(self):
         # Minimal boundary: exactly one word — verifies sorted() with single-element
