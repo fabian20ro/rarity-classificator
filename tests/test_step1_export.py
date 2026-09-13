@@ -1,4 +1,5 @@
 import contextlib
+import csv
 import io
 import unittest
 from pathlib import Path
@@ -10,6 +11,21 @@ from src.classificator.constants import BASE_CSV_HEADERS
 
 
 class TestStep1Export(unittest.TestCase):
+    def test_dry_run_quotes_csv_special_characters_without_writing(self):
+        for word in ['comma,word', 'quoted"word', 'multi\nline']:
+            with self.subTest(word=word):
+                store = MagicMock(spec=WordStore)
+                store.fetch_all_words.return_value = [(1, word, 'noun')]
+                repo = MagicMock(spec=RunCsvRepository)
+                output = io.StringIO()
+                with contextlib.redirect_stdout(output):
+                    run_step1(Step1Options(Path('never-written.csv'), dry_run=True),
+                              word_store=store, repo=repo)
+                preview = output.getvalue().split('\n', 1)[1]
+                rows = list(csv.reader(io.StringIO(preview)))
+                self.assertEqual(rows, [list(BASE_CSV_HEADERS), ['1', word, 'noun']])
+                repo.write_rows.assert_not_called()
+
     def setUp(self):
         self.output_csv = Path("test_output.csv")
         if self.output_csv.exists():

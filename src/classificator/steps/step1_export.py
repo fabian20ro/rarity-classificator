@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import csv
+import sys
 
 from ..constants import BASE_CSV_HEADERS
 from ..run_csv_repository import RunCsvRepository
@@ -27,9 +29,9 @@ def run_step1(options: Step1Options, *, word_store: WordStore, repo: RunCsvRepos
     if options.dry_run:
         print(f"Step 1 dry-run. Would export {word_count} words to {options.output_csv_path}")
         if word_count:
-            print(",".join(BASE_CSV_HEADERS))
-            for row in rows[:3]:
-                print(",".join(row))
+            writer = csv.writer(sys.stdout, lineterminator="\n")
+            writer.writerow(BASE_CSV_HEADERS)
+            writer.writerows(rows[:3])
         return None
     repo.write_rows(options.output_csv_path, BASE_CSV_HEADERS, rows)
     print(f"Step 1 complete. Exported {word_count} words to {options.output_csv_path}")

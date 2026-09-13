@@ -34,6 +34,9 @@ move it to the Archive section at the bottom with a date and reason.
 
 ## Code Patterns & Pitfalls
 
+**[2026-09-13]** Dry-run CSV previews need real CSV escaping too. Use `csv.writer`;
+round-trip comma, quote and newline fields with `csv.reader`, while asserting no file writes.
+
 <!-- Language/framework-specific gotchas discovered in this project -->
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
 **[2026-02-14]** Step5 id domain must remain batch-local — selection output must use only `local_id` in `1..N`; mixing in `word_id` or allowing `0` creates silent corruption risk.

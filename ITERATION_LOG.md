@@ -374,3 +374,12 @@ Each entry should follow this structure:
 **Verification:** New no-re-expansion regression failed before the fix; all 35 focused tests passed after. Container-isolated local-green passed Ruff and all 437 unit tests.
 **Insight:** A changed test file is not proof of added coverage; assertions must exercise the promised behavior. JSON serialization needs only five aggregated counts, not another per-row allocation.
 **Promoted to Lessons Learned:** No
+
+### [2026-09-13] CSV-safe dry-run preview
+
+**What happened:** Replaced comma joining with standard CSV serialization for the
+three-row dry-run preview. No output files written; normal export unchanged.
+**Verification:** Regression tests failed for comma/newline fields before the fix;
+13 step1 tests pass after. Actual container local-green: Ruff and444 tests PASS.
+**Insight:** Preview correctness needs escaping coverage even when happy-path output passes.
+**Promoted to Lessons Learned:** Yes
