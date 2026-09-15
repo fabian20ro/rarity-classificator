@@ -1,4 +1,6 @@
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock
 import csv
@@ -70,6 +72,42 @@ class TestStep4Upload(unittest.TestCase):
             self.assertEqual(len(rows), 2)
             self.assertEqual(rows[0]['new_level'], '2')
             self.assertEqual(rows[1]['new_level'], '3')
+
+    def test_partial_upload_prints_unchanged_count(self):
+        # word 1 already at target level (2), word 2 differs (1 -> 3)
+        self.mock_word_store.fetch_all_word_levels.return_value = [
+            WordLevel(word_id=1, rarity_level=2),
+            WordLevel(word_id=2, rarity_level=1),
+        ]
+        options = Step4Options(
+            final_csv_path=self.final_csv,
+            mode=UploadMode.PARTIAL,
+            report_path=self.report_csv,
+            upload_batch_id="test-batch"
+        )
+
+        out = StringIO()
+        with redirect_stdout(out):
+            run_step4(options, word_store=self.mock_word_store, repo=self.mock_repo, marker_writer=self.mock_marker_writer)
+
+        summary = next(line for line in out.getvalue().splitlines() if line.startswith("Step 4 complete."))
+        self.assertIn("updated=1", summary)
+        self.assertIn("unchanged=1", summary)
+
+    def test_full_fallback_print_unchanged_not_printed(self):
+        options = Step4Options(
+            final_csv_path=self.final_csv,
+            mode=UploadMode.FULL_FALLBACK,
+            report_path=self.report_csv,
+            upload_batch_id="test-batch"
+        )
+
+        out = StringIO()
+        with redirect_stdout(out):
+            run_step4(options, word_store=self.mock_word_store, repo=self.mock_repo, marker_writer=self.mock_marker_writer)
+
+        summary = next(line for line in out.getvalue().splitlines() if line.startswith("Step 4 complete."))
+        self.assertNotIn("unchanged=", summary)
 
     def test_full_upload(self):
         # Setup extra row in DB that isn't in final CSV to check fallback

@@ -61,7 +61,11 @@ def run_step4(options: Step4Options, *, word_store: WordStore, repo: RunCsvRepos
         uploaded_at=now.isoformat(),
     )
 
-    print(f"Step 4 complete. mode={options.mode.value} updated={len(updates)}")
+    if options.mode == UploadMode.PARTIAL:
+        unchanged = sum(1 for status in status_by_word_id.values() if status == "already_matched")
+        print(f"Step 4 complete. mode={options.mode.value} updated={len(updates)} unchanged={unchanged}")
+    else:
+        print(f"Step 4 complete. mode={options.mode.value} updated={len(updates)}")
     print(f"Step 4 input {input_dist.format()}")
     print(f"Step 4 uploaded {uploaded_dist.format()}")
     print(f"Upload report: {options.report_path}")
