@@ -328,5 +328,39 @@ class TestScoringContextContract(unittest.TestCase):
             ctx.run_slug = "mutated"
 
 
+class TestStep2SummaryDistribution(unittest.TestCase):
+    """Step 2 final summary shows the rarity distribution when metrics are absent."""
+
+    def test_summary_includes_distribution_when_metrics_absent(self):
+        import io
+        from contextlib import redirect_stdout
+
+        from classificator.steps.step2_score import Step2Counters, Step2Files, Step2Options, _print_summary
+        from classificator.distribution import RarityDistribution
+
+        distribution = RarityDistribution()
+        distribution.increment(1)
+        distribution.increment(3)
+
+        options = Step2Options(
+            run_slug="test_run",
+            model="test_model",
+            base_csv_path=Path("base.csv"),
+            output_csv_path=Path("out.csv"),
+        )
+        files = Step2Files(
+            run_log_path=Path("runs/test_run.jsonl"),
+            failed_log_path=Path("failed/test_run.failed.jsonl"),
+            state_path=Path("runs/test_run.state.json"),
+        )
+        counters = Step2Counters(scored_count=2, failed_count=0, distribution=distribution)
+
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            _print_summary(options, files, counters, 0, None, distribution=distribution)
+
+        self.assertIn(distribution.format(), buf.getvalue())
+
+
 if __name__ == "__main__":
     unittest.main()

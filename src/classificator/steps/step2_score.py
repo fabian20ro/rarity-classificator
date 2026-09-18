@@ -59,6 +59,7 @@ class Step2Context:
 class Step2Counters:
     scored_count: int
     failed_count: int
+    distribution: RarityDistribution | None = None
 
 
 def run_step2(options: Step2Options, *, repo: RunCsvRepository, lm_client: LmStudioClient, output_dir: Path) -> None:
@@ -90,7 +91,7 @@ def run_step2(options: Step2Options, *, repo: RunCsvRepository, lm_client: LmStu
             )
 
             _write_state(files.state_path, _completed_state(options, files, counters, pending_after))
-            _print_summary(options, files, counters, pending_after, metrics)
+            _print_summary(options, files, counters, pending_after, metrics, distribution=counters.distribution)
         except Exception as exc:
             _write_state(files.state_path, _failed_state(run_slug, exc))
             raise
@@ -203,7 +204,7 @@ def _score_pending_batches(
                 f"failed={failed_count} remaining={remaining_count} {distribution.format()}"
             )
 
-    return Step2Counters(scored_count=scored_count, failed_count=failed_count)
+    return Step2Counters(scored_count=scored_count, failed_count=failed_count, distribution=distribution)
 
 
 def _to_run_rows(scored: list, model: str, run_slug: str) -> list[RunCsvRow]:
@@ -284,13 +285,18 @@ def _print_summary(
     counters: Step2Counters,
     pending_count: int,
     metrics: Step2Metrics | None,
+    distribution: RarityDistribution | None = None,
 ) -> None:
     if metrics:
         print(metrics.format_summary())
     else:
-        print(
-            f"Step 2 complete for run '{options.run_slug}': scored={counters.scored_count} failed={counters.failed_count} pending={pending_count}"
+        summary_line = (
+            f"Step 2 complete for run '{options.run_slug}': scored={counters.scored_count} "
+            f"failed={counters.failed_count} pending={pending_count}"
         )
+        if distribution is not None:
+            summary_line = f"{summary_line} {distribution.format()}"
+        print(summary_line)
     print(f"Run CSV: {options.output_csv_path}")
     print(f"Run log: {files.run_log_path}")
     print(f"Failed log: {files.failed_log_path}")
