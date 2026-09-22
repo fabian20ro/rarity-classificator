@@ -1512,6 +1512,14 @@ class TestBatchSizeAdapter(unittest.TestCase):
         self.assertEqual(adapter.step_count, 1)
         self.assertEqual(adapter.current_size, previous_size)
 
+    def test_record_outcome_accepts_int(self):
+        """record_outcome accepts Python int (isinstance check includes int)."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=5)
+        adapter.record_outcome(1)
+        self.assertTrue(adapter.outcomes[-1])
+        adapter.record_outcome(0)
+        self.assertFalse(adapter.outcomes[-1])
+
 
 if __name__ == "__main__":
     unittest.main()
