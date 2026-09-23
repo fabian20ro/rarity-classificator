@@ -14,6 +14,7 @@ class QualityAuditResult:
     l1_jaccard: float | None
     l1_intersection: int | None
     l1_candidate_size: int
+    l1_word_count: int
     l1_reference_size: int | None
     anchor_precision: float | None
     anchor_recall: float | None
@@ -74,6 +75,7 @@ def run_quality_audit(
         l1_jaccard=l1_jaccard,
         l1_intersection=l1_intersection,
         l1_candidate_size=len(candidate["l1_word_ids"]),
+        l1_word_count=len(candidate["l1_words"]),
         l1_reference_size=l1_reference_size,
         anchor_precision=anchor_precision,
         anchor_recall=anchor_recall,
