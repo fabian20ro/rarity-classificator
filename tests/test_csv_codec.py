@@ -57,6 +57,14 @@ class TestCsvCodec(unittest.TestCase):
         table = self.codec.read_table(path)
         self.assertEqual(len(table.records), 2)
 
+    def test_read_table_trailing_blank_line_raises(self):
+        path = self.test_dir / "trailing_line.csv"
+        with open(path, "w", encoding="utf-8", newline="") as f:
+            f.write("id,name\n1,test_id\n2,test_name\n\n")
+        with self.assertRaises(CsvFormatError) as cm:
+            self.codec.read_table(path)
+        self.assertIn("line 4 has 0 columns, expected 2", str(cm.exception))
+
     def test_read_table_blank_row_in_middle_raises(self):
         path = self.test_dir / "blank_middle.csv"
         with open(path, "w", encoding="utf-8", newline="") as f:
