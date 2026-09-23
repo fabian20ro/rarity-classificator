@@ -84,6 +84,25 @@ class QualityAuditTest(unittest.TestCase):
             self.assertEqual(result.l1_candidate_size, 2)
             self.assertEqual(result.l1_reference_size, 2)
 
+    def test_duplicate_l1_word_texts_collapse_in_l1_word_count(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            cand_rows = [
+                ["1", "om", "N", "1"],
+                ["2", "om", "N", "1"],
+            ]
+            self._write_csv(candidate, headers, cand_rows)
+
+            result = run_quality_audit(
+                candidate_csv=candidate,
+                repo=self.repo,
+            )
+            self.assertEqual(result.l1_candidate_size, 2)
+            self.assertEqual(result.l1_word_count, 1)
+
     def test_empty_anchor_raises_value_error(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

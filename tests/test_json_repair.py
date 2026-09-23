@@ -99,3 +99,14 @@ def test_unclosed_block_comment_drops_tail_and_still_parses():
     result = repair('{"a": 1 /* unclosed')
     assert "unclosed" not in result
     assert _json.loads(result) == {"a": 1}
+
+
+def test_trailing_decimal_point_at_eof():
+    # Regression: _fix_trailing_decimal_points must append '0' when the '.'
+    # is the final character (the `nxt is None` arm), not only when it is
+    # followed by a non-digit.  A fix handling only the non-digit arm would
+    # leave '{"val": 1.' uncorrected, which closes to invalid JSON.
+    import json as _json
+    result = repair('{"val": 1.')
+    assert result == '{"val": 1.0}'
+    assert _json.loads(result) == {"val": 1.0}
