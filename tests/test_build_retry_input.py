@@ -513,6 +513,48 @@ class BuildRetryInputTest(unittest.TestCase):
             # Must identify the offending value for debugging
             self.assertIn("'5'", exc_str)
 
+    def test_build_retry_input_skips_empty_string_word_ids(self):
+        """Regression: empty/whitespace string word_id must be silently skipped.
+
+        The string branch raises on any non-empty string (corruption — covered
+        by test_build_retry_input_rejects_string_word_ids_in_failed_jsonl), but
+        ``""`` and whitespace-only strings are missing data per contract and
+        must be skipped like ``None`` — not raised on. Without this assertion,
+        a regression that raises on empty strings would fail the run instead
+        of the documented fail-soft behavior.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            rows = [
+                {"word_id": "", "error": "x"},
+                {"word_id": "   ", "error": "y"},
+                {"word_id": 3, "error": "ok"},
+            ]
+            failed.write_text(
+                "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
+            )
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [["1", "one"], ["3", "three"]],
+            )
+
+            count = build_retry_input(
+                failed_jsonl=failed,
+                base_csv=base,
+                output_csv=out,
+                repo=self.repo,
+            )
+            self.assertEqual(count, 1)
+
+            table = self.repo.read_table(out)
+            self.assertEqual(table.headers, ["word_id", "word"])
+            self.assertEqual([int(rec.values[0]) for rec in table.records], [3])
+
     def test_build_retry_input_raises_on_malformed_json_lines(self):
         """Regression: malformed JSON in failed file must raise ValueError.
 

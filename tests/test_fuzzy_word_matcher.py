@@ -84,6 +84,27 @@ def test_matches_with_distance_empty_vs_nonempty():
     assert normalize("ȘI") == "si"
 
 
+def test_matches_and_matches_with_distance_diverge_on_prefix_short_circuit():
+    """matches and matches_with_distance disagree on near-matches that differ
+    only in suffix positions.
+
+    ``matches`` has a common-prefix short-circuit (<=1 mismatch in the first 3
+    normalized chars AND length diff <=1) that accepts without computing full
+    edit distance. ``matches_with_distance`` returns the raw edit distance and
+    applies only the MAX_EDIT_DISTANCE threshold, so it never short-circuits.
+
+    Counterexample: "abcdef" vs "abxyzw" — normalized forms are equal length
+    (6) and share the first 2 chars ("ab") with exactly one prefix mismatch
+    ('c' vs 'x'), so ``matches`` accepts via the short-circuit; the full edit
+    distance is 4 (positions 2..5 all differ), so ``matches_with_distance``
+    reports (False, 4). Same input, opposite public results.
+    """
+    assert matches("abcdef", "abxyzw") is True
+    result, dist = matches_with_distance("abcdef", "abxyzw")
+    assert result is False
+    assert dist == 4
+
+
 def test_levenshtein_edge_cases():
     assert levenshtein("abc", "abc") == 0
     assert levenshtein("", "abc") == 3
