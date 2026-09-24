@@ -56,6 +56,11 @@ round-trip comma, quote and newline fields with `csv.reader`, while asserting no
 
 ## Testing & Quality
 
+**[2026-09-25]** Quality-gate integration fixtures must satisfy earlier campaign
+validation. Use isolated CSVs and the real repository/audit; stub the LM boundary,
+not the gate. Check independent Jaccard and anchor failures, and prove the tests
+reject a counterexample that ignores a failed audit.
+
 <!-- What breaks, what's flaky, what testing strategies work here -->
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
 **[2026-02-14]** Histogram fit is insufficient as a release gate — upload candidates need semantic checks (L1 Jaccard plus anchor precision/recall), not just target distribution match.
