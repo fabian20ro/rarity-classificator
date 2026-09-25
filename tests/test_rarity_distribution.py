@@ -40,10 +40,13 @@ class RarityDistributionTest(unittest.TestCase):
                     with redirect_stdout(output):
                         exit_code = main([command, "--csv", str(path), "--json"])
                     self.assertEqual(exit_code, 0)
+                    parsed = json.loads(output.getvalue())
                     self.assertEqual(
-                        json.loads(output.getvalue()),
+                        {k: v for k, v in parsed.items() if k not in ("mode", "std_dev")},
                         {"total": 3, "1": 2, "2": 0, "3": 0, "4": 0, "5": 1},
                     )
+                    self.assertEqual(parsed["mode"], 1)
+                    self.assertAlmostEqual(parsed["std_dev"], 1.89, places=2)
 
     def test_cli_json_empty_csv(self):
         with tempfile.TemporaryDirectory() as td:
@@ -53,7 +56,10 @@ class RarityDistributionTest(unittest.TestCase):
             with redirect_stdout(output):
                 exit_code = main(["rarity-distribution", "--csv", str(path), "--json"])
             self.assertEqual(exit_code, 0)
-            self.assertEqual(json.loads(output.getvalue()), RarityDistribution().to_dict())
+            self.assertEqual(
+                json.loads(output.getvalue()),
+                {**RarityDistribution().to_dict(), "mode": 1, "std_dev": 0.0},
+            )
 
     def test_cli_default_output_remains_human_readable(self):
         with tempfile.TemporaryDirectory() as td:
