@@ -51,7 +51,12 @@ def run_rarity_distribution(
     mode = max(distribution, key=distribution.get)
     std_dev = _weighted_std_dev(distribution, total_rows)
     if json_output:
-        print(json.dumps(counts.to_dict()))
+        payload: dict[str, int | float] = {
+            **counts.to_dict(),
+            "mode": mode,
+            "std_dev": std_dev,
+        }
+        print(json.dumps(payload))
     else:
         print(
             f"input_csv={csv_path}",

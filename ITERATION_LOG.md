@@ -383,3 +383,24 @@ three-row dry-run preview. No output files written; normal export unchanged.
 13 step1 tests pass after. Actual container local-green: Ruff and444 tests PASS.
 **Insight:** Preview correctness needs escaping coverage even when happy-path output passes.
 **Promoted to Lessons Learned:** Yes
+
+### [2026-09-25] Recover chained quality-audit coverage with valid fixtures
+
+**What happened:** Reproduced the recovered test failure: a generic mocked CSV
+repository had no level headers, so the passing case failed before the audit.
+Replaced that uncommitted recovery design with isolated temporary CSVs, the real
+repository and quality audit. Only the network-backed rebalance step is replaced.
+Covered passing output, independent Jaccard rejection and anchor rejection, plus
+the final candidate path and threshold forwarding. Production checks unchanged.
+**Verification:** Recovered fixture failed as expected. Three replacement tests
+pass; an in-memory counterexample that ignores failed audits causes both negative
+tests to fail. Container local-green: Ruff and all 451 tests PASS.
+Expanded verification with pytest found six pre-existing failures among 499
+tests (493 passed): three fuzzy-matcher expectations contradict current behavior,
+three JSON-repair tests constrain incidental whitespace. These function-style
+tests are not collected by the current unittest-only roster and CI commands.
+Runner migration needs a separate requirement/test audit; no unrelated semantics
+changed here. This is a verification gap, not a fully green complete test suite.
+**Insight:** Gate tests need fixtures satisfying earlier validations; replacing
+the gate itself with a canned result cannot prove its threshold behavior.
+**Promoted to Lessons Learned:** Yes
