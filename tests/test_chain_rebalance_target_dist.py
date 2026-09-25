@@ -582,6 +582,67 @@ class TestChainRebalance(unittest.TestCase):
                 import shutil
                 shutil.rmtree("dummy_runs")
 
+    def test_quality_audit_failure_raises_after_full_chain(self):
+        """A failed quality audit must abort the chain with RuntimeError.
+
+        Production contract (run_chain_rebalance, AGENTS.md upload gating):
+        when reference_csv or anchor_l1_file is set, the final output must pass
+        run_quality_audit; a failed audit raises instead of returning the
+        rebalanced CSV. Every existing chain-level test sets both to None, so
+        this gate is unexercised — removing or inverting it would leave all
+        current tests green while silently returning an audit-failed output.
+        """
+        from unittest.mock import patch
+        from dataclasses import replace
+
+        class MockTable:
+            headers = ["word_id", "rarity_level"]
+            # 60000 words, 12000 per level: every step passes pool/target/min/ratio gates.
+            records = [MagicMock(values=["0", str(i)]) for i in range(1, 6)] * 12000
+
+        class MockRepo(RunCsvRepository):
+            def read_table(self, path):
+                return MockTable()
+            def load_run_rows(self, path):
+                return []
+
+        options = replace(_make_options(), reference_csv=Path("dummy_reference.csv"))
+
+        Path("dummy_sp.txt").write_text("", encoding="utf-8")
+        Path("dummy_ut.txt").write_text("", encoding="utf-8")
+        Path("dummy.csv").touch()
+        Path("dummy_runs").mkdir(exist_ok=True)
+
+        try:
+            failed_audit = MagicMock(passed=False)
+            with patch("src.classificator.tools.chain_rebalance_target_dist._count_total_words", return_value=60000), \
+                 patch("src.classificator.tools.chain_rebalance_target_dist.run_step5") as mock_s5, \
+                 patch("src.classificator.tools.chain_rebalance_target_dist.run_quality_audit", return_value=failed_audit) as mock_audit:
+                with self.assertRaises(RuntimeError) as cm:
+                    run_chain_rebalance(
+                        options=options,
+                        repo=MockRepo(),
+                        lm_client=MagicMock(spec=LmStudioClient),
+                        output_dir=Path("."),
+                    )
+
+            self.assertIn("Quality audit failed", str(cm.exception))
+            # All 8 steps complete before the audit gate fires; the audited
+            # candidate is the chain's final output CSV, not the input.
+            self.assertEqual(mock_s5.call_count, 8)
+            self.assertEqual(mock_audit.call_count, 1)
+            self.assertEqual(
+                mock_audit.call_args.kwargs["candidate_csv"],
+                Path("dummy_runs") / "test_run_step8.csv",
+            )
+        finally:
+            for f in [Path("dummy.csv"), Path("dummy_sp.txt"), Path("dummy_ut.txt"), options.state_file]:
+                if f.exists():
+                    f.unlink()
+            if Path("dummy_runs").exists():
+                import shutil
+                shutil.rmtree("dummy_runs")
+
 
 def _make_options():
     return ChainOptions(
