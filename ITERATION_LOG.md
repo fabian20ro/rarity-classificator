@@ -404,3 +404,33 @@ changed here. This is a verification gap, not a fully green complete test suite.
 **Insight:** Gate tests need fixtures satisfying earlier validations; replacing
 the gate itself with a canned result cannot prove its threshold behavior.
 **Promoted to Lessons Learned:** Yes
+
+## 2026-09-29 — Complete verification and fuzzy identity contract
+
+Maintenance-reserved Word; no concurrent cron edit. Baseline full pytest:
+494 passed / 6 failed / 23 subtests. Three matcher assertions used incorrect edit
+distances; three JSON repair assertions constrained incidental whitespace.
+
+TDD: new matcher/parser regressions initially 3 failed / 4 passed. Proven defect:
+the prefix shortcut accepted distance-four `abcdef`/`abxyzw`, assigning an
+unrelated response score to the pending word. Initial import e4fe441 establishes
+the original normalized distance <=2 contract; restore it through the existing
+distance helper, preserving legitimate typo recovery and strict Step5 unchanged.
+Correct mathematical expectations; use parsed JSON values where valid. Replace
+repeated shortcut-specific tests with explicit distance cases and parity checks.
+
+One project-owned `python scripts/check.py` now runs Ruff and full pytest, used
+by CI and requested for Compound local-green. Project pytest configuration
+discovers both unittest classes and function tests; updated stale planner advice.
+Removed redundant 8b536b1 mocked audit test: existing real-CSV tests already prove
+all eight steps, final candidate path, forwarded thresholds, independent Jaccard
+and anchor rejection, and passing output. No production gate weakened.
+
+Verification: Ruff PASS; 536 pytest tests +23 subtests PASS. AST-to-pytest
+collection audit: all 27 standalone test definitions included (parametrization
+expands these), 536 total items. In-memory audit-bypass mutant killed by both
+negative real-CSV tests (2 failed / 1 passed). Check-command tests prove lint
+fail-fast and propagation of pytest exit5/no collection. No live DB/model calls.
+Host legacy .venv Python points into unavailable Xcode runtime; tests used an
+isolated container /tmp venv with already-declared dev dependencies instead.
+Architecture decision: docs/adr/001-complete-project-verification.md.

@@ -127,5 +127,11 @@ classificator step4-upload --final-csv build/rarity/runs/campaign_a.rebalanced.c
 ## Tests
 
 ```bash
-PYTHONPATH=src python -m unittest discover -s tests -p 'test_*.py'
+python -m pip install -e '.[dev]'
+python scripts/check.py
 ```
+
+The same command runs Ruff and the complete pytest collection in CI and local
+automation. Pytest executes both `unittest.TestCase` tests and standalone test
+functions; `unittest discover` alone silently omits the latter. No live database
+or model is required. Inspect collection with `python -m pytest --collect-only -q`.
