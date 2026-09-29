@@ -179,5 +179,33 @@ class TestLmStudioRequestBuilder(unittest.TestCase):
         content = payload["messages"][1]["content"]
         self.assertIn("apple", content)
 
+    def test_user_template_with_placeholder_replaces_entries(self):
+        import json
+
+        user_template = "Clasifică: {{INPUT_JSON}}"
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="system",
+                user_template=user_template,
+                response_format_mode=ResponseFormatMode.JSON_OBJECT,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=100,
+            )
+        )
+        content = payload["messages"][1]["content"]
+        self.assertNotIn("{{INPUT_JSON}}", content)
+        self.assertNotIn("Intrări:", content)
+        self.assertEqual(
+            content,
+            "Clasifică: "
+            + json.dumps(
+                [{"word_id": 1, "word": "apple", "type": "noun"}],
+                ensure_ascii=False,
+            ),
+        )
+
 if __name__ == "__main__":
     unittest.main()
