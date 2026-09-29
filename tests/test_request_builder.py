@@ -262,6 +262,29 @@ class RequestBuilderTest(unittest.TestCase):
         user_content = payload["messages"][1]["content"]
         self.assertIn(user_template + "\n\nIntrări:", user_content)
 
+    def test_user_template_with_placeholder_replaces_input_json(self):
+        config = LmModelConfig(model_id="test-model")
+        user_template = "Clasifică {{INPUT_JSON}} acum"
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template=user_template,
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=config,
+                max_tokens=512,
+                expected_items=2,
+                schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
+            )
+        )
+        user_content = payload["messages"][1]["content"]
+        self.assertEqual(
+            user_content,
+            'Clasifică [{"local_id": 1, "word": "om"}, {"local_id": 2, "word": "casă"}] acum',
+        )
+
     def test_token_estimation_respects_min_max_tokens_floor(self):
         config = LmModelConfig(model_id="test-model")
         # Small words → low content_factor → tiny computed tokens → clamped to floor (256)
