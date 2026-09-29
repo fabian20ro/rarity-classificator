@@ -32,6 +32,8 @@ class TestRarityDistributionExtra(unittest.TestCase):
         self.assertEqual(result.total_rows, 4)
         self.assertEqual(list(sorted(result.distribution.items())), [(1, 1), (2, 1), (3, 1), (4, 1), (5, 0)])
         self.assertEqual(result.mode, 1)
+        # Weighted population std dev for {1,2,3,4}: mean=2.5, variance=(1.5^2+0.5^2+0.5^2+1.5^2)/4=1.25
+        self.assertAlmostEqual(result.std_dev, 1.118, places=3)
 
     def test_empty_csv_header_only_returns_zero_rows(self):
         with tempfile.TemporaryDirectory() as td:
