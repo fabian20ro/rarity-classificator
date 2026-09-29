@@ -188,5 +188,33 @@ class ScoringOutputModeEnumTest(unittest.TestCase):
         self.assertIn("unexpected", str(err.exception))
 
 
+class LmModelConfigValidationTest(unittest.TestCase):
+    """__post_init__ fail-fast validation for LmModelConfig numeric bounds."""
+
+    def test_temperature_out_of_range_raises(self):
+        for bad in (-0.5, 1.5, 5.0):
+            with self.subTest(bad=bad):
+                with self.assertRaises(ValueError) as err:
+                    LmModelConfig(model_id="test", temperature=bad)
+                self.assertIn("temperature", str(err.exception).lower())
+
+    def test_temperature_bounds_are_inclusive(self):
+        self.assertEqual(LmModelConfig(model_id="test", temperature=0.0).temperature, 0.0)
+        self.assertEqual(LmModelConfig(model_id="test", temperature=1.0).temperature, 1.0)
+
+    def test_non_positive_max_tokens_cap_raises(self):
+        for bad in (0, -1):
+            with self.subTest(bad=bad):
+                with self.assertRaises(ValueError) as err:
+                    LmModelConfig(model_id="test", max_tokens_cap=bad)
+                self.assertIn("max_tokens_cap", str(err.exception).lower())
+
+    def test_none_or_positive_max_tokens_cap_allowed(self):
+        self.assertIsNone(LmModelConfig(model_id="test").max_tokens_cap)
+        self.assertEqual(
+            LmModelConfig(model_id="test", max_tokens_cap=128).max_tokens_cap, 128
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
