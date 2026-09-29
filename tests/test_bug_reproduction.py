@@ -59,3 +59,7 @@ class BugReproductionTest(unittest.TestCase):
             exc_str = str(ctx.exception)
             # Must name the offending value so the operator can spot it in logs
             self.assertIn("3.0", exc_str)
+            # Must be the documented JSONL-side boundary that rejects it, not an
+            # unrelated check that happens to name the value (which would make
+            # the JSONL/base failure modes diverge).
+            self.assertIn("String word_id in failed JSONL", exc_str)
