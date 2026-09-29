@@ -112,6 +112,22 @@ class ResponseParserTest(unittest.TestCase):
                 expected_items=1,
             )
 
+    def test_selected_word_ids_accepts_numeric_string_local_id(self):
+        # LMs may return local ids as strings; the id must normalize to the
+        # same local position and map to the correct batch row rather than
+        # being rejected outright.
+        body = self._wrap_content('["1"]')
+        parsed = self.parser.parse(
+            batch=self.batch,
+            response_body=body,
+            output_mode=ScoringOutputMode.SELECTED_WORD_IDS,
+            forced_rarity_level=1,
+            expected_items=1,
+        )
+        self.assertEqual(len(parsed.scores), 1)
+        self.assertEqual(parsed.scores[0].word_id, 101)
+        self.assertEqual(parsed.scores[0].rarity_level, 1)
+
     def test_score_results_parsing(self):
         body = self._wrap_content('[{"word_id": 102, "word": "casă", "type": "N", "rarity_level": 2, "tag": "test", "confidence": 1.0}]')
         parsed = self.parser.parse(
