@@ -1,7 +1,9 @@
 import argparse
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 
-from classificator.cli import _build_parser
+from classificator.cli import _build_parser, main
 
 
 class CliHelpTest(unittest.TestCase):
@@ -36,6 +38,14 @@ class CliHelpTest(unittest.TestCase):
         self.assertIn("--include-undecided", help_text)
         self.assertIn("Alias of review-low-confidence", alias_help_text)
         self.assertIn("--include-undecided", alias_help_text)
+
+    def test_no_command_prints_help_and_returns_nonzero(self):
+        output = StringIO()
+        with redirect_stdout(output):
+            exit_code = main([])
+        self.assertEqual(exit_code, 2)
+        self.assertIn("usage", output.getvalue())
+        self.assertIn("step4-upload", output.getvalue())
 
     def test_step5_help_mentions_dry_run(self):
         parser = _build_parser()

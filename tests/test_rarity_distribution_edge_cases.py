@@ -111,6 +111,20 @@ class RarityDistributionTest(unittest.TestCase):
         self.assertEqual(dist.count(1), 3)
         self.assertEqual(dist.total, 3)
 
+    def test_eq_compares_per_level_counts_not_just_total(self):
+        """__eq__ must compare per-level counts, not just the total.
+
+        Distributions with the same total but different level splits
+        must not compare as equal."""
+        a = RarityDistribution.from_levels([1, 2, 3])
+        b = RarityDistribution.from_levels([1, 2, 3])
+        self.assertEqual(a, b)
+        # Same total (3) but different level split
+        c = RarityDistribution.from_levels([1, 1, 1])
+        self.assertNotEqual(a, c)
+        # __eq__ with a non-RarityDistribution must return False
+        self.assertNotEqual(a, 3)
+
     def test_run_rarity_distribution_missing_column_raises(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

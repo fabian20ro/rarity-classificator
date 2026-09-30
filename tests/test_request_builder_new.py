@@ -143,3 +143,43 @@ class RequestBuilderTest(unittest.TestCase):
         )
 
         self.assertEqual(payload["response_format"], {"type": "json_object"})
+
+    def test_score_results_schema_uses_exact_expected_count(self):
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_SCHEMA,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=512,
+                expected_items=2,
+                schema_kind=JsonSchemaKind.SCORE_RESULTS,
+            )
+        )
+
+        schema = payload["response_format"]["json_schema"]["schema"]
+        self.assertEqual(schema["type"], "array")
+        self.assertEqual(schema["minItems"], 2)
+        self.assertEqual(schema["maxItems"], 2)
+
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_SCHEMA,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=512,
+                expected_items=None,
+                schema_kind=JsonSchemaKind.SCORE_RESULTS,
+            )
+        )
+
+        schema = payload["response_format"]["json_schema"]["schema"]
+        self.assertEqual(schema["minItems"], len(self.batch))
+        self.assertEqual(schema["maxItems"], len(self.batch))

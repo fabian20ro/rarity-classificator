@@ -30,7 +30,7 @@ For every plan, verify:
 - [ ] Does this modify prompt files? Treat as behavior contract change — test with real LM output.
 - [ ] Does this break CSV artifact resumability? Design migration or checkpoint compatibility.
 - [ ] Are there relevant lessons in `LESSONS_LEARNED.md`?
-- [ ] Will new tests be needed? Use `unittest` (project standard), not pytest.
+- [ ] Will new tests be needed? Match existing style (`unittest` or pytest); run `python scripts/check.py` so both styles are collected.
 
 ## Output Format
 

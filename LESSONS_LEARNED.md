@@ -56,6 +56,16 @@ round-trip comma, quote and newline fields with `csv.reader`, while asserting no
 
 ## Testing & Quality
 
+**[2026-09-29]** Use `python scripts/check.py` for complete verification. The old
+unittest-only command silently skipped function-style tests. CI and local gates
+must call the project entrypoint, which runs Ruff then pytest (both test styles).
+
+**[2026-09-29]** Fuzzy word identity requires full normalized edit distance.
+Prefix-only acceptance introduced as "verification hygiene" matched unrelated
+words and could assign one word's score to another pending row. Preserve the
+original two-edit limit; test the parser consumer as well as matcher parity.
+Do not encode a discovered inconsistency as a desired behavior assertion.
+
 **[2026-09-25]** Quality-gate integration fixtures must satisfy earlier campaign
 validation. Use isolated CSVs and the real repository/audit; stub the LM boundary,
 not the gate. Check independent Jaccard and anchor failures, and prove the tests
