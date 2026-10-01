@@ -144,6 +144,18 @@ class WordStoreTest(unittest.TestCase):
 
         store._connect.assert_not_called()
 
+    def test_update_rarity_levels_rejects_bool_level_without_connecting(self):
+        store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
+        store._connect = MagicMock()
+
+        # bool is an int subclass; the validator must reject it explicitly
+        # and fail fast before any database connection is attempted.
+        with self.assertRaises(TypeError):
+            store.update_rarity_levels({1: True})
+        with self.assertRaises(TypeError):
+            store.update_rarity_levels({1: False})
+        store._connect.assert_not_called()
+
     def test_fetch_all_words_parses_rows_into_word_objects(self):
         store = WordStore(db_url="postgresql://example.invalid/db", db_user="u", db_password="p")
         fake_cursor = _FakeCursor()
