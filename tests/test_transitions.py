@@ -165,6 +165,17 @@ class TransitionsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse_transitions("-1:0")
 
+    def test_parse_transitions_non_numeric_level_rejected(self):
+        # Non-numeric levels must raise at parse time (single and pair forms),
+        # not be silently coerced to 0 or skipped.
+        with self.assertRaises(ValueError):
+            parse_transitions("2:a")
+        with self.assertRaises(ValueError):
+            parse_transitions("2-3:b")
+        # Wrong token shape (three ':' parts) must fail the from:to check.
+        with self.assertRaises(ValueError):
+            parse_transitions("1:2:3")
+
     def test_other_level_same_level_at_5(self):
         # Same-level at level 5 returns 5 (already at cap).
         t = LevelTransition(from_level=5, to_level=5)
