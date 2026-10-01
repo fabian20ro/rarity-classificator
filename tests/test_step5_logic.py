@@ -198,6 +198,22 @@ class TestStep5Logic(unittest.TestCase):
         # desired=int(5*1.0+0.5)=5, cap min(1000000, 5)=5, delta=5-0=5, clamped to batch_size=5 → 5
         self.assertEqual(result, 5)
 
+    def test_result_capped_at_batch_when_delta_exceeds_batch(self):
+        # Per-batch target count can never exceed the batch size, even when the
+        # desired cumulative allocation (delta) is many times larger than the
+        # batch. Catches an implementation that drops the min(batch_size, ...)
+        # upper cap and returns the raw delta (e.g. 110) instead of batch_size.
+        result = _compute_adaptive_target_count(
+            processed_before_batch=100,
+            assigned_before_batch=0,
+            batch_size=10,
+            ratio=1.0,
+            expected_total=1000
+        )
+        # processed_after=110, desired=int(110*1.0+0.5)=110, cap min(1000,110)=110,
+        # delta=110-0=110, min(batch_size=10, 110)=10 -> 10
+        self.assertEqual(result, 10)
+
     def test_delta_negative_clamped_to_zero(self):
         # When assigned_before_batch > desired_cumulative, delta is negative → must clamp to 0
         result = _compute_adaptive_target_count(
