@@ -836,5 +836,44 @@ class BuildRetryInputTest(unittest.TestCase):
             self.assertIn("base.csv", warning)
             self.assertIn("[9]", warning)
 
+    def test_build_retry_input_empty_base_csv_writes_headers_only(self):
+        """Regression: header-only base CSV (no data rows) must hit the early-return
+        path — write headers-only output, return 0, and emit no warning.
+
+        The early-return branch (``if not table.records:``) skips the matching
+        loop and the ``seen_ids != wanted_ids`` warning entirely. A regression
+        that altered or removed that guard would cause the loop to run and log
+        a spurious "not found in base CSV" warning for every valid failed id,
+        but all existing tests use non-empty base CSVs and would still pass.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base.csv"
+            out = root / "retry.csv"
+
+            failed.write_text('{"word_id": 1}\n', encoding="utf-8")
+            # Header-only CSV: no data records
+            self.repo.write_rows(
+                base,
+                ["word_id", "word"],
+                [],
+            )
+
+            with self.assertNoLogs(
+                "classificator.tools.build_retry_input", level="WARNING"
+            ):
+                count = build_retry_input(
+                    failed_jsonl=failed,
+                    base_csv=base,
+                    output_csv=out,
+                    repo=self.repo,
+                )
+
+            self.assertEqual(count, 0)
+            table = self.repo.read_table(out)
+            self.assertEqual(table.headers, ["word_id", "word"])
+            self.assertEqual(len(table.records), 0)
+
     if __name__ == "__main__":
         unittest.main()
