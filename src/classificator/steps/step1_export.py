@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 import csv
@@ -29,6 +30,8 @@ def run_step1(options: Step1Options, *, word_store: WordStore, repo: RunCsvRepos
     if options.dry_run:
         print(f"Step 1 dry-run. Would export {word_count} words to {options.output_csv_path}")
         if word_count:
+            type_counts = Counter(w_type for _, _, w_type in words)
+            print("Types: " + ", ".join(f"{t}={n}" for t, n in sorted(type_counts.items(), key=lambda x: (-x[1], x[0]))))
             writer = csv.writer(sys.stdout, lineterminator="\n")
             writer.writerow(BASE_CSV_HEADERS)
             writer.writerows(rows[:3])

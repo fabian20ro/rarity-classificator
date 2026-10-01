@@ -123,6 +123,32 @@ class RunCsvRepositoryTest(unittest.TestCase):
             with self.assertRaises(CsvFormatError):
                 self.repo.load_run_rows(path)
 
+    def test_load_run_rows_rejects_rarity_out_of_range(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "run.csv"
+            self.repo.write_rows(
+                path,
+                [
+                    "word_id",
+                    "word",
+                    "type",
+                    "rarity_level",
+                    "tag",
+                    "confidence",
+                    "scored_at",
+                    "model",
+                    "run_slug",
+                ],
+                [
+                    ["1", "om", "N", "3", "uncertain", "0.3", "t", "m", "r"],
+                    ["2", "casă", "N", "6", "common", "0.9", "t2", "m", "r"],
+                ],
+            )
+            with self.assertRaisesRegex(
+                CsvFormatError, r"rarity_level out of range at .*:3"
+            ):
+                self.repo.load_run_rows(path)
+
     def test_load_final_levels_falls_back_to_rarity_level(self):
         with tempfile.TemporaryDirectory() as td:
             path = Path(td) / "levels.csv"

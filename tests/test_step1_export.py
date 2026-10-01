@@ -21,7 +21,7 @@ class TestStep1Export(unittest.TestCase):
                 with contextlib.redirect_stdout(output):
                     run_step1(Step1Options(Path('never-written.csv'), dry_run=True),
                               word_store=store, repo=repo)
-                preview = output.getvalue().split('\n', 1)[1]
+                preview = output.getvalue().split('\n', 2)[2]
                 rows = list(csv.reader(io.StringIO(preview)))
                 self.assertEqual(rows, [list(BASE_CSV_HEADERS), ['1', word, 'noun']])
                 repo.write_rows.assert_not_called()
@@ -124,11 +124,13 @@ class TestStep1Export(unittest.TestCase):
         self.assertIsNone(result_path)
         self.mock_repo.write_rows.assert_not_called()
         lines = buf.getvalue().splitlines()
-        # First line is the existing count message, then header, then <=3 rows.
+        # First line is the existing count message, then the new Types: summary,
+        # then header, then <=3 rows.
         self.assertIn("4 words", lines[0])
+        self.assertIn("Types: fruit=4", lines[1])
         header_line = ",".join(BASE_CSV_HEADERS)
-        self.assertEqual(lines[1], header_line)
-        sample_lines = lines[2:]
+        self.assertEqual(lines[2], header_line)
+        sample_lines = lines[3:]
         self.assertEqual(len(sample_lines), 3)
         self.assertEqual(sample_lines[0], "1,apple,fruit")
         self.assertEqual(sample_lines[1], "2,banana,fruit")
@@ -145,8 +147,32 @@ class TestStep1Export(unittest.TestCase):
             run_step1(options, word_store=store, repo=self.mock_repo)
 
         lines = buf.getvalue().splitlines()
-        self.assertEqual(lines[1], ",".join(BASE_CSV_HEADERS))
-        self.assertEqual(lines[2:], ["7,fig,fruit"])
+        self.assertIn("Types: fruit=1", lines[1])
+        self.assertEqual(lines[2], ",".join(BASE_CSV_HEADERS))
+        self.assertEqual(lines[3:], ["7,fig,fruit"])
+
+    def test_dry_run_prints_type_counts_descending(self):
+        # 3 distinct types with asymmetric counts: Types: line must list all
+        # three with correct counts, sorted by descending count (ties by name).
+        words = [
+            (1, "apple", "fruit"),
+            (2, "banana", "fruit"),
+            (3, "cherry", "fruit"),
+            (4, "date", "fruit"),
+            (5, "zebra", "animal"),
+            (6, "koala", "animal"),
+            (7, "star", "symbol"),
+        ]
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = words
+        options = Step1Options(output_csv_path=self.output_csv, dry_run=True)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            run_step1(options, word_store=store, repo=self.mock_repo)
+
+        lines = buf.getvalue().splitlines()
+        self.assertIn("7 words", lines[0])
+        self.assertEqual(lines[1], "Types: fruit=4, animal=2, symbol=1")
 
     def test_dry_run_empty_prints_count_only(self):
         # Empty word list: only the count message — no header, no rows.
