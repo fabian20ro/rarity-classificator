@@ -242,6 +242,49 @@ class TestStep5Contract(unittest.TestCase):
         all_ids = {w.word_id for w in batch}
         self.assertTrue(all_ids <= {3, 4, 5}, "only eligible (unprocessed) word_ids may be selected")
 
+    def test_select_common_word_ids_enforces_strict_selection_contract(self):
+        """_select_common_word_ids must enforce the strict Step5 selection contract:
+        only in-batch ids with rarity_level==common_level, id>0, de-duplicated, and
+        exact-count capped at common_count.
+
+        Production contract: scored results are filtered to (a) word_id present in the
+        current batch, (b) rarity_level equal to common_level, (c) word_id > 0, and
+        (d) de-duplicated via a seen set; a result exceeding common_count is truncated.
+        test_no_zero_local_id exercises a single well-formed result through the full run
+        and never feeds a malformed result into the selector, so a regression that drops
+        the id>0, in-batch, wrong-level, or de-dup filters would not be caught there.
+        """
+        from classificator.steps.step5_rebalance import _select_common_word_ids, RebalanceWord
+
+        batch = [
+            RebalanceWord(word_id=1, word="a", type="N"),
+            RebalanceWord(word_id=2, word="b", type="N"),
+        ]
+
+        # Filter case: one valid id, plus a duplicate, a zero id, an out-of-batch id,
+        # and a wrong-level id. None of the malformed entries may be selected.
+        scored = [
+            MagicMock(word_id=1, rarity_level=1),   # valid: in batch, right level
+            MagicMock(word_id=1, rarity_level=1),   # duplicate: de-duplicated, still one
+            MagicMock(word_id=0, rarity_level=1),   # zero id: must be excluded
+            MagicMock(word_id=99, rarity_level=1),  # not in batch: must be excluded
+            MagicMock(word_id=2, rarity_level=2),   # wrong level: must be excluded
+        ]
+        selected = _select_common_word_ids(batch=batch, scored=scored, common_level=1, common_count=1)
+        self.assertEqual(selected, {1}, "only the valid in-batch same-level id may be selected")
+        self.assertNotIn(0, selected)
+        self.assertNotIn(99, selected)
+        self.assertNotIn(2, selected)
+
+        # Exact-count cap: two valid distinct ids but common_count=1 -> truncated to one.
+        scored_trunc = [
+            MagicMock(word_id=1, rarity_level=1),
+            MagicMock(word_id=2, rarity_level=1),
+        ]
+        truncated = _select_common_word_ids(batch=batch, scored=scored_trunc, common_level=1, common_count=1)
+        self.assertEqual(len(truncated), 1, "selection must be exact-count capped at common_count")
+        self.assertEqual(truncated, {1}, "truncation keeps the first valid id in scored order")
+
 
 def _make_distribution(counts):
     from classificator.distribution import RarityDistribution
