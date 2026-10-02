@@ -12,7 +12,7 @@ from scripts.check import main
 @pytest.mark.parametrize("codes,expected,expected_calls", [
     ([0, 0], 0, 2), ([1], 1, 1), ([0, 5], 5, 2),
 ])
-def test_check_propagates_failure_without_skipping_complete_collection(codes, expected, expected_calls):
+def test_check_propagates_failure_without_skipping_complete_collection(codes, expected, expected_calls, capsys):
     with patch("scripts.check.subprocess.run", side_effect=[
         CompletedProcess([], code) for code in codes
     ]) as run:
@@ -25,3 +25,5 @@ def test_check_propagates_failure_without_skipping_complete_collection(codes, ex
         assert run.call_args_list[1].args[0] == [sys.executable, "-m", "pytest", "-q"]
     assert all(call.kwargs["cwd"] == Path(__file__).resolve().parents[1]
                for call in run.call_args_list)
+    banners = capsys.readouterr().out.splitlines()
+    assert banners == ["+ " + " ".join(call.args[0]) for call in run.call_args_list]
