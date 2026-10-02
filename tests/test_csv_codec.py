@@ -22,6 +22,13 @@ class TestCsvCodec(unittest.TestCase):
         self.assertEqual(len(table.records), 2)
         self.assertEqual(table.records[0].values, ["1", "test_id"])
 
+    def test_read_table_line_number_tracks_physical_csv_line(self):
+        path = self.test_dir / "line_numbers.csv"
+        with open(path, "w", encoding="utf-8", newline="") as f:
+            f.write("id,name\n1,test_id\n2,test_name")
+        table = self.codec.read_table(path)
+        self.assertEqual([r.line_number for r in table.records], [2, 3])
+
     def test_read_table_empty_file(self):
         path = self.test_dir / "empty.csv"
         path.touch()
