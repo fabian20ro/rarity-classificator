@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from classificator.csv_codec import CsvFormatError
 from classificator.run_csv_repository import RunCsvRepository
 from classificator.tools.build_retry_input import build_retry_input
 
@@ -63,3 +64,34 @@ class BugReproductionTest(unittest.TestCase):
             # unrelated check that happens to name the value (which would make
             # the JSONL/base failure modes diverge).
             self.assertIn("String word_id in failed JSONL", exc_str)
+
+    def test_run_csv_load_rejects_confidence_out_of_range(self):
+        """Confidence outside [0,1] must raise CsvFormatError — not be silently accepted.
+
+        load_run_rows enforces the confidence range (run_csv_repository.py).
+        An LLM outputting "1.5" would otherwise parse as a valid float and
+        propagate into downstream confidence gates.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "run.csv"
+            self.repo.write_rows(
+                path,
+                [
+                    "word_id",
+                    "word",
+                    "type",
+                    "rarity_level",
+                    "tag",
+                    "confidence",
+                    "scored_at",
+                    "model",
+                    "run_slug",
+                ],
+                [
+                    ["1", "om", "N", "3", "uncertain", "1.5", "t", "m", "r"],
+                ],
+            )
+            with self.assertRaisesRegex(
+                CsvFormatError, r"confidence out of range at .*:2"
+            ):
+                self.repo.load_run_rows(path)

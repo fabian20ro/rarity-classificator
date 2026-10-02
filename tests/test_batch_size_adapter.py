@@ -27,6 +27,22 @@ class TestBatchSizeAdapter(unittest.TestCase):
         adapter.record_outcome(0.0) # Failure
         self.assertEqual(adapter.success_rate(), 1/3)
 
+    def test_success_rate_aggregates_binary_classification_of_fractional_ratio(self):
+        """success_rate() is the mean of the stored *binary* outcomes, not the mean of
+        raw clamped ratios. A fractional ratio just below success_threshold is recorded
+        as a single False, so the window mean reflects bool aggregation — pinning the
+        documented success_threshold → binary-outcome contract for a non-extreme input.
+        A regression that stored/averaged the raw clamped float instead would return
+        (1.0 + 0.89) / 2 = 0.945 here, not 0.5, and this assertion would catch it."""
+        adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)
+        # 1.0 >= 0.9 (default success_threshold) -> True
+        adapter.record_outcome(1.0)
+        # 0.89 < 0.9 -> stored as a single False, not the raw 0.89
+        adapter.record_outcome(0.89)
+        self.assertFalse(adapter.outcomes[-1])
+        # window=[True, False] -> mean of bools is 0.5, not 0.945
+        self.assertEqual(adapter.success_rate(), 0.5)
+
     def test_adjustment(self):
         # window_size=2, initial=10, min=3
         adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=2)

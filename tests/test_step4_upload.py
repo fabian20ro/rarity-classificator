@@ -223,6 +223,38 @@ class TestStep4Upload(unittest.TestCase):
                 rows = list(reader)
                 self.assertEqual(len(rows), 2)
 
+    def test_partial_audit_receives_configured_thresholds(self):
+        # The pre-upload gate must be checked with Jaccard and anchor
+        # precision/recall. Configured thresholds must reach run_quality_audit;
+        # if run_step4 stops forwarding them, the gate uses wrong limits and a
+        # quality-failing candidate uploads unchecked.
+        options = Step4Options(
+            final_csv_path=self.final_csv,
+            mode=UploadMode.PARTIAL,
+            report_path=self.report_csv,
+            upload_batch_id="test-batch",
+            reference_csv=self.test_dir / "ref.csv",
+            min_l1_jaccard=0.9,
+            min_anchor_l1_precision=0.5,
+            min_anchor_l1_recall=0.6,
+        )
+
+        from unittest.mock import patch
+
+        with patch("classificator.tools.quality_audit.run_quality_audit") as mock_audit:
+            mock_result = MagicMock()
+            mock_result.passed = True
+            mock_result.failures = []
+            mock_audit.return_value = mock_result
+
+            run_step4(options, word_store=self.mock_word_store, repo=self.mock_repo, marker_writer=self.mock_marker_writer)
+
+            self.assertTrue(mock_audit.called)
+            _, kwargs = mock_audit.call_args
+            self.assertEqual(kwargs["min_l1_jaccard"], 0.9)
+            self.assertEqual(kwargs["min_anchor_l1_precision"], 0.5)
+            self.assertEqual(kwargs["min_anchor_l1_recall"], 0.6)
+
     def _build_full_fallback_plan(self, final_levels, db_levels):
         return _build_full_fallback_plan(final_levels, db_levels)
 

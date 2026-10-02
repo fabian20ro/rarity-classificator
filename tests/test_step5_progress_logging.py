@@ -111,6 +111,7 @@ class Step5ProgressLoggingTest(unittest.TestCase):
             self.assertEqual(row["picked_target_level"], 3)
             self.assertEqual(row["picked_target_word_ids"], [2])
             self.assertEqual(row["picked_target_words"], ["b"])
+            self.assertEqual(row["picked_target_count"], 1)
             run_row = json.loads(logs.run_log_path.read_text(encoding="utf-8").strip())
             self.assertEqual(run_row["event"], "batch_progress")
             self.assertEqual(run_row["picked_target_level"], 3)

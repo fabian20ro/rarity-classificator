@@ -6,6 +6,7 @@ from classificator.lm.client import (
     LmStudioClient,
 )
 from classificator.models import ScoringOutputMode
+from classificator.constants import USER_INPUT_PLACEHOLDER
 
 
 class SelectionRepairPromptTest(unittest.TestCase):
@@ -19,6 +20,17 @@ class SelectionRepairPromptTest(unittest.TestCase):
     def test_user_template_restates_exact_count_and_local_id_contract(self):
         self.assertIn("Numărul exact de id-uri", SELECTION_REPAIR_USER_TEMPLATE)
         self.assertIn("contractul local_id `1..N`", SELECTION_REPAIR_USER_TEMPLATE)
+
+    def test_user_template_uses_input_json_placeholder(self):
+        """Repair user template must use the shared input placeholder.
+
+        Production contract (request_builder.py): when USER_INPUT_PLACEHOLDER
+        ("{{INPUT_JSON}}") is present, the entry list is substituted in place;
+        otherwise it is appended after the template text, which would duplicate
+        the input section. Keeping the placeholder in the repair template pins
+        the in-place substitution path.
+        """
+        self.assertIn(USER_INPUT_PLACEHOLDER, SELECTION_REPAIR_USER_TEMPLATE)
 
     def test_resolve_selection_prompt_counts_passthrough_when_not_selected_mode(self):
         client = LmStudioClient(api_key=None)
