@@ -56,6 +56,15 @@ class CliHelpTest(unittest.TestCase):
         self.assertIn("Simulate the run without writing", help_text)
         self.assertIn("--dry-run", alias_help_text)
 
+    def test_rarity_distribution_help_mentions_json_flag(self):
+        parser = _build_parser()
+        subparsers = next(action for action in parser._actions if isinstance(action, argparse._SubParsersAction))
+        help_text = subparsers.choices["rarity-distribution"].format_help()
+        alias_help_text = subparsers.choices["dist"].format_help()
+        self.assertIn("--json", help_text)
+        self.assertIn("machine-readable JSON", help_text)
+        self.assertIn("--json", alias_help_text)
+
 
 class AllSubcommandHelpTest(unittest.TestCase):
     def test_all_subcommands_have_non_empty_help(self):
