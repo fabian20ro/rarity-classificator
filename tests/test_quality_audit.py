@@ -527,6 +527,46 @@ class QualityAuditTest(unittest.TestCase):
                     repo=self.repo,
                 )
 
+    def test_min_l1_intersection_parameter_is_a_noop(self):
+        """min_l1_intersection is declared, computed, and returned, but never gated.
+
+        The parameter exists in the signature, l1_intersection is computed and
+        exposed on the result, yet no conditional checks it against the threshold.
+        This test pins that behaviour so a future implementation of the
+        intersection gate (or removal of the parameter) is a visible, deliberate
+        change rather than a silent one.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            reference = root / "reference.csv"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            # Candidate L1: word_ids {1,2}; reference has no level-1 rows
+            # (both level 5) → intersection of word_ids is empty.
+            cand_rows = [
+                ["1", "om", "N", "1"],
+                ["2", "casă", "N", "1"],
+            ]
+            ref_rows = [
+                ["3", "rarissim", "A", "5"],
+                ["4", "obscur", "A", "5"],
+            ]
+            self._write_csv(candidate, headers, cand_rows)
+            self._write_csv(reference, headers, ref_rows)
+
+            result = run_quality_audit(
+                candidate_csv=candidate,
+                reference_csv=reference,
+                min_l1_intersection=1,  # would fail if gated, but is not
+                repo=self.repo,
+            )
+
+            self.assertTrue(result.passed)
+            self.assertEqual(result.failures, [])
+            self.assertEqual(result.l1_intersection, 0)
+            self.assertEqual(result.l1_jaccard, 0.0)
+
     def test_l1_words_excludes_empty_word_from_anchor_matching(self):
         """An empty word at level 1 must not participate in anchor intersection."""
         with tempfile.TemporaryDirectory() as td:
