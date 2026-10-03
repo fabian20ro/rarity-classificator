@@ -146,6 +146,32 @@ class ScoringOutputModeEdgeTest(unittest.TestCase):
                     ScoringOutputMode.parse(bad)
 
 
+class LmApiFlavorEdgeTest(unittest.TestCase):
+    """Negative-path and edge-case coverage for LM API flavor parsing."""
+
+    def test_parse_none_and_empty_resolve_to_openai_compat(self):
+        self.assertIs(LmApiFlavor.parse(None), LmApiFlavor.OPENAI_COMPAT)
+        self.assertIs(LmApiFlavor.parse(""), LmApiFlavor.OPENAI_COMPAT)
+
+    def test_parse_accepts_lmstudio_rest_aliases(self):
+        self.assertIs(LmApiFlavor.parse("lmstudio_rest"), LmApiFlavor.LMSTUDIO_REST)
+        self.assertIs(LmApiFlavor.parse("lmstudio-rest"), LmApiFlavor.LMSTUDIO_REST)
+
+    def test_parse_case_insensitive_and_strips_whitespace(self):
+        self.assertIs(LmApiFlavor.parse("OPENAI_COMPAT"), LmApiFlavor.OPENAI_COMPAT)
+        self.assertIs(
+            LmApiFlavor.parse(" LMSTUDIO_REST "),
+            LmApiFlavor.LMSTUDIO_REST,
+        )
+
+    def test_rejects_unknown_value(self):
+        with self.assertRaises(ValueError) as err:
+            LmApiFlavor.parse("unexpected")
+        message = str(err.exception)
+        self.assertIn("lmapi", message.lower())
+        self.assertIn("unexpected", message)
+
+
 class LmApiFlavorEnumTest(unittest.TestCase):
     """Confirm enum members and string values match the source-of-truth."""
 
