@@ -74,6 +74,26 @@ class TestRarityDistributionExtra(unittest.TestCase):
         self.assertEqual(list(sorted(result.distribution.items())), [(1, 2), (2, 0), (3, 0), (4, 1), (5, 0)])
         self.assertEqual(result.mode, 1)
 
+    def test_auto_detect_prefers_rarity_level_over_median_level(self):
+        # Default resolution order is (final_level, rarity_level, median_level),
+        # independent of header order. median_level appears first in the header
+        # and carries different values, so a resolution by header order or a
+        # re-ordered candidate list would select the wrong column.
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            path = root / 'both.csv'
+            with open(path, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(['word_id', 'word', 'median_level', 'rarity_level'])
+                writer.writerow(['1', 'alpha', '4', '1'])
+                writer.writerow(['2', 'beta', '2', '1'])
+                writer.writerow(['3', 'gamma', '2', '3'])
+            result = run_rarity_distribution(csv_path=path, repo=self.repo)
+        self.assertEqual(result.level_column, 'rarity_level')
+        self.assertEqual(result.total_rows, 3)
+        self.assertEqual(list(sorted(result.distribution.items())), [(1, 2), (2, 0), (3, 1), (4, 0), (5, 0)])
+        self.assertEqual(result.mode, 1)
+
     def test_explicit_median_level_column_used(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
