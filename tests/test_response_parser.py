@@ -128,6 +128,34 @@ class ResponseParserTest(unittest.TestCase):
         self.assertEqual(parsed.scores[0].word_id, 101)
         self.assertEqual(parsed.scores[0].rarity_level, 1)
 
+    def test_selected_word_ids_requires_forced_rarity_level(self):
+        # Strict Step5 selection contract: missing/out-of-range forced rarity
+        # level must fail fast, never be silently defaulted.
+        body = self._wrap_content("[1]")
+        with self.assertRaises(ValueError) as ctx:
+            self.parser.parse(
+                batch=self.batch,
+                response_body=body,
+                output_mode=ScoringOutputMode.SELECTED_WORD_IDS,
+                forced_rarity_level=None,
+                expected_items=1,
+            )
+        self.assertIn("forced_rarity_level is required", str(ctx.exception))
+
+    def test_selected_word_ids_requires_expected_items(self):
+        # Strict Step5 selection contract: expected_items of None/0 must fail
+        # fast instead of silently auto-filling whatever the LM returned.
+        body = self._wrap_content("[1]")
+        with self.assertRaises(ValueError) as ctx:
+            self.parser.parse(
+                batch=self.batch,
+                response_body=body,
+                output_mode=ScoringOutputMode.SELECTED_WORD_IDS,
+                forced_rarity_level=1,
+                expected_items=None,
+            )
+        self.assertIn("expected_items is required", str(ctx.exception))
+
     def test_score_results_parsing(self):
         body = self._wrap_content('[{"word_id": 102, "word": "casă", "type": "N", "rarity_level": 2, "tag": "test", "confidence": 1.0}]')
         parsed = self.parser.parse(
