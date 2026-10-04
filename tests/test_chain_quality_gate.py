@@ -88,3 +88,40 @@ class TestChainQualityGate(unittest.TestCase):
         self.anchors.write_text("absent\n", encoding="utf-8")
         with self.assertRaisesRegex(RuntimeError, "Quality audit failed"):
             self.run_chain()
+
+    def test_failed_precision_blocks_despite_passing_recall(self):
+        """Anchor precision and recall are independent gates; precision alone blocks.
+
+        test_failed_anchors_block_result couples both metrics: a single absent
+        anchor zeroes precision and recall together. This case isolates the
+        precision branch — the candidate retains every seeded anchor (recall
+        stays 1.0 >= 0.9) but also emits extra level-1 words the anchor set does
+        not cover, so precision drops below the floor. A regression that removes
+        or swaps the precision check would let this candidate pass on recall
+        alone; asserting on the QualityAuditResult return values distinguishes it
+        in a way the chain's opaque RuntimeError cannot.
+        """
+        candidate_csv = self.root / "candidate.csv"
+        with candidate_csv.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.writer(handle)
+            writer.writerow(["word_id", "word", "final_level"])
+            for word_id in range(1, 9):
+                writer.writerow([word_id, f"keep{word_id}", 1])
+            writer.writerow([9, "extra", 3])
+        anchors = self.root / "anchors.txt"
+        anchors.write_text("keep1\nkeep2\n", encoding="utf-8")
+
+        result = run_quality_audit(
+            candidate_csv=candidate_csv,
+            anchor_l1_file=anchors,
+            min_anchor_l1_precision=0.9,
+            min_anchor_l1_recall=0.9,
+            repo=self.repo,
+        )
+
+        self.assertFalse(result.passed)
+        self.assertIsNone(result.l1_jaccard)
+        self.assertLess(result.anchor_precision, 0.9)
+        self.assertGreaterEqual(result.anchor_recall, 0.9)
+        self.assertEqual(len(result.failures), 1)
+        self.assertRegex(result.failures[0], "anchor_l1_precision")

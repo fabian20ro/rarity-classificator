@@ -66,6 +66,31 @@ class TestLmStudioRequestBuilder(unittest.TestCase):
         self.assertIn("items", payload["response_format"]["json_schema"]["schema"])
         self.assertIn("word_id", payload["response_format"]["json_schema"]["schema"]["items"]["properties"])
 
+    def test_score_results_schema_pins_expected_count_not_batch_size(self):
+        import json
+
+        batch = [
+            BaseWordRow(word_id=1, word="apple", type="noun"),
+            BaseWordRow(word_id=2, word="banana", type="noun"),
+        ]
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=batch,
+                system_prompt="system",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_SCHEMA,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=100,
+                expected_items=1,
+                schema_kind=JsonSchemaKind.SCORE_RESULTS,
+            )
+        )
+        schema = payload["response_format"]["json_schema"]["schema"]
+        self.assertEqual(schema["minItems"], 1)
+        self.assertEqual(schema["maxItems"], 1)
+
     def test_different_response_format_mode(self):
         payload_str = self.builder.build_request(
             model="test-model",
