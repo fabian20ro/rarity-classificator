@@ -512,5 +512,40 @@ class ReviewSkipCountTest(unittest.TestCase):
             self.assertIn("skipped=1", queue_line)
 
 
+class ReviewSkipKeyTest(unittest.TestCase):
+    def setUp(self):
+        self.repo = RunCsvRepository()
+
+    def _write_csv(self, path: Path, headers: list[str], rows: list[list[str]]):
+        self.repo.write_rows(path, headers, rows)
+
+    @patch("builtins.print")
+    @patch("builtins.input", side_effect=["s", "1", "q"])
+    def test_skip_key_skips_item_without_labeling(self, mock_input, mock_print):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            csv_path = root / "run.csv"
+            labels_csv = root / "labels.csv"
+            self._write_csv(
+                csv_path,
+                ["word_id", "word", "type", "rarity_level", "confidence"],
+                [
+                    ["1", "a", "N", "1", "0.1"],
+                    ["2", "b", "N", "1", "0.2"],
+                ],
+            )
+            run_review_low_confidence(
+                csv_path=csv_path,
+                labels_csv=labels_csv,
+                repo=self.repo,
+            )
+            print_calls = [str(c.args[0]) for c in mock_print.call_args_list]
+            self.assertTrue(any("skipping word_id=1" in c for c in print_calls))
+            self.assertTrue(any("session_labeled=1" in c for c in print_calls))
+            latest = load_latest_review_labels(labels_csv)
+            self.assertNotIn(1, latest)
+            self.assertEqual(latest[2].label, "1")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -104,6 +104,44 @@ class RequestBuilderTest(unittest.TestCase):
         )
         self.assertEqual(payload["max_tokens"], 50)
 
+    def test_selected_word_ids_max_tokens_estimation_and_hard_ceiling(self):
+        # Small batch: estimated = 1*24 + 128 = 152, no clamping needed
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=5000,
+                expected_items=1,
+                schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
+            )
+        )
+        self.assertEqual(payload["max_tokens"], 152)
+
+        # Large batch: estimated = 60*24 + 128 = 1568, capped at SELECTION_HARD_MAX_TOKENS=1024
+        large_batch = [
+            BaseWordRow(word_id=i, word=f"word{i}", type="N") for i in range(1, 61)
+        ]
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=large_batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=5000,
+                expected_items=60,
+                schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
+            )
+        )
+        self.assertEqual(payload["max_tokens"], 1024)
+
     def test_selected_word_ids_schema_multi_item_bounds(self):
         payload = json.loads(
             self.builder.build_request(

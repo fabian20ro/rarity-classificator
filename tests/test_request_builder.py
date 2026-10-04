@@ -377,6 +377,25 @@ class RequestBuilderTest(unittest.TestCase):
         # computed effective=280, cap=200 → min(280, 200)=200
         self.assertEqual(payload["max_tokens"], 200)
 
+    def test_token_estimation_selection_mode_respects_hard_max_cap(self):
+        config = LmModelConfig(model_id="test-model")
+        # 50 items * 24 + 128 = 1328 → clamped to selection hard cap 1024
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch * 25,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=config,
+                max_tokens=10_000,
+                expected_items=50,
+                schema_kind=JsonSchemaKind.SELECTED_WORD_IDS,
+            )
+        )
+        self.assertEqual(payload["max_tokens"], 1024)
+
     def test_config_optional_fields_included_when_set(self):
         config = LmModelConfig(
             model_id="test-model",

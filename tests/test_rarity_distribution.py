@@ -257,6 +257,22 @@ class RarityDistributionTest(unittest.TestCase):
                 run_rarity_distribution(csv_path=path, repo=self.repo)
             self.assertIn("Invalid rarity_level '' at row 2", str(cm.exception))
 
+    def test_short_row_missing_level_raises_specific_message(self):
+        from classificator.csv_codec import CsvRecord, CsvTable
+
+        class ShortRowRepo(RunCsvRepository):
+            def read_table(self, path):
+                return CsvTable(
+                    headers=["word_id", "rarity_level"],
+                    records=[CsvRecord(line_number=2, values=["1"])],
+                )
+
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "short.csv"
+            with self.assertRaises(ValueError) as cm:
+                run_rarity_distribution(csv_path=path, repo=ShortRowRepo())
+            self.assertIn("Missing rarity_level at row 2 in", str(cm.exception))
+
     def test_mode_for_single_record(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

@@ -99,6 +99,20 @@ class RarityDistributionTest(unittest.TestCase):
         self.assertEqual(dist.count(1), 1)
         self.assertEqual(dist.count(3), 1)
 
+    def test_set_level_zero_count_previous_does_not_underflow(self):
+        """set_level must not drive a zero-count previous level negative.
+
+        The production guard skips the decrement when the previous level has
+        no entries, so the source stays at 0 while the destination still
+        increments. A regression that removes the guard would let the source
+        count underflow below zero and miscount the total."""
+        dist = RarityDistribution.from_levels([3])
+        dist.set_level(previous_level=5, new_level=4)
+        self.assertEqual(dist.count(3), 1)
+        self.assertEqual(dist.count(5), 0)
+        self.assertEqual(dist.count(4), 1)
+        self.assertEqual(dist.total, 2)
+
     def test_increment_silent_duplicate_inflates_counts(self):
         dist = RarityDistribution()
         dist.increment(3)
