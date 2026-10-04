@@ -5,7 +5,7 @@ from classificator.lm.client import (
     SELECTION_REPAIR_USER_TEMPLATE,
     LmStudioClient,
 )
-from classificator.models import ScoringOutputMode
+from classificator.models import BaseWordRow, ScoringOutputMode
 from classificator.constants import USER_INPUT_PLACEHOLDER
 
 
@@ -121,6 +121,24 @@ class SelectionRepairPromptTest(unittest.TestCase):
         sys_p, user_t = client._resolve_selection_prompt_counts(ctx)
         self.assertEqual(sys_p, "{{TARGET_COUNT}} from {{COMMON_COUNT}}")
         self.assertEqual(user_t, "{{TARGET_COUNT}} of {{COMMON_COUNT}}")
+
+    def test_try_selection_repair_skips_when_expected_covers_full_batch(self):
+        """Repair must be skipped (returns None) when expected >= len(batch).
+
+        Production contract (_try_selection_repair_before_split, client.py):
+            the guard `expected is None or expected <= 0 or expected >= len(batch)`
+            returns None before any network call, because when the LM is already
+            asked to select every row there is no count mismatch to repair — the
+            caller then falls through to the recursive split path.
+        """
+        client = LmStudioClient(api_key=None)
+        batch = [BaseWordRow(word_id=i, word=f"word{i}", type="noun") for i in (1, 2, 3)]
+        ctx = type(
+            "Ctx",
+            (),
+            {"output_mode": ScoringOutputMode.SELECTED_WORD_IDS, "expected_json_items": 3},
+        )()
+        self.assertIsNone(client._try_selection_repair_before_split(batch, ctx))
 
 
 if __name__ == "__main__":
