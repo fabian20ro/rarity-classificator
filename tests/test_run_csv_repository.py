@@ -176,6 +176,21 @@ class RunCsvRepositoryTest(unittest.TestCase):
             with self.assertRaises(CsvFormatError):
                 self.repo.load_final_levels(path)
 
+    def test_load_final_levels_rejects_level_out_of_range(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "levels.csv"
+            self.repo.write_rows(
+                path,
+                ["word_id", "word", "type", "final_level"],
+                [
+                    ["1", "om", "N", "6"],
+                ],
+            )
+            with self.assertRaisesRegex(
+                CsvFormatError, r"final_level out of range at .*:2"
+            ):
+                self.repo.load_final_levels(path)
+
 
 if __name__ == "__main__":
     unittest.main()
