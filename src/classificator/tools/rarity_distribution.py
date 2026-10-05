@@ -50,27 +50,28 @@ def run_rarity_distribution(
     distribution = {level: counts[level] for level in range(1, 6)}
     mode = max(distribution, key=distribution.get)
     std_dev = _weighted_std_dev(distribution, total_rows)
-    if json_output:
-        payload: dict[str, int | float] = {
-            **counts.to_dict(),
-            "mode": mode,
-            "std_dev": std_dev,
-        }
-        print(json.dumps(payload))
-    else:
-        print(
-            f"input_csv={csv_path}",
-            f"level_column={resolved_level_col}",
-            f"mode={mode}",
-            f"distribution=[1:{distribution[1]} 2:{distribution[2]} 3:{distribution[3]} ",
-            f"4:{distribution[4]} 5:{distribution[5]}] total={total_rows}"
-        )
-        print(
-            "distribution_pct=["
-            + " ".join([f"{k}:{_pct(v, total_rows):.2f}%" for k, v in sorted(distribution.items())])
-            + "]"
-        )
-        print(f"std_dev={std_dev:.2f}")
+    if not quiet:
+        if json_output:
+            payload: dict[str, int | float] = {
+                **counts.to_dict(),
+                "mode": mode,
+                "std_dev": std_dev,
+            }
+            print(json.dumps(payload))
+        else:
+            print(
+                f"input_csv={csv_path}",
+                f"level_column={resolved_level_col}",
+                f"mode={mode}",
+                f"distribution=[1:{distribution[1]} 2:{distribution[2]} 3:{distribution[3]} ",
+                f"4:{distribution[4]} 5:{distribution[5]}] total={total_rows}"
+            )
+            print(
+                "distribution_pct=["
+                + " ".join([f"{k}:{_pct(v, total_rows):.2f}%" for k, v in sorted(distribution.items())])
+                + "]"
+            )
+            print(f"std_dev={std_dev:.2f}")
 
     return RarityDistributionResult(
         csv_path=csv_path,

@@ -77,6 +77,44 @@ class RarityDistributionTest(unittest.TestCase):
                 "std_dev=0.94\n",
             )
 
+    def test_quiet_true_produces_no_stdout(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "run.csv"
+            self._write_csv(path, ["rarity_level"], [["1"], ["1"], ["3"]])
+            output = StringIO()
+            with redirect_stdout(output):
+                result = run_rarity_distribution(csv_path=path, repo=self.repo, quiet=True)
+            self.assertEqual(output.getvalue(), "")
+            self.assertEqual(result.total_rows, 3)
+            self.assertEqual(result.mode, 1)
+            self.assertEqual(result.distribution[1], 2)
+            self.assertEqual(result.distribution[3], 1)
+
+    def test_quiet_false_default_emits_three_lines(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "run.csv"
+            self._write_csv(path, ["rarity_level"], [["1"], ["1"], ["3"]])
+            output = StringIO()
+            with redirect_stdout(output):
+                run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertEqual(
+                output.getvalue(),
+                f"input_csv={path} level_column=rarity_level mode=1 "
+                "distribution=[1:2 2:0 3:1  4:0 5:0] total=3\n"
+                "distribution_pct=[1:66.67% 2:0.00% 3:33.33% 4:0.00% 5:0.00%]\n"
+                "std_dev=0.94\n",
+            )
+
+    def test_quiet_parameter_does_not_change_result_fields(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "run.csv"
+            self._write_csv(path, ["rarity_level"], [["1"], ["1"], ["3"]])
+            with redirect_stdout(StringIO()):
+                default_result = run_rarity_distribution(csv_path=path, repo=self.repo)
+            with redirect_stdout(StringIO()):
+                quiet_result = run_rarity_distribution(csv_path=path, repo=self.repo, quiet=True)
+            self.assertEqual(quiet_result, default_result)
+
     def test_json_does_not_reexpand_counts_into_individual_levels(self):
         with tempfile.TemporaryDirectory() as td:
             path = Path(td) / "run.csv"
