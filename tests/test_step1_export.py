@@ -63,6 +63,18 @@ class TestStep1Export(unittest.TestCase):
         self.mock_repo.write_rows.assert_called_once()
         args, _ = self.mock_repo.write_rows.call_args
         self.assertEqual(args[0], self.output_csv)
+
+    def test_null_word_id_refuses_export_without_writing(self):
+        # A None word_id must raise ValueError (fail-fast) before any write —
+        # the guard refuses exporting 'None' as a word_id.
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = [(None, "ghost", "noun"), (1, "real", "fruit")]
+        options = Step1Options(output_csv_path=self.output_csv)
+        with self.assertRaises(ValueError):
+            run_step1(options, word_store=store, repo=self.mock_repo)
+        # Guard precedes write phase — a silent str(None) fallback would corrupt the CSV.
+        self.mock_repo.write_rows.assert_not_called()
+
     def test_run_step1_success(self):
         options = Step1Options(output_csv_path=self.output_csv)
         store = MagicMock(spec=WordStore)
