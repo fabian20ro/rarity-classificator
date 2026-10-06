@@ -198,6 +198,9 @@ class Step5ProgressLoggingTest(unittest.TestCase):
             self.assertEqual(set(dist.keys()), {"1", "2", "3", "4", "5"})
             # 3 words total (levels [4, 4, 5]) → sum of counts = 3
             self.assertEqual(sum(dist.values()), 3)
+            # Per-level values must map each level to its own count. The sum
+            # alone would still pass a level->key off-by-one regression.
+            self.assertEqual(dist, {"1": 0, "2": 0, "3": 0, "4": 2, "5": 1})
 
 
 if __name__ == "__main__":

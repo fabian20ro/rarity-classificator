@@ -95,3 +95,34 @@ class BugReproductionTest(unittest.TestCase):
                 CsvFormatError, r"confidence out of range at .*:2"
             ):
                 self.repo.load_run_rows(path)
+
+    def test_run_csv_load_rejects_confidence_below_zero(self):
+        """Confidence below 0 must raise CsvFormatError — not be silently accepted.
+
+        Pins the lower bound of the same range check the test above pins for the
+        upper bound (1.5). An LLM emitting a negative confidence ("-0.1") would
+        otherwise parse as a valid float and propagate into downstream gates.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "run.csv"
+            self.repo.write_rows(
+                path,
+                [
+                    "word_id",
+                    "word",
+                    "type",
+                    "rarity_level",
+                    "tag",
+                    "confidence",
+                    "scored_at",
+                    "model",
+                    "run_slug",
+                ],
+                [
+                    ["1", "om", "N", "3", "uncertain", "-0.1", "t", "m", "r"],
+                ],
+            )
+            with self.assertRaisesRegex(
+                CsvFormatError, r"confidence out of range at .*:2"
+            ):
+                self.repo.load_run_rows(path)

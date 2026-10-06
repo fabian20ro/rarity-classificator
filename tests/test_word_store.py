@@ -1,5 +1,6 @@
+import os
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from classificator.word_store import WordStore
 
@@ -229,6 +230,38 @@ class WordStoreTest(unittest.TestCase):
             self.assertTrue(fake_psycopg.connect.called)
         finally:
             del sys.modules["psycopg"]
+
+    def test_init_resolves_credentials_and_preserves_explicit_empty_password(self):
+        saved = {k: os.environ.get(k) for k in (
+            "SUPABASE_DB_URL", "SUPABASE_DB_USER", "SUPABASE_DB_PASSWORD"
+        )}
+        for k in saved:
+            os.environ.pop(k, None)
+        try:
+            # No env: empty url/user fall through to hardcoded defaults, but an
+            # explicitly empty password is a meaningful value (no password) and is
+            # preserved via the `is not None` check, not collapsed away.
+            store = WordStore(db_url="", db_user="", db_password="")
+            self.assertEqual(store.db_url, "postgresql://localhost:5432/postgres")
+            self.assertEqual(store.db_user, "postgres")
+            self.assertEqual(store.db_password, "")
+            # Env present: empty url/user resolve from env, while the explicit empty
+            # password still wins over the env var.
+            with patch.dict(os.environ, {
+                "SUPABASE_DB_URL": "env-url",
+                "SUPABASE_DB_USER": "env-user",
+                "SUPABASE_DB_PASSWORD": "env-pass",
+            }):
+                store = WordStore(db_url="", db_user="", db_password="")
+                self.assertEqual(store.db_url, "env-url")
+                self.assertEqual(store.db_user, "env-user")
+                self.assertEqual(store.db_password, "")
+        finally:
+            for k, v in saved.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
 
 
 if __name__ == "__main__":

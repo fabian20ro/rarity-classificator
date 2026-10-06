@@ -1,5 +1,5 @@
 import unittest
-from classificator.steps.step5_rebalance import _compute_adaptive_target_count
+from classificator.steps.step5_rebalance import _compute_adaptive_target_count, _resolve_level_column
 
 class TestStep5Logic(unittest.TestCase):
     def test_adaptive_target_count_zero_batch(self):
@@ -225,6 +225,36 @@ class TestStep5Logic(unittest.TestCase):
         )
         # processed_after=15, desired=int(3.0+0.5)=3, cap min(10, 3)=3, delta=3-8=-5, max(0, -5)=0
         self.assertEqual(result, 0)
+
+    def test_resolve_level_column_prefers_final_level(self):
+        # Priority contract: final_level wins when multiple level columns exist.
+        # A regression reordering the priority chain would silently read stale
+        # levels from rarity_level/median_level instead of final_level.
+        self.assertEqual(
+            _resolve_level_column(["word_id", "word", "type", "rarity_level", "median_level", "final_level"]),
+            "final_level",
+        )
+        self.assertEqual(
+            _resolve_level_column(["word_id", "word", "type", "median_level", "final_level"]),
+            "final_level",
+        )
+
+    def test_resolve_level_column_prefers_rarity_level_over_median(self):
+        self.assertEqual(
+            _resolve_level_column(["word_id", "word", "type", "median_level", "rarity_level"]),
+            "rarity_level",
+        )
+
+    def test_resolve_level_column_single_median_only(self):
+        self.assertEqual(
+            _resolve_level_column(["word_id", "word", "type", "median_level"]),
+            "median_level",
+        )
+
+    def test_resolve_level_column_missing_level_column_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            _resolve_level_column(["word_id", "word", "type"])
+        self.assertIn("final_level", str(ctx.exception))
 
 if __name__ == "__main__":
     unittest.main()
