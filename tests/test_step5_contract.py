@@ -285,6 +285,74 @@ class TestStep5Contract(unittest.TestCase):
         self.assertEqual(len(truncated), 1, "selection must be exact-count capped at common_count")
         self.assertEqual(truncated, {1}, "truncation keeps the first valid id in scored order")
 
+    def test_allocate_quota_honors_stratified_proportions_and_availability(self):
+        """_allocate_quota must honor stratified proportions and availability caps.
+
+        Production contract: per-source quotas are proportional shares of the batch
+        size, rounded to integers that still sum to the batch size; a quota that
+        exceeds the level's remaining pool is capped at the pool and the excess is
+        redistributed to levels with spare capacity.
+        test_processed_ids_are_excluded_from_later_batches exercises
+        _select_stratified_batch but only asserts returned ids stay within the
+        pools — it never pins the per-level batch composition, so a quota
+        regression (dropped cap, skipped remainder distribution, or skipped
+        redistribution) would under- or over-fill the batch without failing there.
+        """
+        from classificator.steps.step5_rebalance import _allocate_quota, RebalanceWord
+
+        def words(n, wid_base=0):
+            return [RebalanceWord(word_id=wid_base + i, word=f"w{i}", type="N") for i in range(1, n + 1)]
+
+        # Single source level: the whole batch is drawn from it.
+        quotas = _allocate_quota(
+            source_levels=[2],
+            initial_source_counts={2: 10},
+            target_size=5,
+            remaining_by_source_level={2: words(10)},
+        )
+        self.assertEqual(quotas, {2: 5})
+
+        # Proportional split with fractional remainder: a 1:2 initial ratio for a
+        # 5-word batch must allocate 2/3, not truncate to 1/3 (sum 4 < 5).
+        quotas = _allocate_quota(
+            source_levels=[2, 3],
+            initial_source_counts={2: 1, 3: 2},
+            target_size=5,
+            remaining_by_source_level={2: words(2), 3: words(3, 100)},
+        )
+        self.assertEqual(quotas, {2: 2, 3: 3})
+        self.assertEqual(sum(quotas.values()), 5)
+
+        # Availability cap: when a quota exceeds the level's remaining pool, the
+        # quota is capped at the pool instead of over-allocating unavailable ids.
+        quotas = _allocate_quota(
+            source_levels=[2, 3],
+            initial_source_counts={2: 1, 3: 2},
+            target_size=5,
+            remaining_by_source_level={2: words(1), 3: words(3, 100)},
+        )
+        self.assertEqual(quotas, {2: 1, 3: 3})
+
+        # Redistribution: a capped level's excess moves to a level that still has
+        # spare capacity so the batch fills to the target size.
+        quotas = _allocate_quota(
+            source_levels=[2, 3],
+            initial_source_counts={2: 2, 3: 2},
+            target_size=6,
+            remaining_by_source_level={2: words(2), 3: words(4, 100)},
+        )
+        self.assertEqual(quotas, {2: 2, 3: 4})
+        self.assertEqual(sum(quotas.values()), 6)
+
+        # No eligible words at all: every quota is zero.
+        quotas = _allocate_quota(
+            source_levels=[2, 3],
+            initial_source_counts={2: 0, 3: 0},
+            target_size=5,
+            remaining_by_source_level={2: [], 3: []},
+        )
+        self.assertEqual(quotas, {2: 0, 3: 0})
+
 
 def _make_distribution(counts):
     from classificator.distribution import RarityDistribution
