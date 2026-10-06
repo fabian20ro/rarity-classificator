@@ -151,6 +151,9 @@ class TestStep4Upload(unittest.TestCase):
 
         # Only word 1 should be in updates; word 2 absent from DB
         self.assertEqual(set(self.mock_word_store.update_rarity_levels_chunked.call_args[0][0].keys()), {1})
+        marker_kwargs = self.mock_marker_writer.mark_uploaded_rows.call_args[1]
+        self.assertEqual(marker_kwargs["uploaded_levels"], {1: 2})
+        self.assertEqual(marker_kwargs["status_by_word_id"], {1: "uploaded", 2: "missing_db_word"})
         with open(self.report_csv, "r") as f:
             reader = csv.DictReader(f)
             rows = list(reader)
