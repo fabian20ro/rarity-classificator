@@ -125,3 +125,43 @@ class TestChainQualityGate(unittest.TestCase):
         self.assertGreaterEqual(result.anchor_recall, 0.9)
         self.assertEqual(len(result.failures), 1)
         self.assertRegex(result.failures[0], "anchor_l1_precision")
+
+    def test_failed_recall_blocks_despite_passing_precision(self):
+        """Anchor precision and recall are independent gates; recall alone blocks.
+
+        test_failed_precision_blocks_despite_passing_recall isolates the
+        precision branch; this case isolates the recall branch. The candidate
+        retains one of the eight seeded anchors (recall = 1/8 = 0.125 < 0.9)
+        while its extra level-1 word keeps precision at 0.5 as well — both
+        gates fail, but the recall assertion is the distinguishing one: a
+        regression that removes or swaps the min_anchor_l1_recall check would
+        still trip the precision gate and raise the chain's opaque RuntimeError,
+        so only asserting on the QualityAuditResult return values catches it.
+        """
+        candidate_csv = self.root / "candidate.csv"
+        with candidate_csv.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.writer(handle)
+            writer.writerow(["word_id", "word", "final_level"])
+            writer.writerow([1, "keep1", 1])
+            writer.writerow([2, "keep2", 1])
+            writer.writerow([3, "extra", 1])
+        anchors = self.root / "anchors.txt"
+        anchors.write_text(
+            "\n".join(f"keep{i}" for i in range(1, 9)), encoding="utf-8"
+        )
+
+        result = run_quality_audit(
+            candidate_csv=candidate_csv,
+            anchor_l1_file=anchors,
+            min_anchor_l1_precision=0.9,
+            min_anchor_l1_recall=0.9,
+            repo=self.repo,
+        )
+
+        self.assertFalse(result.passed)
+        self.assertLess(result.anchor_recall, 0.9)
+        self.assertLess(result.anchor_precision, 0.9)
+        self.assertEqual(len(result.failures), 2)
+        self.assertTrue(
+            any("anchor_l1_recall" in failure for failure in result.failures)
+        )
