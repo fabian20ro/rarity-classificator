@@ -107,6 +107,25 @@ class BuildRetryInputTest(unittest.TestCase):
             with self.assertRaises(IsADirectoryError):
                 build_retry_input(failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo)
 
+    def test_build_retry_input_raises_on_base_directory(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            failed = root / "failed.jsonl"
+            base = root / "base_dir"
+            out = root / "retry.csv"
+
+            failed.write_text('{"word_id": 1}\n', encoding="utf-8")
+            base.mkdir()
+
+            with self.assertRaises(IsADirectoryError) as ctx:
+                build_retry_input(
+                    failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
+                )
+            # The base-directory branch is signalled by its own prefix — distinct
+            # from the failed-JSONL and output-CSV branches — and names the path.
+            self.assertIn("Base CSV is a directory", str(ctx.exception))
+            self.assertIn(str(base), str(ctx.exception))
+
     def test_build_retry_input_raises_on_output_directory(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
