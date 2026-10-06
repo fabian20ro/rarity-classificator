@@ -198,6 +198,19 @@ class TestBatchSizeAdapter(unittest.TestCase):
         self.assertIn("min=4", r)
         self.assertIn("max=50", r)
 
+    def test_repr_includes_all_threshold_parameters(self):
+        """__repr__ must include success_threshold, low_threshold, and high_threshold
+        with their actual values; a regression dropping any of these fields would go
+        uncaught by existing tests (which only assert size/min/max)."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=5,
+            success_threshold=0.7, low_threshold=0.3, high_threshold=0.8,
+        )
+        r = repr(adapter)
+        self.assertIn("threshold=0.7", r)
+        self.assertIn("low=0.3", r)
+        self.assertIn("high=0.8", r)
+
     def test_adjustment_long_sequence(self):
         # Test a long sequence of successes to see if it reaches initial_size
         adapter = BatchSizeAdapter(initial_size=20, min_size=5, window_size=5)
