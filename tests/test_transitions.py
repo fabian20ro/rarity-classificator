@@ -203,5 +203,16 @@ class TransitionsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             require_valid_pair_transition(-1, 0, 1)
 
+    def test_reversed_pair_sources_rejected(self):
+        # Pair source ranges are order-sensitive: the lower level must come
+        # first. A reversed/descending range (hi < lo) is not consecutive and
+        # must be rejected, not silently normalized or accepted.
+        # Unit layer: (4,3,3) fails the consecutive check (hi != lo + 1).
+        with self.assertRaises(ValueError):
+            require_valid_pair_transition(4, 3, 3)
+        # Public entry: "4-3:3" parses left=4, right=3 (no sort) and must raise.
+        with self.assertRaises(ValueError):
+            parse_transitions("4-3:3")
+
 if __name__ == "__main__":
     unittest.main()
