@@ -35,6 +35,17 @@ class TestCsvCodec(unittest.TestCase):
         with self.assertRaises(CsvFormatError):
             self.codec.read_table(path)
 
+    def test_read_table_blank_header_row_raises(self):
+        # A blank first physical line yields an empty header row (rows[0] == []),
+        # a distinct guard from an entirely empty file.
+        path = self.test_dir / "blank_header_row.csv"
+        with open(path, "w", encoding="utf-8", newline="") as f:
+            f.write("\nid,name\n1,test_id\n")
+        with self.assertRaises(CsvFormatError) as cm:
+            self.codec.read_table(path)
+        self.assertIn("CSV has empty header row", str(cm.exception))
+        self.assertIn(str(path), str(cm.exception))
+
     def test_read_table_file_not_found_raises(self):
         path = self.test_dir / "missing.csv"
         with self.assertRaises(FileNotFoundError) as cm:
