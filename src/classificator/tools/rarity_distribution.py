@@ -52,10 +52,15 @@ def run_rarity_distribution(
     std_dev = _weighted_std_dev(distribution, total_rows)
     if not quiet:
         if json_output:
-            payload: dict[str, int | float] = {
+            pct = {
+                str(level): round(_pct(count, total_rows), 2)
+                for level, count in sorted(distribution.items())
+            }
+            payload: dict[str, int | float | dict[str, float]] = {
                 **counts.to_dict(),
                 "mode": mode,
                 "std_dev": std_dev,
+                "pct": pct,
             }
             print(json.dumps(payload))
         else:
