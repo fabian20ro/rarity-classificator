@@ -237,6 +237,15 @@ class BuildRetryInputTest(unittest.TestCase):
                 )
 
     def test_build_retry_input_rejects_non_positive_word_ids(self):
+        """Regression: non-positive word_id must raise from the non-positive branch.
+
+        A regression that fired a different branch (e.g. the string or float
+        branch, which also raise ValueError) — or whose message omits the
+        value — would still satisfy a bare assertRaises(ValueError). The
+        documented JSONL-side boundary raises with a unique, actionable message
+        naming the offending value, so both the branch prefix and the value are
+        asserted.
+        """
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             failed = root / "failed.jsonl"
@@ -255,10 +264,15 @@ class BuildRetryInputTest(unittest.TestCase):
                 [["1", "test"]],
             )
 
-            with self.assertRaises(ValueError):
+            with self.assertRaises(ValueError) as ctx:
                 build_retry_input(
                     failed_jsonl=failed, base_csv=base, output_csv=out, repo=self.repo
                 )
+            # Must be the non-positive branch — not an unrelated check — and must
+            # name the offending value for debugging.
+            exc_str = str(ctx.exception)
+            self.assertIn("Non-positive word_id", exc_str)
+            self.assertIn("0", exc_str)
 
     def test_build_retry_input_deduplicates_base_word_ids(self):
         """Regression: duplicate word_id in base CSV must not produce duplicates in output."""

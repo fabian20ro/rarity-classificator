@@ -687,3 +687,66 @@ class TestStep8DoubleCountingFix(unittest.TestCase):
             if Path("dummy_runs").exists():
                 import shutil
                 shutil.rmtree("dummy_runs")
+
+    def test_step1_upper_source_minimum_fires_when_lower_source_is_healthy(self):
+        """Step 1 with a healthy lower source (l1) but a tiny upper source (l2) fires the upper per-source arm.
+
+        The per-source minimum validation has two arms:
+            count_low  < min_per_source  → "source level {from_low} has only ..."
+            count_high < min_per_source  → "source level {from_high} has only ..." (guarded by from_high != from_low)
+
+        test_step1_per_source_minimum_fires_before_ratio_gate probes only the count_low arm
+        (it asserts "source level 1"). This case inverts the imbalance: l1 is large enough
+        to pass (3000 >= 250), l2 is small (100 < 250), so the upper-source arm fires. A
+        regression that drops or inverts the `from_high != from_low and count_high < min_per_source`
+        branch would let this step pass validation and reach the ratio gate (2500/3100 ≈ 0.806,
+        in range) and execute run_step5 on a skewed pool; the existing count_low assertion still
+        passes. Only this upper-source assertion — plus the guard that the LM step never runs —
+        distinguishes the regression.
+        """
+        from unittest.mock import patch
+
+        def fake_get_level_count(csv_path, level, repo):
+            if level == 1:
+                return 3000  # >= min_per_source=250 → count_low arm passes
+            if level == 2:
+                return 100   # < min_per_source=250 → count_high arm fires
+            return 0
+
+        class MockTable:
+            headers = ["word_id", "word", "type", "rarity_level", "confidence"]
+            records = [MagicMock(values=["1", "test", "test", "4", "1.0"], line_number=2)]
+
+        class MockRepo(RunCsvRepository):
+            def read_table(self, path):
+                return MockTable()
+            def load_run_rows(self, path):
+                return []
+
+        Path("dummy_sp.txt").write_text("", encoding="utf-8")
+        Path("dummy_ut.txt").write_text("", encoding="utf-8")
+        Path("dummy.csv").touch()
+
+        try:
+            with patch("src.classificator.tools.chain_rebalance_target_dist._count_total_words", return_value=60000), \
+                 self.assertRaises(ValueError) as cm, \
+                 patch("src.classificator.tools.chain_rebalance_target_dist.run_step5") as mock_s5, \
+                 patch("src.classificator.tools.chain_rebalance_target_dist._get_level_count", side_effect=fake_get_level_count):
+                run_chain_rebalance(
+                    options=_make_options_small(),
+                    repo=MockRepo(),
+                    lm_client=MagicMock(spec=LmStudioClient),
+                    output_dir=Path("."),
+                )
+
+            self.assertFalse(mock_s5.called, "upper-source minimum must block the LM step, not let it run")
+            msg = str(cm.exception)
+            self.assertIn("[step 1]", msg, f"should fail at step 1, got: {msg}")
+            self.assertIn("source level 2", msg, f"should name upper source level 2 (count_high), got: {msg}")
+        finally:
+            for f in ["dummy.csv", "dummy_sp.txt", "dummy_ut.txt"]:
+                if Path(f).exists():
+                    Path(f).unlink()
+            if Path("dummy_runs").exists():
+                import shutil
+                shutil.rmtree("dummy_runs")

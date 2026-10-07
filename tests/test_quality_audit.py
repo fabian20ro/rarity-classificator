@@ -185,6 +185,60 @@ class QualityAuditTest(unittest.TestCase):
             self.assertFalse(result.passed)
             self.assertGreaterEqual(len(result.failures), 1)
 
+    def test_failed_l1_jaccard_blocks_despite_passing_anchors(self):
+        """L1 Jaccard and anchor precision/recall are independent gates; Jaccard alone blocks.
+
+        test_quality_gate_fails_on_thresholds fires all three gates and only
+        asserts a failure count >= 1, so a regression that removes the
+        min_l1_jaccard check would still pass it via the anchor gates. This
+        case isolates the Jaccard branch: the candidate and anchor word sets
+        match perfectly (precision = recall = 1.0) while the reference holds
+        disjoint L1 word_ids, so Jaccard is 0.0 < 0.9 and exactly one failure
+        must fire. The chain-level counterpart can only observe an opaque
+        RuntimeError, so asserting on the QualityAuditResult values distinguishes
+        a removed or swapped Jaccard check.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            reference = root / "reference.csv"
+            anchor = root / "anchor.txt"
+
+            headers = ["word_id", "word", "type", "final_level"]
+            # Candidate L1 words are exactly the anchors -> precision = recall = 1.0.
+            cand_rows = [
+                ["1", "om", "N", "1"],
+                ["2", "casă", "N", "1"],
+            ]
+            # Reference L1 word_ids disjoint from the candidate -> Jaccard = 0.0.
+            ref_rows = [
+                ["3", "rare", "A", "1"],
+                ["4", "obscur", "A", "1"],
+            ]
+            self._write_csv(candidate, headers, cand_rows)
+            self._write_csv(reference, headers, ref_rows)
+            anchor.write_text("om\ncasă\n", encoding="utf-8")
+
+            result = run_quality_audit(
+                candidate_csv=candidate,
+                reference_csv=reference,
+                anchor_l1_file=anchor,
+                min_l1_jaccard=0.9,
+                min_anchor_l1_precision=0.9,
+                min_anchor_l1_recall=0.9,
+                repo=self.repo,
+            )
+
+            self.assertFalse(result.passed)
+            self.assertEqual(len(result.failures), 1)
+            self.assertRegex(result.failures[0], "l1_jaccard")
+            self.assertEqual(result.l1_jaccard, 0.0)
+            self.assertEqual(result.l1_intersection, 0)
+            self.assertEqual(result.l1_candidate_size, 2)
+            self.assertEqual(result.l1_reference_size, 2)
+            self.assertEqual(result.anchor_precision, 1.0)
+            self.assertEqual(result.anchor_recall, 1.0)
+
     def test_quality_audit_zero_jaccard(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
