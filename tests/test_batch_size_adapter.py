@@ -1263,6 +1263,35 @@ class TestBatchSizeAdapter(unittest.TestCase):
         self.assertEqual(adapter.trend, "stable")
         self.assertEqual(adapter.current_size, 10)
 
+    def test_all_binary_successes_exceed_shared_low_threshold(self):
+        """success_threshold == low_threshold with all binary successes.
+
+        Mirror of test_success_threshold_equals_low_threshold_boundary: the stable
+        boundary (rate == low_threshold, no decrease) is pinned there, but the other
+        side is missing — all outcomes classified as success by the >= success_threshold
+        rule push the window rate to 1.0, strictly above BOTH shared thresholds
+        (1.0 > 0.5), so trend must read "increasing" and _adjust_size must grow the
+        batch. A regression computing the trend from raw clamped ratios (or with a
+        non-strict comparison that mislabels the shared band) would leave the size
+        at 10 or 15 here instead of growing it to 22 (10→15→22, one increase per record)."""
+        adapter = BatchSizeAdapter(
+            initial_size=10, min_size=3, window_size=2, max_size=50,
+            success_threshold=0.5, low_threshold=0.5, high_threshold=0.8,
+        )
+
+        # All recorded ratios classify as success (>= 0.5); window is all-True.
+        adapter.record_outcome(0.5)
+        adapter.record_outcome(0.9)
+        self.assertTrue(adapter.outcomes[0])
+        self.assertTrue(adapter.outcomes[1])
+
+        # rate = 2/2 = 1.0 — strictly above high_threshold=0.8 → "increasing".
+        self.assertEqual(adapter.success_rate(), 1.0)
+        self.assertEqual(adapter.trend, "increasing")
+        # Strictly above low_threshold=0.5 as well; compound per-record increases:
+        # 10→15 ((10*3)//2), then 15→22 ((15*3)//2).
+        self.assertEqual(adapter.current_size, 22)
+
     def test_len_reflects_window_state(self):
         """__len__ must return len(outcomes) across empty, partial, full-with-eviction, and post-reset."""
         adapter = BatchSizeAdapter(initial_size=10, min_size=3, window_size=3)
