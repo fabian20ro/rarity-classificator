@@ -45,3 +45,12 @@ def test_matches_complete_distance(left, right, distance):
     for expected, actual in [(left, right), (right, left)]:
         assert matches_with_distance(expected, actual) == (distance <= 2, distance)
         assert matches(expected, actual) is (distance <= 2)
+
+
+def test_matches_rejects_word_which_is_only_prefix_not_full_distance_match():
+    # "cat" is a true prefix of "category", but full distance is 5 (> 2),
+    # so a prefix-only similarity heuristic would wrongly accept this pair.
+    assert matches_with_distance("cat", "category") == (False, 5)
+    assert matches_with_distance("category", "cat") == (False, 5)
+    assert matches("cat", "category") is False
+    assert matches("category", "cat") is False
