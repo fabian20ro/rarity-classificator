@@ -114,3 +114,14 @@ def test_trailing_decimal_point_at_eof():
     result = repair('{"val": 1.')
     assert result == '{"val": 1.0}'
     assert _json.loads(result) == {"val": 1.0}
+
+
+def test_multi_line_block_comment_fully_stripped():
+    # Regression: /* ... */ removal must scan to the closing */ across
+    # newlines (docstring: "including any newlines inside"), not stop at the
+    # first line end.  A line-oriented stripper would leave the bare comment
+    # tail in the output, which leaves the document unparseable.
+    import json as _json
+    result = repair('{"a": 1 /* c\ncomment */\n}')
+    assert "comment" not in result
+    assert _json.loads(result) == {"a": 1}
