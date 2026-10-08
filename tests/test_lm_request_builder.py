@@ -185,6 +185,31 @@ class TestLmStudioRequestBuilder(unittest.TestCase):
         )
         self.assertEqual(payload["reasoning_effort"], "high")
 
+    def test_include_reasoning_controls_false_omits_reasoning_keys(self):
+        config = LmModelConfig(
+            model_id="test-model",
+            temperature=0.0,
+            reasoning_effort="high",
+            enable_thinking=True,
+            thinking_type="disabled",
+        )
+        import json
+
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="system",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_OBJECT,
+                include_reasoning_controls=False,
+                config=config,
+                max_tokens=100,
+            )
+        )
+        self.assertNotIn("reasoning_effort", payload)
+        self.assertNotIn("chat_template_kwargs", payload)
+
     def test_user_template_without_placeholder_appends_entries(self):
         import json
 
