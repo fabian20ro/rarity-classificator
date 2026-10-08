@@ -80,6 +80,16 @@ class RarityDistributionTest(unittest.TestCase):
         dist = RarityDistribution.from_levels([1, 1])
         self.assertEqual(dist.count(2), 0)
 
+    def test_getitem_returns_count_and_validates_range(self):
+        """Subscript access must mirror count(): returns the level's count and
+        rejects out-of-range levels with ValueError."""
+        dist = RarityDistribution.from_levels([1, 1, 2])
+        self.assertEqual(dist[1], 2)
+        with self.assertRaises(ValueError):
+            dist[0]
+        with self.assertRaises(ValueError):
+            dist[6]
+
     def test_total_returns_sum_of_counts(self):
         dist = RarityDistribution.from_levels([1, 2, 3, 3, 5])
         self.assertEqual(dist.total, 5)
