@@ -125,3 +125,14 @@ def test_multi_line_block_comment_fully_stripped():
     result = repair('{"a": 1 /* c\ncomment */\n}')
     assert "comment" not in result
     assert _json.loads(result) == {"a": 1}
+
+
+def test_unclosed_string_containing_brace_closes_quote_then_brace():
+    # Regression: a brace inside an open string is not structural, so the
+    # stack must keep both the open brace and the open quote and append a
+    # closing quote before the brace.  A fix counting in-string braces as
+    # structural would drop the brace or reorder the suffix.
+    import json as _json
+    result = repair('{"a": "x}')
+    assert result == '{"a": "x}"}'
+    assert _json.loads(result) == {"a": "x}"}
