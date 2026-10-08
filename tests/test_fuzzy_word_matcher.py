@@ -15,6 +15,15 @@ def test_normalize(text, expected):
     assert normalize(normalize(text)) == expected
 
 
+def test_normalize_expands_compatibility_ligature_via_nfkd():
+    # NFKD compatibility decomposition maps the fi-ligature to its two
+    # letters ("fi"); canonical diacritic rows only strip a combining mark.
+    # Swapping the source's deliberate NFKD for NFD leaves every canonical
+    # diacritic row green but yields "" here, so this row pins the form.
+    assert normalize("\ufb01") == "fi"
+    assert normalize(normalize("\ufb01")) == "fi"
+
+
 @pytest.mark.parametrize("left,right,distance", [
     ("abc", "abc", 0), ("", "abc", 3), ("abc", "ab", 1),
     ("abc", "axc", 1), ("abc", "ayz", 2), ("kitten", "sitting", 3),
