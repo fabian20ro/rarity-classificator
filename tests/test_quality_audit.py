@@ -304,6 +304,23 @@ class QualityAuditTest(unittest.TestCase):
             msg = str(ctx.exception)
             self.assertIn("word_id", msg)
 
+    def test_missing_word_column_raises_value_error(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            candidate = root / "candidate.csv"
+            self._write_csv(
+                candidate,
+                ["word_id", "type", "final_level"],
+                [["1", "N", "1"]],
+            )
+
+            with self.assertRaises(ValueError) as ctx:
+                run_quality_audit(
+                    candidate_csv=candidate,
+                    repo=self.repo,
+                )
+            self.assertIn("must contain word_id and word", str(ctx.exception))
+
     def test_missing_level_column_raises_value_error(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
