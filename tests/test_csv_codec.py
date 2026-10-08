@@ -163,7 +163,7 @@ class TestCsvCodec(unittest.TestCase):
         rows = [["1", "plain"], ["2", "has,comma"]]
         self.codec.write_table(path, headers, rows)
 
-        raw = path.read_text(encoding="utf-8", newline="")
+        raw = path.open("r", encoding="utf-8", newline="").read()
         # QUOTE_ALL wraps every field, including delimiter-free cells;
         # a switch to QUOTE_MINIMAL would leave "id", "name" and "plain" bare.
         self.assertIn('"id","name"', raw)
