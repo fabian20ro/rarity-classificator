@@ -91,6 +91,9 @@ class ModelsTest(unittest.TestCase):
             is True
         )
         assert LmModelConfig(model_id="test", enable_thinking=True).has_reasoning_controls() is True
+        # A falsy explicit value is still a control: the GLM profile sets
+        # enable_thinking=False to opt out, and request_builder sends it when not None.
+        assert LmModelConfig(model_id="test", enable_thinking=False).has_reasoning_controls() is True
         assert LmModelConfig(
             model_id="test", thinking_type="enabled"
         ).has_reasoning_controls() is True

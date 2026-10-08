@@ -65,6 +65,11 @@ class CliHelpTest(unittest.TestCase):
         self.assertIn("machine-readable JSON", help_text)
         self.assertIn("--json", alias_help_text)
 
+    def test_quality_audit_help_mentions_l1_jaccard_and_anchor_precision_recall(self):
+        help_text = " ".join(_build_parser().format_help().split())
+        self.assertIn("L1 Jaccard", help_text)
+        self.assertIn("anchor precision/recall", help_text)
+
 
 class AllSubcommandHelpTest(unittest.TestCase):
     def test_all_subcommands_have_non_empty_help(self):

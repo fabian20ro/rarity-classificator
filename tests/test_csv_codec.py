@@ -157,6 +157,24 @@ class TestCsvCodec(unittest.TestCase):
         self.assertEqual(table.headers, headers)
         self.assertEqual(len(table.records), 2)
 
+    def test_write_table_quotes_all_fields(self):
+        path = self.test_dir / "quoted.csv"
+        headers = ["id", "name"]
+        rows = [["1", "plain"], ["2", "has,comma"]]
+        self.codec.write_table(path, headers, rows)
+
+        raw = path.open("r", encoding="utf-8", newline="").read()
+        # QUOTE_ALL wraps every field, including delimiter-free cells;
+        # a switch to QUOTE_MINIMAL would leave "id", "name" and "plain" bare.
+        self.assertIn('"id","name"', raw)
+        self.assertIn('"plain"', raw)
+        self.assertIn('"has,comma"', raw)
+
+        table = self.codec.read_table(path)
+        self.assertEqual(table.headers, headers)
+        self.assertEqual(table.records[0].values, ["1", "plain"])
+        self.assertEqual(table.records[1].values, ["2", "has,comma"])
+
     def tearDown(self):
         import shutil
         if self.test_dir.exists():
