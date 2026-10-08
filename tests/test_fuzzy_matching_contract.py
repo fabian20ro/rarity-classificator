@@ -69,3 +69,19 @@ def test_score_parser_counts_fuzzy_recovery_metric_only_for_fuzzy_matches():
     assert metrics.fuzzy_match_count == 1
     assert [score.word_id for score in result.scores] == [101]
     assert result.unresolved == []
+
+
+def test_score_parser_reuses_row_across_type_when_fuzzy_match_hits():
+    # Batch row type is "N"; LM returns the word with type "V". Same-type
+    # fuzzy fails, but the cross-type fallback still matches within two
+    # edits, so the word is not silently dropped.
+    row = BaseWordRow(word_id=101, word="abcdef", type="N")
+    body = json.dumps({"choices": [{"message": {"content": json.dumps([{
+        "word_id": 999, "word": "abcdex", "type": "V", "rarity_level": 3,
+        "confidence": 0.9,
+    }])}}]})
+    result = LmStudioResponseParser().parse(batch=[row], response_body=body)
+    assert [(score.word_id, score.word, score.rarity_level) for score in result.scores] == [
+        (101, "abcdef", 3),
+    ]
+    assert result.unresolved == []
