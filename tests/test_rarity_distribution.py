@@ -45,11 +45,12 @@ class RarityDistributionTest(unittest.TestCase):
                         {
                             k: v
                             for k, v in parsed.items()
-                            if k not in ("mode", "std_dev", "pct")
+                            if k not in ("mode", "std_dev", "pct", "level_column")
                         },
                         {"total": 3, "1": 2, "2": 0, "3": 0, "4": 0, "5": 1},
                     )
                     self.assertEqual(parsed["mode"], 1)
+                    self.assertEqual(parsed["level_column"], "rarity_level")
                     self.assertAlmostEqual(parsed["std_dev"], 1.89, places=2)
                     self.assertAlmostEqual(parsed["pct"]["1"], 66.67, places=2)
                     self.assertAlmostEqual(parsed["pct"]["5"], 33.33, places=2)
@@ -66,6 +67,7 @@ class RarityDistributionTest(unittest.TestCase):
                 json.loads(output.getvalue()),
                 {
                     **RarityDistribution().to_dict(),
+                    "level_column": "rarity_level",
                     "mode": 1,
                     "std_dev": 0.0,
                     "pct": {"1": 0.0, "2": 0.0, "3": 0.0, "4": 0.0, "5": 0.0},
@@ -165,6 +167,13 @@ class RarityDistributionTest(unittest.TestCase):
             self.assertEqual(result.level_column, "median_level")
             self.assertEqual(result.distribution[2], 2)
             self.assertEqual(result.distribution[4], 1)
+            output = StringIO()
+            with redirect_stdout(output):
+                exit_code = main(
+                    ["rarity-distribution", "--csv", str(path), "--level-column", "median_level", "--json"]
+                )
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(json.loads(output.getvalue())["level_column"], "median_level")
 
     def test_invalid_level_raises(self):
         with tempfile.TemporaryDirectory() as td:

@@ -56,8 +56,9 @@ def run_rarity_distribution(
                 str(level): round(_pct(count, total_rows), 2)
                 for level, count in sorted(distribution.items())
             }
-            payload: dict[str, int | float | dict[str, float]] = {
+            payload: dict[str, int | float | str | dict[str, float]] = {
                 **counts.to_dict(),
+                "level_column": resolved_level_col,
                 "mode": mode,
                 "std_dev": std_dev,
                 "pct": pct,
