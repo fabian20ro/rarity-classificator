@@ -1,4 +1,5 @@
 import csv
+from dataclasses import replace
 from pathlib import Path
 from shutil import copyfile
 from tempfile import TemporaryDirectory
@@ -47,7 +48,7 @@ class TestChainQualityGate(unittest.TestCase):
             endpoint_option=None, base_url_option=None,
         )
 
-    def run_chain(self):
+    def run_chain(self, *, expect_audit=True):
         def finish_step(options, **kwargs):
             copyfile(options.input_csv_path, options.output_csv_path)
 
@@ -65,15 +66,40 @@ class TestChainQualityGate(unittest.TestCase):
                 )
             finally:
                 self.assertEqual(step.call_count, 8)
-                audit.assert_called_once_with(
-                    candidate_csv=self.options.runs_dir / "quality-gate_step8.csv",
-                    reference_csv=self.reference_csv, anchor_l1_file=self.anchors,
-                    min_l1_jaccard=0.8, min_anchor_l1_precision=0.9,
-                    min_anchor_l1_recall=0.9, repo=self.repo,
-                )
+                if expect_audit:
+                    audit.assert_called_once_with(
+                        candidate_csv=self.options.runs_dir / "quality-gate_step8.csv",
+                        reference_csv=self.reference_csv,
+                        anchor_l1_file=self.anchors,
+                        min_l1_jaccard=0.8, min_anchor_l1_precision=0.9,
+                        min_anchor_l1_recall=0.9, repo=self.repo,
+                    )
+                else:
+                    audit.assert_not_called()
 
     def test_passing_audit_returns_final_csv(self):
         result = self.run_chain()
+        self.assertEqual(result, self.options.runs_dir / "quality-gate_step8.csv")
+        self.assertEqual(result.read_bytes(), self.input_csv.read_bytes())
+
+    def test_no_reference_no_anchor_skips_audit_and_returns_final_csv(self):
+        """Audit is opt-in: with no reference and no anchors, the chain skips run_quality_audit.
+
+        The audit-present cases above pin the gate call; this pins the other
+        branch. run_chain_rebalance only calls run_quality_audit when
+        options.reference_csv or options.anchor_l1_file is set, so a regression
+        that audits unconditionally would raise or block here, and one that
+        drops the skip result would return no csv at all.
+        """
+        self.options = replace(
+            self.options,
+            reference_csv=None,
+            anchor_l1_file=None,
+            min_l1_jaccard=None,
+            min_anchor_l1_precision=None,
+            min_anchor_l1_recall=None,
+        )
+        result = self.run_chain(expect_audit=False)
         self.assertEqual(result, self.options.runs_dir / "quality-gate_step8.csv")
         self.assertEqual(result.read_bytes(), self.input_csv.read_bytes())
 
