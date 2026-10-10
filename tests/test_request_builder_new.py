@@ -221,3 +221,19 @@ class RequestBuilderTest(unittest.TestCase):
         schema = payload["response_format"]["json_schema"]["schema"]
         self.assertEqual(schema["minItems"], len(self.batch))
         self.assertEqual(schema["maxItems"], len(self.batch))
+
+    def test_score_results_rejects_expected_count_exceeding_batch_size(self):
+        with self.assertRaises(ValueError) as ctx:
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_SCHEMA,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=512,
+                expected_items=3,
+                schema_kind=JsonSchemaKind.SCORE_RESULTS,
+            )
+        self.assertIn("cannot exceed batch size", str(ctx.exception))

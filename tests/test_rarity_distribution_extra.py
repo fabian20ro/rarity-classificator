@@ -29,6 +29,7 @@ class TestRarityDistributionExtra(unittest.TestCase):
                 for lid in (1, 2, 3, 4):
                     writer.writerow([str(lid), f'word{lid}', str(lid)])
             result = run_rarity_distribution(csv_path=path, repo=self.repo)
+        self.assertEqual(result.csv_path, path)
         self.assertEqual(result.total_rows, 4)
         self.assertEqual(list(sorted(result.distribution.items())), [(1, 1), (2, 1), (3, 1), (4, 1), (5, 0)])
         self.assertEqual(result.mode, 1)

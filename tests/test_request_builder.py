@@ -242,6 +242,21 @@ class RequestBuilderTest(unittest.TestCase):
             )
         self.assertIn("max_tokens must be positive", str(ctx.exception))
 
+    def test_response_format_absent_when_mode_none(self):
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="sys",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.NONE,
+                include_reasoning_controls=False,
+                config=self.config,
+                max_tokens=512,
+            )
+        )
+        self.assertNotIn("response_format", payload)
+
     def test_user_template_without_placeholder_uses_input_prefix(self):
         config = LmModelConfig(model_id="test-model")
         user_template = "Clasifică aceste cuvinte:"
