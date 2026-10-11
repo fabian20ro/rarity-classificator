@@ -118,6 +118,22 @@ class ReviewLowConfidenceTest(unittest.TestCase):
         self.assertEqual(stats.accepted_level1, 1)
         self.assertAlmostEqual(stats.precision, 1 / 3)
 
+    def test_l1_stats_empty_labels_precision_zero(self):
+        stats = compute_l1_review_stats({})
+        self.assertEqual(stats.reviewed_decided, 0)
+        self.assertEqual(stats.accepted_level1, 0)
+        self.assertEqual(stats.precision, 0.0)
+
+    def test_l1_stats_non_l1_labels_only_precision_zero(self):
+        labels = {
+            5: ReviewLabel(word_id=5, predicted_level=2, label="1"),
+            6: ReviewLabel(word_id=6, predicted_level=5, label="3"),
+        }
+        stats = compute_l1_review_stats(labels)
+        self.assertEqual(stats.reviewed_decided, 0)
+        self.assertEqual(stats.accepted_level1, 0)
+        self.assertEqual(stats.precision, 0.0)
+
     def test_map_input_to_label_all_valid_inputs(self):
         self.assertEqual(_map_input_to_label("1"), "1")
         self.assertEqual(_map_input_to_label("2"), "2")
