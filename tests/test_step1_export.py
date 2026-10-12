@@ -186,6 +186,26 @@ class TestStep1Export(unittest.TestCase):
         self.assertIn("7 words", lines[0])
         self.assertEqual(lines[1], "Types: fruit=4, animal=2, symbol=1")
 
+    def test_dry_run_type_counts_tie_broken_alphabetically(self):
+        # Two types with equal counts: the type name is the secondary sort
+        # key. First-appearance (Counter) order is zoo-then-apple; alphabetical
+        # must win, so the summary reads apple then zoo. Dropping the `x[0]`
+        # tie-break from the production sort would leave stable Counter order
+        # and emit "zoo=1, apple=1" instead -- this assertion catches that.
+        words = [
+            (1, "apple", "zoo"),
+            (2, "banana", "apple"),
+        ]
+        store = MagicMock(spec=WordStore)
+        store.fetch_all_words.return_value = words
+        options = Step1Options(output_csv_path=self.output_csv, dry_run=True)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            run_step1(options, word_store=store, repo=self.mock_repo)
+
+        lines = buf.getvalue().splitlines()
+        self.assertEqual(lines[1], "Types: apple=1, zoo=1")
+
     def test_dry_run_empty_prints_count_only(self):
         # Empty word list: only the count message — no header, no rows.
         store = MagicMock(spec=WordStore)

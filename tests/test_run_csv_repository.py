@@ -4,6 +4,7 @@ from pathlib import Path
 
 from classificator.run_csv_repository import RunCsvRepository
 from classificator.csv_codec import CsvFormatError
+from classificator.models import RunBaseline, RunCsvRow
 
 
 class RunCsvRepositoryTest(unittest.TestCase):
@@ -190,6 +191,89 @@ class RunCsvRepositoryTest(unittest.TestCase):
                 CsvFormatError, r"final_level out of range at .*:2"
             ):
                 self.repo.load_final_levels(path)
+
+
+    def test_merge_and_rewrite_atomic_updates_existing_and_adds_new(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "run.csv"
+            self.repo.write_rows(
+                path,
+                [
+                    "word_id",
+                    "word",
+                    "type",
+                    "rarity_level",
+                    "tag",
+                    "confidence",
+                    "scored_at",
+                    "model",
+                    "run_slug",
+                ],
+                [
+                    ["1", "om", "N", "3", "uncertain", "0.3", "t", "m", "r"],
+                    ["2", "casă", "N", "1", "common", "0.9", "t2", "m", "r"],
+                ],
+            )
+            baseline = self.repo.compute_baseline(self.repo.load_run_rows(path))
+            merged = self.repo.merge_and_rewrite_atomic(
+                path,
+                [
+                    _row(1, "om", "N", 5, "updated", 0.8, "t3", "m", "r"),
+                    _row(3, "noe", "N", 2, "common", 0.7, "t3", "m", "r"),
+                ],
+                baseline,
+            )
+            self.assertIsNone(merged)
+            rows = self.repo.load_run_rows(path)
+            self.assertEqual([r.word_id for r in rows], [1, 2, 3])
+            self.assertEqual(rows[0].rarity_level, 5)
+            self.assertEqual(rows[0].tag, "updated")
+            self.assertEqual(rows[1].rarity_level, 1)
+            self.assertEqual(rows[2].rarity_level, 2)
+
+    def test_merge_and_rewrite_atomic_aborts_on_shrunk_merge(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "run.csv"
+            self.repo.write_rows(
+                path,
+                [
+                    "word_id",
+                    "word",
+                    "type",
+                    "rarity_level",
+                    "tag",
+                    "confidence",
+                    "scored_at",
+                    "model",
+                    "run_slug",
+                ],
+                [
+                    ["1", "om", "N", "3", "uncertain", "0.3", "t", "m", "r"],
+                ],
+            )
+            original_text = path.read_text(encoding="utf-8")
+            baseline = RunBaseline(count=2, min_id=1, max_id=2)
+            with self.assertRaisesRegex(RuntimeError, "Guarded rewrite aborted"):
+                self.repo.merge_and_rewrite_atomic(
+                    path,
+                    [_row(1, "om", "N", 3, "uncertain", 0.3, "t", "m", "r")],
+                    baseline,
+                )
+            self.assertEqual(path.read_text(encoding="utf-8"), original_text)
+
+
+def _row(word_id: int, word: str, type_: str, rarity: int, tag: str, confidence: float, scored_at: str, model: str, run_slug: str) -> RunCsvRow:
+    return RunCsvRow(
+        word_id=word_id,
+        word=word,
+        type=type_,
+        rarity_level=rarity,
+        tag=tag,
+        confidence=confidence,
+        scored_at=scored_at,
+        model=model,
+        run_slug=run_slug,
+    )
 
 
 if __name__ == "__main__":

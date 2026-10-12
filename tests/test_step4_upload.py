@@ -171,6 +171,26 @@ class TestStep4Upload(unittest.TestCase):
             self.assertEqual(row_2["new_level"], "")
             self.assertEqual(row_2["source"], "missing_db_word")
 
+    def test_missing_batch_id_falls_back_to_timestamped_id(self):
+        # upload_batch_id=None → run_step4 must generate "upload_<ms-timestamp>"
+        # (line: options.upload_batch_id or f"upload_{int(now.timestamp()*1000)}")
+        # so the marker is never written with a missing batch id
+        options = Step4Options(
+            final_csv_path=self.final_csv,
+            mode=UploadMode.PARTIAL,
+            report_path=self.report_csv,
+            upload_batch_id=None,
+        )
+
+        run_step4(options, word_store=self.mock_word_store, repo=self.mock_repo, marker_writer=self.mock_marker_writer)
+
+        self.assertTrue(self.mock_marker_writer.mark_uploaded_rows.called)
+        kwargs = self.mock_marker_writer.mark_uploaded_rows.call_args[1]
+        batch_id = kwargs["upload_batch_id"]
+        self.assertIsInstance(batch_id, str)
+        self.assertTrue(batch_id.startswith("upload_"))
+        self.assertTrue(batch_id.removeprefix("upload_").isdigit())
+
     def test_partial_audit_gate_blocks_upload(self):
         # When reference_csv is provided and quality audit fails, run_step4 must raise RuntimeError
         options = Step4Options(

@@ -140,6 +140,29 @@ class SelectionRepairPromptTest(unittest.TestCase):
         )()
         self.assertIsNone(client._try_selection_repair_before_split(batch, ctx))
 
+    def test_try_selection_repair_skips_when_expected_nonpositive(self):
+        """Repair must be skipped (returns None) when expected <= 0.
+
+        Production contract (_try_selection_repair_before_split, client.py):
+            the guard `expected is None or expected <= 0 or expected >= len(batch)`
+            returns None before any network call. The existing sibling test
+            covers only the `expected >= len(batch)` arm; this covers the
+            `expected <= 0` arm, which is the no-silent-auto-fill side of the
+            strict exact-count local_id contract (AGENTS.md constraint 1): a
+            nonpositive count must never trigger a repair request that selects
+            zero ids.
+        """
+        client = LmStudioClient(api_key=None)
+        batch = [BaseWordRow(word_id=i, word=f"word{i}", type="noun") for i in (1, 2, 3)]
+        ctx = type(
+            "Ctx",
+            (),
+            {"output_mode": ScoringOutputMode.SELECTED_WORD_IDS, "expected_json_items": 0},
+        )()
+        with unittest.mock.patch.object(client, "_try_score_batch") as mock_score:
+            self.assertIsNone(client._try_selection_repair_before_split(batch, ctx))
+            mock_score.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

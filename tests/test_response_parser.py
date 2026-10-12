@@ -169,6 +169,28 @@ class ResponseParserTest(unittest.TestCase):
         self.assertEqual(parsed.scores[0].word_id, 102)
         self.assertEqual(parsed.scores[0].rarity_level, 2)
 
+    def test_score_results_propagates_normalized_confidence(self):
+        # Confidence from the LM is observable on the public ScoreResult:
+        # percentage values (1..100) normalize into [0..1], in-range values
+        # pass through unchanged.
+        body = self._wrap_content(
+            '[{"word_id": 101, "word": "om", "type": "N", "rarity_level": 1, '
+            '"tag": "test", "confidence": 50}, '
+            '{"word_id": 102, "word": "casă", "type": "N", "rarity_level": 2, '
+            '"tag": "test", "confidence": 1.0}]'
+        )
+        parsed = self.parser.parse(
+            batch=self.batch,
+            response_body=body,
+            output_mode=ScoringOutputMode.SCORE_RESULTS,
+            forced_rarity_level=None,
+            expected_items=None,
+        )
+        by_id = {s.word_id: s for s in parsed.scores}
+        self.assertEqual(sorted(by_id), [101, 102])
+        self.assertAlmostEqual(by_id[101].confidence, 0.5)
+        self.assertAlmostEqual(by_id[102].confidence, 1.0)
+
     def test_score_results_rejects_float_ids(self):
         body = self._wrap_content('[{"word_id": 102.5, "word": "casă", "type": "N", "rarity_level": 2, "tag": "test", "confidence": 1.0}]')
         with self.assertRaises(RuntimeError) as ctx:
