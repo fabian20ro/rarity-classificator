@@ -19,6 +19,7 @@ class RarityDistributionResult:
     distribution: dict[int, int]
     mode: int
     std_dev: float
+    pct: dict[str, float]
 
 
 def run_rarity_distribution(
@@ -50,12 +51,12 @@ def run_rarity_distribution(
     distribution = {level: counts[level] for level in range(1, 6)}
     mode = max(distribution, key=distribution.get)
     std_dev = _weighted_std_dev(distribution, total_rows)
+    pct = {
+        str(level): round(_pct(count, total_rows), 2)
+        for level, count in sorted(distribution.items())
+    }
     if not quiet:
         if json_output:
-            pct = {
-                str(level): round(_pct(count, total_rows), 2)
-                for level, count in sorted(distribution.items())
-            }
             payload: dict[str, int | float | str | dict[str, float]] = {
                 **counts.to_dict(),
                 "level_column": resolved_level_col,
@@ -86,6 +87,7 @@ def run_rarity_distribution(
         distribution=distribution,
         mode=mode,
         std_dev=std_dev,
+        pct=pct,
     )
 
 
