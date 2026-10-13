@@ -809,3 +809,65 @@ class TestStep8DoubleCountingFix(unittest.TestCase):
             if Path("dummy_runs").exists():
                 import shutil
                 shutil.rmtree("dummy_runs")
+
+    def test_step1_ratio_lower_bound_blocks_step_and_lm_run(self):
+        """Step 1 with a pool far above its target (ratio below 0.01) raises at the ratio gate.
+
+        test_step1_ratio_upper_bound_blocks_step_and_lm_run pins the 0.99 upper arm;
+        this pins the untested 0.01 lower arm of the same compound check
+        `if not (0.01 <= ratio <= 0.99)`. A pool of 300000 (l1=250, l2=299750)
+        clears pool size, target feasibility, and both per-source minimums
+        (250 == min_per_source passes the strict `<` arm; 299750 passes trivially),
+        then ratio = 2500/300000 ≈ 0.0083 falls below 0.01 and must raise instead
+        of calling run_step5 with a near-zero lower_ratio — the degenerate case
+        where the LM is asked to select under 1% of the pool and the "rebalance"
+        silently does almost nothing. A regression that drops or loosens the 0.01
+        lower bound would let run_step5 execute; the not-called guard plus the
+        ratio-specific message pin the gate.
+        """
+        from unittest.mock import patch
+
+        def fake_get_level_count(csv_path, level, repo):
+            if level == 1:
+                return 250     # exactly min_per_source (2500 // 10) → per-source arms pass
+            if level == 2:
+                return 299750  # pool = 300000 → ratio = 2500/300000 ≈ 0.0083 < 0.01
+            return 0
+
+        class MockTable:
+            headers = ["word_id", "word", "type", "rarity_level", "confidence"]
+            records = [MagicMock(values=["1", "test", "test", "4", "1.0"], line_number=2)]
+
+        class MockRepo(RunCsvRepository):
+            def read_table(self, path):
+                return MockTable()
+            def load_run_rows(self, path):
+                return []
+
+        Path("dummy_sp.txt").write_text("", encoding="utf-8")
+        Path("dummy_ut.txt").write_text("", encoding="utf-8")
+        Path("dummy.csv").touch()
+
+        try:
+            with patch("src.classificator.tools.chain_rebalance_target_dist._count_total_words", return_value=60200), \
+                 self.assertRaises(ValueError) as cm, \
+                 patch("src.classificator.tools.chain_rebalance_target_dist.run_step5") as mock_s5, \
+                 patch("src.classificator.tools.chain_rebalance_target_dist._get_level_count", side_effect=fake_get_level_count):
+                run_chain_rebalance(
+                    options=_make_options_small(),
+                    repo=MockRepo(),
+                    lm_client=MagicMock(spec=LmStudioClient),
+                    output_dir=Path("."),
+                )
+
+            self.assertFalse(mock_s5.called, "ratio below 0.01 must block the LM step, not let it run")
+            msg = str(cm.exception)
+            self.assertIn("[step 1]", msg, f"should fail at step 1, got: {msg}")
+            self.assertIn("ratio out of range 0.01..0.99", msg, f"should be the ratio gate, got: {msg}")
+        finally:
+            for f in ["dummy.csv", "dummy_sp.txt", "dummy_ut.txt"]:
+                if Path(f).exists():
+                    Path(f).unlink()
+            if Path("dummy_runs").exists():
+                import shutil
+                shutil.rmtree("dummy_runs")
