@@ -126,3 +126,41 @@ class BugReproductionTest(unittest.TestCase):
                 CsvFormatError, r"confidence out of range at .*:2"
             ):
                 self.repo.load_run_rows(path)
+
+    def test_write_table_atomic_failure_preserves_existing_file(self):
+        """A failed atomic write must leave the existing file intact — no partial overwrite.
+
+        write_table_atomic buffers to a `.tmp` and only replaces the target on success.
+        When a row fails validation mid-buffer, the replace never runs and the existing
+        target must survive byte-for-byte. A regression that truncates the target (a
+        non-atomic direct write) would destroy previously-saved run data, breaking the
+        resumable, CSV-first workflow (AGENTS.md constraint 3).
+        """
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "run.csv"
+            headers = ["word_id", "word"]
+            self.repo.write_rows(
+                path,
+                headers,
+                [
+                    ["1", "om"],
+                    ["2", "casa"],
+                ],
+            )
+            original_text = path.read_text(encoding="utf-8")
+
+            # Row ["2"] has one column where two are expected, failing validation
+            # mid-buffer. The atomic replace must never run, so the 2-row file stays.
+            with self.assertRaises(CsvFormatError):
+                self.repo.write_table_atomic(
+                    path,
+                    headers,
+                    [
+                        ["1", "om"],
+                        ["2"],
+                    ],
+                )
+
+            # A non-atomic write would have truncated the file to one row; the
+            # existing file must be unchanged.
+            self.assertEqual(path.read_text(encoding="utf-8"), original_text)
