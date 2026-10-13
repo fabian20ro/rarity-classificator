@@ -102,6 +102,10 @@ class RarityDistributionTest(unittest.TestCase):
             self.assertEqual(result.mode, 1)
             self.assertEqual(result.distribution[1], 2)
             self.assertEqual(result.distribution[3], 1)
+            self.assertEqual(
+                result.pct,
+                {"1": 66.67, "2": 0.0, "3": 33.33, "4": 0.0, "5": 0.0},
+            )
 
     def test_quiet_false_default_emits_three_lines(self):
         with tempfile.TemporaryDirectory() as td:
@@ -127,6 +131,17 @@ class RarityDistributionTest(unittest.TestCase):
             with redirect_stdout(StringIO()):
                 quiet_result = run_rarity_distribution(csv_path=path, repo=self.repo, quiet=True)
             self.assertEqual(quiet_result, default_result)
+
+    def test_header_only_csv_returns_zero_pct_and_zero_total(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "empty.csv"
+            self._write_csv(path, ["rarity_level"], [])
+            result = run_rarity_distribution(csv_path=path, repo=self.repo)
+            self.assertEqual(result.total_rows, 0)
+            self.assertEqual(
+                result.pct,
+                {"1": 0.0, "2": 0.0, "3": 0.0, "4": 0.0, "5": 0.0},
+            )
 
     def test_json_does_not_reexpand_counts_into_individual_levels(self):
         with tempfile.TemporaryDirectory() as td:
