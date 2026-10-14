@@ -85,3 +85,29 @@ def test_score_parser_reuses_row_across_type_when_fuzzy_match_hits():
         (101, "abcdef", 3),
     ]
     assert result.unresolved == []
+
+
+def test_score_parser_recovery_flips_at_max_edit_distance_boundary():
+    # The parser consumes matches (dist <= MAX_EDIT_DISTANCE = 2). Matcher-level
+    # tests pin the 2/3 boundary, and the other parser tests use dist 1 (in) and
+    # dist 4 (out), so this pins it at the parser-integration level: two edits
+    # away -> recovered; three -> dropped (single-row batch raises). Catches a
+    # parser threshold that silently diverges from the matcher.
+    two_edit_row = BaseWordRow(word_id=101, word="abcdef", type="N")
+    two_edit_body = json.dumps({"choices": [{"message": {"content": json.dumps([{
+        "word_id": 999, "word": "abxdeg", "type": "N", "rarity_level": 2,
+        "confidence": 0.9,
+    }])}}]})
+    result = LmStudioResponseParser().parse(batch=[two_edit_row], response_body=two_edit_body)
+    assert [(score.word_id, score.word, score.rarity_level) for score in result.scores] == [
+        (101, "abcdef", 2),
+    ]
+    assert result.unresolved == []
+
+    three_edit_row = BaseWordRow(word_id=102, word="abcdef", type="N")
+    three_edit_body = json.dumps({"choices": [{"message": {"content": json.dumps([{
+        "word_id": 999, "word": "abcxdg", "type": "N", "rarity_level": 2,
+        "confidence": 0.9,
+    }])}}]})
+    with pytest.raises(RuntimeError, match="No valid results parsed"):
+        LmStudioResponseParser().parse(batch=[three_edit_row], response_body=three_edit_body)
