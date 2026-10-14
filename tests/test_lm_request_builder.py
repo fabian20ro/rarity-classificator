@@ -165,6 +165,41 @@ class TestLmStudioRequestBuilder(unittest.TestCase):
         self.assertEqual(payload["top_k"], 42)
         self.assertEqual(payload["repeat_penalty"], 1.5)
 
+    def test_config_none_sampling_fields_omitted_from_payload(self):
+        import json
+
+        config = LmModelConfig(
+            model_id="test-model",
+            temperature=0.0,
+            top_k=None,
+            top_p=None,
+            min_p=None,
+            repeat_penalty=None,
+            frequency_penalty=None,
+            presence_penalty=None,
+        )
+        payload = json.loads(
+            self.builder.build_request(
+                model="test-model",
+                batch=self.batch,
+                system_prompt="system",
+                user_template="user",
+                response_format_mode=ResponseFormatMode.JSON_OBJECT,
+                include_reasoning_controls=False,
+                config=config,
+                max_tokens=100,
+            )
+        )
+        for key in (
+            "top_k",
+            "top_p",
+            "min_p",
+            "repeat_penalty",
+            "frequency_penalty",
+            "presence_penalty",
+        ):
+            self.assertNotIn(key, payload)
+
     def test_include_reasoning_controls_injects_effort_and_kwargs(self):
         config = LmModelConfig(
             model_id="test-model", temperature=0.0, reasoning_effort="high"
