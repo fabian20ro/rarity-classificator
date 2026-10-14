@@ -34,6 +34,13 @@ def test_levenshtein(left, right, distance):
     assert levenshtein(right, left) == distance
 
 
+def test_levenshtein_counts_adjacent_transposition_as_two_edits():
+    # Classic Levenshtein has no transposition operation, so the adjacent
+    # swap costs two edits; a Damerau transposition would count it as one.
+    assert levenshtein("ca", "ac") == 2
+    assert levenshtein("ac", "ca") == 2
+
+
 @pytest.mark.parametrize("left,right,distance", [
     ("apple", "apple", 0), ("APPLE", "apple", 0),
     ("ăn", "an", 0), ("ș", "s", 0), ("Ț", "t", 0), ("Ăntă", "anta", 0),

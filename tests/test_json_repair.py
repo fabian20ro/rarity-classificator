@@ -136,3 +136,13 @@ def test_unclosed_string_containing_brace_closes_quote_then_brace():
     result = repair('{"a": "x}')
     assert result == '{"a": "x}"}'
     assert _json.loads(result) == {"a": "x}"}
+
+
+def test_escaped_quote_does_not_close_string():
+    # Regression: _track_string keeps in_string=True after a backslash, so an
+    # escaped quote must not terminate the string. A parser closing on escaped
+    # quotes would keep the trailing comma and append a dangling quote,
+    # leaving the output unparseable.
+    result = repair('{"a": "x\\"y",}')
+    assert result == '{"a": "x\\"y"}'
+    assert json.loads(result) == {"a": 'x"y'}

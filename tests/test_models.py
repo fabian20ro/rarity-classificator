@@ -245,5 +245,28 @@ class LmModelConfigValidationTest(unittest.TestCase):
         )
 
 
+class LmModelConfigDefaultsTest(unittest.TestCase):
+    """Pin the declared LmModelConfig defaults that determine every LM request's sampling.
+
+    request_builder serializes temperature always, and top_k/top_p whenever they
+    are not None, so a drift in these defaults silently changes every request
+    payload even though all existing tests set the fields explicitly.
+    """
+
+    def test_declared_sampling_defaults(self):
+        config = LmModelConfig(model_id="test")
+        self.assertEqual(config.temperature, 0.0)
+        self.assertEqual(config.top_k, 40)
+        self.assertEqual(config.top_p, 1.0)
+        self.assertIsNone(config.min_p)
+        self.assertIsNone(config.repeat_penalty)
+        self.assertIsNone(config.frequency_penalty)
+        self.assertIsNone(config.presence_penalty)
+        self.assertIsNone(config.max_tokens_cap)
+        self.assertIsNone(config.reasoning_effort)
+        self.assertIsNone(config.enable_thinking)
+        self.assertIsNone(config.thinking_type)
+
+
 if __name__ == "__main__":
     unittest.main()

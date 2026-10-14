@@ -210,6 +210,20 @@ class RarityDistributionTest(unittest.TestCase):
         self.assertIn("4:1", formatted)
         self.assertIn("5:1", formatted)
 
+    def test_format_zero_total_renders_all_zero_pct(self):
+        """format() on an empty distribution must render every level at 0.0%
+        without dividing by the zero total.
+
+        The production guard computes pct as (count * 100.0 / total) if
+        total > 0 else 0.0. A regression that dropped the guard would raise
+        ZeroDivisionError on an empty distribution (or emit a wrong pct);
+        the exact string below pins the all-zero rendering."""
+        dist = RarityDistribution()
+        self.assertEqual(
+            dist.format(),
+            "distribution=[1:0(0.0%) 2:0(0.0%) 3:0(0.0%) 4:0(0.0%) 5:0(0.0%)]",
+        )
+
     def test_extra_columns_do_not_break_detection(self):
         """A CSV with additional columns beyond the expected ones must still detect rarity_level."""
         with tempfile.TemporaryDirectory() as td:

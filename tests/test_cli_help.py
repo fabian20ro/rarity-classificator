@@ -65,6 +65,17 @@ class CliHelpTest(unittest.TestCase):
         self.assertIn("machine-readable JSON", help_text)
         self.assertIn("--json", alias_help_text)
 
+    def test_rarity_distribution_help_mentions_level_column_flag(self):
+        parser = _build_parser()
+        subparsers = next(action for action in parser._actions if isinstance(action, argparse._SubParsersAction))
+        help_text = subparsers.choices["rarity-distribution"].format_help()
+        alias_help_text = subparsers.choices["dist"].format_help()
+        self.assertIn("--level-column", help_text)
+        self.assertIn("Optional explicit level column", help_text)
+        self.assertIn("rarity_level/final_level", help_text)
+        self.assertIn("--level-column", alias_help_text)
+        self.assertIn("Optional explicit level column", alias_help_text)
+
     def test_quality_audit_help_mentions_l1_jaccard_and_anchor_precision_recall(self):
         help_text = " ".join(_build_parser().format_help().split())
         self.assertIn("L1 Jaccard", help_text)

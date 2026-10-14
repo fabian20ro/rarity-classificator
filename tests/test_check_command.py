@@ -31,3 +31,4 @@ def test_check_propagates_failure_without_skipping_complete_collection(codes, ex
     ]
     assert all(call.kwargs.get("flush") is True
                for call in mock_print.call_args_list)
+    assert all(not call.kwargs.get("check") for call in run.call_args_list)
