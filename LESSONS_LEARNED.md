@@ -56,6 +56,10 @@ round-trip comma, quote and newline fields with `csv.reader`, while asserting no
 
 ## Testing & Quality
 
+**[2026-10-15]** Exercise real producer/consumer boundaries — WordStore yields BaseWordRow, and Step3/Step5 preserve source level columns alongside final_level. Tuple-only mocks and isolated helpers hid broken exports, successful scoring calls and audited pipeline artifacts; smoke tests should use real internal collaborators and mock DB/LM I/O.
+**[2026-10-15]** Duplicate test-class declarations silently remove coverage — an empty second TestStep4Upload replaced nine integration tests. Keep Ruff F811 enabled and verify collection of critical gate tests; a passing suite cannot detect tests it never discovers.
+**[2026-10-15]** Forced rescoring needs atomic replacement per batch — appending an existing word ID poisons strict CSV loading before final merge. Persist complete replacement snapshots after each successful forced batch so interruptions retain unique readable rows, including failed/unprocessed/unrelated records.
+
 **[2026-09-29]** Use `python scripts/check.py` for complete verification. The old
 unittest-only command silently skipped function-style tests. CI and local gates
 must call the project entrypoint, which runs Ruff then pytest (both test styles).
@@ -94,6 +98,8 @@ reject a counterexample that ignores a failed audit.
 **[2026-02-14]** Upload default should stay partial — only rows present in candidate CSV should update by default; `full-fallback` is an explicit exception mode.
 
 ## Process & Workflow
+
+**[2026-10-15]** Push new PR branches with explicit destinations — a source-only push followed the existing main upstream and updated main. Use `refs/heads/<branch>:refs/heads/<branch>`, set the matching upstream, and verify remote heads. If correcting an accidental update, preserve the commit first; respect protected-branch rules and use a normal revert when force rollback is prohibited.
 
 <!-- What makes iterations smoother, communication patterns, PR conventions -->
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->

@@ -434,3 +434,49 @@ fail-fast and propagation of pytest exit5/no collection. No live DB/model calls.
 Host legacy .venv Python points into unavailable Xcode runtime; tests used an
 isolated container /tmp venv with already-declared dev dependencies instead.
 Architecture decision: docs/adr/001-complete-project-verification.md.
+
+
+## 2026-10-15 — Repair eight whole-codebase review findings
+
+User requested all eight fixes, regressions, push and PR, conditional on GitHub activity.
+Verified repository unarchived; PR #79 merged 2026-10-14 22:12 UTC (2026-10-15
+01:12 Europe/Bucharest), with daily merged PRs during the preceding week. Started
+from latest origin/main dc98588 on codex/fix-review-regressions; original dirty
+checkout preserved.
+
+Red-to-green fixes at existing public boundaries:
+- Step1 consumes actual BaseWordRow attributes, including sort/null/dry-run paths;
+  real WordStore with only DB connection mocked round-trips escaped CSV data.
+- Successful flock no longer raises; contention handled through BlockingIOError;
+  real lock tests cover normal release, exceptions, interruption and rejected handles.
+- Nontrivial Step5 batches no longer pass unsupported rng to selection helper.
+- Selector rejects malformed counts, duplicate/foreign/nonpositive IDs and wrong
+  levels before assignments/checkpoints. Removed random auto-fill/truncation.
+- Both upload modes require reference/anchors and finite 0..1 thresholds, rerun
+  all three semantic gates, and block before DB access on invalid configuration
+  or independent Jaccard/precision/recall failure. CLI defaults now match API.
+- Audit follows final_level > rarity_level > median_level, allowing actual Step3
+  and Step5 output while retaining source-level provenance.
+- Forced scoring atomically persists complete replacement snapshots per batch;
+  strict duplicate loading retained, unprocessed/failed/unrelated rows preserved.
+  Interruption and atomic-replace failure tests prove readable partial progress.
+- Removed duplicate empty TestStep4Upload; restored nine integration tests. Added
+  collection regression and Ruff F811 to prevent silently shadowed definitions.
+
+Surprises flagged to user: previous suite passed despite fatal orchestration bugs;
+old Step5 test explicitly demanded truncation contrary to AGENTS. Corrected those
+expectations rather than preserving the broken behavior. Original repros already
+proved causes, so exploratory hypothesis/instrumentation phases were unnecessary.
+
+Verification: each regression observed failing before its corresponding fix.
+python scripts/check.py on Python 3.11.16: Ruff PASS, 691 tests +34 subtests PASS.
+No live database/model calls. README/Runbook show mandatory upload audit inputs.
+Force mode intentionally trades per-batch full-CSV rewrites for crash-safe recovery;
+ordinary scoring retains append persistence.
+
+Publication correction: a source-only push inherited the upstream main destination
+and advanced main to 01d5752. Preserved that commit on the intended PR branch.
+GitHub rejected a lease-protected force rollback; restored the original source
+tree with normal revert 287d3a7 (tree verified identical to dc98588), then reapplied
+the fixes on the PR branch. No repository rules changed. Subsequent pushes use
+explicit full source:destination refspecs and matching branch upstreams.
