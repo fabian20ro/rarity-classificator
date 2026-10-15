@@ -304,7 +304,6 @@ def _apply_transition(
                 scored=scored,
                 common_level=common_level,
                 common_count=common_count,
-                rng=rng,
             )
 
         switched_events = _apply_batch_assignments(
@@ -494,20 +493,25 @@ def _select_common_word_ids(
     common_level: int,
     common_count: int,
 ) -> set[int]:
+    if len(scored) != common_count:
+        raise ValueError(
+            f"Step5 selection expected exactly {common_count} results, got {len(scored)}"
+        )
+
     batch_ids = {w.word_id for w in batch}
-    selected = []
-    seen = set()
-    for s in scored:
-        if s.word_id in batch_ids and s.rarity_level == common_level and s.word_id not in seen and s.word_id > 0:
-            selected.append(s.word_id)
-            seen.add(s.word_id)
-    if len(selected) > common_count:
-        selected = selected[:common_count]
-    elif len(selected) < common_count:
-        fallback = [w.word_id for w in batch if w.word_id not in seen]
-        random.shuffle(fallback)
-        selected.extend(fallback[: common_count - len(selected)])
-    return set(selected)
+    selected: set[int] = set()
+    for score in scored:
+        if type(score.word_id) is not int or score.word_id <= 0 or score.word_id not in batch_ids:
+            raise ValueError(f"Step5 selection contains invalid batch word_id={score.word_id!r}")
+        if score.rarity_level != common_level:
+            raise ValueError(
+                f"Step5 selection word_id={score.word_id} has level {score.rarity_level}; "
+                f"expected {common_level}"
+            )
+        if score.word_id in selected:
+            raise ValueError(f"Step5 selection contains duplicate word_id={score.word_id}")
+        selected.add(score.word_id)
+    return selected
 
 
 def _apply_batch_assignments(

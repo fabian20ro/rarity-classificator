@@ -19,18 +19,18 @@ class Step1Options:
 
 def run_step1(options: Step1Options, *, word_store: WordStore, repo: RunCsvRepository) -> Path | None:
     words = list(word_store.fetch_all_words())
-    for word_id, word, word_type in words:
-        if word_id is None:
+    for row in words:
+        if row.word_id is None:
             raise ValueError(
-                f"step1 export: null word_id (word={word!r}, type={word_type!r}); "
+                f"step1 export: null word_id (word={row.word!r}, type={row.type!r}); "
                 "refusing to export 'None' as word_id"
             )
-    rows = [[str(w_id), w_word, w_type] for w_id, w_word, w_type in sorted(words, key=lambda w: w[0])]
+    rows = [[str(row.word_id), row.word, row.type] for row in sorted(words, key=lambda row: row.word_id)]
     word_count = len(rows)
     if options.dry_run:
         print(f"Step 1 dry-run. Would export {word_count} words to {options.output_csv_path}")
         if word_count:
-            type_counts = Counter(w_type for _, _, w_type in words)
+            type_counts = Counter(row.type for row in words)
             print("Types: " + ", ".join(f"{t}={n}" for t, n in sorted(type_counts.items(), key=lambda x: (-x[1], x[0]))))
             writer = csv.writer(sys.stdout, lineterminator="\n")
             writer.writerow(BASE_CSV_HEADERS)
