@@ -172,6 +172,11 @@ def _score_pending_batches(
         flavor=resolved_endpoint.flavor,
         max_tokens=options.max_tokens,
     )
+    baseline = RunBaseline(
+        count=ctx.baseline_count,
+        min_id=ctx.baseline_min_id,
+        max_id=ctx.baseline_max_id,
+    )
 
     remaining = list(ctx.pending)
     while remaining:
@@ -185,12 +190,24 @@ def _score_pending_batches(
             metrics.record_batch_result(len(batch), len(scored))
 
         if scored:
-            rows_to_append = _to_run_rows(scored, options.model, run_slug)
-            for row in rows_to_append:
+            scored_rows = _to_run_rows(scored, options.model, run_slug)
+            if options.force:
+                # A forced batch replaces existing IDs. Persist the full snapshot
+                # atomically so interruptions leave a readable, resumable CSV.
+                snapshot = dict(ctx.existing_rows)
+                snapshot.update((row.word_id, row) for row in scored_rows)
+                repo.merge_and_rewrite_atomic(
+                    path=options.output_csv_path,
+                    in_memory_rows=list(snapshot.values()),
+                    baseline=baseline,
+                )
+            else:
+                repo.append_run_rows(options.output_csv_path, scored_rows)
+            for row in scored_rows:
+                previous = ctx.existing_rows.get(row.word_id)
+                distribution.set_level(previous.rarity_level if previous else None, row.rarity_level)
                 ctx.existing_rows[row.word_id] = row
-                distribution.increment(row.rarity_level)
-            repo.append_run_rows(options.output_csv_path, rows_to_append)
-            scored_count += len(rows_to_append)
+            scored_count += len(scored_rows)
 
         failed_count += len(batch) - len(scored)
         processed += len(batch)
