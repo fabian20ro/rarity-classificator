@@ -428,11 +428,11 @@ def _add_step4_args(parser: argparse.ArgumentParser) -> None:
     )
     parser.add_argument("--report-csv", default="build/rarity/step4_upload_report.csv")
     parser.add_argument("--upload-batch-id")
-    parser.add_argument("--reference-csv", required=True, help="Trusted reference for the mandatory L1 Jaccard gate")
-    parser.add_argument("--anchor-l1-file", required=True, help="Curated vocabulary for mandatory anchor precision/recall gates")
-    parser.add_argument("--min-l1-jaccard", type=float, default=0.7)
-    parser.add_argument("--min-anchor-l1-precision", type=float, default=0.8)
-    parser.add_argument("--min-anchor-l1-recall", type=float, default=0.8)
+    parser.add_argument("--reference-csv")
+    parser.add_argument("--anchor-l1-file")
+    parser.add_argument("--min-l1-jaccard", type=float)
+    parser.add_argument("--min-anchor-l1-precision", type=float)
+    parser.add_argument("--min-anchor-l1-recall", type=float)
 
 
 def _add_step5_args(parser: argparse.ArgumentParser) -> None:

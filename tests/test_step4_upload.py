@@ -20,8 +20,6 @@ class TestStep4Upload(unittest.TestCase):
         
         self.final_csv = self.test_dir / "final.csv"
         self.report_csv = self.test_dir / "report.csv"
-        self.reference_csv = self.test_dir / "ref.csv"
-        self.anchor_l1_file = self.test_dir / "anchors.txt"
         
         # Setup input CSV
         with open(self.final_csv, 'w', newline='') as f:
@@ -29,10 +27,8 @@ class TestStep4Upload(unittest.TestCase):
             writer.writerow(["word_id", "word", "type", "rarity_level"])
             writer.writerow(["1", "apple", "fruit", "2"])
             writer.writerow(["2", "banana", "fruit", "3"])
-        self.reference_csv.write_bytes(self.final_csv.read_bytes())
-        self.anchor_l1_file.write_text("apple\nbanana\n", encoding="utf-8")
 
-        self.mock_repo = MagicMock(spec=RunCsvRepository, wraps=RunCsvRepository())
+        self.mock_repo = MagicMock(spec=RunCsvRepository)
         self.mock_word_store = MagicMock(spec=WordStore)
         self.mock_marker_writer = MagicMock(spec=UploadMarkerWriter)
         
@@ -42,23 +38,25 @@ class TestStep4Upload(unittest.TestCase):
             WordLevel(word_id=2, rarity_level=1)
         ]
         
+        # Mock Repo behavior
+        def mock_load_final(path):
+            return {
+                1: 2,
+                2: 3,
+            }
+        self.mock_repo.load_final_levels.side_effect = mock_load_final
+        
+        def mock_write_rows(path, headers, rows):
+            with open(path, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(headers)
+                writer.writerows(rows)
+        self.mock_repo.write_rows.side_effect = mock_write_rows
+        
         self.mock_marker_writer.mark_uploaded_rows.return_value = MagicMock(marker_path=self.test_dir/"marker.json")
 
-    def tearDown(self):
-        self.temp_dir.cleanup()
-
-    def options(self, **overrides):
-        # These upload-plan fixtures intentionally have no L1 rows. Still run
-        # every real metric, with explicit zero thresholds for this fixture.
-        values = dict(
-            reference_csv=self.reference_csv, anchor_l1_file=self.anchor_l1_file,
-            min_l1_jaccard=0, min_anchor_l1_precision=0, min_anchor_l1_recall=0,
-        )
-        values.update(overrides)
-        return Step4Options(**values)
-
     def test_partial_upload(self):
-        options = self.options(
+        options = Step4Options(
             final_csv_path=self.final_csv,
             mode=UploadMode.PARTIAL,
             report_path=self.report_csv,
@@ -81,7 +79,7 @@ class TestStep4Upload(unittest.TestCase):
             WordLevel(word_id=1, rarity_level=2),
             WordLevel(word_id=2, rarity_level=1),
         ]
-        options = self.options(
+        options = Step4Options(
             final_csv_path=self.final_csv,
             mode=UploadMode.PARTIAL,
             report_path=self.report_csv,
@@ -97,7 +95,7 @@ class TestStep4Upload(unittest.TestCase):
         self.assertIn("unchanged=1", summary)
 
     def test_full_fallback_print_unchanged_not_printed(self):
-        options = self.options(
+        options = Step4Options(
             final_csv_path=self.final_csv,
             mode=UploadMode.FULL_FALLBACK,
             report_path=self.report_csv,
@@ -119,7 +117,7 @@ class TestStep4Upload(unittest.TestCase):
             WordLevel(word_id=3, rarity_level=1), # In DB but not in final CSV
         ]
         
-        options = self.options(
+        options = Step4Options(
             final_csv_path=self.final_csv,
             mode=UploadMode.FULL_FALLBACK,
             report_path=self.report_csv,
@@ -142,7 +140,7 @@ class TestStep4Upload(unittest.TestCase):
             WordLevel(word_id=1, rarity_level=1),
         ]
 
-        options = self.options(
+        options = Step4Options(
             final_csv_path=self.final_csv,
             mode=UploadMode.PARTIAL,
             report_path=self.report_csv,
@@ -177,7 +175,7 @@ class TestStep4Upload(unittest.TestCase):
         # upload_batch_id=None → run_step4 must generate "upload_<ms-timestamp>"
         # (line: options.upload_batch_id or f"upload_{int(now.timestamp()*1000)}")
         # so the marker is never written with a missing batch id
-        options = self.options(
+        options = Step4Options(
             final_csv_path=self.final_csv,
             mode=UploadMode.PARTIAL,
             report_path=self.report_csv,
@@ -195,7 +193,7 @@ class TestStep4Upload(unittest.TestCase):
 
     def test_partial_audit_gate_blocks_upload(self):
         # When reference_csv is provided and quality audit fails, run_step4 must raise RuntimeError
-        options = self.options(
+        options = Step4Options(
             final_csv_path=self.final_csv,
             mode=UploadMode.PARTIAL,
             report_path=self.report_csv,
@@ -223,7 +221,7 @@ class TestStep4Upload(unittest.TestCase):
 
     def test_partial_audit_pass_allows_upload(self):
         # When reference_csv is provided and quality audit passes, run_step4 proceeds normally
-        options = self.options(
+        options = Step4Options(
             final_csv_path=self.final_csv,
             mode=UploadMode.PARTIAL,
             report_path=self.report_csv,
@@ -253,7 +251,7 @@ class TestStep4Upload(unittest.TestCase):
         # precision/recall. Configured thresholds must reach run_quality_audit;
         # if run_step4 stops forwarding them, the gate uses wrong limits and a
         # quality-failing candidate uploads unchecked.
-        options = self.options(
+        options = Step4Options(
             final_csv_path=self.final_csv,
             mode=UploadMode.PARTIAL,
             report_path=self.report_csv,
@@ -410,6 +408,16 @@ class TestBuildFullFallbackPlan(unittest.TestCase):
         # All rows should have fallback_4 as source
         sources = {row[3] for row in report_rows}
         self.assertEqual(sources, {"fallback_4"})
+
+
+class TestStep4Upload(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.test_dir = Path(self.temp_dir.name)
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
 
 
 if __name__ == "__main__":

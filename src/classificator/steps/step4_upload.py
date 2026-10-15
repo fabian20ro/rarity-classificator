@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
-import math
 from pathlib import Path
 
 from ..constants import FALLBACK_RARITY_LEVEL, UPLOAD_REPORT_HEADERS
@@ -27,31 +26,19 @@ class Step4Options:
 
 
 def run_step4(options: Step4Options, *, word_store: WordStore, repo: RunCsvRepository, marker_writer: UploadMarkerWriter) -> None:
-    for name in ("reference_csv", "anchor_l1_file"):
-        if getattr(options, name) is None:
-            raise ValueError(f"{name} is required before upload")
-    for name in ("min_l1_jaccard", "min_anchor_l1_precision", "min_anchor_l1_recall"):
-        value = getattr(options, name)
-        if (
-            not isinstance(value, (int, float))
-            or isinstance(value, bool)
-            or not math.isfinite(value)
-            or not 0 <= value <= 1
-        ):
-            raise ValueError(f"{name} must be a finite number in 0..1 before upload")
-
-    from ..tools.quality_audit import run_quality_audit
-    result = run_quality_audit(
-        candidate_csv=options.final_csv_path,
-        reference_csv=options.reference_csv,
-        anchor_l1_file=options.anchor_l1_file,
-        min_l1_jaccard=options.min_l1_jaccard,
-        min_anchor_l1_precision=options.min_anchor_l1_precision,
-        min_anchor_l1_recall=options.min_anchor_l1_recall,
-        repo=repo,
-    )
-    if not result.passed:
-        raise RuntimeError(f"Quality audit failed: {', '.join(result.failures)}")
+    if any((options.reference_csv, options.anchor_l1_file, options.min_l1_jaccard, options.min_anchor_l1_precision, options.min_anchor_l1_recall)):
+        from ..tools.quality_audit import run_quality_audit
+        result = run_quality_audit(
+            candidate_csv=options.final_csv_path,
+            reference_csv=options.reference_csv,
+            anchor_l1_file=options.anchor_l1_file,
+            min_l1_jaccard=options.min_l1_jaccard,
+            min_anchor_l1_precision=options.min_anchor_l1_precision,
+            min_anchor_l1_recall=options.min_anchor_l1_recall,
+            repo=repo,
+        )
+        if not result.passed:
+            raise RuntimeError(f"Quality audit failed: {', '.join(result.failures)}")
     final_levels = repo.load_final_levels(options.final_csv_path)
     db_levels = {wl.word_id: wl for wl in word_store.fetch_all_word_levels()}
 

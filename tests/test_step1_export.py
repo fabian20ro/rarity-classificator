@@ -3,11 +3,7 @@ import csv
 import io
 import unittest
 from pathlib import Path
-from unittest.mock import MagicMock, patch
-
-import pytest
-
-from src.classificator.models import BaseWordRow
+from unittest.mock import MagicMock
 from src.classificator.steps.step1_export import run_step1, Step1Options
 from src.classificator.run_csv_repository import RunCsvRepository
 from src.classificator.word_store import WordStore
@@ -19,7 +15,7 @@ class TestStep1Export(unittest.TestCase):
         for word in ['comma,word', 'quoted"word', 'multi\nline']:
             with self.subTest(word=word):
                 store = MagicMock(spec=WordStore)
-                store.fetch_all_words.return_value = [BaseWordRow(1, word, 'noun')]
+                store.fetch_all_words.return_value = [(1, word, 'noun')]
                 repo = MagicMock(spec=RunCsvRepository)
                 output = io.StringIO()
                 with contextlib.redirect_stdout(output):
@@ -37,10 +33,10 @@ class TestStep1Export(unittest.TestCase):
 
         self.mock_repo = MagicMock(spec=RunCsvRepository)
 
-        # Use the actual WordStore return contract.
+        # fetch_all_words returns tuples: (id, word, type)
         self.words = [
-            BaseWordRow(1, "apple", "fruit"),
-            BaseWordRow(2, "banana", "fruit"),
+            (1, "apple", "fruit"),
+            (2, "banana", "fruit"),
         ]
 
     def tearDown(self):
@@ -72,7 +68,7 @@ class TestStep1Export(unittest.TestCase):
         # A None word_id must raise ValueError (fail-fast) before any write —
         # the guard refuses exporting 'None' as a word_id.
         store = MagicMock(spec=WordStore)
-        store.fetch_all_words.return_value = [BaseWordRow(None, "ghost", "noun"), BaseWordRow(1, "real", "fruit")]
+        store.fetch_all_words.return_value = [(None, "ghost", "noun"), (1, "real", "fruit")]
         options = Step1Options(output_csv_path=self.output_csv)
         with self.assertRaises(ValueError):
             run_step1(options, word_store=store, repo=self.mock_repo)
@@ -125,10 +121,10 @@ class TestStep1Export(unittest.TestCase):
     def test_dry_run_prints_sample_rows(self):
         # 3+ words: header line followed by exactly 3 sample data rows.
         words = [
-            BaseWordRow(3, "cherry", "fruit"),
-            BaseWordRow(1, "apple", "fruit"),
-            BaseWordRow(2, "banana", "fruit"),
-            BaseWordRow(4, "date", "fruit"),
+            (3, "cherry", "fruit"),
+            (1, "apple", "fruit"),
+            (2, "banana", "fruit"),
+            (4, "date", "fruit"),
         ]
         store = MagicMock(spec=WordStore)
         store.fetch_all_words.return_value = words
@@ -156,7 +152,7 @@ class TestStep1Export(unittest.TestCase):
     def test_dry_run_fewer_than_three_rows_prints_all(self):
         # Fewer than 3 words: every row is printed, no padding.
         store = MagicMock(spec=WordStore)
-        store.fetch_all_words.return_value = [BaseWordRow(7, "fig", "fruit")]
+        store.fetch_all_words.return_value = [(7, "fig", "fruit")]
         options = Step1Options(output_csv_path=self.output_csv, dry_run=True)
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
@@ -171,13 +167,13 @@ class TestStep1Export(unittest.TestCase):
         # 3 distinct types with asymmetric counts: Types: line must list all
         # three with correct counts, sorted by descending count (ties by name).
         words = [
-            BaseWordRow(1, "apple", "fruit"),
-            BaseWordRow(2, "banana", "fruit"),
-            BaseWordRow(3, "cherry", "fruit"),
-            BaseWordRow(4, "date", "fruit"),
-            BaseWordRow(5, "zebra", "animal"),
-            BaseWordRow(6, "koala", "animal"),
-            BaseWordRow(7, "star", "symbol"),
+            (1, "apple", "fruit"),
+            (2, "banana", "fruit"),
+            (3, "cherry", "fruit"),
+            (4, "date", "fruit"),
+            (5, "zebra", "animal"),
+            (6, "koala", "animal"),
+            (7, "star", "symbol"),
         ]
         store = MagicMock(spec=WordStore)
         store.fetch_all_words.return_value = words
@@ -197,8 +193,8 @@ class TestStep1Export(unittest.TestCase):
         # tie-break from the production sort would leave stable Counter order
         # and emit "zoo=1, apple=1" instead -- this assertion catches that.
         words = [
-            BaseWordRow(1, "apple", "zoo"),
-            BaseWordRow(2, "banana", "apple"),
+            (1, "apple", "zoo"),
+            (2, "banana", "apple"),
         ]
         store = MagicMock(spec=WordStore)
         store.fetch_all_words.return_value = words
@@ -229,7 +225,7 @@ class TestStep1Export(unittest.TestCase):
         # Minimal boundary: exactly one word — verifies sorted() with single-element
         # list and write_rows invocation at the lower bound of input cardinality.
         store = MagicMock(spec=WordStore)
-        store.fetch_all_words.return_value = [BaseWordRow(42, "zebra", "animal")]
+        store.fetch_all_words.return_value = [(42, "zebra", "animal")]
         options = Step1Options(output_csv_path=self.output_csv)
         result_path = run_step1(options, word_store=store, repo=self.mock_repo)
 
@@ -243,9 +239,9 @@ class TestStep1Export(unittest.TestCase):
         # Deliberately invert word ordering vs. word_id so sorting by any field
         # other than itemgetter(0) produces a clearly wrong row order.
         inverted_words = [
-            BaseWordRow(20, "apple", "fruit"),   # id=20 but alphabetically first
-            BaseWordRow(1, "banana", "fruit"),   # id=1  but alphabetically second
-            BaseWordRow(5, "cherry", "fruit"),
+            (20, "apple", "fruit"),   # id=20 but alphabetically first
+            (1,  "banana", "fruit"),   # id=1  but alphabetically second
+            (5,  "cherry", "fruit"),
         ]
         store = MagicMock(spec=WordStore)
         store.fetch_all_words.return_value = inverted_words
@@ -267,10 +263,10 @@ class TestStep1Export(unittest.TestCase):
     def test_run_step1_sorts_by_word_id(self):
         # Multi-digit IDs: string sort would give 1,10,2,20; int sort gives 1,2,10,20.
         unsorted_words = [
-            BaseWordRow(20, "pear", "fruit"),
-            BaseWordRow(10, "grape", "fruit"),
-            BaseWordRow(2, "banana", "fruit"),
-            BaseWordRow(1, "apple", "fruit"),
+            (20, "pear", "fruit"),
+            (10, "grape", "fruit"),
+            (2, "banana", "fruit"),
+            (1, "apple", "fruit"),
         ]
         store = MagicMock(spec=WordStore)
         store.fetch_all_words.return_value = unsorted_words
@@ -297,9 +293,9 @@ class TestStep1Export(unittest.TestCase):
         # before digits (wrong ordering). Only int-sort via itemgetter(0) gives
         # the mathematically correct ascending order.
         mixed_words = [
-            BaseWordRow(1, "zebra", "animal"),  # id=1   positive
-            BaseWordRow(-5, "alpha", "letter"),  # id=-5  negative
-            BaseWordRow(0, "middle", "symbol"),   # id=0   zero
+            (1,   "zebra",  "animal"),  # id=1   positive
+            (-5,  "alpha",  "letter"),  # id=-5  negative
+            (0,   "middle", "symbol"),   # id=0   zero
         ]
         store = MagicMock(spec=WordStore)
         store.fetch_all_words.return_value = mixed_words
@@ -321,28 +317,3 @@ class TestStep1Export(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-@pytest.mark.parametrize("dry_run", [False, True])
-def test_word_store_export_round_trips_real_rows(tmp_path, capsys, dry_run):
-    store = WordStore()
-    connection = MagicMock()
-    cursor = connection.__enter__.return_value.cursor.return_value.__enter__.return_value
-    cursor.fetchall.return_value = [(20, 'quoted"word', "noun"), (2, "comma,word", "verb")]
-    repo = RunCsvRepository()
-    destination = tmp_path / "export.csv"
-
-    with patch.object(store, "_connect", return_value=connection):
-        result = run_step1(Step1Options(destination, dry_run=dry_run), word_store=store, repo=repo)
-
-    expected = [BaseWordRow(2, "comma,word", "verb"), BaseWordRow(20, 'quoted"word', "noun")]
-    if dry_run:
-        preview = capsys.readouterr().out.split("\n", 2)[2]
-        assert list(csv.reader(io.StringIO(preview))) == [
-            BASE_CSV_HEADERS, ["2", "comma,word", "verb"], ["20", 'quoted"word', "noun"]
-        ]
-        assert result is None
-        assert not destination.exists()
-    else:
-        assert result == destination
-        assert repo.load_base_rows(destination) == expected

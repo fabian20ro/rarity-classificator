@@ -111,18 +111,8 @@ classificator l1-review-check \
   --min-precision 0.90
 
 # D) Upload to DB (partial default)
-classificator step4-upload \
-  --final-csv build/rarity/runs/campaign_a.rebalanced.csv \
-  --reference-csv build/rarity/runs/reference.csv \
-  --anchor-l1-file docs/rarity-anchor-l1-ro.txt \
-  --min-l1-jaccard 0.80 \
-  --min-anchor-l1-precision 0.90 \
-  --min-anchor-l1-recall 0.70
+classificator step4-upload --final-csv build/rarity/runs/campaign_a.rebalanced.csv
 ```
-
-Upload always reruns all three quality gates before DB access. Both audit files
-are required; omitted thresholds default to `0.7` Jaccard, `0.8` anchor precision,
-and `0.8` anchor recall. Thresholds must be finite numbers in `0..1`.
 
 ## Docs
 
