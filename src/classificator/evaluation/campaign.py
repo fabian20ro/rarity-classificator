@@ -103,6 +103,7 @@ def run_campaign(
                 except (ValueError, KeyError, TypeError) as exc:
                     raise ValueError("Corrupt campaign checkpoint outcome") from exc
                 records[item.word_id] = _summary(record)
+        committed_since_export = 0
         try:
             for item in items:
                 record = records.get(item.word_id)
@@ -124,8 +125,10 @@ def run_campaign(
                 }
                 _write_json(records_dir / f"{item.word_id}.json", record)
                 records[item.word_id] = _summary(record)
-                if len(records) % 100 == 0:
+                committed_since_export += 1
+                if committed_since_export == 100:
                     _export(list(records.values()), output_dir, config, len(items))
+                    committed_since_export = 0
         finally:
             _export(list(records.values()), output_dir, config, len(items))
     return output_dir / "predictions.csv"

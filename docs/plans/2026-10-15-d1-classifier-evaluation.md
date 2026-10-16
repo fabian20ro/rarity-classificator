@@ -116,7 +116,7 @@ Before any eventual upload, retain mandatory Jaccard plus anchor precision/recal
 Research detail: [D1 and Jev source notes](../research/2026-10-15-d1-jev.md).
 
 
-## Implementation status on 2026 10 16
+## Implementation status on 2026-10-16
 
 | Planned area | Delivered | Remaining |
 |---|---|---|
@@ -132,4 +132,6 @@ No LLM execution, model loading, database writes or measured Romanian accuracy i
 
 Architectural choices: KISS, YAGNI, DRY, Rule of Three, SoC, POLA, Fail Fast and Gall's Law; add high cohesion/low coupling, explicit dependencies, composition and reproducibility. See [decision record](../adr/2026-10-16-d1-evaluation-seam.md). No generic provider framework or trained hybrid before labels establish the need.
 
-Next recommended action: freeze a confirmed150-entry pilot inventory and familiarity rubric, collect blind labels, then manually load the matching D1 GGUF when RAM permits. Compare word-only, definitions-only, full-evidence, frequency and frozen current-classifier predictions. Inspect rare-to-common errors first. Use those results to decide whether a fitted hybrid deserves implementation, then expand the gold benchmark. Continue via [evaluation runbook](../D1_EVALUATION.md).
+Offline verification: Python 3.11.16, `python scripts/check.py`: Ruff passed; 785 tests and 98 subtests passed. Independent architecture review identified and resolved retry projection write amplification and quadratic evidence-ID validation. Live compatibility and Romanian quality remain unverified.
+
+Next recommended action: freeze a confirmed 150-entry pilot inventory and familiarity rubric, collect blind labels, then manually load the matching D1 GGUF when RAM permits. Compare word-only, definitions-only, full-evidence, frequency and frozen current-classifier predictions. Inspect rare-to-common errors first. Use those results to decide whether a fitted hybrid deserves implementation, then expand the gold benchmark. Continue via [evaluation runbook](../D1_EVALUATION.md).

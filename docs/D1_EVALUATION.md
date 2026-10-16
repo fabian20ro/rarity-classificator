@@ -23,7 +23,7 @@ Omit either optional evidence flag when unavailable. Existing output directories
 
 `wordfreq` missingness is censored coverage, not proof of extreme rarity. DEX exact-original matches only; ambiguous/missing definitions remain marked. Full HTML pages contribute definition spans, not navigation text. Dictionary token-frequency estimation is deferred.
 
-Have Romanian speakers label familiarity1..5 without model predictions or definitions. Keep independent rater records; write adjudicated values into a COPY of labels.csv. Do not overwrite the frozen dataset or use test labels for tuning. All rows supplied to the report require valid labels; for a partially annotated inventory, supply matching curated label and prediction subsets. Initial tooling does not perform annotation adjudication or statistical sampling automatically.
+Have Romanian speakers label familiarity 1..5 without model predictions or definitions. Keep independent rater records; write adjudicated values into a COPY of labels.csv. Do not overwrite the frozen dataset or use test labels for tuning. All rows supplied to the report require valid labels; for a partially annotated inventory, supply matching curated label and prediction subsets. Initial tooling does not perform annotation adjudication or statistical sampling automatically.
 
 ## Run D1 when memory permits
 
@@ -81,4 +81,4 @@ Reports include coverage/status counts, confusion with a missing column, ordinal
 
 `python scripts/check.py` runs Ruff and the complete offline suite. New tests use unittest interfaces, real temporary CSV/checkpoint files and simulated external HTTP/corpus data. No live D1 quality claim follows from those tests.
 
-Next: confirm inventory and familiarity rubric, obtain150 blind human labels, manually load D1 when RAM permits, then run word-only and evidence-assisted pilot plus frequency/current-classifier baselines. Review rare-to-common errors before expanding to the locked benchmark or fitting a hybrid. Keep mandatory Jaccard/anchor gates and partial upload default.
+Next: confirm inventory and familiarity rubric, obtain 150 blind human labels, manually load D1 when RAM permits, then run word-only and evidence-assisted pilot plus frequency/current-classifier baselines. Review rare-to-common errors before expanding to the locked benchmark or fitting a hybrid. Keep mandatory Jaccard/anchor gates and partial upload default.

@@ -89,6 +89,7 @@ def _run(args) -> int:
     items = RunCsvRepository().load_base_rows(args.vocabulary_csv)
     evidence = {}
     if args.evidence_csv:
+        inventory_ids = {item.word_id for item in items}
         table = CsvCodec().read_table(args.evidence_csv)
         allowed_fields = {
             "word_id",
@@ -106,7 +107,7 @@ def _run(args) -> int:
         for record in table.records:
             row = dict(zip(table.headers, record.values))
             word_id = int(row.pop("word_id"))
-            if word_id in evidence or word_id not in {item.word_id for item in items}:
+            if word_id in evidence or word_id not in inventory_ids:
                 raise ValueError("Duplicate or unknown evidence word_id")
             evidence[word_id] = row
     config = {

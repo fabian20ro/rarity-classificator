@@ -85,6 +85,9 @@ reject a counterexample that ignores a failed audit.
 
 ## Performance & Infrastructure
 
+**[2026-10-16]** DEX cache records can contain complete HTML pages — extract definition spans one file at a time; never retain the full cache or count navigation text as lexical evidence. Observed local rebus cache: roughly 1.3 GB across 12,728 records.
+**[2026-10-16]** Retry projection cadence must count committed attempts — replacing existing IDs does not change record count. A modulo check on total record count can turn batched CSV projection into one full rewrite per retry.
+
 <!-- Deployment quirks, scaling lessons, CI/CD gotchas -->
 <!-- Format: **[YYYY-MM-DD]** Brief title — Explanation -->
 **[2026-02-14]** Local model instability requires bounded recovery tactics — retries, partial salvage, and capped batch splitting are necessary for predictable throughput.

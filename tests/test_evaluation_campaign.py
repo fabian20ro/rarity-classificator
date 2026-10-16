@@ -3,15 +3,42 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from classificator.models import BaseWordRow
 from classificator.scoring.d1 import D1Scorer
 from classificator.evaluation.campaign import run_campaign
+from classificator.csv_codec import CsvCodec
 from tests.test_d1_scorer import response, models, answer
 
 
 class CampaignTests(unittest.TestCase):
+    def test_retry_batches_csv_writes_instead_of_rewriting_per_word(self):
+        import requests
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "run"
+            http = Mock()
+            http.get.return_value = response(models())
+            http.post.side_effect = requests.Timeout("offline")
+            scorer = D1Scorer(model="d1-3b", http=http)
+            items = [BaseWordRow(i, f"word{i}", "") for i in range(1, 101)]
+            run_campaign(items, scorer, path, config={})
+            http.post.side_effect = None
+            http.post.return_value = response(answer())
+            original = CsvCodec.write_table_atomic
+            writes = []
+
+            def record_write(codec, target, *args, **kwargs):
+                writes.append(target.name)
+                return original(codec, target, *args, **kwargs)
+
+            with patch.object(CsvCodec, "write_table_atomic", record_write):
+                run_campaign(items, scorer, path, config={}, retry_failed=True)
+
+            self.assertLessEqual(writes.count("predictions.csv"), 2)
+            self.assertEqual(json.loads((path / "summary.json").read_text())["scored"], 100)
+
     def test_csv_campaign_resumes_completed_ids_without_another_request(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "run"
