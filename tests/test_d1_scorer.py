@@ -56,6 +56,38 @@ class D1ScorerTests(unittest.TestCase):
             set(request["questions"]["rarity"]["criteria"]), {"L1", "L2", "L3", "L4", "L5"}
         )
 
+    def test_exact_form_contract_keeps_all_pos_and_does_not_restrict_to_inventory_type(self):
+        http = Mock()
+        http.get.return_value = response(models())
+        http.post.return_value = response(answer())
+        contract = {
+            1: dict(
+                word="tău",
+                inventory_type="N",
+                loc_entries=[dict(pos="N"), dict(pos="P")],
+                contexts=[],
+            )
+        }
+        outcome = D1Scorer(model="d1-3b", http=http, form_contract=contract).score_batch(
+            [BaseWordRow(1, "tău", "N")]
+        )[0]
+        state = outcome.request["state"]
+        self.assertEqual(state["word"], "tău")
+        self.assertNotIn("type", state)
+        self.assertEqual(state["inventory_type"], "N")
+        self.assertEqual(state["form_contract"]["loc_entries"], [dict(pos="N"), dict(pos="P")])
+        instructions = outcome.request["questions"]["rarity"]["instructions"]
+        self.assertIn("most familiar valid sense", instructions)
+        self.assertIn("all valid parts of speech", instructions)
+        self.assertIn("Do not substitute", instructions)
+        http.reset_mock()
+        with self.assertRaises(ValueError):
+            D1Scorer(model="d1-3b", http=http, form_contract=contract).score_batch(
+                [BaseWordRow(1, "tau", "N")]
+            )
+        http.get.assert_not_called()
+        http.post.assert_not_called()
+
     def test_unloaded_or_wrong_model_never_triggers_an_inference_request(self):
         for model in [
             dict(models()["models"][0], loaded_instances=[]),

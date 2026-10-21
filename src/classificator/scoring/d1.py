@@ -17,7 +17,10 @@ RUBRIC = {
 }
 INSTRUCTIONS = (
     "Rate familiarity of the exact Romanian lexical form to an ordinary adult "
-    "Romanian speaker. Lower level means more common. Meaning supplied by a "
+    "Romanian speaker, through its most familiar valid sense across all valid parts of speech. "
+    "The inventory_type is historical metadata, not a restriction. Lexical evidence is "
+    "source-bounded, not exhaustive. Do not substitute a lemma, another inflection or "
+    "a spelling with different diacritics. Lower level means more common. Meaning supplied by a "
     "definition does not imply familiarity. Judge familiarity independently "
     "of offensiveness or suitability. Do not impose population quotas."
 )
@@ -31,6 +34,7 @@ class D1Scorer:
         base_url: str = "http://127.0.0.1:1234",
         http=None,
         evidence=None,
+        form_contract=None,
         min_probability: float = 0.0,
     ):
         if not math.isfinite(min_probability) or not 0 <= min_probability <= 1:
@@ -40,6 +44,7 @@ class D1Scorer:
         self.base_url = base_url.rstrip("/")
         self.http = http if http is not None else requests.Session()
         self.evidence = evidence or {}
+        self.form_contract = form_contract
         self._identity = None
 
     def preflight(self) -> dict:
@@ -67,6 +72,13 @@ class D1Scorer:
         return model
 
     def score_batch(self, items: list[BaseWordRow]) -> list[Outcome]:
+        if self.form_contract is not None:
+            for item in items:
+                if (
+                    item.word_id not in self.form_contract
+                    or self.form_contract[item.word_id].get("word") != item.word
+                ):
+                    raise ValueError("Exact-form contract identity mismatch")
         outcomes = []
         for item in items:
             model = self.preflight()
@@ -75,7 +87,10 @@ class D1Scorer:
                 "model": instance,
                 "state": {
                     "word": item.word,
-                    "type": item.type,
+                    "inventory_type": item.type,
+                    "form_contract": (
+                        self.form_contract[item.word_id] if self.form_contract is not None else None
+                    ),
                     "evidence": self.evidence.get(item.word_id, {}),
                 },
                 "questions": {
@@ -111,9 +126,9 @@ class D1Scorer:
                         item.word_id,
                         level,
                         probabilities,
-                        status="scored"
-                        if max(probabilities) >= self.min_probability
-                        else "unresolved",
+                        status=(
+                            "scored" if max(probabilities) >= self.min_probability else "unresolved"
+                        ),
                         confidence=max(probabilities),
                         request=payload,
                         response=raw_response,

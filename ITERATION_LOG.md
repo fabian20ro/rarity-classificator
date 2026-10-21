@@ -514,3 +514,29 @@ claim; no fitted hybrid, calibration, weighted/subgroup reporting, or automatic
 promotion. Next: freeze 150-word pilot/rubric, blind labels, then explicit live
 smoke/ablations when RAM permits. Additional principles recommended: high
 cohesion/low coupling, explicit dependencies, composition and reproducibility.
+
+
+## 2026-10-21 — Exact-form/all-POS contract and offline frequency comparison
+
+- Recovered PR81 f990e6c sources into isolated `build/d1/exact-form-code`; primary
+  checkout main lacked experimental modules and contained unrelated dirty files.
+- Read Matt Pocock TDD and project lessons; planner supplied read-only seam/source
+  review. Red/green slices: CSV exact-form contract, nested label/identity rejection,
+  scorer request target, rebus extraction, paired development report, offline CLI,
+  source policy/hash checks and extractor provenance. Existing BatchScorer retained.
+- Frozen150 exact targets /218 lexical contexts. All LOC entries and curated POS
+  retained; inventory POS nonrestricting. No fabricated sense labels or added targets.
+- Reused frozen wordfreq3.1.1; streamed12,728 rebus cache records, excluding60 target
+  pages and147 non-ok records;114,689 unique definitions /1,280,002 tokens. Repeated
+  full extraction yielded identical frequency CSV bytes.
+- Compared37 clarified development labels, excluding113 opaque labels:29 observed
+  each,26 paired,32 union; paired Spearman0.451(wordfreq)/0.536(rebus). No threshold
+  fit or independent accuracy claim; rebus missing all4 L5 forms is material.
+- Review found source-identity validation and extractor fingerprint gaps; regression
+  tests demonstrated failures before fixes. Final Ruff +792 tests /108 subtests pass.
+  Verified34 current/previous artifact, input and implementation hashes; original
+  latest annotation import unchanged. D1 never loaded/contacted; tests simulate HTTP.
+- Plan/results/docs updated: retain separate frequency signals, next independent
+  held-out labels before thresholds/hybrid; no renewed172-context request. D1 later,
+  sequentially, conditional on RAM. Implementation retained as a separate Git branch;
+  primary checkout code left intact. No remote push or production upload.

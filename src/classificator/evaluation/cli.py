@@ -14,6 +14,30 @@ from ..scoring.d1 import D1Scorer, RUBRIC, INSTRUCTIONS
 
 
 def add_commands(sub) -> None:
+    forms = sub.add_parser(
+        "evaluation-exact-forms", help="Freeze exact surfaces and all source-attested POS"
+    )
+    forms.add_argument("--vocabulary-csv", type=Path, required=True)
+    forms.add_argument("--loc-file", type=Path, required=True)
+    forms.add_argument("--contexts-csv", type=Path, required=True)
+    forms.add_argument("--campaign-dir", type=Path, required=True)
+    forms.set_defaults(evaluation_handler=_exact_forms)
+    rebus = sub.add_parser(
+        "evaluation-rebus", help="Count exact tokens in local rebus definitions; no network"
+    )
+    rebus.add_argument("--vocabulary-csv", type=Path, required=True)
+    rebus.add_argument("--dex-cache", type=Path, required=True)
+    rebus.add_argument("--campaign-dir", type=Path, required=True)
+    rebus.set_defaults(evaluation_handler=_rebus)
+    form_report = sub.add_parser(
+        "evaluation-form-report", help="Development-only exact-form frequency rank comparison"
+    )
+    form_report.add_argument("--reference-csv", type=Path, required=True)
+    form_report.add_argument("--form-contract-csv", type=Path, required=True)
+    form_report.add_argument("--wordfreq-csv", type=Path, required=True)
+    form_report.add_argument("--rebus-csv", type=Path, required=True)
+    form_report.add_argument("--campaign-dir", type=Path, required=True)
+    form_report.set_defaults(evaluation_handler=_form_report)
     prepare = sub.add_parser(
         "evaluation-prepare", help="Freeze Scrabble vocabulary and offline evidence"
     )
@@ -30,6 +54,11 @@ def add_commands(sub) -> None:
     run.add_argument("--vocabulary-csv", type=Path, required=True)
     run.add_argument("--campaign-dir", type=Path, required=True)
     run.add_argument("--evidence-csv", type=Path)
+    run.add_argument(
+        "--form-contract-csv",
+        type=Path,
+        help="Exact surface/all-POS contract, separate from labels",
+    )
     run.add_argument("--model", required=True)
     run.add_argument("--run", help="Stable run identity; defaults to campaign directory name")
     run.add_argument("--model-file", type=Path, required=True)
@@ -110,7 +139,17 @@ def _run(args) -> int:
             if word_id in evidence or word_id not in inventory_ids:
                 raise ValueError("Duplicate or unknown evidence word_id")
             evidence[word_id] = row
+    form_contract_path = getattr(args, "form_contract_csv", None)
+    form_contract = None
+    if form_contract_path:
+        from .exact_form import load_form_contract
+
+        form_contract = load_form_contract(
+            form_contract_path, {item.word_id: item.word for item in items}
+        )
     config = {
+        "form_contract_sha256": _hash_file(form_contract_path) if form_contract_path else None,
+        "target": "exact-form-most-familiar-valid-sense-v1",
         "run_slug": (getattr(args, "run", None) or args.campaign_dir.name),
         "model": args.model,
         "model_file_sha256": _hash_file(args.model_file),
@@ -129,6 +168,7 @@ def _run(args) -> int:
         model=args.model,
         base_url=args.base_url,
         evidence=evidence,
+        form_contract=form_contract,
         min_probability=args.min_probability,
     )
     api_key = os.getenv("LMSTUDIO_API_KEY")
@@ -227,4 +267,36 @@ def _wordfreq(args) -> int:
 
     result = export_wordfreq(args.vocabulary_csv, args.output_csv)
     print(json.dumps(result, default=str, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _exact_forms(args):
+    from .exact_form import prepare_exact_forms
+
+    result = prepare_exact_forms(
+        args.vocabulary_csv, args.loc_file, args.contexts_csv, args.campaign_dir
+    )
+    print(json.dumps(result, default=str, indent=2))
+    return 0
+
+
+def _rebus(args):
+    from .definition_frequency import export_rebus_frequencies
+
+    result = export_rebus_frequencies(args.vocabulary_csv, args.dex_cache, args.campaign_dir)
+    print(json.dumps(result, default=str, indent=2))
+    return 0
+
+
+def _form_report(args):
+    from .form_frequency_report import compare_form_frequencies
+
+    result = compare_form_frequencies(
+        args.reference_csv,
+        args.form_contract_csv,
+        args.wordfreq_csv,
+        args.rebus_csv,
+        args.campaign_dir,
+    )
+    print(json.dumps(result, indent=2))
     return 0

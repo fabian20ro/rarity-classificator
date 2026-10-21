@@ -24,3 +24,19 @@ Architecture principles applied:
 - Reproducibility: immutable inputs, versioned policy, retained probabilities and explicit missingness.
 
 Step5's exact-count local-ID selection and Step4's semantic gates remain separate. D1 scores do not automatically implement exact-K selection. No upload or production default change in this feature.
+
+
+## 2026-10-21: exact surface across valid POS
+
+Keep the existing BatchScorer and CSV boundaries. Add a separate versioned
+`forms.csv` lexical contract rather than extending production BaseWordRow or
+reinterpreting its `type` column. The request exposes `inventory_type` as historical
+metadata plus optional all-POS evidence. The rubric uses the most familiar valid
+sense of the literal surface; normalization never lemmatizes or strips diacritics.
+
+Source-bounded LOC/curated evidence is separate from human labels and assistant
+estimates. Exact-form reference kinds gate metrics, preventing the113 opaque
+initial pilot labels from entering the clarified-target comparison. Raw frequency
+and ranking comparisons precede any threshold fitting. Rebus uses sequential local
+cache extraction with target-page exclusion and exact-definition deduplication.
+No new scoring framework, parallel inference, automatic model load or upload path.

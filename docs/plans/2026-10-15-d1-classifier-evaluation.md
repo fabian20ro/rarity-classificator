@@ -1,6 +1,6 @@
 # D1 adapter and Romanian Scrabble evaluation plan
 
-Date: 2026-10-15. Updated: 2026-10-16. Status: offline implementation delivered; live validation and replacement decision pending. See implementation status below.
+Date: 2026-10-15. Updated: 2026-10-20. Status: offline implementation delivered; consolidated audit imported (46 contexts, 12 exact forms). Independent evaluation, live validation and replacement decision pending. Latest status and leftovers at the end.
 
 Recommendation: build an offline evaluation harness first, then a Step2 scoring adapter for D1 through LM Studio `/v1/systemone`. Evaluate D1 alone, with dictionary evidence, and alongside frequency features. Replace the existing scorer only if held-out Romanian results justify it. Expect a hybrid scorer to be a stronger candidate than D1 using word spelling alone; treat that as a hypothesis.
 
@@ -14,7 +14,7 @@ Local inspection: LM Studio 0.4.26 build 4, llama.cpp runtime 2.58.0, server on 
 
 ## Target and population
 
-Provisional target: familiarity of each eligible word to an ordinary adult Romanian speaker, retaining the existing direction 1=common through 5=obscure. Corpus frequency is evidence for familiarity, not its definition. Confirm this target before annotation.
+Accepted target (2026-10-19): familiarity of the exact eligible spelling through its most familiar valid sense, across valid parts of speech. Retain the direction 1=common through 5=obscure; project contextual scores by minimum and preserve all winning contexts. Do not transfer familiarity from another spelling or inflection. Corpus frequency is evidence for familiarity, not its definition.
 
 Freeze an authoritative Scrabble inventory as `vocabulary.csv`: `word_id`, original spelling, part of speech, source/version, and game-normalized key. Existing `words` exports are candidates; verify importer provenance and eligibility before calling them authoritative. Include only inventory rows in final output. Do not expand into all Romanian inflections, and do not reduce eligible forms to lemmas. If an inflected form is explicitly in the inventory, preserve it as its own target.
 
@@ -135,3 +135,344 @@ Architectural choices: KISS, YAGNI, DRY, Rule of Three, SoC, POLA, Fail Fast and
 Offline verification: Python 3.11.16, `python scripts/check.py`: Ruff passed; 785 tests and 98 subtests passed. Independent architecture review identified and resolved retry projection write amplification and quadratic evidence-ID validation. Live compatibility and Romanian quality remain unverified.
 
 Next recommended action: freeze a confirmed 150-entry pilot inventory and familiarity rubric, collect blind labels, then manually load the matching D1 GGUF when RAM permits. Compare word-only, definitions-only, full-evidence, frequency and frozen current-classifier predictions. Inspect rare-to-common errors first. Use those results to decide whether a fitted hybrid deserves implementation, then expand the gold benchmark. Continue via [evaluation runbook](../D1_EVALUATION.md).
+
+## Pilot prepared on 2026-10-17
+
+Local package: `build/d1/pilot-2026-10-17/`; UI: `index.html` (currently served at
+http://127.0.0.1:8765). All 150 exact forms checked against local LOC 5.0 and
+selected from existing stable IDs. Seed 20261017; 100 frequency-stratified random
+forms plus 50 targeted challenge forms. Wordfreq3.1.1 coverage101/150; exact DEX
+text53/150, missing85, ambiguous12. These are coverage counts, not model results.
+All pilot rows explicitly assigned to development; collision IDs reserved for
+future benchmark expansion. Full inventory/model-family audit still required
+before selecting a held-out benchmark.
+
+User requested an easy annotation interface plus assistant estimates. Delivered
+150 explicit assistant estimates with short rationales, stored separately from
+blank human labels. UI shows estimates after first human rating by default;
+optional early reveal is audited, as is definition exposure. CSV preserves first
+and final ratings, independent/assisted status and source; JSON preserves action
+history and supports import. Autosave remains local. Test responses use a separate
+QA storage namespace; user session starts0/150. Two independent CSV rater sheets
+also available. Estimates are neither D1 outputs nor human gold.
+
+Next: collect the user's first-pass ratings through the UI, adjudicate unclear
+POS/senses, optionally obtain a second independent rater. Then run D1 only when
+memory permits and compare independent versus assisted labels separately.
+No model loaded, no inference or DB writes. Calibration, hybrid fitting and
+live accuracy remain pending. Pilot files are local artifacts; PR81 unchanged.
+
+## Human pilot imported on 2026-10-19
+
+Imported Fabian's150/150 completed scores and199 audit events (196 rating events)
+from browser CSV/JSON exports. Preserved originals and hashed assistant estimates;
+validated all IDs, POS, splits, first/final scores and exposure against the log.
+Results: final agreement112/150 (74.7%), MAE0.273; first-independent agreement
+85/149 (57.0%), MAE0.557.31 revisions all moved closer to assistant estimates;
+this is observational, not proof of causal anchoring. Final ratings are a separate
+assisted reference, not an independent validation set. Single-rater developmental
+reference, no population accuracy or D1 performance claims.
+
+Two final gaps≥2: micșurat user5/assistant2 (user explicitly confirmed5), nordic
+user1/assistant3. Twelve-item optional sense/rubric queue prepared. Main next
+recommendation: reconcile ambiguous form+POS versus any-sense word familiarity,
+freeze rubric, obtain a second blind review/new batch before calibration. Future
+independent UI rounds should defer AI reveal until the whole batch is completed.
+D1 word-only/evidence runs remain pending sufficient memory, sequential only.
+
+Local [comparison report](../../build/d1/pilot-2026-10-17/data/evaluations/2026-10-19-fabian/comparison-report.md)
+and [all differences](../../build/d1/pilot-2026-10-17/data/evaluations/2026-10-19-fabian/differences.csv).
+Human pilot annotation is now done; adjudication, independent second-rater evidence,
+live D1 verification, calibration and hybrid decisions remain open.
+
+## Sense review UI delivered on 2026-10-19
+
+Twelve cases ready at http://127.0.0.1:8765/review-12/ with POS, sourced meanings,
+illustrative examples and original scores; multiple contexts explicitly selectable
+for mai, ata, carter and sezisa. State and exports isolated from the original150.
+Original LOC gender narrows ițar to a loom component; initial AI explanation had
+assumed the trousers sense. micșurat needs exact-variant familiarity, not implicit
+normalization to micșorat. Frozen assistant predictions remain unchanged.
+
+Leftovers: user's12-case review; import contextual revisions as a separate assisted
+layer; decide how multiple senses map to a single word/POS rarity label. Preserve
+source gender and curate POS-compatible definitions before evaluating evidence-fed
+D1. Next recommendation: finish this sense/rubric decision before collecting a
+second blind batch or fitting calibration. D1 still awaits available memory;
+requests remain sequential.
+
+## Sense review imported on 2026-10-19 — current next step
+
+**Done:** user's12/12 contextual labels imported and validated against both exports,
+case pack and final event. Four changes from the first round's final scores:
+nordic1→2, mai (mallet)5→4, pag4→5, ițar (loom component)4→5. Eight retained;
+micșurat5 reconfirmed. Original150 labels and frozen AI estimates unchanged.
+No AI reveal in this round, but it remains assisted by definitions, prior scores
+and previous exposure. Descriptive numeric agreement4/12→7/12 cannot establish
+model improvement: ițar/carter rationale scopes differ, ata's initial AI sense was
+unspecified, and micșurat's exact variant was not distinguished by its rationale.
+No new150-item aggregate computed from mixed contextual/word-level targets.
+
+**Rubric accepted by user on 2026-10-19:** familiarity of the exact accepted form through its most familiar valid
+sense. Keep POS/gender/sense as explicit evidence. The game target is the exact form
+across its valid senses, including valid POS uses; contextual labels remain
+separate. Do not silently normalize spelling variants. This is an accepted
+product rule; projection implementation remains a follow-up.
+
+**Immediate small follow-up:** rate carter as a mechanical housing and ata as a
+trump card. User selected carter=volume5 and ata=money5; neither resolves the
+potentially more familiar alternative. The12-case review itself is complete;
+these are additional contexts, not missing answers. Four unchosen contexts remain
+recorded without labels (also mai=liver and sezisa=notify).
+
+**Implementation recommendation:** preserve contextual labels keyed by word_id +
+sense_id and LOC gender; curate definitions to match POS and exact form; make any
+projection to a game score explicit and reject unresolved priority senses. No
+hybrid fitting or threshold changes from these12 selected cases. After rubric
+freeze, obtain a second blind rater/new batch; then run D1 sequentially when RAM
+permits, comparing word-only, curated-evidence, frequency and current classifier
+against the same target. Live compatibility and Romanian D1 quality still untested.
+
+[Imported contextual review and full comparison](../../build/d1/pilot-2026-10-17/data/evaluations/2026-10-19-fabian-sense-review/comparison-report.md).
+
+
+## Two additional contexts delivered on 2026-10-19
+
+UI: http://127.0.0.1:8765/review-2/ — carter/housing and ata/trump, each with
+fixed sense, POS, definition, example and sources from the frozen lexical pack.
+Fresh scores required; no carry-over of5 from volume/money. Separate storage
+version `additional-contexts-2026-10-19-v1` and CSV/JSON export names.
+
+Accepted rule: **exact form through its most familiar valid sense**. On the
+current1(common)–5(obscure) scale, a form-level projection takes the minimum
+of its valid sense scores; it must retain the contributing context/provenance
+and flag unresolved priority senses. Include valid senses across POS; keep
+contextual POS labels available for diagnosis. Do not equate a known normalized
+variant with familiarity of the exact spelling. A minimum over only the reviewed
+contexts is provisional when relevant alternatives remain unresolved.
+
+Next: import the two responses; combine them with the frozen volume/money labels
+under the accepted rule, preserving raw contextual ratings. Then audit remaining
+priority sense coverage before producing an explicit form-level benchmark. Blind
+second-rater/new-batch evaluation and sequential D1 verification remain pending.
+
+## Additional contexts imported and form projection computed — 2026-10-19
+
+**Done:** carter/housing=5 and ata/trump=5 imported from the live UI exports,
+validated against JSON/CSV, case pack and final event. Combined14 contextual
+ratings across12 exact forms. Accepted minimum rule yields carter=min(5,5)=5,
+ata=min(5,5)=5. No numeric changes from the12-case review; four differences from
+the initial final ratings remain. Numeric agreement with frozen AI remains7/12,
+MAE0.583, descriptive only. carter's mechanics comparison is now sense-matched:
+human5 versus AI4. Raw150 and previous12 imports unchanged.
+
+**New coverage finding:** original LOC includes tău N52 and tău P92, while the
+pilot retains only the noun. The rating5 for lake cannot certify exact-form
+familiarity across valid senses/POS. Also unreviewed in the existing case pack:
+mai/liver and sezisa/notify. Other forms have not had exhaustive coverage audit.
+All12 computed minima therefore carry provisional observed-sense status, with
+separate coverage flags and winning context IDs; no automatic overwrite of gold.
+
+**Current recommendation:** the two requested contexts are complete. Next, audit
+valid exact-form homographs/POS and priority meanings once, then produce one
+consolidated missing-context list. Preserve all valid LOC entries instead of
+choosing a single row; start with confirmed tău/pronoun omission and verify
+la/mai/literare context coverage before finalizing the benchmark. Ask the user
+only for genuinely missing ratings that could affect the minimum. Keep raw
+context labels and form projection separate. The calculation is implemented as
+a small analysis function, tested for cross-POS minimum, exact-variant isolation,
+invalid ratings and duplicate contexts. Calibration/model changes remain deferred
+until coverage and an independent second-rater/new-batch check are complete.
+D1 stays unloaded; future inference sequential and conditional on available RAM.
+
+[Updated comparison and recommendation](../../build/d1/pilot-2026-10-17/data/evaluations/2026-10-19-fabian-form-projection/comparison-report.md)
+· [Explicit form projection](../../build/d1/pilot-2026-10-17/data/evaluations/2026-10-19-fabian-form-projection/form-projection.csv).
+
+## Consolidated sense/POS audit delivered — 2026-10-19
+
+Audited the12 adjudicated exact forms against saved DEX/MDA2/DOOM evidence and
+local LOC.32 missing semantic-family contexts across10 forms in one UI:
+http://127.0.0.1:8765/review-consolidated/. Existing14 contextual labels retained.
+Carter and stenodactilograf need no additional distinct contexts in reviewed
+sources. Common omissions include la/preposition+music, mai/adverb+month,
+tău/possessive and literare/adjectival exact-form uses. Regional/archaic meanings
+also queued; assistant rarity guesses never exclude a candidate.
+
+Scope is the12-form queue, not the other138 pilot forms. No claim of absolute
+lexicographic exhaustiveness or newer Scrabble-edition certification. Exclusions
+include other spellings, proper nouns, symbols, unattached suffixes, and senses
+explicitly limited to other forms (notably ițari clothing versus exact ițar).
+Related senses grouped with instruction to score their most familiar listed use.
+
+UI now keys answers by word_id:sense_id, preserving multiple answers per form.
+Tests cover independent scores, reload/export,32 unique contexts, uncertainty and
+old-state isolation. JSON retains full source pack, history and prior labels;
+CSV preserves context identity and original inventory POS separately. Single
+new namespace; old datasets/imports unchanged. No model or DB calls.
+
+Next: complete this one round, import using composite-key validation, merge with
+prior14 contextual labels, inspect unresolved responses/notes and project exact
+forms via minimum. Only then freeze audited coverage for independent evaluation.
+[Consolidated audit](../../build/d1/pilot-2026-10-17/review-consolidated/audit-report.md).
+
+## Consolidated audit imported — 2026-10-20 (current recommendation)
+
+**Done:**32/32 new ratings, no unresolved answers/notes; combined with14 preserved
+contextual labels. All46 audited families now rated across12 exact forms. Frozen
+CSV/JSON, case pack, events, dictionary hashes and prior-import hashes verified.
+Coverage is complete within the audited sources/families, not a claim of absolute
+lexicographic exhaustiveness. Original150 labels unchanged.
+
+Exact-form minima: micșurat5, nordic2, mai1, la1, tău1, literare2, ata5,
+carter5, pag4, ițar4, stenodactilograf4, sezisa3. Six changes from the previous
+projection; five from the initial final ratings. Common cross-POS senses resolve
+la/mai/tău/literare; regional pag/page and ițar/cloth reduce their minima to4.
+Sezisa remains3 from notice despite three new context ratings5.
+
+New contextual estimates: final26/32 exact (81.25%), MAE0.1875; first choices
+21/32 (65.625%), MAE0.34375. All first choices preceded their own estimate;
+four later revisions followed reveal and moved toward it. Definition assistance
+and earlier exposure remain; this is development data, not independent evidence
+of model performance. Original frozen estimates agree numerically with1/12
+projected forms (previously7/12); their target was inconsistent with the newly
+accepted rule. Do not interpret that drop as model degradation or mix rubric
+versions into a revised150-item accuracy.
+
+**Next:** freeze this12-form reference as semantic regression/development data;
+align the model/evidence contract to exact form across all valid POS; then obtain
+independent labels under the frozen rubric. No further annotation round for
+these12 is recommended absent new lexical evidence.
+
+**Leftovers, in order:**
+1. Preserve all LOC POS entries per exact form in the evaluation input. Keep
+   contextual labels, form projection and game-normalized keys separate.
+2. Audit the other138 pilot forms before reusing their labels under this rubric;
+   request only ratings needed to close real coverage gaps.
+3. Prepare a fresh held-out batch and independent second rater, hiding AI and
+   prior scores; freeze split and criteria before model/threshold tuning.
+4. When RAM permits, run D1 sequentially on the same target as frequency and the
+   current classifier. Compare word-only versus curated lexical evidence. Decide
+   replacement/hybrid/calibration from held-out results. No model loaded today.
+
+[Full updated comparison](../../build/d1/pilot-2026-10-17/data/evaluations/2026-10-20-fabian-consolidated/comparison-report.md)
+· [12 exact-form scores](../../build/d1/pilot-2026-10-17/data/evaluations/2026-10-20-fabian-consolidated/form-projection.csv).
+
+## Remaining138 exact-form audit delivered — 2026-10-20 (current recommendation)
+
+Audited the other138 forms:34 already at1,21 with no distinct missing family
+identified,83 with172 additional candidate contexts. All104 forms above1 have
+saved dictionary evidence; all138 retain exact LOC matches and initial metadata.
+Initial labels remain opaque form/POS ratings, never retroactively assigned to
+specific senses. This closes the source-review task within consulted families,
+not absolute lexicographic coverage or contextual labeling of the entire pilot.
+
+One round: http://127.0.0.1:8765/review-remaining/. Cards show exact sense/POS,
+example, source and optional assistant estimate. No estimate-based exclusions.
+A human1 makes other unrated contexts for the exact same form optional, without
+inventing ratings; revising the final1 reopens them. Existing answers preserved.
+Exports retain all172 contexts, actual decisions, events, eligibility and witness
+IDs. TDD and browser checks cover this behavior plus persistence/state isolation.
+
+**Next:** complete this round; import CSV/JSON with the new optional-context
+semantics. Recompute eligibility from human answers rather than trusting exported
+flags. Validate composite IDs and score-time AI exposure; inspect unresolved
+answers/notes. Keep original opaque ratings separately from contextual minima and
+winning-context provenance. Then update the150-form comparison under explicitly
+stated coverage/rubric limits. No new model-performance accuracy from mixed targets.
+
+**Leftovers:** independent second-rater/new held-out batch; exact-form/all-POS
+input contract; frequency/context baselines; RAM-permitted sequential D1 trial.
+No additional annotation round recommended now; use the notes field for omissions.
+
+[Audit report](../../build/d1/pilot-2026-10-17/review-remaining/audit-report.md)
+· [138-form ledger](../../build/d1/pilot-2026-10-17/review-remaining/audit.csv).
+
+## Annotation burden reduced — 2026-10-21 (supersedes172-round requirement)
+
+User rejected the need to rate172 contexts and authorized one card per form,
+probable-impact cases only. Delivered review-short:25 forms/32 relevant contexts,
+selected when assistant context estimate is below original human form rating.
+This is triage, not exhaustive coverage. One selected familiar sense plus one
+explicit form score; estimates optional. Full audit remains reference material.
+
+Old context answers/events/notes remain untouched; new form decisions use a
+separate schema/version. Old raw snapshots retained and reread on reload/export.
+Context1 closes a form even if that context is excluded from the shortlist;
+no synthetic ratings. Existing complete shortlisted contexts also resolve a card.
+A new score above an old context score flags a conflict and stays uncompleted.
+
+**Next:** finish only the short round; import form decisions separately from
+context labels, recompute derived statuses, inspect conflicts/notes, update the
+comparison with provisional coverage. Do not require172 ratings. Earlier
+independent-label/held-out and sequential-D1/RAM constraints remain.
+
+[Short round](../../build/d1/pilot-2026-10-17/review-short/README.md)
+· http://127.0.0.1:8765/review-short/.
+
+## Short25 review imported — 2026-10-21 (current recommendation)
+
+25 explicit form ratings imported;0 unresolved.19 decrease from the initial
+ratings,6 unchanged.14 forms now at1 (numeric minimum closed);11 remain provisional
+against unreviewed senses. The ai/other note explicitly describes second-person
+a avea: retained raw, analytically mapped to79068:have; no user clarification
+needed and no new per-sense labels manufactured.
+
+New assistant estimates:16/25 exact (64%), MAE0.36; all differences one level.
+First choices15/25 (60%), MAE0.40.22 first ratings preceded their own AI panel;
+21 final ratings preceded it.19 panels opened,3 revisions: circulat1→2 before
+reveal; in2→3 after reveal (away from estimate); înșelat2→1 after (toward estimate).
+This remains selected, definition-assisted single-rater development data; not D1
+performance or independent validation. Original AI numeric agreement7/25 has a
+different semantic target and must not be used to claim model degradation.
+
+**Annotation phase closed for this pilot.** Do not request the remaining172
+contexts. Preserve25 form labels separately from46 prior context labels/12 minima.
+Working-reference150 has37 entries under the clarified target and113 original
+opaque form/POS labels, with per-row provenance/coverage;24 numeric changes versus
+the initial150. No mixed-rubric global accuracy.
+
+**Recommended next implementation:** freeze the reference and align model/evidence
+input to exact Scrabble surface across valid POS; verify that contract offline on
+the37 development cases. Then compute comparable exact-form frequency baselines
+(wordfreq and rebus definitions), preserving missingness and avoiding lemma or
+diacritic substitution. Prepare a separate held-out batch and independent labels
+before calibration. D1 trials remain sequential and conditional on RAM; no model
+was loaded in this iteration. Replacement decision still awaits empirical results.
+
+[Imported comparison](../../build/d1/pilot-2026-10-17/data/evaluations/2026-10-21-fabian-short/comparison-report.md)
+· [25 form labels](../../build/d1/pilot-2026-10-17/data/evaluations/2026-10-21-fabian-short/form-labels.csv)
+· [Working reference150](../../build/d1/pilot-2026-10-17/data/evaluations/2026-10-21-fabian-short/working-reference-150.csv).
+
+## Exact-form contract and frequency comparison — 2026-10-21 (current recommendation)
+
+Implemented with TDD on PR81 sources: exact surface + every matching LOC entry +
+curated all-POS contexts; inventory POS is historical, nonrestricting metadata.
+Frozen150 forms /218 lexical contexts, with no human/AI scores in model inputs.
+D1 request contract updated and verified with simulated HTTP only; no model loaded.
+Offline CSV commands and manifests preserve source/implementation hashes, missingness
+and source-bounded coverage. No lemma/inflection/diacritic substitution.
+
+Compared the37 clarified development labels; excluded113 opaque initial labels.
+Both wordfreq3.1.1 and rebus cover29/37; union32, intersection26. On the same26,
+Spearman with familiarity is0.451 for wordfreq and0.536 for rebus. No fitted
+thresholds or classification-accuracy claim. Rebus contributes țanc/antereu/izotop;
+wordfreq contributes carter/pinot/ata. Five forms remain unobserved in both.
+Rebus has zero observations among the4 forms rated5; coverage-conditioned metrics
+must not be interpreted as evidence of rare-word classification quality.
+
+Rebus extraction:12,728 local cache files;60 target/collision pages excluded,
+147 non-ok;114,689 unique definition bodies /1,280,002 tokens,59,809 duplicate bodies
+removed. Wordfreq export reused with its original digest. Initial/form/context labels
+remain unchanged. Results: [frequency comparison](../research/2026-10-21-exact-form-frequency-results.md).
+
+**Next:** preserve both sources as separate signals; prepare independent, family-separated
+held-out labels before fitting thresholds/hybrids. Keep this pilot development-only;
+no further172-context round. Then evaluate same-target frequency ablations and,
+when RAM permits, sequential D1 without/with evidence. No replacement/upload decision yet.
+
+**Leftovers:** independent second-rater agreement; locked calibration/test split;
+held-out threshold and rare-error comparison; D1 runtime/quality trial; source-bounded
+lexical coverage remains a stated limitation, not another mandatory annotation round.
+Implementation checkout: `build/d1/exact-form-code/`, based on open PR81 f990e6c;
+main checkout left intact because it lacks PR81 and contains unrelated local changes.
+Final experiment artifacts: `build/d1/exact-form-evaluation-2026-10-21-v2/`.

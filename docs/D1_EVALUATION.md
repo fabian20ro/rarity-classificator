@@ -21,7 +21,7 @@ python -m classificator evaluation-prepare \
 
 Omit either optional evidence flag when unavailable. Existing output directories are refused. Generated files: vocabulary.csv, evidence.csv, labels.csv, manifest.json. Splits approximate 25% development, 25% calibration, 50% test by deterministic group hashing; small pilots need manual inspection of split counts. Families and ASCII game-key collisions stay together.
 
-`wordfreq` missingness is censored coverage, not proof of extreme rarity. DEX exact-original matches only; ambiguous/missing definitions remain marked. Full HTML pages contribute definition spans, not navigation text. Dictionary token-frequency estimation is deferred.
+`wordfreq` missingness is censored coverage, not proof of extreme rarity. DEX exact-original matches only; ambiguous/missing definitions remain marked. Full HTML pages contribute definition spans, not navigation text. Dictionary token-frequency estimation is available through `evaluation-rebus`; see the exact-form section below.
 
 Have Romanian speakers label familiarity 1..5 without model predictions or definitions. Keep independent rater records; write adjudicated values into a COPY of labels.csv. Do not overwrite the frozen dataset or use test labels for tuning. All rows supplied to the report require valid labels; for a partially annotated inventory, supply matching curated label and prediction subsets. Initial tooling does not perform annotation adjudication or statistical sampling automatically.
 
@@ -81,4 +81,64 @@ Reports include coverage/status counts, confusion with a missing column, ordinal
 
 `python scripts/check.py` runs Ruff and the complete offline suite. New tests use unittest interfaces, real temporary CSV/checkpoint files and simulated external HTTP/corpus data. No live D1 quality claim follows from those tests.
 
-Next: confirm inventory and familiarity rubric, obtain 150 blind human labels, manually load D1 when RAM permits, then run word-only and evidence-assisted pilot plus frequency/current-classifier baselines. Review rare-to-common errors before expanding to the locked benchmark or fitting a hybrid. Keep mandatory Jaccard/anchor gates and partial upload default.
+The original pilot annotation phase is complete. Next: independent held-out labels under the clarified exact-form rubric; D1 only when RAM permits. See the current recommendation below. Review rare-to-common errors before expanding to the locked benchmark or fitting a hybrid. Keep mandatory Jaccard/anchor gates and partial upload default.
+
+
+## Exact-form/all-POS evaluation (2026-10-21)
+
+The target is the exact Scrabble surface through its most familiar valid sense
+across all valid parts of speech. Inventory `type` remains historical metadata,
+not a restriction. `forms.csv` retains every exact LOC entry and explicitly
+curated sense/POS evidence; coverage is source-bounded, not exhaustive. Human
+scores and assistant estimates are rejected as lexical input columns.
+
+```sh
+python -m classificator evaluation-exact-forms \
+  --vocabulary-csv pilot.csv --loc-file /path/to/LOC/words.txt \
+  --contexts-csv curated-contexts.csv --campaign-dir build/d1/forms
+
+python -m classificator evaluation-rebus \
+  --vocabulary-csv pilot.csv --dex-cache /path/to/rebus/.cache/dex_definitions \
+  --campaign-dir build/d1/rebus
+
+python -m classificator evaluation-form-report \
+  --reference-csv working-reference-150.csv \
+  --form-contract-csv build/d1/forms/forms.csv \
+  --wordfreq-csv frequencies.csv --rebus-csv build/d1/rebus/frequencies.csv \
+  --campaign-dir build/d1/form-comparison
+```
+
+Contexts CSV schema: `word_id,word,context_id,pos,meaning,example,source`; all fields
+required. Exact surface and ID must match the inventory. An empty context list is
+allowed when only LOC evidence is available. This does not certify that all valid
+uses have been enumerated. Frequency scoring pools exact-form uses across POS.
+
+The comparison consumes versioned Romanian `wordfreq` export metadata and the
+rebus export manifest/ledger. It selects only `audited_context_minimum` and
+`shortlist_form_review` reference rows; `initial_opaque_form_pos` is excluded.
+Reports are development-only Spearman/rank/coverage comparisons, without fitted
+class thresholds. Missing values remain abstentions; undefined correlation is null.
+
+Rebus extraction is local and sequential, excludes every target/collision page,
+removes normalized exact duplicate definition bodies, and counts exact tokens
+without lemma or diacritic substitution. The corpus includes lexicographic
+conventions and is not a general-language familiarity sample. Source file hashes,
+extractor hashes and policy are recorded. Existing outputs are refused.
+
+For the future D1 campaign, add `--form-contract-csv build/d1/forms/forms.csv` to
+`evaluation-run`. The contract is validated before HTTP and pinned in the campaign.
+Without this optional evidence file, the rubric still covers all valid POS and
+explicitly treats inventory type as nonrestricting. Existing campaign manifests
+cannot resume under the changed instructions/implementation. Use a new campaign.
+No live inference is part of preparation or comparison.
+
+See [pilot results](research/2026-10-21-exact-form-frequency-results.md) and the
+latest section of [the plan](plans/2026-10-15-d1-classifier-evaluation.md). The pilot
+annotation phase is closed; next is an independent held-out evaluation before
+calibration. `scripts/run_exact_form_pilot.py` reproduces this local experiment:
+
+```sh
+python scripts/run_exact_form_pilot.py --pilot /path/to/pilot-2026-10-17 \
+  --loc-file /path/to/LOC/words.txt --dex-cache /path/to/rebus/.cache/dex_definitions \
+  --output /path/to/new-experiment-directory
+```

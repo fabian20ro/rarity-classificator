@@ -123,3 +123,10 @@ reject a counterexample that ignores a failed audit.
 
 <!-- Lessons that are no longer applicable. Keep for historical context. -->
 <!-- Format: **[YYYY-MM-DD] Archived [YYYY-MM-DD]** Title — Reason for archival -->
+
+**[2026-10-21]** Corpus identity is part of evaluation validation — a matching CSV
+hash alone does not establish Romanian wordfreq or the intended rebus corpus.
+Validate language/package/versioned policy and source-ledger hashes; pin extractor
+code. Exclude pilot/collision pages from dictionary token counts to reduce self-entry
+contamination. Dictionary coverage is not familiarity: this pilot's rebus corpus
+observed29/37 forms but none of the4 rated5; report paired coverage and missingness.
