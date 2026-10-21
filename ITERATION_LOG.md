@@ -540,3 +540,13 @@ cohesion/low coupling, explicit dependencies, composition and reproducibility.
   held-out labels before thresholds/hybrid; no renewed172-context request. D1 later,
   sequentially, conditional on RAM. Implementation retained as a separate Git branch;
   primary checkout code left intact. No remote push or production upload.
+
+
+## 2026-10-21 — Publish exact-form frequency evaluation
+
+- User requested push and PR for `codex/exact-form-frequency-evaluation`.
+- Confirmed clean implementation checkout at085e71d and open PR81 headf990e6c.
+- PR base: `codex/d1-evaluation-adapter`; dependency explicit, avoiding duplicate
+  adapter changes in the review. Includes implementation, comparison results and
+  updated plan. Prior validation:792 tests /108 subtests and Ruff passed; no code
+  changed since validation. D1 remains unloaded.
