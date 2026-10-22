@@ -570,3 +570,16 @@ Plan now reuses150 existing latest labels, separates37 clarified from113 opaque
 initial targets, and recommends fold-local calibration for internal comparison.
 No new annotations requested, no AI estimates promoted to gold, no D1 load.
 Documentation-only correction; no code/tests changed.
+
+## 2026-10-23 — Frequency cross-validation on existing annotations
+
+Implemented public CSV orchestration with existing frozen calibrator:37 LOO folds,
+113 separate historical diagnostics, no mixed-rubric total accuracy. TDD red missing
+module→green; added source-conditioned median red→green. Mutating held-out truth
+does not alter its own prediction/baselines; opaque truth changes cannot affect CV.
+Verified150 identities,37 train-ID exclusions, all hashes and metric arithmetic.
+Matched26 MAE0.538/0.500; surprise: source-conditioned constant1 baseline also0.500.
+Own source coverage29/37; rare coverage3/8 vs2/8. Explicitly report this selection
+limitation; no frequency-only replacement. Added baseline diagnostic after initial
+run without changing frequency predictions; retainedv1, finalv2. Updated report/plan.
+Ruff +796 tests/112 subtests pass. No model calls/loading, no new annotation asked.

@@ -524,3 +524,28 @@ training-fit artifact, not a test result. Do not tune against the omitted label.
 No additional user annotation is a prerequisite. New human ground truth and
 second-rater agreement are deferred, optional future work. D1 remains unloaded;
 any future inference must be sequential and separately authorized.
+
+## Cross-validation completed — 2026-10-23 (current recommendation)
+
+37 clarified leave-one-form-out folds; each held-out label removed before fitting.
+All150 retained in CSV;113 opaque initial labels evaluated only as a separate
+historical diagnostic with the full37 model, never included in calibration.
+Frozen features/corpus and threshold policy unchanged. No D1/LM calls.
+
+Matched26: MAE wordfreq0.538, rebus0.500; source-matched training-median baseline
+0.500. Only1 total absolute-error point separates sources; severe errors2 vs4.
+Own coverage29/37 each; own MAE0.759 vs0.517 (different subsets). Rare4/5 coverage
+3/8 vs2/8; all3 observed wordfreq rare forms severely underestimated. Rebus observes
+none of4 human5 forms, so its L5 convention remains unsupported. No replacement
+decision justified. Historical matched64: MAE0.625 vs0.563, not a CV score.
+
+**Next:** keep both frequency sources as separate optional evidence with explicit
+abstention. Preserve this baseline; no new threshold/hybrid tuning to improve it.
+When RAM and explicit loading authorization permit, compare sequential D1 without
+and with evidence on the same existing labels, separating37/113. No new human
+annotation required. **Leftovers:** D1 runtime and quality comparison; rare-word
+coverage; optional independent-rater/generalization evidence. Production unchanged.
+
+[Results, errors and limitations](../research/2026-10-23-frequency-cross-validation.md).
+Artifacts: `build/d1/cross-validation-2026-10-23-v2/`.
+Verified796 tests +112 subtests, input/output hashes and all37 exclusion folds.

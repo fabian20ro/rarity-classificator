@@ -141,3 +141,10 @@ excluding both development and held-out target pages before fitting thresholds.
 annotation workload — the user explicitly declined after150 pilot forms. Reuse
 existing labels with rubric/provenance strata and internal validation; keep new
 unlabelled forms optional. Never invent independent gold from assistant estimates.
+
+**[2026-10-23]** Coverage-conditioned baselines matter — missing frequencies are
+concentrated among rare forms. Compare each frequency method with a median fitted
+on the same observed training labels, excluding the held-out label, alongside a
+global median. Validated here: rebus matched26 CV MAE0.500 equals the source-matched
+constant1 baseline, despite beating the global-median0.808. Always report per-level
+coverage and rare-word abstentions; pooled MAE alone can hide this selection effect.
