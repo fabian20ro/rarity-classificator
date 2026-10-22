@@ -1,0 +1,14 @@
+<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lot independent · evaluare</title><link rel="stylesheet" href="style.css"></head><body><main>
+<header><div><p class="eyebrow">EVALUARE · FORMA EXACTĂ</p><h1>Lot independent</h1><p>O fișă, un singur scor. Estimările nu sunt disponibile în această rundă.</p></div><span id="progress-text" aria-live="polite"></span></header>
+<progress id="progress" max="40" value="0" aria-label="Forme evaluate"></progress>
+<details class="instructions"><summary>Regula de evaluare</summary><p>Notează familiaritatea <strong>formei scrise exact, prin cel mai familiar sens valid</strong>, indiferent de partea de vorbire. Nu înlocui forma cu lema sau cu o grafie apropiată.</p><p>Definițiile explică sensul; faptul că îl înțelegi acum nu înseamnă că termenul îți era deja familiar. Alege cât de cunoscută era această formă pentru tine înainte de explicație.</p><p>1 — foarte comun; 2 — comun; 3 — mai puțin comun; 4 — rar; 5 — foarte obscur. Dacă lipsește sensul pe care îl cunoști, alege „Alt sens” și descrie-l. Nu trebuie să notezi separat fiecare sens.</p></details>
+<label for="jump">Mergi la o formă</label><select id="jump"></select>
+<article><div class="row"><span id="position"></span><span id="current-status"></span></div><h2 id="word"></h2><div id="contexts"></div>
+<label for="familiar">Sensul cel mai familiar pentru tine</label><select id="familiar"></select>
+<label for="notes">Observații (opțional; obligatoriu pentru „Alt sens”)</label><textarea id="notes" rows="2" placeholder="Un sens lipsă, o neclaritate…"></textarea>
+<p class="score-label">Cât de familiară îți era forma?</p><div class="scale">
+<button data-level="1" aria-pressed="false"><strong>1</strong><span>Foarte comun</span></button><button data-level="2" aria-pressed="false"><strong>2</strong><span>Comun</span></button><button data-level="3" aria-pressed="false"><strong>3</strong><span>Mai puțin comun</span></button><button data-level="4" aria-pressed="false"><strong>4</strong><span>Rar</span></button><button data-level="5" aria-pressed="false"><strong>5</strong><span>Foarte obscur</span></button></div>
+<p id="alert" role="status"></p><button id="unsure" class="quiet">Nu pot decide</button>
+<nav><button id="previous">← Înapoi</button><button id="next-unrated">Următoarea necompletată</button><button id="next">Înainte →</button></nav></article>
+<section class="exports"><button id="export-csv">Exportă CSV</button><button id="export-json">Salvează JSON complet</button></section><p id="save-status" role="status"></p><p class="footnote">Progresul se păstrează în acest browser. Poți reveni oricând. La final, salvează CSV și JSON; „Nu pot decide” rămâne fără scor.</p>
+<script id="case-data" type="application/json">__DATA__</script><script src="app.js"></script></main></body></html>

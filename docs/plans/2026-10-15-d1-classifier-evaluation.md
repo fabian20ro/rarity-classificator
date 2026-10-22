@@ -476,3 +476,27 @@ lexical coverage remains a stated limitation, not another mandatory annotation r
 Implementation checkout: `build/d1/exact-form-code/`, based on open PR81 f990e6c;
 main checkout left intact because it lacks PR81 and contains unrelated local changes.
 Final experiment artifacts: `build/d1/exact-form-evaluation-2026-10-21-v2/`.
+
+## Independent40 prepared — 2026-10-23 (current recommendation)
+
+40 unseen inventory forms,10 per wordfreq band;70 lexical contexts on40 cards.
+Pilot150/collision IDs excluded; conservative family review recorded. Cache-covered
+diagnostic sample, same rater, definition-assisted and estimate-blind. New namespace
+preserves earlier answers; no predictions/frequencies/strata sent to the UI.
+
+User-authorized calibration now fixed on37 clarified pilot labels only, before
+new labels. Shared rebus corpus excludes190 targets;100 pages removed.29 observed
+fit cases per source. Training MAE wordfreq0.4828/rebus0.3448 is **not** validation.
+Rebus L4/L5 boundary remains an explicitly unvalidated convention (no observed
+pilot5). Predictions and assistant estimates sealed outside the web root.
+
+**Next:** finish this single40-card round, export/import JSON+CSV, compare matched
+MAE, coverage, agreement and severe rare-word errors under frozen thresholds.
+No tuning on the new labels; no mandatory further sense-audit round.
+**Leftovers:** actual held-out comparison; second-rater agreement; D1 feasibility
+and sequential quality trials when RAM permits; source-bounded lexical coverage.
+No D1 loaded, no production classifier/upload changes.
+
+[Protocol, thresholds and artifacts](../research/2026-10-23-independent-form-round.md).
+UI: http://127.0.0.1:8765/review-independent/.
+Implementation branch: `codex/independent-form-benchmark`, based on PR82.

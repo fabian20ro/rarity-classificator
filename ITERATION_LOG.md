@@ -550,3 +550,14 @@ cohesion/low coupling, explicit dependencies, composition and reproducibility.
   adapter changes in the review. Includes implementation, comparison results and
   updated plan. Prior validation:792 tests /108 subtests and Ruff passed; no code
   changed since validation. D1 remains unloaded.
+
+## 2026-10-23 — Independent40 blind round and frozen calibration
+
+Prepared40 unseen forms/70 contexts, deterministic frequency strata, collision and
+conservative family exclusions. Rebuilt rebus corpus excluding union190, fit only
+37 clarified pilot labels; froze190 predictions before annotation. Rebus has no
+observed pilot5: final boundary explicitly conventional. True blind public payload
+and separate storage namespace; old answers intact. TDD public APIs/UI, then
+format/review; note-clearing regression first failed and then passed. Ruff and795
+tests/112 subtests passed; browser QA rating/context/notes survive reload. D1 not
+loaded/contacted. Updated protocol/plan; held-out comparison awaits user's round.

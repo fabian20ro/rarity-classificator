@@ -130,3 +130,9 @@ Validate language/package/versioned policy and source-ledger hashes; pin extract
 code. Exclude pilot/collision pages from dictionary token counts to reduce self-entry
 contamination. Dictionary coverage is not familiarity: this pilot's rebus corpus
 observed29/37 forms but none of the4 rated5; report paired coverage and missingness.
+
+**[2026-10-23]** Blind review means removing predictions from the public payload —
+CSS-hidden panels still expose estimates. Publish only lexical fields, use a new
+pack-bound storage namespace, preserve old labels/events, and freeze predictions
+outside the web root before annotation. Rebuild shared dictionary frequencies
+excluding both development and held-out target pages before fitting thresholds.
