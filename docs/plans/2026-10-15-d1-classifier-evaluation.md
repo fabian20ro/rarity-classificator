@@ -477,7 +477,7 @@ Implementation checkout: `build/d1/exact-form-code/`, based on open PR81 f990e6c
 main checkout left intact because it lacks PR81 and contains unrelated local changes.
 Final experiment artifacts: `build/d1/exact-form-evaluation-2026-10-21-v2/`.
 
-## Independent40 prepared — 2026-10-23 (current recommendation)
+## Independent40 prepared — 2026-10-23 (superseded below)
 
 40 unseen inventory forms,10 per wordfreq band;70 lexical contexts on40 cards.
 Pilot150/collision IDs excluded; conservative family review recorded. Cache-covered
@@ -500,3 +500,27 @@ No D1 loaded, no production classifier/upload changes.
 [Protocol, thresholds and artifacts](../research/2026-10-23-independent-form-round.md).
 UI: http://127.0.0.1:8765/review-independent/.
 Implementation branch: `codex/independent-form-benchmark`, based on PR82.
+
+## 2026-10-23 — Revised scope: reuse existing annotations, no new user round
+
+User declined any additional annotation:150 forms already evaluated, with later
+clarifications preserved. The40-card round is withdrawn from the required workflow;
+its artifacts remain unused/unlabelled, not a benchmark with human ground truth.
+Do not ask the user to complete it or replace human labels with assistant estimates.
+
+Next comparison uses existing answers only. Keep a150-row view with the latest
+available human score and explicit provenance. Primary exact-form metrics use37
+clarified forms; report the113 initial opaque form/POS labels separately as a
+historical diagnostic, without claiming a single homogeneous150-form benchmark.
+No annotations discarded or silently reinterpreted as sense labels.
+
+For a less optimistic internal estimate on37, use leave-one-out calibration:
+fit thresholds on the other36 clarified forms, predict the omitted form, and
+compare sources on the same covered cases. Keep missingness/rare-error counts
+explicit. This is internal cross-validation of selected development data, not
+independent validation. Existing all37 fitted thresholds remain a reproducible
+training-fit artifact, not a test result. Do not tune against the omitted label.
+
+No additional user annotation is a prerequisite. New human ground truth and
+second-rater agreement are deferred, optional future work. D1 remains unloaded;
+any future inference must be sequential and separately authorized.

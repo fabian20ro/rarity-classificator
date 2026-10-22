@@ -1,5 +1,9 @@
 # Independent exact-form round — frozen 2026-10-23
 
+> Superseded by user direction on2026-10-23: no additional annotation round.
+> This pack remains unlabelled; reuse the existing150 evaluations with provenance.
+> See the revised plan. The frozen protocol below records preparation, not an active user task.
+
 40 new Scrabble inventory forms; one card and one form score each;70 relevant
 lexical contexts. The label is familiarity of the **exact spelling through its
 most familiar valid meaning**, across valid parts of speech. Definitions assist

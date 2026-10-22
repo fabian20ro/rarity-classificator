@@ -561,3 +561,12 @@ and separate storage namespace; old answers intact. TDD public APIs/UI, then
 format/review; note-clearing regression first failed and then passed. Ruff and795
 tests/112 subtests passed; browser QA rating/context/notes survive reload. D1 not
 loaded/contacted. Updated protocol/plan; held-out comparison awaits user's round.
+
+## 2026-10-23 — Withdraw additional annotation workload
+
+User clarified they will not evaluate another batch after the150-word pilot.
+Withdrawn40-card round from required work; retained all artifacts/answers unchanged.
+Plan now reuses150 existing latest labels, separates37 clarified from113 opaque
+initial targets, and recommends fold-local calibration for internal comparison.
+No new annotations requested, no AI estimates promoted to gold, no D1 load.
+Documentation-only correction; no code/tests changed.

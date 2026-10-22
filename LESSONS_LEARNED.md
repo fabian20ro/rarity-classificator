@@ -136,3 +136,8 @@ CSS-hidden panels still expose estimates. Publish only lexical fields, use a new
 pack-bound storage namespace, preserve old labels/events, and freeze predictions
 outside the web root before annotation. Rebuild shared dictionary frequencies
 excluding both development and held-out target pages before fitting thresholds.
+
+**[2026-10-23]** Preparing an independent batch does not authorize more user
+annotation workload — the user explicitly declined after150 pilot forms. Reuse
+existing labels with rubric/provenance strata and internal validation; keep new
+unlabelled forms optional. Never invent independent gold from assistant estimates.
