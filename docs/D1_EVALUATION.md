@@ -81,7 +81,11 @@ Reports include coverage/status counts, confusion with a missing column, ordinal
 
 `python scripts/check.py` runs Ruff and the complete offline suite. New tests use unittest interfaces, real temporary CSV/checkpoint files and simulated external HTTP/corpus data. No live D1 quality claim follows from those tests.
 
-The original pilot annotation phase is complete. Next: independent held-out labels under the clarified exact-form rubric; D1 only when RAM permits. See the current recommendation below. Review rare-to-common errors before expanding to the locked benchmark or fitting a hybrid. Keep mandatory Jaccard/anchor gates and partial upload default.
+The pilot annotation phase is complete; no new user annotation is required. The
+full150 baseline suite and independent-first-response149 sensitivity are available
+in [the current results](research/2026-10-23-full-pilot-baselines.md). Keep the latest
+plan as the current recommendation. D1 remains unloaded unless explicitly authorized
+with sufficient RAM. Mandatory semantic upload gates and partial default remain.
 
 
 ## Exact-form/all-POS evaluation (2026-10-21)
@@ -134,11 +138,19 @@ No live inference is part of preparation or comparison.
 
 See [pilot results](research/2026-10-21-exact-form-frequency-results.md) and the
 latest section of [the plan](plans/2026-10-15-d1-classifier-evaluation.md). The pilot
-annotation phase is closed; next is an independent held-out evaluation before
-calibration. `scripts/run_exact_form_pilot.py` reproduces this local experiment:
+annotation phase is closed; the latest plan reuses existing150 labels and149
+first-independent responses for explicitly internal validation. `scripts/run_exact_form_pilot.py` reproduces this local experiment:
 
 ```sh
 python scripts/run_exact_form_pilot.py --pilot /path/to/pilot-2026-10-17 \
   --loc-file /path/to/LOC/words.txt --dex-cache /path/to/rebus/.cache/dex_definitions \
   --output /path/to/new-experiment-directory
 ```
+
+## Full-pilot offline baselines (2026-10-23)
+
+Install optional `evaluation` dependencies for Ridge: `pip install -e '.[evaluation]'`.
+`evaluation.full_pilot_baselines.evaluate_full_pilot` compares saved legacy/AI,
+constants, frequency thresholds and a fixed Ridge model using fold-only preprocessing.
+Three distinct views: original-round-final150, revised-working150, independent-first149.
+No model-server calls. [Results and reproduction](research/2026-10-23-full-pilot-baselines.md).

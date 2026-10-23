@@ -549,3 +549,31 @@ coverage; optional independent-rater/generalization evidence. Production unchang
 [Results, errors and limitations](../research/2026-10-23-frequency-cross-validation.md).
 Artifacts: `build/d1/cross-validation-2026-10-23-v2/`.
 Verified796 tests +112 subtests, input/output hashes and all37 exclusion folds.
+
+## Full150 baseline suite completed — 2026-10-23 (current recommendation)
+
+All150 evaluated in two separate label views: original-round-final and latest
+working labels; latest is explicitly mixed37 clarified/113 original. Added149
+immutable first-independent labels as a third learned-model validation, not just
+saved-AI scoring.449 LOO folds;149/148 train labels; fold-only imputation/scaling.
+Fixed historical legacy/AI, median/majority, individual frequency thresholds,
+source-matched medians, and fixed-alpha1 Ridge with logs+missing flags. No D1.
+
+Latest150 full-coverage MAE: legacy1.740, AI0.473, Ridge0.533, median1.227.
+First-independent149: legacy1.685, AI0.557, Ridge0.671, median1.188.
+Latest matched90: wordfreq0.400, Ridge0.444, AI0.544, rebus0.567. Individual
+frequency coverage101/150 and110/150; never rank their own-subset MAE against
+full150 without matching IDs. Latest rare43: Ridge4 severe underestimates,
+wordfreq5/5 observed rare, rebus6/15 observed rare. Missingness is learned,
+not proof of rarity:25/29 fully missing forms are rare in this selected pilot.
+
+**Next:** retain Ridge as the local experimental baseline, AI as a historical
+reference, wordfreq as a separate source. Before any production decision, check
+family-group robustness and a missingness-only control on existing labels.
+No parameter search to improve this report; no new human annotation required.
+**Leftovers:** those robustness checks, generalization beyond this selected pilot,
+optional future sequential D1 when explicitly authorized and RAM permits.
+
+[Full results and provenance](../research/2026-10-23-full-pilot-baselines.md).
+Artifacts: `build/d1/full-pilot-baselines-2026-10-23-v2/`.
+Ruff +797 tests/112 subtests pass; all449 fold exclusions/scalers audited.

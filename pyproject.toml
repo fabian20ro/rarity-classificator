@@ -15,6 +15,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest", "black", "ruff>=0.12.0"]
+evaluation = ["scikit-learn>=1.5,<2"]
 
 [tool.ruff]
 target-version = "py311"

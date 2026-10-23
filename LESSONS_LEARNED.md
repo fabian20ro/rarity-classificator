@@ -148,3 +148,9 @@ on the same observed training labels, excluding the held-out label, alongside a
 global median. Validated here: rebus matched26 CV MAE0.500 equals the source-matched
 constant1 baseline, despite beating the global-median0.808. Always report per-level
 coverage and rare-word abstentions; pooled MAE alone can hide this selection effect.
+
+**[2026-10-23]** initial_level is not necessarily a blind first response — in this
+pilot it equals the first round's FINAL labels150, including post-AI revisions.
+Use immutable labels-first-independent149 for exposure sensitivity and refit
+learned baselines on those labels when comparing to saved AI. Keep latest mixed
+150, original-final150, and first-independent149 as distinct named experiments.

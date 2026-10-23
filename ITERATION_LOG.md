@@ -583,3 +583,29 @@ Own source coverage29/37; rare coverage3/8 vs2/8. Explicitly report this selecti
 limitation; no frequency-only replacement. Added baseline diagnostic after initial
 run without changing frequency predictions; retainedv1, finalv2. Updated report/plan.
 Ruff +796 tests/112 subtests pass. No model calls/loading, no new annotation asked.
+
+## 2026-10-23 — Baseline inventory and full150 scope clarification
+
+Confirmed150 latest human scores,150 frozen legacy DB scores,150 original assistant
+estimates and149 first-independent initial ratings.37 is the explicitly clarified
+subset, not the number of available evaluations. Proposed operational comparison
+on all150 with original/latest-label views and37/113 breakdown, explicitly retaining
+mixed-target limitation. Prioritize frozen legacy/assistant comparisons, then
+constant/frequency baselines and a small regularized combined-feature model using
+fold-local preprocessing/fitting. No new benchmark or model executed in this Q&A;
+no D1 loaded and no additional annotation required.
+
+## 2026-10-23 — Full150 historical and learned baseline suite
+
+User authorized all proposed baselines. Reused150 labels in two separate views;
+added149 first-independent learned CV because original initial_level is exposed
+round-final, not first response.449 folds, shared frozen source evidence; no D1.
+TDD CSV seam: initial red→green; independent-view red→green; holdout label mutation
+leaves its model unchanged. Optional sklearn extra and CI installation added.
+Latest150 Ridge MAE0.533 vs legacy1.740; independent149 Ridge0.671 vs AI0.557 and
+legacy1.685. Recommend Ridge experimental baseline, not production replacement.
+Missingness selection remains material (25/29 fully missing forms rare).
+Surprise verified: original-final median LOO has0 exact due75/75 boundary split.
+Preserved initial two views byte-identical when adding independent149; finalv2.
+Audit449 train exclusions, imputation/scaling, hashes, CSV arithmetic;797 tests
++112 subtests/Ruff pass. Reports, plan and stale annotation guidance updated.
