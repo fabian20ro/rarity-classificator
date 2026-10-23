@@ -154,3 +154,11 @@ pilot it equals the first round's FINAL labels150, including post-AI revisions.
 Use immutable labels-first-independent149 for exposure sensitivity and refit
 learned baselines on those labels when comparing to saved AI. Keep latest mixed
 150, original-final150, and first-independent149 as distinct named experiments.
+
+
+**[2026-10-24]** Full coverage is an operational requirement — user requires a
+score for every form. Exclude abstaining methods from the primary comparison;
+conditional MAE on101/150 cannot outrank a complete150-score method. Evaluate an
+explicit fold-trained fallback on all forms, keep raw coverage as diagnostics,
+and retain support/route provenance. Missing-group medians learn pilot composition,
+not lexical truth; compare large errors and clarified-label strata as well as MAE.

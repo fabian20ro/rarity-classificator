@@ -154,3 +154,13 @@ Install optional `evaluation` dependencies for Ridge: `pip install -e '.[evaluat
 constants, frequency thresholds and a fixed Ridge model using fold-only preprocessing.
 Three distinct views: original-round-final150, revised-working150, independent-first149.
 No model-server calls. [Results and reproduction](research/2026-10-23-full-pilot-baselines.md).
+
+
+### Mandatory100% coverage (2026-10-24)
+
+The full-pilot API now returns `views.<view>.operational` as the primary comparison.
+`wordfreq_complete` and `rebus_complete` use unchanged observed-frequency thresholds
+plus an explicit training-only missing-group median fallback (global training median
+if necessary). Raw source-only columns remain diagnostics. Every operational method
+must emit integer1–5 scores for the full view. Fold support, prediction route and route
+metrics are saved. [Updated results and recommendation](research/2026-10-24-complete-coverage-baselines.md).

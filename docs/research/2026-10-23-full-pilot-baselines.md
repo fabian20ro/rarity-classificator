@@ -1,5 +1,7 @@
 # Baseline-uri pe întregul pilot — 2026-10-23
 
+> Operational ranking superseded by the [2026-10-24 complete-coverage comparison](2026-10-24-complete-coverage-baselines.md). This report preserves the earlier abstaining diagnostics.
+
 **Toate cele 150 de evaluări au fost folosite.** Două experimente cu 150 de forme,
 plus unul cu cele 149 de prime răspunsuri independente. 449 de runde leave-one-out.
 Nicio încărcare D1, nicio cerere LLM, nicio evaluare nouă solicitată utilizatorului.

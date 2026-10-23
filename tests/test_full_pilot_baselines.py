@@ -106,3 +106,101 @@ class FullPilotBaselineTests(unittest.TestCase):
             self.assertEqual(before["majority_level"], 2)
             with self.assertRaises(FileExistsError):
                 evaluate_full_pilot(ref, features, legacy, assistant, first, root / "out")
+
+    def test_missing_source_gets_training_missing_group_median_and_full_coverage(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            ref, features, saved, first = self._coverage_inputs(root)
+            result = evaluate_full_pilot(ref, features, saved, saved, first, root / "out")
+            rows = {r["word_id"]: r for r in csv.DictReader(
+                (root / "out/revised_working/predictions.csv").open()
+            )}
+            # Missing-group labels for word1 are [4,5], lower median4; global median1.
+            self.assertEqual(rows["1"]["wordfreq_complete_level"], "4")
+            self.assertEqual(rows["1"]["wordfreq_complete_basis"], "missing_group_median")
+            self.assertEqual(rows["1"]["rebus_complete_level"], "4")
+            # Retain direct frequency predictions for every observed form.
+            self.assertEqual(rows["4"]["wordfreq_complete_level"], rows["4"]["wordfreq_level"])
+            self.assertEqual(rows["4"]["wordfreq_complete_basis"], "frequency_thresholds")
+            for view in result["views"].values():
+                primary = view["operational"]
+                for method in ("wordfreq_complete", "rebus_complete", "ridge"):
+                    self.assertEqual(primary[method]["covered"], 6)
+                    self.assertEqual(primary[method]["missing"], 0)
+                self.assertNotIn("wordfreq", primary)
+                self.assertNotIn("rebus", primary)
+            fold = json.loads((root / "out/revised_working/folds/1.json").read_text())
+            self.assertEqual(fold["wordfreq_fallback"]["train_ids"], [2, 3])
+            self.assertEqual(fold["wordfreq_fallback"]["level"], 4)
+
+    def _coverage_inputs(self, root):
+        labels = [2, 4, 5, 1, 1, 1]
+        ref = write_csv(root / "ref.csv", [
+            dict(word_id=i, word=str(i), initial_level=y, working_level=y,
+                 reference_kind="initial_opaque_form_pos")
+            for i, y in enumerate(labels, 1)
+        ])
+        features = write_csv(root / "features.csv", [
+            dict(word_id=i, word=str(i), wordfreq=f, rebus=f)
+            for i, f in enumerate(["", "", "", 0.1, 0.1, 0.1], 1)
+        ])
+        saved = write_csv(root / "saved.csv", [
+            dict(word_id=i, word=str(i), rarity_level=y)
+            for i, y in enumerate(labels, 1)
+        ])
+        first = write_csv(root / "first.csv", [
+            dict(word_id=i, word=str(i), level=y) for i, y in enumerate(labels, 1)
+        ])
+        return ref, features, saved, first
+
+    def test_fallback_reports_all_errors_and_excludes_held_out_labels_in_every_view(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            ref, features, saved, first = self._coverage_inputs(root)
+            before = evaluate_full_pilot(ref, features, saved, saved, first, root / "before")
+            breakdown = before["views"]["revised_working"]["completion_routes"]["wordfreq"]
+            # Missing forms have truth [2,4,5], predictions [4,2,2]: absolute errors2+2+3.
+            self.assertEqual(breakdown["missing_group_median"]["covered"], 3)
+            self.assertAlmostEqual(breakdown["missing_group_median"]["mae"], 7 / 3)
+            self.assertAlmostEqual(
+                before["views"]["revised_working"]["operational"]["wordfreq_complete"]["mae"],
+                7 / 6,
+            )
+            refs = list(csv.DictReader(ref.open()))
+            refs[0]["initial_level"] = refs[0]["working_level"] = "5"
+            write_csv(ref, refs)
+            independent = list(csv.DictReader(first.open()))
+            independent[0]["level"] = "5"
+            write_csv(first, independent)
+            evaluate_full_pilot(ref, features, saved, saved, first, root / "after")
+            for view in before["views"]:
+                self.assertEqual(
+                    json.loads((root / f"before/{view}/folds/1.json").read_text()),
+                    json.loads((root / f"after/{view}/folds/1.json").read_text()),
+                )
+
+    def test_global_fallback_covers_unseen_missingness_and_absent_threshold_model(self):
+        scenarios = [
+            ([0, 0.1, 0.1, 0.1, 0.1, 0.1], "global_median", [2, 3, 4, 5, 6]),
+            ([0.1, "", "", "", "", ""], "global_median", [2, 3, 4, 5, 6]),
+            ([0, "", 0, "", 0, ""], "missing_group_median", [2, 3, 4, 5, 6]),
+        ]
+        for values, basis, support in scenarios:
+            with self.subTest(values=values), TemporaryDirectory() as temp:
+                root = Path(temp)
+                ref, features, saved, first = self._coverage_inputs(root)
+                write_csv(features, [
+                    dict(word_id=i, word=str(i), wordfreq=f, rebus=f)
+                    for i, f in enumerate(values, 1)
+                ])
+                result = evaluate_full_pilot(ref, features, saved, saved, first, root / "out")
+                for view in result["views"]:
+                    rows = list(csv.DictReader((root / f"out/{view}/predictions.csv").open()))
+                    for source in ("wordfreq", "rebus"):
+                        self.assertEqual(rows[0][source + "_complete_level"], "1")
+                        self.assertEqual(rows[0][source + "_complete_basis"], basis)
+                        self.assertEqual(
+                            result["views"][view]["operational"][source + "_complete"]["covered"], 6
+                        )
+                        fold = json.loads((root / f"out/{view}/folds/1.json").read_text())
+                        self.assertEqual(fold[source + "_fallback"]["train_ids"], support)

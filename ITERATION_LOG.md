@@ -609,3 +609,30 @@ Surprise verified: original-final median LOO has0 exact due75/75 boundary split.
 Preserved initial two views byte-identical when adding independent149; finalv2.
 Audit449 train exclusions, imputation/scaling, hashes, CSV arithmetic;797 tests
 +112 subtests/Ruff pass. Reports, plan and stale annotation guidance updated.
+
+
+## 2026-10-24 — Mandatory100% coverage baseline comparison
+
+User correction: no unclassified forms in operational comparison. Extended the
+existing CSV evaluation seam with source-specific missing-training-group lower
+median fallback; empty subgroup or unavailable threshold model uses global training
+median. All calibration excludes held-out labels. Primary operational summary
+requires complete integer1–5 predictions; raw abstentions retained diagnostically.
+
+TDD red: missing completion columns; green. Next red: missing route summaries;
+green. Regressions cover missing-group vs global fallback, missing model, zero/blank,
+all-missing data, no held-out-label leakage in3 views, full-denominator MAE and
+preservation of source predictions. Ruff +800 tests/115 subtests pass.
+449 folds run offline. Independent script and planner audit verify support, medians,
+completeness, arithmetic, hashes and unchanged old prediction columns.
+
+Latest150 MAE: wordfreq+fallback0.520, Ridge0.533, rebus+fallback0.680; all150 scored.
+Fallback counts49/40, all learned4. First-independent149:0.624/0.671/0.805.
+Surprise flagged to user: wordfreq wins MAE by only2 aggregate error points while
+Ridge has fewer large errors and wins the clarified37 slice; no broad winner claim.
+Recommendation: simple complete wordfreq baseline, Ridge challenger; next robustness
+checks on missingness alone and lexical families using existing labels. No new user
+annotation, D1 loading/inference, production change, upload or push.
+Artifacts: build/d1/complete-coverage-baselines-2026-10-24/. Report and plan updated;
+prior output directories preserved. Changes maintained in exact-form-code clone;
+root's unrelated dirty work preserved.

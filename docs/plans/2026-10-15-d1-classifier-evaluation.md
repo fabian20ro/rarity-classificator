@@ -577,3 +577,29 @@ optional future sequential D1 when explicitly authorized and RAM permits.
 [Full results and provenance](../research/2026-10-23-full-pilot-baselines.md).
 Artifacts: `build/d1/full-pilot-baselines-2026-10-23-v2/`.
 Ruff +797 tests/112 subtests pass; all449 fold exclusions/scalers audited.
+
+
+## Mandatory complete coverage — 2026-10-24 (current recommendation)
+
+Supersedes source-only rankings and abstention as an operational option. A method
+must score every form; own-coverage MAE remains diagnostic. Implemented fold-local
+missing-source median fallback, with global training median for empty support or
+unavailable threshold model. All primary methods now cover150/150.
+
+Latest150: wordfreq+fallback MAE0.520 (86 exact,11 severe), Ridge0.533 (80 exact,
+9 severe), rebus+fallback0.680 (64 exact,16 severe), historical AI0.473, legacy1.740.
+Wordfreq49/rebus40 fallback predictions all learn4; no hard-coded rarity assumption.
+First-independent149: wordfreq0.624, Ridge0.671, rebus0.805. Latest clarified37:
+Ridge0.514 beats wordfreq0.568. Keep all views and provenance strata separate.
+
+**Recommendation:** wordfreq+fallback as the simple complete offline baseline;
+Ridge as challenger for severe-error and clarified-form performance. Wordfreq's
+latest MAE advantage is only2 total absolute-error points; no production promotion.
+**Next:** missingness-only control and family-grouped validation on existing labels.
+**Leftovers:** those robustness checks and generalization evidence; future sequential
+D1 only with explicit authorization and sufficient RAM. No new user ratings needed.
+
+[Complete comparison](../research/2026-10-24-complete-coverage-baselines.md).
+Artifacts: `build/d1/complete-coverage-baselines-2026-10-24/`.
+TDD + Ruff;800 tests/115 subtests pass.449 folds audited; previous predictions
+unchanged, complete scores and fallback support verified. No D1/LM requests.

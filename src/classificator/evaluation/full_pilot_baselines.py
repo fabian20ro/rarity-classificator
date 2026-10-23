@@ -23,6 +23,11 @@ METHODS = (
     "wordfreq_median",
     "rebus_median",
     "ridge",
+    "wordfreq_complete",
+    "rebus_complete",
+)
+OPERATIONAL_METHODS = (
+    "legacy", "assistant", "median", "majority", "wordfreq_complete", "rebus_complete", "ridge"
 )
 VIEWS = {"original_round_final": "initial_level", "revised_working": "working_level"}
 
@@ -87,7 +92,22 @@ def _summary(rows, methods=METHODS):
 
 def _view_summary(rows):
     all_present = [r for r in rows if all(r[s + "_level"] is not None for s in SOURCES)]
+    for row in rows:
+        for method in OPERATIONAL_METHODS:
+            level = row[method + "_level"]
+            if type(level) is not int or level not in range(1, 6):
+                raise ValueError(f"Incomplete operational method: {method}")
     return dict(
+        operational=_summary(rows, OPERATIONAL_METHODS),
+        completion_routes={
+            s: {
+                basis: _metrics(
+                    [r for r in rows if r[s + "_complete_basis"] == basis], s + "_complete"
+                )
+                for basis in ("frequency_thresholds", "missing_group_median", "global_median")
+            }
+            for s in SOURCES
+        },
         all=_summary(rows),
         clarified=_summary([r for r in rows if r["reference_kind"] in REFERENCE_KINDS]),
         opaque=_summary([r for r in rows if r["reference_kind"] == "initial_opaque_form_pos"]),
@@ -158,8 +178,8 @@ def evaluate_full_pilot(
     runtime = {p: version(p) for p in ("numpy", "scipy", "scikit-learn")}
     output_dir.mkdir(parents=True)
     policy = dict(
-        schema=1,
-        experiment="full-pilot-exploratory-loocv-v1",
+        schema=2,
+        experiment="full-pilot-complete-coverage-loocv-v2",
         views=dict(VIEWS, first_independent="immutable first independent level, subset only"),
         folds="leave-one-form-out;149 training labels for150 views,148 for first-independent149",
         threshold_policy="shared monotone MAE log-grid fitter; no hyperparameter search",
@@ -172,7 +192,13 @@ def evaluate_full_pilot(
             rounding="floor(raw+.5), then clip1..5; no confidence claims",
         ),
         constants="lower median; smallest majority class on ties",
-        missing="frequency methods abstain; Ridge infers from training missingness pattern",
+        missing="raw frequency methods remain abstaining diagnostics; complete variants use explicit fallback",
+        coverage_requirement="100% integer scores1..5 required for operational comparison",
+        frequency_fallback=dict(
+            missing_source="lower median of same-source-missing training labels; global training median if empty",
+            missing_model="global training median when observed test frequency has no fitted threshold model",
+            choice="fixed before this run; exploratory choice after prior pilot inspection, not an independent test",
+        ),
         limitations=[
             "Latest150 mixes37 clarified and113 original form/POS labels.",
             "Original-round-final is not first-independent; report saved-prediction sensitivity separately.",
@@ -230,6 +256,18 @@ def evaluate_full_pilot(
                 row[source + "_frequency"] = value
                 row[source + "_median_level"] = (
                     int(median_low(y for _, y in observed)) if level else None
+                )
+                missing_ids = [i for i in train_ids if not features[i][source]]
+                fallback_ids = missing_ids if not value and missing_ids else train_ids
+                fallback = dict(
+                    level=int(median_low(labels[i] for i in fallback_ids)),
+                    train_ids=fallback_ids,
+                    basis="missing_group_median" if not value and missing_ids else "global_median",
+                )
+                fold[source + "_fallback"] = fallback
+                row[source + "_complete_level"] = level if level is not None else fallback["level"]
+                row[source + "_complete_basis"] = (
+                    "frequency_thresholds" if level is not None else fallback["basis"]
                 )
             fold["ridge"] = _ridge(train_ids, held_out, labels, features)
             row["ridge_level"] = fold["ridge"]["level"]
