@@ -633,3 +633,34 @@ evidence, future sequential D1 only if explicitly authorized and RAM permits.
 Artifacts: `build/d1/robustness-baselines-2026-10-24/`.
 TDD + Ruff;804 tests/122 subtests pass. Independent artifact and planner audits
 confirm group exclusions, presence supports, full coverage and metrics. No D1 calls.
+
+## Frozen offline scorer and full export completed — 2026-10-24 (current recommendation)
+
+Implemented CSV freeze/score functions and CLI commands using TDD. Exact-form
+wordfreq export now pins corpus digest and lookup policy; scoring validates exact
+inventory/source/config identity, preserves every ID/POS and records frequency,
+route and model version. Runtime never refits. Existing abstaining scorer unchanged.
+Committed configuration: `configs/wordfreq-ro-pilot-2026-10-24.json`, model version
+`8f3061e2332cf9d6844ff4ea9dabd4fd23111c04b713a8a0cde886a23c82e0cc`.
+Fit on latest150,101 observed/49 missing, fallback4; global emergency median2.
+
+Complete saved inventory exported:77,698 records/75,147 forms;11,610 direct and
+66,088 fallback (85.06%, versus32.67% in selected pilot). Histogram1..5:
+972 /6,283 /4,355 /66,088 /0. Positive frequency floor exceeds both rare-class
+boundaries; direct scores1–3, missing forms4. No fabricated5 or histogram repair.
+The saved inventory hash matches the pilot source; no database query/write.
+
+**Recommendation updated:** implementation complete, keep frozen shadow baseline;
+do not promote to production. Full-inventory missingness exposes poor rare-form
+discrimination despite complete coverage. **Next:** read-only coverage audit of
+additional local lexical/frequency evidence for fallback forms; evaluate any future
+candidate against existing labels before a new export. No extra annotation required.
+**Leftovers:** better4/5 discrimination and generalization evidence; production
+integration/upload only if later authorized and semantic gates pass; D1 remains
+unloaded, any future model run requires explicit authorization and sufficient RAM.
+
+[Export results and reproduction](../research/2026-10-24-offline-wordfreq-export.md).
+Artifacts: `build/d1/offline-wordfreq-2026-10-24/export/scores.csv` plus frozen config,
+source snapshots, manifests and replay. Ruff +811 tests/137 subtests pass; complete
+independent numeric/identity audit and byte-identical77,698-row replay. Actual CLI
+runs blocked HTTP and DB connection boundaries. Architect review passed.

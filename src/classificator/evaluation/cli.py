@@ -94,6 +94,19 @@ def add_commands(sub) -> None:
     wordfreq.add_argument("--vocabulary-csv", type=Path, required=True)
     wordfreq.add_argument("--output-csv", type=Path, required=True)
     wordfreq.set_defaults(evaluation_handler=_wordfreq)
+    freeze = sub.add_parser("evaluation-freeze-wordfreq", help="Freeze complete offline wordfreq model from working labels")
+    freeze.add_argument("--vocabulary-csv", type=Path, required=True)
+    freeze.add_argument("--reference-csv", type=Path, required=True)
+    freeze.add_argument("--wordfreq-csv", type=Path, required=True)
+    freeze.add_argument("--campaign-dir", type=Path, required=True)
+    freeze.set_defaults(evaluation_handler=_freeze_wordfreq)
+    score = sub.add_parser("evaluation-score-wordfreq", help="Complete shadow CSV from frozen wordfreq model; no DB or LLM")
+    score.add_argument("--vocabulary-csv", type=Path, required=True)
+    score.add_argument("--wordfreq-csv", type=Path, required=True)
+    score.add_argument("--model-json", type=Path, required=True)
+    score.add_argument("--campaign-dir", type=Path, required=True)
+    score.set_defaults(evaluation_handler=_score_wordfreq)
+
 
 
 def _prepare(args) -> int:
@@ -299,4 +312,20 @@ def _form_report(args):
         args.campaign_dir,
     )
     print(json.dumps(result, indent=2))
+    return 0
+
+
+def _freeze_wordfreq(args) -> int:
+    from .wordfreq_baseline import freeze_wordfreq_model
+
+    result = freeze_wordfreq_model(args.vocabulary_csv, args.reference_csv, args.wordfreq_csv, args.campaign_dir)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _score_wordfreq(args) -> int:
+    from .wordfreq_baseline import score_wordfreq_inventory
+
+    result = score_wordfreq_inventory(args.vocabulary_csv, args.wordfreq_csv, args.model_json, args.campaign_dir)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0

@@ -669,3 +669,33 @@ freeze offline scorer/config and shadow-export full inventory with provenance.
 No parameter search, extra human annotations, D1/model calls, production upload,
 remote push. Artifacts build/d1/robustness-baselines-2026-10-24/; previous results
 preserved. Root unrelated changes untouched; docs/logs mirrored from code clone.
+
+
+## 2026-10-24 — Frozen offline wordfreq scorer and full inventory CSV
+
+Implemented plain CSV freeze/score APIs, two lazy CLI handlers and optional pinned
+wordfreq extra. Kept FrequencyScorer's old abstaining behavior. New workflow binds
+source to exact inventory and corpus, freezes config digest/support/thresholds,
+records every score's frequency/route/version, preserves all IDs/POS and publishes
+atomic staged outputs without overwriting. Runtime does not refit.
+
+TDD red/green: source-policy/corpus provenance, freeze/replay API, CLI command.
+Negative and edge tests: corrupted metadata/config, wrong inventory/version,
+malformed frequency never becoming fallback, duplicate/invalid labels/IDs,
+no missing/no observed training examples, threshold equality, diacritics and
+repeated POS. Ruff +811 tests/137 subtests pass; architect found no actionable flaw.
+
+Frozen on latest150:101 observed/49 missing, fallback4/global median2. Source
+values equal previous experiment for all150. Config version8f3061e2332cf9d6844ff4ea9dabd4fd23111c04b713a8a0cde886a23c82e0cc.
+Full saved inventory77,698 rows/75,147 forms:11,610 direct,66,088 fallback85.06%.
+Histogram1..5=972/6283/4355/66088/0. Surprise flagged: fallback dominates compared
+with pilot32.67%; positive frequency floor exceeds rare thresholds, so no5.
+Do not promote or manufacture a histogram; keep shadow baseline, prioritize
+additional evidence for missing/rare forms. Plan and ADR updated accordingly.
+
+Actual CLI run and byte-identical replay blocked requests.Session.request and
+psycopg.connect. Independent audit checked all scores/identities/routes/support,
+same-form POS consistency, hashes and summary arithmetic. No DB access/write,
+D1 loading/inference, production upload or remote push. Artifact directory:
+build/d1/offline-wordfreq-2026-10-24/; tracked config in configs/. Root's unrelated
+changes preserved; docs/logs/config mirrored from implementation clone.

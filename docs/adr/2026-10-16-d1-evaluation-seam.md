@@ -40,3 +40,23 @@ initial pilot labels from entering the clarified-target comparison. Raw frequenc
 and ranking comparisons precede any threshold fitting. Rebus uses sequential local
 cache extraction with target-page exclusion and exact-definition deduplication.
 No new scoring framework, parallel inference, automatic model load or upload path.
+
+## 2026-10-24: frozen complete wordfreq scorer
+
+Use two plain CSV functions in `evaluation.wordfreq_baseline`: freeze a model from
+an explicit pilot/reference/frequency snapshot, then score an explicit inventory
+from that model and compatible exported frequencies. Calibration imports the fitter
+lazily; scoring never refits or imports wordfreq, sklearn, DB clients or model
+transport. CLI handlers dispatch before database configuration. Keep the existing
+abstaining FrequencyScorer unchanged; the offline workflow applies an explicit
+recorded fallback to its unresolved outcomes. No integration with production Step2.
+
+Frequency exports now pin exact lookup policy and normalized full-corpus digest,
+in addition to package/version/language and inventory/export hashes. Each scoring
+input must be an export for that exact inventory; a subset cannot masquerade as
+missing evidence. Configuration identity is a canonical-content SHA256. Every CSV
+row carries the model identity, frequency and direct/fallback route. Preserve all
+inventory IDs/POS, including repeated forms; no lemmatization or diacritic stripping.
+Publish staged output directories atomically and refuse existing output paths.
+A shadow export is an operational artifact, not authorization to upload or evidence
+of accuracy on unlabelled inventory. Step5 and upload gates remain independent.

@@ -173,3 +173,17 @@ omitting the argument preserves one-form-out validation. Presence-only baselines
 use each source flag and the exact ordered pair of flags with fold-trained medians.
 Reports include singleton/non-singleton slices to show how many forms actually
 exercise group exclusion. [Robustness results and next implementation](research/2026-10-24-frequency-robustness.md).
+
+### Frozen offline scorer and full shadow export (2026-10-24)
+
+`evaluation-freeze-wordfreq` freezes the complete-source baseline from explicit
+pilot vocabulary, latest working labels and a bound wordfreq export.
+`evaluation-score-wordfreq` consumes that config and an exact-inventory frequency
+snapshot; it never refits or connects to a database/model service. Both refuse
+existing output directories. Install optional `.[frequency]` only to generate fresh
+wordfreq exports; saved CSV scoring does not require wordfreq or sklearn.
+
+Frozen configuration: `configs/wordfreq-ro-pilot-2026-10-24.json`.
+[Commands, verification and full-inventory results](research/2026-10-24-offline-wordfreq-export.md).
+All77,698 saved rows scored, but85.06% use fallback4 and none score5. Keep the model
+as a shadow baseline; complete coverage is not evidence of full-inventory accuracy.

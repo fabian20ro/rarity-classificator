@@ -170,3 +170,11 @@ are identical to LOO by construction. Report grouped subsets and unique training
 exclusion counts, not just a stable aggregate. Source-presence controls distinguish
 frequency magnitude from corpus coverage; here two presence bits match Ridge on
 first-independent149. Shared prefixes are not verified lexical families.
+
+
+**[2026-10-24]** Bind complete-scorer evidence to the exact inventory — a valid
+subset frequency file cannot distinguish genuinely missing words from unqueried
+ones. Validate inventory hash/count, export hash/count, lookup policy and corpus
+identity before fallback. Full export exposed85.06% missing rows versus32.67% in
+pilot; all missing→4 and positive-frequency floor above rare boundaries yields
+zero5. Coverage100% is an operational guarantee, not evidence of discrimination.
