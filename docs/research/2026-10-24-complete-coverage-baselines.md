@@ -1,5 +1,7 @@
 # Complete-coverage pilot baselines — 2026-10-24
 
+> Follow-up completed: [presence controls and grouped validation](2026-10-24-frequency-robustness.md). Original results below preserved.
+
 Operational requirement: a score for every form. Incomplete methods cannot enter
 the main comparison; conditional MAE on observed words is diagnostic only.
 All150 latest working labels retained; no new annotation, model inference or D1 load.

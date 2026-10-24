@@ -636,3 +636,36 @@ annotation, D1 loading/inference, production change, upload or push.
 Artifacts: build/d1/complete-coverage-baselines-2026-10-24/. Report and plan updated;
 prior output directories preserved. Changes maintained in exact-form-code clone;
 root's unrelated dirty work preserved.
+
+
+## 2026-10-24 — Presence-only and grouped robustness checks
+
+Implemented at existing full-pilot CSV seam: source-specific presence medians,
+ordered two-bit presence-pattern median, global train median for unseen patterns;
+optional exact-reference groups CSV with complete group exclusion before all fits.
+Fail-fast group validation includes each label view. Per-form artifacts retain
+held-out group/members, training support and complete integer scores.
+
+TDD red/green for missing presence columns, then grouped API. Regression checks:
+family-wide label changes cannot alter that family's fits; singleton equivalence;
+source-bit identity, numeric-magnitude invariance, unseen patterns, invalid maps.
+Ruff +804 tests/122 subtests pass.898 prediction records independently audited,
+including group support, medians, Ridge train preprocessing, metrics and hashes.
+Planner review found no actionable defect.
+
+Frozen8 pair groups: original6 preserved, cover/discover and Europe-related links
+added using dictionary evidence. Candidate iț/ițar link not established by exact
+cached meanings; excluded rather than merging by prefix. Latest142 groups,16
+paired forms; first-independent142 groups,14 paired forms. Grouped426 unique
+training exclusions across3 views,449 per-form records; LOO449 more.
+
+Latest grouped MAE: wf+fallback0.520, Ridge0.533, joint-presence0.587, rebus0.693;
+source-presence0.767/0.867. Numeric values help; only16 forms exercise different
+training sets. Surprise flagged: joint-presence matches Ridge0.664 on first149;
+more complexity not consistently useful. No production-quality claim.
+
+Report/plan updated: retain complete wordfreq baseline, Ridge comparator; next
+freeze offline scorer/config and shadow-export full inventory with provenance.
+No parameter search, extra human annotations, D1/model calls, production upload,
+remote push. Artifacts build/d1/robustness-baselines-2026-10-24/; previous results
+preserved. Root unrelated changes untouched; docs/logs mirrored from code clone.

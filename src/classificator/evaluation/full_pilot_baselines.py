@@ -13,6 +13,11 @@ from .frequency_calibration import _fit
 from .frequency_cross_validation import _metrics
 
 SOURCES = ("wordfreq", "rebus")
+PRESENCE_CONTROLS = {
+    "wordfreq_presence": ("wordfreq",),
+    "rebus_presence": ("rebus",),
+    "presence_pattern": SOURCES,
+}
 METHODS = (
     "legacy",
     "assistant",
@@ -25,9 +30,11 @@ METHODS = (
     "ridge",
     "wordfreq_complete",
     "rebus_complete",
+    *PRESENCE_CONTROLS,
 )
 OPERATIONAL_METHODS = (
-    "legacy", "assistant", "median", "majority", "wordfreq_complete", "rebus_complete", "ridge"
+    "legacy", "assistant", "median", "majority", "wordfreq_complete", "rebus_complete", "ridge",
+    *PRESENCE_CONTROLS,
 )
 VIEWS = {"original_round_final": "initial_level", "revised_working": "working_level"}
 
@@ -131,11 +138,14 @@ def evaluate_full_pilot(
     assistant_csv: Path,
     first_independent_csv: Path,
     output_dir: Path,
+    *,
+    groups_csv: Path | None = None,
 ):
     """Use every pilot form, without pretending mixed labels are a homogeneous gold set.
 
     Existing output directories are refused; manifest.json marks a complete run.
     Every fold's training IDs, thresholds, preprocessing and coefficients are saved.
+    Optional groups exclude all group mates; groups must cover the exact pilot.
     """
     if output_dir.exists() or output_dir.is_symlink():
         raise FileExistsError(output_dir)
@@ -175,13 +185,28 @@ def evaluate_full_pilot(
         raise ValueError("At least three first-independent labels required")
     for row in first.values():
         row["level"] = _level(row["level"])
+    groups = {i: str(i) for i in ref}
+    if groups_csv is not None:
+        group_rows = _indexed(groups_csv, {"group"})
+        if group_rows.keys() != ref.keys() or any(
+            r["word"] != ref[i]["word"] or not r["group"].strip()
+            or set(r) != {"word_id", "word", "group"}
+            for i, r in group_rows.items()
+        ):
+            raise ValueError("Groups must exactly match pilot identities with nonempty group IDs")
+        groups = {i: r["group"].strip() for i, r in group_rows.items()}
+    for ids in (ref, first):
+        if len({groups[i] for i in ids}) < 2:
+            raise ValueError("Each label view requires at least two groups")
     runtime = {p: version(p) for p in ("numpy", "scipy", "scikit-learn")}
     output_dir.mkdir(parents=True)
     policy = dict(
-        schema=2,
-        experiment="full-pilot-complete-coverage-loocv-v2",
+        schema=3,
+        experiment="full-pilot-robustness-v3",
         views=dict(VIEWS, first_independent="immutable first independent level, subset only"),
-        folds="leave-one-form-out;149 training labels for150 views,148 for first-independent149",
+        folds="leave-one-group-out" if groups_csv else "leave-one-form-out",
+        grouping="explicit frozen groups CSV" if groups_csv else "one group per form",
+        aggregation="per-form metrics; each form predicted once, group mates excluded together",
         threshold_policy="shared monotone MAE log-grid fitter; no hyperparameter search",
         ridge=dict(
             alpha=1.0,
@@ -192,6 +217,8 @@ def evaluate_full_pilot(
             rounding="floor(raw+.5), then clip1..5; no confidence claims",
         ),
         constants="lower median; smallest majority class on ties",
+        presence_controls="lower median of training labels with identical source-presence bits; global training median if unseen",
+
         missing="raw frequency methods remain abstaining diagnostics; complete variants use explicit fallback",
         coverage_requirement="100% integer scores1..5 required for operational comparison",
         frequency_fallback=dict(
@@ -202,7 +229,7 @@ def evaluate_full_pilot(
         limitations=[
             "Latest150 mixes37 clarified and113 original form/POS labels.",
             "Original-round-final is not first-independent; report saved-prediction sensitivity separately.",
-            "LOO is internal single-rater validation, not an independent or family-held-out test.",
+            "Internal single-rater validation; group exclusion is only as complete as the supplied group map.",
             "Saved assistant/legacy are fixed historical predictions, not cross-validated fits.",
         ],
         runtime=runtime,
@@ -217,11 +244,14 @@ def evaluate_full_pilot(
         (directory / "folds").mkdir(parents=True)
         predictions = []
         for held_out in ids:
-            train_ids = [i for i in ids if i != held_out]
+            held_out_ids = [i for i in ids if groups[i] == groups[held_out]]
+            train_ids = [i for i in ids if groups[i] != groups[held_out]]
             train_labels = [labels[i] for i in train_ids]
             counts = Counter(train_labels)
             fold = dict(
                 held_out_id=held_out,
+                held_out_group=groups[held_out],
+                held_out_ids=held_out_ids,
                 train_ids=train_ids,
                 median_level=int(median_low(train_labels)),
                 majority_level=min(counts, key=lambda k: (-counts[k], k)),
@@ -233,6 +263,8 @@ def evaluate_full_pilot(
                 human_level=labels[held_out],
                 reference_kind=ref[held_out]["reference_kind"],
                 label_view=view,
+                group=groups[held_out],
+                group_size=len(held_out_ids),
                 evidence_group={2: "both", 1: "one", 0: "neither"}[observed_count],
                 legacy_level=saved["legacy"][held_out],
                 assistant_level=saved["assistant"][held_out],
@@ -269,6 +301,18 @@ def evaluate_full_pilot(
                 row[source + "_complete_basis"] = (
                     "frequency_thresholds" if level is not None else fallback["basis"]
                 )
+            for name, sources in PRESENCE_CONTROLS.items():
+                pattern = [bool(features[held_out][s]) for s in sources]
+                matches = [i for i in train_ids if [bool(features[i][s]) for s in sources] == pattern]
+                support = matches or train_ids
+                control = dict(
+                    pattern=pattern,
+                    train_ids=support,
+                    level=int(median_low(labels[i] for i in support)),
+                    basis="presence_median" if matches else "global_median",
+                )
+                fold[name] = control
+                row[name + "_level"] = control["level"]
             fold["ridge"] = _ridge(train_ids, held_out, labels, features)
             row["ridge_level"] = fold["ridge"]["level"]
             row["ridge_raw"] = fold["ridge"]["raw_prediction"]
@@ -279,6 +323,14 @@ def evaluate_full_pilot(
             predictions.append(row)
         _write_csv(directory / "predictions.csv", list(predictions[0]), predictions)
         result["views"][view] = _view_summary(predictions)
+        result["views"][view].update(
+            grouping=dict(
+                group_count=len({groups[i] for i in ids}),
+                non_singleton_ids=[r["word_id"] for r in predictions if r["group_size"] > 1],
+            ),
+            non_singleton=_summary([r for r in predictions if r["group_size"] > 1]),
+            singleton=_summary([r for r in predictions if r["group_size"] == 1]),
+        )
     independent = [
         dict(
             word_id=i,
@@ -292,6 +344,8 @@ def evaluate_full_pilot(
     result["first_independent_saved"] = _summary(independent, ("legacy", "assistant"))
     (output_dir / "summary.json").write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
     inputs = [reference_csv, features_csv, legacy_csv, assistant_csv, first_independent_csv]
+    if groups_csv is not None:
+        inputs.append(groups_csv)
     code = [
         Path(__file__),
         Path(__file__).with_name("frequency_calibration.py"),

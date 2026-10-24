@@ -162,3 +162,11 @@ conditional MAE on101/150 cannot outrank a complete150-score method. Evaluate an
 explicit fold-trained fallback on all forms, keep raw coverage as diagnostics,
 and retain support/route provenance. Missing-group medians learn pilot composition,
 not lexical truth; compare large errors and clarified-label strata as well as MAE.
+
+
+**[2026-10-24]** Group-held-out stability needs an affected-form denominator —
+only16 of150 pilot forms belong to the8 declared pair groups;134 singleton folds
+are identical to LOO by construction. Report grouped subsets and unique training
+exclusion counts, not just a stable aggregate. Source-presence controls distinguish
+frequency magnitude from corpus coverage; here two presence bits match Ridge on
+first-independent149. Shared prefixes are not verified lexical families.

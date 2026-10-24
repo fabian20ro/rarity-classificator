@@ -204,3 +204,117 @@ class FullPilotBaselineTests(unittest.TestCase):
                         )
                         fold = json.loads((root / f"out/{view}/folds/1.json").read_text())
                         self.assertEqual(fold[source + "_fallback"]["train_ids"], support)
+
+    def test_presence_controls_use_only_training_observation_patterns(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            ref, features, saved, first = self._coverage_inputs(root)
+            result = evaluate_full_pilot(ref, features, saved, saved, first, root / "before")
+            rows = list(csv.DictReader((root / "before/revised_working/predictions.csv").open()))
+            # Missing forms truth2,4,5: held-out2 sees4,5 and predicts4.
+            for method in ("wordfreq_presence", "rebus_presence", "presence_pattern"):
+                self.assertEqual(rows[0][method + "_level"], "4")
+                self.assertEqual(rows[3][method + "_level"], "1")
+                self.assertAlmostEqual(result["views"]["revised_working"]["operational"][method]["mae"], 7/6)
+            # Frequency magnitudes change; presence-only predictions must not.
+            data = list(csv.DictReader(features.open()))
+            for r in data[3:]:
+                r["wordfreq"] = "0.0000001"
+                r["rebus"] = "0.7"
+            write_csv(features, data)
+            evaluate_full_pilot(ref, features, saved, saved, first, root / "after")
+            changed = list(csv.DictReader((root / "after/revised_working/predictions.csv").open()))
+            for old, new in zip(rows, changed):
+                for method in ("wordfreq_presence", "rebus_presence", "presence_pattern"):
+                    self.assertEqual(old[method + "_level"], new[method + "_level"])
+            # A joint pattern with no training match uses global train median1.
+            data[0]["rebus"] = "0.001"
+            write_csv(features, data)
+            evaluate_full_pilot(ref, features, saved, saved, first, root / "unseen")
+            fold = json.loads((root / "unseen/revised_working/folds/1.json").read_text())
+            self.assertEqual(fold["presence_pattern"]["level"], 1)
+            self.assertEqual(fold["presence_pattern"]["basis"], "global_median")
+            self.assertEqual(fold["presence_pattern"]["train_ids"], [2, 3, 4, 5, 6])
+
+    def test_group_validation_excludes_all_family_labels_before_any_fitting(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            ref, features, saved, first = self._coverage_inputs(root)
+            groups = write_csv(root / "groups.csv", [
+                dict(word_id=i, word=str(i), group="family" if i <= 2 else str(i))
+                for i in range(1, 7)
+            ])
+            result = evaluate_full_pilot(ref, features, saved, saved, first, root / "before", groups_csv=groups)
+            for view in result["views"].values():
+                self.assertEqual(view["grouping"]["group_count"], 5)
+                self.assertEqual(view["non_singleton"]["total"], 2)
+                self.assertEqual(view["operational"]["presence_pattern"]["covered"], 6)
+            fold = json.loads((root / "before/revised_working/folds/1.json").read_text())
+            self.assertEqual(fold["train_ids"], [3, 4, 5, 6])
+            self.assertEqual(fold["held_out_ids"], [1, 2])
+            self.assertEqual(fold["held_out_group"], "family")
+            self.assertEqual(fold["presence_pattern"]["train_ids"], [3])
+            self.assertEqual(fold["wordfreq_fallback"]["level"], 5)
+            refs = list(csv.DictReader(ref.open()))
+            independent = list(csv.DictReader(first.open()))
+            for r in refs[:2]:
+                r["initial_level"] = r["working_level"] = "1"
+            for r in independent[:2]:
+                r["level"] = "1"
+            write_csv(ref, refs)
+            write_csv(first, independent)
+            evaluate_full_pilot(ref, features, saved, saved, first, root / "after", groups_csv=groups)
+            for view in result["views"]:
+                for i in [1, 2]:
+                    self.assertEqual(
+                        json.loads((root / f"before/{view}/folds/{i}.json").read_text()),
+                        json.loads((root / f"after/{view}/folds/{i}.json").read_text()),
+                    )
+
+    def test_singleton_groups_reproduce_loo_and_presence_bits_keep_source_identity(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            ref, features, saved, first = self._coverage_inputs(root)
+            write_csv(features, [
+                dict(word_id=i, word=str(i), wordfreq=f, rebus=g)
+                for i, (f, g) in enumerate([(0, .1), (.1, 0), (0, .1), (.1, 0), (.1, .1), (0, 0)], 1)
+            ])
+            groups = write_csv(root / "groups.csv", [
+                dict(word_id=i, word=str(i), group=str(i)) for i in range(1, 7)
+            ])
+            result = evaluate_full_pilot(ref, features, saved, saved, first, root / "loo")
+            evaluate_full_pilot(ref, features, saved, saved, first, root / "groups", groups_csv=groups)
+            for view in result["views"]:
+                self.assertEqual((root / f"loo/{view}/predictions.csv").read_bytes(),
+                                 (root / f"groups/{view}/predictions.csv").read_bytes())
+            rows = list(csv.DictReader((root / "loo/revised_working/predictions.csv").open()))
+            self.assertEqual(rows[0]["presence_pattern_level"], "5")
+            self.assertEqual(rows[1]["presence_pattern_level"], "1")
+
+    def test_invalid_group_maps_fail_before_output_including_first_view_with_one_group(self):
+        for bad in ("missing", "extra", "spelling", "empty", "duplicate", "single", "first_single"):
+            with self.subTest(bad=bad), TemporaryDirectory() as temp:
+                root = Path(temp)
+                ref, features, saved, first = self._coverage_inputs(root)
+                rows = [dict(word_id=i, word=str(i), group=str(i)) for i in range(1, 7)]
+                if bad == "missing":
+                    rows.pop()
+                elif bad == "extra":
+                    rows.append(dict(word_id=7, word="7", group="7"))
+                elif bad == "spelling":
+                    rows[0]["word"] = "wrong"
+                elif bad == "empty":
+                    rows[0]["group"] = " "
+                elif bad == "duplicate":
+                    rows.append(rows[0])
+                elif bad == "single":
+                    for r in rows:
+                        r["group"] = "one"
+                else:
+                    for r in rows[:3]:
+                        r["group"] = "one"
+                    write_csv(first, list(csv.DictReader(first.open()))[:3])
+                groups = write_csv(root / "groups.csv", rows)
+                with self.assertRaises(ValueError):
+                    evaluate_full_pilot(ref, features, saved, saved, first, root / "out", groups_csv=groups)
+                self.assertFalse((root / "out").exists())

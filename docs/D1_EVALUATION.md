@@ -164,3 +164,12 @@ plus an explicit training-only missing-group median fallback (global training me
 if necessary). Raw source-only columns remain diagnostics. Every operational method
 must emit integer1–5 scores for the full view. Fold support, prediction route and route
 metrics are saved. [Updated results and recommendation](research/2026-10-24-complete-coverage-baselines.md).
+
+### Presence controls and grouped validation (2026-10-24)
+
+`evaluate_full_pilot(..., groups_csv=path)` accepts an optional exact-reference CSV
+with `word_id,word,group`. All group mates are excluded from training together;
+omitting the argument preserves one-form-out validation. Presence-only baselines
+use each source flag and the exact ordered pair of flags with fold-trained medians.
+Reports include singleton/non-singleton slices to show how many forms actually
+exercise group exclusion. [Robustness results and next implementation](research/2026-10-24-frequency-robustness.md).

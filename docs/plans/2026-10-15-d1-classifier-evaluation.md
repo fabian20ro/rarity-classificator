@@ -603,3 +603,33 @@ D1 only with explicit authorization and sufficient RAM. No new user ratings need
 Artifacts: `build/d1/complete-coverage-baselines-2026-10-24/`.
 TDD + Ruff;800 tests/115 subtests pass.449 folds audited; previous predictions
 unchanged, complete scores and fallback support verified. No D1/LM requests.
+
+## Robustness checks completed — 2026-10-24 (current recommendation)
+
+Implemented three fold-trained presence controls and optional group-held-out
+validation at the existing CSV seam. All methods retain100% coverage. Reused all
+three reference views;898 per-form predictions checked across LOO/grouped runs.
+Frozen groups preserve6 original family/collision pairs and add2 conservative
+lexical links:142 groups,16 paired forms in latest150. Shared prefixes alone
+rejected (iț/ițar and numărat/numitor not merged). Group map has explicit limits.
+
+Latest grouped MAE: wordfreq+fallback0.520, Ridge0.533, joint-presence0.587,
+rebus+fallback0.693; source-only presence controls0.767 and0.867. Numeric frequencies
+add information beyond presence. Wordfreq latest predictions unchanged from LOO;
+only16 forms have changed training sets, so aggregate stability is weak evidence
+for broad generalization. First-independent149: wordfreq0.624, Ridge/joint-pattern
+both0.664, rebus0.805. Ridge still better on latest clarified37 and large mistakes.
+
+**Recommendation:** retain simple complete wordfreq baseline, Ridge comparator;
+no additional pilot-driven hybrid tuning. **Next implementation:** freeze fitted
+wordfreq threshold/fallback config, deterministic offline scorer with route/version
+provenance, then shadow CSV export over the full inventory. Validate coverage,
+reproducibility and fallback rates; unlabelled export does not measure accuracy.
+No production upload or new user annotation in that next step.
+**Leftovers:** scorer/config/export, inventory operational checks, generalization
+evidence, future sequential D1 only if explicitly authorized and RAM permits.
+
+[Results and grouping limitations](../research/2026-10-24-frequency-robustness.md).
+Artifacts: `build/d1/robustness-baselines-2026-10-24/`.
+TDD + Ruff;804 tests/122 subtests pass. Independent artifact and planner audits
+confirm group exclusions, presence supports, full coverage and metrics. No D1 calls.
