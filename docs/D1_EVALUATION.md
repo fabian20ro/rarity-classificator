@@ -187,3 +187,16 @@ Frozen configuration: `configs/wordfreq-ro-pilot-2026-10-24.json`.
 [Commands, verification and full-inventory results](research/2026-10-24-offline-wordfreq-export.md).
 All77,698 saved rows scored, but85.06% use fallback4 and none score5. Keep the model
 as a shadow baseline; complete coverage is not evidence of full-inventory accuracy.
+
+### Local evidence audit (2026-10-24)
+
+[Local-source audit](research/2026-10-24-local-fallback-source-audit.md) inventories
+LEX/DEX/rebus evidence for the66,088 fallback rows. Combined positive-source coverage
+is18,769 rows; all49 pilot tail forms have raw local snapshots through prior reviews.
+Sense-aware extraction and validation are the next step. Page tags, missing corpus
+entries and inherited classifier scores are not reliable automatic level5 labels.
+
+Local lexical fallback experiment (2026-10-25): `evaluation-local-evidence` and
+`evaluation-local-fallback` provide reproducible offline extraction and grouped
+validation. All150 scored; modest latest-label gain fails first-independent checks.
+Keep frozen fallback4. [Results, limitations and commands](research/2026-10-25-local-lexical-fallback.md).

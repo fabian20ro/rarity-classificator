@@ -60,3 +60,13 @@ inventory IDs/POS, including repeated forms; no lemmatization or diacritic strip
 Publish staged output directories atomically and refuse existing output paths.
 A shadow export is an operational artifact, not authorization to upload or evidence
 of accuracy on unlabelled inventory. Step5 and upload gates remain independent.
+
+## 2026-10-25: local lexical evidence and fallback experiment
+
+Two plain offline CSV functions: local_evidence exports source-bound senses and
+features; local_fallback validates artifacts and runs grouped comparisons. Reuse
+exact normalization, threshold fitter and metrics. Keep extraction label-free and
+retain unresolved identities/POS instead of transferring lemma evidence. A small
+fixed tree is evaluation-only; shared direct thresholds fit inside training folds.
+No production scorer integration or alteration of the frozen wordfreq configuration.
+Local sources stream sequentially by file; outputs publish atomically with hashes.

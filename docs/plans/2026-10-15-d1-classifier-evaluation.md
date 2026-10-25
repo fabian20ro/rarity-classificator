@@ -664,3 +664,90 @@ Artifacts: `build/d1/offline-wordfreq-2026-10-24/export/scores.csv` plus frozen 
 source snapshots, manifests and replay. Ruff +811 tests/137 subtests pass; complete
 independent numeric/identity audit and byte-identical77,698-row replay. Actual CLI
 runs blocked HTTP and DB connection boundaries. Architect review passed.
+
+## Local fallback-source audit completed — 2026-10-24 (current recommendation)
+
+Audited66,088 fallback rows/64,226 distinct forms, without changing scores/config.
+Streamed12,728 local DEX cache pages; hashes and old190 frequency counts reproduced.
+LOC matches every form but provides validity/POS, not familiarity. Query-exact
+nonempty cache pages cover7,334 rows; prior review snapshots extend that to7,375.
+Outside-own-page definition mentions cover13,991 rows. Union across local raw
+snapshots/mentions:18,769 rows/17,898 forms;47,319 rows still lack either signal.
+Page/query match is candidate evidence, not verified meaning/all-POS coverage.
+
+Supplemental review archives restore raw lexical source coverage for all49 pilot
+forms without wordfreq. Existing218 authored contexts cover only36 of those49;
+use uniform parsing of raw sources, never label-exposed estimates/rationales or
+review-selection flags. Regional/archaic HTML menu text is not a usage marker.
+Legacy generator scores are inherited and disagree with classifier snapshot on
+43,890 exact-match rows; do not borrow as independent gold. No separate broad
+natural-language corpus found in scoped local workspaces; installed ro wordfreq
+has no large list. One minimal status-ok CASA cache payload needs provenance check.
+
+On existing group-held-out tail predictions, presence-pattern MAE0.592 beats
+constant4 at0.653 by only3 aggregate error points, but severe errors rise2→6.
+Only16/29 predictions5 are correct (13 false5); the gain disappears on immutable
+first-response labels. No validated replacement for4/5 separation yet.
+
+**Next:** implement a uniform source/sense/POS-aware lexical evidence extractor,
+starting with the49 local pilot snapshots; retain usage scope and ambiguity.
+Test one small predeclared interpretable fallback candidate on existing grouped
+folds, reporting all150, tail49,4/5 precision/recall and false5 on human1–3.
+Allow lower scores when supported:11/49 latest tail labels are2/3. Keep4 where
+coverage/sense alignment is unresolved; do not turn absence into5 or tune to a
+histogram. No new human annotation required. **Leftovers:** validate lexical
+features, improve broad-source coverage and generalization; no production promotion,
+DB write or D1 loading authorized by this audit.
+
+[Source audit and recommendation](../research/2026-10-24-local-fallback-source-audit.md).
+Combined evidence: `build/d1/local-source-audit-2026-10-24/fallback-local-evidence.csv`.
+Audit/diagnostic/supplement scripts and hashes saved;77,698 identities and merged
+coverage checked. Classifier implementation, frozen model and output CSV unchanged.
+
+
+## Local lexical fallback implementation prepared — 2026-10-25
+
+User authorized TDD implementation of local evidence extraction and one simple
+fallback comparison on all150 ratings, with separate4/5 results. Proposed public
+boundaries: raw-source/LOC/mentions CSV inputs → senses/evidence/source-ledger CSVs;
+validated evidence + labels/frequencies/groups → grouped predictions/metrics.
+TDD skill requires explicit seam confirmation; question pending before tests/code.
+
+Predeclared protocol saved at `build/d1/local-fallback-2026-10-25/protocol-proposed.json`.
+Candidate: depth2 absolute-error tree, min leaf5, seed0, lower-median leaves;
+features cross-entry definition counts, all-senses restriction and specialist tags.
+Unknown exact-form/POS alignment→4. Fit direct wordfreq thresholds and fallback
+only on training groups, never reuse frozen all150 thresholds for held-out metrics.
+Preserve latest150, original-final150, first-independent149 and37/113 strata.
+No results yet; existing frozen scorer/config/export remain unchanged.
+
+Parser review confirms structured headings, explicit inflections, multiple POS
+heading blocks and inherited parent-sense tags. Redirects such as micșurat→micșorat
+must remain unresolved. No database or D1 access. Next: confirm CSV seams, then
+vertical red/green slices, grouped comparison, independent review and results.
+
+## Local evidence + fallback experiment completed — 2026-10-25 (current recommendation)
+
+CSV interfaces confirmed; implemented with vertical TDD. Exact structured headings,
+explicit inflections, all known LOC POS, inherited sense tags and source hashes
+exported independently of labels. Two offline CLI commands; no production changes.
+150 evidence rows;168 sources/134 forms,123 source-bounded aligned, including42/49
+tail forms. Seven tail forms unresolved→4; raw query match alone is insufficient.
+
+One predeclared depth2/minleaf5 median-leaf tree, three lexical/count features,
+no search. Shared direct wordfreq thresholds refit within frozen group folds;
+latest150/original150/first-independent149 all100% covered,37/113 strata retained.
+Latest MAE0.520→0.500, severe11→12; tail0.653→0.592. Clarified37 worsens0.568→0.595.
+First-independent149 worsens0.624→0.671; tail0.653→0.796. Latest predicted5=24,
+correct13 (54.2% precision);8 human4 and3 human3 become5. Tail human4/5 exact19→21/38.
+Only cross-entry count is selected in tree splits; tag evidence too sparse to split.
+
+**Recommendation:** retain frozen wordfreq+fallback4. Preserve the extractor and
+comparison tools; do not promote this candidate or rescore the full inventory.
+**Next:** investigate a versioned independent Romanian running-text corpus/source
+and its exact-form coverage/provenance before another model. No new annotation
+required for discovery; no repeated tree tuning on the same150. **Leftovers:**
+broad coverage, exact-sense alignment, robust4/5 separation and external validation.
+DB and frozen scorer/config/export unchanged; no D1 or model server calls.
+
+[Implementation, results and reproduction](../research/2026-10-25-local-lexical-fallback.md).

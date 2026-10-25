@@ -107,6 +107,26 @@ def add_commands(sub) -> None:
     score.add_argument("--campaign-dir", type=Path, required=True)
     score.set_defaults(evaluation_handler=_score_wordfreq)
 
+    evidence = sub.add_parser(
+        "evaluation-local-evidence", help="Extract exact-form lexical evidence from local snapshots"
+    )
+    evidence.add_argument("--vocabulary-csv", type=Path, required=True)
+    evidence.add_argument("--loc-file", type=Path, required=True)
+    evidence.add_argument("--sources-csv", type=Path, required=True)
+    evidence.add_argument("--mentions-csv", type=Path, required=True)
+    evidence.add_argument("--campaign-dir", type=Path, required=True)
+    evidence.set_defaults(evaluation_handler=_local_evidence)
+    fallback = sub.add_parser(
+        "evaluation-local-fallback", help="Grouped offline lexical fallback comparison; no DB or LLM"
+    )
+    fallback.add_argument("--reference-csv", type=Path, required=True)
+    fallback.add_argument("--features-csv", type=Path, required=True)
+    fallback.add_argument("--evidence-dir", type=Path, required=True)
+    fallback.add_argument("--first-independent-csv", type=Path, required=True)
+    fallback.add_argument("--groups-csv", type=Path, required=True)
+    fallback.add_argument("--campaign-dir", type=Path, required=True)
+    fallback.set_defaults(evaluation_handler=_local_fallback)
+
 
 
 def _prepare(args) -> int:
@@ -327,5 +347,23 @@ def _score_wordfreq(args) -> int:
     from .wordfreq_baseline import score_wordfreq_inventory
 
     result = score_wordfreq_inventory(args.vocabulary_csv, args.wordfreq_csv, args.model_json, args.campaign_dir)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _local_evidence(args) -> int:
+    from .local_evidence import export_local_evidence
+
+    result = export_local_evidence(args.vocabulary_csv, args.loc_file, args.sources_csv,
+                                   args.mentions_csv, args.campaign_dir)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _local_fallback(args) -> int:
+    from .local_fallback import evaluate_local_fallback
+
+    result = evaluate_local_fallback(args.reference_csv, args.features_csv, args.evidence_dir,
+                                     args.first_independent_csv, args.groups_csv, args.campaign_dir)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0

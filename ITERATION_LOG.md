@@ -699,3 +699,69 @@ same-form POS consistency, hashes and summary arithmetic. No DB access/write,
 D1 loading/inference, production upload or remote push. Artifact directory:
 build/d1/offline-wordfreq-2026-10-24/; tracked config in configs/. Root's unrelated
 changes preserved; docs/logs/config mirrored from implementation clone.
+
+
+## 2026-10-24 — Local source audit for fallback4/5
+
+Read-only audit of classifier/generator-rebus/propozitii-nostime local artifacts,
+using Matt Pocock research skill/background source researcher. No product code,
+config, frozen scores, DB/API or model loading changes.66,088 fallback rows =64,226
+forms. LOC covers all.12,728 DEX payloads streamed/hash-checked; frozen1,273,283
+corpus tokens and190 prior counts reproduced. Initial span-count check found one
+empty structural span; retained for exact compatibility, zero token effect.
+
+Broad-cache exact-query pages7,334 rows, outside-own-page mentions13,991. Added117
+prior-review snapshots: combined pages7,375 rows, union positive evidence18,769
+rows/17,898 forms;47,319 rows lack both. Supplemental snapshots give all49 pilot
+missing-wordfreq forms raw lexical material. Query match is not sense validation.
+
+Validated traps: menu labels trigger regional/archaic HTML regexes; lexical page
+hints can describe another meaning/reference. Generator rarity is inherited and
+43,890 exact-match rows disagree with classifier legacy snapshot. Installed ro
+wordfreq has no large list; curated/generated clues are not independent use counts.
+Minimal CASA status-ok HTML41chars has unverified provenance; not silently removed
+from the frozen corpus. Source researcher/count scripts independently cross-checked.
+
+Tail49 latest existing grouped predictions: constant4 MAE.653,severe2; presence
+pattern.592,severe6, only16 correct of29 predictions5. Gain vanishes on first
+responses. Reported to user; no absence→5 rule justified. Recommended uniform
+sense/POS-aware raw-source extraction, then one small interpretable fallback test
+on existing labels, preserving100% coverage and unknown→4. Eleven tail labels are
+2/3, so do not force a binary4/5 target. No extra annotation needed for this step.
+
+Saved full/combined evidence CSVs, source ledger, scopes, diagnostics, verification
+and reproducible scripts under build/d1/local-source-audit-2026-10-24. Verified
+77,698 identities, hashes, summaries, all49 raw snapshots and merged coverage.
+Updated research note, plan and evaluation guide; root docs/logs mirrored. No
+production tests rerun because classifier code/config unchanged. No remote push.
+
+
+## 2026-10-25 — Local evidence implementation preparation
+
+Read lessons and Matt implement/TDD/code-review instructions; planner/architect
+subagent inspected local HTML and evaluation seams. Proposed two public CSV
+boundaries; explicit confirmation requested per TDD skill, pending. No tests or
+production implementation started before confirmation. Predeclared one depth2
+median-leaf fallback and leakage controls in local-fallback-2026-10-25 protocol.
+Structured headings support exact forms/explicit inflections/all POS; redirects
+stay unresolved, parent tags inherited. Fold-fitted wordfreq required to avoid
+using all150-trained frozen configuration in held-out metrics. Plan updated with
+pending implementation, not claimed results. No D1, DB, frozen artifact changes.
+
+## 2026-10-25 — Local lexical evidence implementation and experiment
+
+User confirmed both CSV test seams. Vertical TDD: exact/all-POS source export;
+scoped/inherited tags and exclusion guards; inflections/multiple headings/redirects;
+input hashes/schema/identity and atomic output; LOC gender/transitive codes;
+CLI offline integration. Evaluator agent used TDD for fold-local thresholds/tree,
+unknown→4, complete coverage, group-label mutation invariance,4/5 metrics and strict
+artifact contracts. Two modules and offline commands; frozen scorer untouched.
+
+168 sources/134 pilot forms;150 evidence rows,123 aligned (42/49 tail),7 tail unknown.
+Predeclared depth2/minleaf5 tree evaluated on latest150, original150 and first149.
+Latest MAE.520→.500 but severe11→12 and clarified37.568→.595; first149.624→.671.
+Tail predicted5 precision13/24=.542, false5=8human4+3human3; only mention-count
+feature selected. Recommendation: keep frozen4; investigate independent running-text
+corpus coverage/provenance, no extra annotation or pilot tree search. Report/plan/ADR
+updated. Full826 tests/157 subtests +Ruff pass; HTTP/DB blocked in integration/run.
+Independent code review and final artifact verification next. No D1, DB or push.

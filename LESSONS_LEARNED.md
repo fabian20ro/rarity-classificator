@@ -178,3 +178,21 @@ ones. Validate inventory hash/count, export hash/count, lookup policy and corpus
 identity before fallback. Full export exposed85.06% missing rows versus32.67% in
 pilot; all missing→4 and positive-frequency floor above rare boundaries yields
 zero5. Coverage100% is an operational guarantee, not evidence of discrimination.
+
+
+**[2026-10-24]** Dictionary source coverage is not sense validity — local cache
+keys fold diacritics; exact query/status or a lemma witness still does not establish
+all valid senses. Whole-page usage regexes match navigation; definition-local tags
+can qualify synonyms/variants. Audit confirms even human2 forms have obsolete/
+regional page hints. Prior review raw snapshots cover all49 missing-wordfreq pilot
+forms, but assistant-authored, label-exposed contexts are not independent features.
+Never infer5 from dictionary absence, selection flags or an unscoped obsolete tag.
+
+**[2026-10-25]** Structured lexical alignment needs explicit inflections and inherited
+scope — DEX headings may have multiple POS blocks and inflected alternatives;
+lexemeName includes superscript/POS text. Match literal heading/explicit alternatives,
+inherit parent meaning tags, exclude examples/etymology, and retain nearby-lemma
+redirects as unresolved. Raw snapshots covered49 pilot tail forms, but only42
+passed source-bounded exact-form/POS alignment. More source files do not imply more
+verified meanings. A small latest-label gain that reverses on first-independent
+ratings does not justify replacing a frozen fallback.
