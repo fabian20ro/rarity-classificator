@@ -196,3 +196,11 @@ redirects as unresolved. Raw snapshots covered49 pilot tail forms, but only42
 passed source-bounded exact-form/POS alignment. More source files do not imply more
 verified meanings. A small latest-label gain that reverses on first-independent
 ratings does not justify replacing a frozen fallback.
+
+**[2026-10-25]** Exact heading match still needs grammatical scope — ițar's trousers
+sense is explicitly plural-only and cannot witness singular ițar. Keep literal noun
+plural alternatives and invariant forms; a child singular restriction can override
+a parent plural restriction. Nonexclusive “mai ales la plural” is not exclusion.
+Validated against local source records and public CSV regression tests;19 exported
+sense records corrected. Corpus-derived mention counts also need a versioned
+sidecar and derivation checks, not only a projected CSV hash.

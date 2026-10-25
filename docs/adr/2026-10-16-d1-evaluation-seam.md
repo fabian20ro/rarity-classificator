@@ -70,3 +70,9 @@ retain unresolved identities/POS instead of transferring lemma evidence. A small
 fixed tree is evaluation-only; shared direct thresholds fit inside training folds.
 No production scorer integration or alteration of the frozen wordfreq configuration.
 Local sources stream sequentially by file; outputs publish atomically with hashes.
+
+Mention counts carry a mandatory sidecar tying the exact inventory to a versioned
+corpus, source ledger, extractor and checked derivation; hashing a bare counts CSV
+is insufficient provenance. Explicit singular/plural restrictions participate in
+sense alignment. A child's explicit number scope overrides its parent's; usage
+preferences such as “mai ales la plural” are not exclusive restrictions.

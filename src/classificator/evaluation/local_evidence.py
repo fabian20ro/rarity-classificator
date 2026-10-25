@@ -9,6 +9,7 @@ import re
 from tempfile import TemporaryDirectory
 
 from .dataset import _lexeme, _read_csv, _sha256, _vocabulary, _write_csv
+from .local_mentions import validate_local_mentions
 
 POLICY = "local-lexical-evidence-v1"
 EVIDENCE_FIELDS = [
@@ -32,6 +33,8 @@ SENSE_FIELDS = [
     "definition",
     "tags",
     "alignment",
+    "alignment_reason",
+    "number_restriction",
     "source_path",
     "source_sha256",
 ]
@@ -171,11 +174,23 @@ def _senses(html, target):
                         alternatives.extend(
                             part.strip() for part in _text(variant).split(",")
                         )
+                pos = _pos(_text(pos_node))
+                pos_text = _lexeme(_text(pos_node))
+                numbers = set()
+                if target == _lexeme(spelling) and "plural" not in pos_text:
+                    numbers.add("singular")
+                if (
+                    "plural" in pos_text
+                    or pos == "N"
+                    and target in {_lexeme(w) for w in alternatives[1:] if w}
+                ):
+                    numbers.add("plural")
                 headings.append(
                     (
                         spelling,
-                        _pos(_text(pos_node)),
+                        pos,
                         target in {_lexeme(w) for w in alternatives if w},
+                        numbers,
                     )
                 )
             parents = {}
@@ -183,7 +198,7 @@ def _senses(html, target):
                 if not item.has("type-meaning"):
                     continue
                 ancestor = item.parent
-                inherited, parent_id, excluded = [], "", False
+                inherited, parent_id, excluded, number = [], "", False, None
                 while ancestor is not node:
                     if ancestor is None:
                         break
@@ -191,7 +206,7 @@ def _senses(html, target):
                         "type-example"
                     )
                     if id(ancestor) in parents and not parent_id:
-                        parent_id, inherited = parents[id(ancestor)]
+                        parent_id, inherited, number = parents[id(ancestor)]
                     ancestor = ancestor.parent
                 if excluded:
                     continue
@@ -204,21 +219,29 @@ def _senses(html, target):
                 if not containers:
                     continue
                 container = containers[0]
-                tags = sorted(
-                    set(
-                        inherited
-                        + [
-                            _lexeme(_text(n))
-                            for n in container.nodes()
-                            if n.has("meaning-tags") and _text(n)
-                        ]
-                    )
-                )
+                own_tags = [
+                    _lexeme(_text(n))
+                    for n in container.nodes()
+                    if n.has("meaning-tags") and _text(n)
+                ]
+                own_number = _number_restriction(own_tags)
+                if own_number is not None:
+                    number = own_number
+                tags = sorted(set(inherited + own_tags))
                 sense_id = container.attrs.get("id", "")
-                parents[id(item)] = (sense_id, tags)
+                parents[id(item)] = (sense_id, tags, number)
                 definitions = [n for n in container.nodes() if n.has("tree-def")]
                 if definitions:
-                    for spelling, pos, matched in headings:
+                    for spelling, pos, matched, numbers in headings:
+                        reason = (
+                            "heading_mismatch"
+                            if not matched
+                            else (
+                                "number_restriction"
+                                if number and number not in numbers
+                                else "literal_heading_or_inflection"
+                            )
+                        )
                         yield dict(
                             heading=spelling,
                             pos=pos,
@@ -226,9 +249,26 @@ def _senses(html, target):
                             parent_sense_id=parent_id,
                             definition=_text(definitions[0]),
                             tags=json.dumps(tags, ensure_ascii=False),
-                            alignment="exact" if matched else "unresolved",
+                            alignment=(
+                                "exact"
+                                if reason == "literal_heading_or_inflection"
+                                else "unresolved"
+                            ),
+                            alignment_reason=reason,
+                            number_restriction=number or "",
                         )
             heading = None
+
+
+def _number_restriction(tags):
+    """Nearest explicit number scope wins; nonexclusive usage is not a restriction."""
+    text = re.sub(r"[()]", "", " ".join(tags))
+    if not re.search(r"\b(plural|singular)\b", text):
+        return None
+    if re.search(r"mai ales|adesea|și la", text):
+        return ""
+    found = set(re.findall(r"\b(plural|singular)\b", text))
+    return next(iter(found)) if len(found) == 1 else "unresolved"
 
 
 def _restricted(sense):
@@ -259,24 +299,9 @@ def export_local_evidence(
     vocabulary = _vocabulary(vocabulary_csv)
     loc = _loc(loc_file)
     sources = _read_csv(sources_csv, {"word", "path", "sha256", "format"})
-    mention_rows = _read_csv(
-        mentions_csv, {"word_id", "word", "other_definition_count"}
+    mentions, provenance_paths = validate_local_mentions(
+        mentions_csv, vocabulary_csv, vocabulary
     )
-    mentions = {}
-    identities = {r["word_id"]: r["word"] for r in vocabulary}
-    for row in mention_rows:
-        if (
-            set(row) != {"word_id", "word", "other_definition_count"}
-            or row["word_id"] in mentions
-            or identities.get(row["word_id"]) != row["word"]
-        ):
-            raise ValueError("Invalid mention schema or identity")
-        count = int(row["other_definition_count"])
-        if count < 0:
-            raise ValueError("Negative mention count")
-        mentions[row["word_id"]] = row
-    if mentions.keys() != identities.keys():
-        raise ValueError("Mentions must cover every inventory ID")
     by_form = {}
     for row in vocabulary:
         by_form.setdefault(_lexeme(row["word"]), []).append(row)
@@ -368,11 +393,22 @@ def export_local_evidence(
             policy=POLICY,
             inputs={
                 str(p.resolve()): _sha256(p)
-                for p in (vocabulary_csv, loc_file, sources_csv, mentions_csv)
+                for p in (
+                    vocabulary_csv,
+                    loc_file,
+                    sources_csv,
+                    mentions_csv,
+                    *provenance_paths,
+                )
             },
             implementation={
                 str(p.resolve()): _sha256(p)
-                for p in (Path(__file__), Path(__file__).with_name("dataset.py"))
+                for p in (
+                    Path(__file__),
+                    Path(__file__).with_name("dataset.py"),
+                    Path(__file__).with_name("local_mentions.py"),
+                    Path(__file__).with_name("definition_frequency.py"),
+                )
             },
             artifacts={p.name: _sha256(p) for p in staged.iterdir()},
         )

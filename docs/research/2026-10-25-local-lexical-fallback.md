@@ -20,7 +20,11 @@ The two CSV boundaries were explicitly confirmed by the user before tests.
 ## Extraction and scope
 
 150 forms;168 hash-verified local source files covering134 forms. Structured DEX
-headings bind literal spelling/explicit inflected alternatives to POS. Multiple
+headings bind literal spelling/explicit inflected alternatives to POS. Explicit
+number restrictions also gate each sense: singular ițar cannot inherit the trousers
+sense tagged only-plural; child singular tags override parent plural scope.
+Nonexclusive “mai ales la plural” does not exclude singular; literal noun plural
+alternatives (including invariant spellings) remain admissible. Multiple
 heading blocks preserve all stated POS. Meaning IDs, definitions, source paths/hashes,
 parent meanings and scoped tags remain inspectable. Tags inherit down a meaning
 branch; navigation, etymology, examples and unscoped raw-definition abbreviations
@@ -35,7 +39,11 @@ that every valid sense or inflected use has been found; this remains a conservat
 structured-source gate, not automatic linguistic verification.
 
 Cross-entry counts reuse the audited frozen rebus corpus with its original target
-page exclusions and outside-own-page correction. No source filenames, review-round
+page exclusions and outside-own-page correction. A mandatory
+`mentions.csv.metadata.json` binds vocabulary/count hashes, the versioned corpus
+manifest, source ledger, audited extractor and full derivation table. Export validates
+all references, corpus/ledger agreement and each projected count against its
+derivation; a bare or self-entry-count CSV is rejected. No source filenames, review-round
 flags, snapshot counts, assistant contexts/estimates or inherited rarity scores
 enter the feature vector. Selection of locally saved pages still limits external
 validity; feature exclusion cannot make a selected pilot independent.
@@ -130,10 +138,10 @@ Install the existing `evaluation` extra. From the implementation checkout:
 
 ```sh
 classificator evaluation-local-evidence \
-  --vocabulary-csv ../local-fallback-2026-10-25/inputs/inventory.csv \
-  --loc-file ../local-fallback-2026-10-25/inputs/loc.txt \
-  --sources-csv ../local-fallback-2026-10-25/inputs/sources.csv \
-  --mentions-csv ../local-fallback-2026-10-25/inputs/mentions.csv \
+  --vocabulary-csv ../local-fallback-2026-10-25/inputs-final/inventory.csv \
+  --loc-file ../local-fallback-2026-10-25/inputs-final/loc.txt \
+  --sources-csv ../local-fallback-2026-10-25/inputs-final/sources.csv \
+  --mentions-csv ../local-fallback-2026-10-25/inputs-final/mentions.csv \
   --campaign-dir ../local-fallback-2026-10-25/evidence-replay
 classificator evaluation-local-fallback \
   --reference-csv ../pilot-2026-10-17/data/evaluations/2026-10-21-fabian-short/working-reference-150.csv \
@@ -148,3 +156,28 @@ Local run artifacts under `build/d1/local-fallback-2026-10-25/`: input projectio
 and lineage, predeclared protocol, extraction, comparison, scripts and verification.
 These are local artifacts; existing raw HTML/LOC snapshots are not bundled with
 the source commit. Use fresh output paths; existing directories are refused.
+
+
+Input contracts: source index columns `word,path,sha256,format`, with format `html`
+or `cache_json`; paths relative to index location or absolute. Mention CSV columns
+`word_id,word,other_definition_count`, exact vocabulary coverage. The sidecar uses
+schema1, policy `exact-form-outside-own-page-definitions-v1`, vocabulary/mentions
+SHA256 and `{path,sha256}` references `corpus_manifest`, `source_ledger`, `extractor`,
+`derivation`. Derivation must expose `word_id,word,rebus_other_definition_count`;
+extra inventory IDs are permitted, ambiguous/duplicate identities are not.
+Final accepted artifacts: `evidence-final/` and `comparison-final/`; earlier scratch
+runs are retained separately. The statistical protocol was not changed after results;
+review fixes tightened lexical alignment and provenance only.
+
+## Verification
+
+832 tests and173 subtests pass; Ruff passes. CLI extraction/comparison ran with
+HTTP, socket and database entry points blocked. Replay reproduces457 data artifacts
+byte-for-byte. Frozen wordfreq input/config hashes and full inventory scores unchanged.
+
+Independent review: spec axis no actionable findings; standards axis found the
+missing mention-corpus contract, now fixed and rechecked. Independent artifact
+verification covered449 folds,126 tree predictions,36 metric slices and168 source
+hashes. It also found the plural-only sense defect; regression and actual-source
+checks now pass.19 sense rows (16 distinct word/sense pairs) were corrected without
+changing any of the three prediction CSVs. No remaining blocking review findings.

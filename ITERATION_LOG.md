@@ -765,3 +765,20 @@ feature selected. Recommendation: keep frozen4; investigate independent running-
 corpus coverage/provenance, no extra annotation or pilot tree search. Report/plan/ADR
 updated. Full826 tests/157 subtests +Ruff pass; HTTP/DB blocked in integration/run.
 Independent code review and final artifact verification next. No D1, DB or push.
+
+### 2026-10-25 — Review fixes and final verification
+
+Spec review passed. Standards review found bare mention CSV lacked corpus contract;
+added mandatory schema/policy sidecar, input/ref hashes, corpus→ledger binding and
+per-row agreement with audited derivation. New public-export TDD regression slices.
+Independent artifact reviewer found plural-only ițar/zar sense alignment defect;
+added explicit number gate, literal plural/invariant witnesses, child singular
+scope override and nonexclusive preference handling. RED→GREEN regression;19
+sense rows corrected (16 distinct pairs), no change to the three prediction CSVs.
+
+Final832 tests/173 subtests and Ruff pass. Independent audit449 folds/126 trees/
+36 metric slices/168 source hashes passes. Guarded real CLI replay457 data artifacts
+byte-identical. Frozen model/input/export hashes unchanged. Final artifacts in
+local-fallback-2026-10-25/evidence-final andcomparison-final; manifests, projection,
+protocol, verifier and replay scripts retained. Plan/report/ADR updated. No open
+review findings. No D1, database access, production promotion or remote push.

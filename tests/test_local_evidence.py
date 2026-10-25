@@ -61,6 +61,9 @@ class LocalEvidenceTests(unittest.TestCase):
                 )
             ],
         )
+        from tests.test_local_mentions import write_metadata
+
+        write_metadata(vocabulary, mentions)
         return vocabulary, loc_file, sources, mentions
 
     def test_exports_exact_senses_for_every_pos_with_source_provenance(self):
@@ -290,6 +293,9 @@ class LocalEvidenceTests(unittest.TestCase):
                     for i in [1, 2]
                 ],
             )
+            from tests.test_local_mentions import write_metadata
+
+            write_metadata(inputs[0], inputs[3])
             export_local_evidence(*inputs, root / "out")
             rows = read(root / "out/evidence.csv")
             self.assertEqual([r["word_id"] for r in rows], ["1", "2"])
@@ -368,6 +374,9 @@ class LocalEvidenceTests(unittest.TestCase):
                     for r in vocab
                 ],
             )
+            from tests.test_local_mentions import write_metadata
+
+            write_metadata(inputs[0], inputs[3])
             with (
                 patch(
                     "requests.sessions.Session.request",
@@ -416,4 +425,60 @@ class LocalEvidenceTests(unittest.TestCase):
                 )
             self.assertEqual(
                 len(read(root / "comparison/revised_working/predictions.csv")), 3
+            )
+
+    def test_number_restrictions_exclude_singular_but_allow_plural_and_child_override(
+        self,
+    ):
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            html = heading(
+                'ițar<span class="tree-inflected-form">, ițari</span>',
+                "substantiv masculin",
+            ) + body(
+                meaning("1", "Pantaloni.", "(numai) plural")
+                + meaning("2", "Dispozitiv de țesut.")
+            )
+            inputs = self.inputs(root, html, word="ițar", loc="ițar M1\n")
+            export_local_evidence(*inputs, root / "singular")
+            senses = {s["sense_id"]: s for s in read(root / "singular/senses.csv")}
+            self.assertEqual(senses["meaning1"]["alignment"], "unresolved")
+            self.assertEqual(senses["meaning2"]["alignment"], "exact")
+            self.assertEqual(
+                read(root / "singular/evidence.csv")[0]["aligned_senses"], "1"
+            )
+            inputs = self.inputs(root, html, word="ițari", loc="ițari M1\n")
+            export_local_evidence(*inputs, root / "plural-number")
+            self.assertEqual(
+                read(root / "plural-number/senses.csv")[0]["alignment"], "exact"
+            )
+            html = heading(
+                'briofită<span class="tree-inflected-form">, briofite</span>',
+                "substantiv feminin",
+            ) + body(
+                meaning(
+                    "3",
+                    "Grupă de plante.",
+                    "(la) plural",
+                    "<ul>"
+                    + meaning("4", "O plantă din grupă.", "(la) singular")
+                    + "</ul>",
+                )
+                + meaning("5", "Sens neexclusiv.", "mai ales la plural")
+            )
+            inputs = self.inputs(root, html, word="briofită", loc="briofită F1\n")
+            export_local_evidence(*inputs, root / "override")
+            senses = {s["sense_id"]: s for s in read(root / "override/senses.csv")}
+            self.assertEqual(
+                [senses[f"meaning{i}"]["alignment"] for i in [3, 4, 5]],
+                ["unresolved", "exact", "exact"],
+            )
+            html = heading(
+                'abietacee<span class="tree-inflected-form">, abietacee</span>',
+                "substantiv feminin",
+            ) + body(meaning("6", "Familie de plante.", "(la) plural"))
+            inputs = self.inputs(root, html, word="abietacee", loc="abietacee F1\n")
+            export_local_evidence(*inputs, root / "invariant")
+            self.assertEqual(
+                read(root / "invariant/evidence.csv")[0]["alignment"], "source_bounded"
             )

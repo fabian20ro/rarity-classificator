@@ -751,3 +751,10 @@ broad coverage, exact-sense alignment, robust4/5 separation and external validat
 DB and frozen scorer/config/export unchanged; no D1 or model server calls.
 
 [Implementation, results and reproduction](../research/2026-10-25-local-lexical-fallback.md).
+
+Final checks:832 tests/173 subtests +Ruff pass. Mandatory mention sidecar binds
+corpus policy/ledger/extractor/derivation and projected counts; plural-only meanings
+cannot leak into singular targets. Review corrected19 sense rows, unchanged scores.
+Independent449-fold audit and457-artifact CLI replay pass; no open review findings.
+Final local artifacts: `build/d1/local-fallback-2026-10-25/evidence-final/` and
+`comparison-final/`; frozen scorer/config/full inventory export verified unchanged.
