@@ -782,3 +782,29 @@ byte-identical. Frozen model/input/export hashes unchanged. Final artifacts in
 local-fallback-2026-10-25/evidence-final andcomparison-final; manifests, projection,
 protocol, verifier and replay scripts retained. Plan/report/ADR updated. No open
 review findings. No D1, database access, production promotion or remote push.
+
+
+## 2026-10-25 — Romanian running-text corpus access and licence investigation
+
+Used Matt research skill plus background primary-source researcher. Inspected
+CoRoLa, Leipzig, SETIMES, ParlaMint, FineWeb2, CulturaX, OSCAR, CC-News, roTenTen and
+wROdfreq. Bounded anonymous probes verify FineWeb2 metadata/files/range/viewer,
+CoRoLa frequency ZIP segments, Leipzig exact-word API and SETIMES archive range.
+No full corpus download, gated-term acceptance, provider contact, D1 or DB access.
+
+Recommendation: bounded cross-shard FineWeb2 coverage experiment, recent crawl
+slice separately; ODC-By+Common Crawl rights recorded. CoRoLa optional eligible
+NC diagnostic. Surprises: OSCAR explicitly suspended, current full ParlaMint lacks
+RO despite project existence; FineFreq counts characters, not words. wROdfreq data
+binaries/licence not verified. New Common Crawl data is not automatically independent
+of wordfreq. No measured new inventory coverage or 4/5 improvement claimed.
+
+Research note and plan updated; protocol keeps all66,088 rows/64,226 forms, existing
+150-label strata, fold-local calibration and unknown→4. Frozen scorer/config/export
+unchanged. Documentation-only checks; production tests not rerun. Probe receipts in
+build/d1/romanian-corpora-research-2026-10-25. Root mirrors receive only new sections,
+preserving divergent historical logs. No remote push.
+
+Independent research review: no blocking source/licence findings. Clarified observed
+vs valid uses, unverified prefix recency and sample-only inference; require row-group
+sizes/selection probabilities before extrapolation. Markdown diff checks pass.

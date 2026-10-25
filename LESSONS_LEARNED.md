@@ -204,3 +204,12 @@ a parent plural restriction. Nonexclusive “mai ales la plural” is not exclus
 Validated against local source records and public CSV regression tests;19 exported
 sense records corrected. Corpus-derived mention counts also need a versioned
 sidecar and derivation checks, not only a projected CSV hash.
+
+
+**[2026-10-25]** Verify corpus access and licence at the actual release/file layer —
+a dataset badge may cover metadata only (OSCAR), an API licence need not establish
+archive terms (Leipzig), and a language project may be absent from full releases
+(ParlaMint-RO). Anonymous range probes establish availability, not inventory coverage.
+Web corpus prefixes can be old; freeze balanced sampling and byte budgets. Missing
+in a bounded sample is not evidence for level5, and Common Crawl derivatives are
+not automatically independent of wordfreq's Romanian OSCAR source.

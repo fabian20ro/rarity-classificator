@@ -758,3 +758,37 @@ cannot leak into singular targets. Review corrected19 sense rows, unchanged scor
 Independent449-fold audit and457-artifact CLI replay pass; no open review findings.
 Final local artifacts: `build/d1/local-fallback-2026-10-25/evidence-final/` and
 `comparison-final/`; frozen scorer/config/full inventory export verified unchanged.
+
+
+## Romanian running-text corpus research — 2026-10-25 (current recommendation)
+
+Investigated public access and advertised terms; no new corpus coverage measured.
+FineWeb2 Romanian train is anonymously readable (actual HTTP206/200 probes), pinned
+revision af9c13333eb981300149d5ca60a8e9d659b276b9;20 shards≈85.37GiB. Database ODC-By1.0
+plus Common Crawl/content rights. Crawl dates2013–April2024, not live2026 text.
+CoRoLa publishes a complete lowercase word-form list (1.81M entries), but BY-NC-ND
+limits reuse: optional eligible noncommercial diagnostic, not automatic app dependency.
+Leipzig news2011 API works but bulk licence unresolved; SETIMES archive reachable,
+CC-BY-SA version/unique text volume need checking. OSCAR access explicitly suspended;
+CulturaX gated. Full current ParlaMint release omits RO. wROdfreq relevant but no
+frequency binary or repository licence verified; not an immediate drop-in.
+
+**Next experiment:** coverage-first FineWeb2 sample, sequential bounded range reads,
+≤100k examined documents /≤1GiB transferred including metadata, whichever first;
+fixed seed/manifest spread across20shards, verify balanced sampling feasibility.
+Report2020–2024 primary slice and older separately; freeze exact tokenizer, exclusions,
+source/input hashes. Export every66,088 missing row/64,226form and pilot targets,
+with token/document/host counts and denominator; keep zero as unobserved.
+
+Only after coverage/quality gate: one predeclared wordfreq→supported corpus frequency
+→4 candidate; thresholds fit inside existing group folds. Proposed support floor
+5occurrences/3docs/2hosts, fixed before labels; insufficient training support stops
+calibration. Full150,missing49,37/113,first-independent149,4/5confusion/false5/severe
+errors reported. No promotion if first-response performance or severe errors worsen.
+Common Crawl ancestry may overlap wordfreq; new source is not independent gold.
+No new user annotation. Retain frozen wordfreq+4 pending validated improvement.
+
+**Leftovers:** extractor/TDD, real coverage, sample quality/recency, comparison and
+robust4/5 discrimination; larger sample only if coverage justifies cost. No D1,
+database access, raw-text corpus redistribution or frozen config/export changes.
+[Source/access/licence audit and experiment protocol](../research/2026-10-25-romanian-running-text-corpora.md).
