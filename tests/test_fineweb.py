@@ -330,7 +330,12 @@ class FineWebTests(unittest.TestCase):
 
         shards, http = self.source()
         with (
-            patch("requests.Session", return_value=http),
+            patch(
+                "requests.adapters.HTTPAdapter.send",
+                side_effect=lambda request, **kwargs: http.get(
+                    request.url, headers=request.headers
+                ),
+            ),
             patch("psycopg.connect", side_effect=AssertionError("DB forbidden")),
             redirect_stdout(io.StringIO()),
         ):
@@ -379,3 +384,66 @@ class FineWebTests(unittest.TestCase):
             export_fineweb_frequencies(
                 self.vocab, shards, self.root / "out", session=http, initial_bytes=0
             )
+
+    def test_corrupt_checkpoint_fails_closed_before_resuming(self):
+        shards, http = self.source()
+        original = http.get
+        calls = 0
+
+        def interrupted(*args, **kwargs):
+            nonlocal calls
+            calls += 1
+            if calls == 7:
+                raise ConnectionError("interrupted")
+            return original(*args, **kwargs)
+
+        http.get = interrupted
+        with self.assertRaises(ConnectionError):
+            export_fineweb_frequencies(
+                self.vocab, shards, self.root / "out", session=http, initial_bytes=0
+            )
+        path = self.root / "out/checkpoint.json"
+        data = json.loads(path.read_text())
+        state = data.get("state", data)
+        state["primary"]["counts"]["casă"] += 1
+        path.write_text(json.dumps(data))
+        http.get = original
+        with self.assertRaisesRegex(ValueError, "checkpoint"):
+            export_fineweb_frequencies(
+                self.vocab, shards, self.root / "out", session=http, initial_bytes=0
+            )
+
+    def test_interrupted_projection_after_disk_recovery_is_rebuildable(self):
+        from unittest.mock import patch
+
+        shards, http = self.source()
+        calls = 0
+
+        def disk(path):
+            nonlocal calls
+            calls += 1
+            return type("Disk", (), {"free": (10 << 30) if calls <= 6 else 1})()
+
+        with patch("shutil.disk_usage", side_effect=disk):
+            stopped = export_fineweb_frequencies(
+                self.vocab, shards, self.root / "out", session=http, initial_bytes=0
+            )
+        self.assertEqual(stopped["stop_reason"], "disk_reserve")
+        original = Path.open
+
+        def interrupted(path, *args, **kwargs):
+            if path.name == "older-frequencies.csv" and args and args[0] == "w":
+                raise OSError("publication interrupted")
+            return original(path, *args, **kwargs)
+
+        with patch.object(Path, "open", interrupted):
+            with self.assertRaises(OSError):
+                export_fineweb_frequencies(
+                    self.vocab, shards, self.root / "out", session=http, initial_bytes=0
+                )
+        result = export_fineweb_frequencies(
+            self.vocab, shards, self.root / "out", session=http, initial_bytes=0
+        )
+        self.assertEqual(result["counts"]["examined_documents"], 2)
+        rows = list(csv.DictReader((self.root / "out/frequencies.csv").open()))
+        self.assertEqual(rows[0]["count"], "3")

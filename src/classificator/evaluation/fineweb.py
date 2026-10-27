@@ -41,6 +41,18 @@ def _save(path, data):
     temporary.replace(path)
 
 
+def _digest(data):
+    return hashlib.sha256(
+        json.dumps(
+            data, sort_keys=True, allow_nan=False, default=lambda v: sorted(v)
+        ).encode()
+    ).hexdigest()
+
+
+def _checkpoint(path, state, binding):
+    _save(path, dict(schema=1, binding=binding, state=state, sha256=_digest(state)))
+
+
 class _Budget:
     def __init__(self, path, binding, maximum, initial):
         self.path, self.maximum = path, maximum
@@ -317,7 +329,6 @@ def _export(
     max_group_bytes=128 << 20,
 ):
     import pyarrow.parquet as pq
-    import requests
 
     if (
         not 0 <= initial_bytes <= max_bytes <= 1 << 30
@@ -355,6 +366,7 @@ def _export(
                 Path(__file__),
                 Path(__file__).with_name("dataset.py"),
                 Path(__file__).with_name("definition_frequency.py"),
+                Path(__file__).with_name("fineweb_transport.py"),
             )
         },
     )
@@ -369,12 +381,28 @@ def _export(
                 raise ValueError("Completed artifact changed")
         if result["stop_reason"] != "disk_reserve":
             return result
+        # Invalidate the provisional generation before replacing any projection.
+        final.unlink()
     checkpoint = output_dir / "checkpoint.json"
     state = _runtime_state()
     state["next_group"] = 0
     state["sampling"] = []
     if checkpoint.exists():
-        state = json.loads(checkpoint.read_text())
+        saved = json.loads(checkpoint.read_text())
+        if (
+            saved.get("schema") != 1
+            or saved.get("binding") != binding
+            or _digest(saved.get("state")) != saved.get("sha256")
+        ):
+            raise ValueError("Invalid or changed checkpoint")
+        state = saved["state"]
+        if (
+            state["next_group"] != len(state["sampling"])
+            or sum(r["examined"] for r in state["sampling"])
+            != state["stats"]["examined_documents"]
+            or state["stats"]["examined_documents"] > budget.state["reserved_documents"]
+        ):
+            raise ValueError("Invalid checkpoint progress")
         state["stats"] = Counter(state["stats"])
         for name in ("primary", "older"):
             corpus = state[name]
@@ -388,7 +416,7 @@ def _export(
     try:
         readers = []
         for shard in shards:
-            source = _RemoteFile(session or requests.Session(), shard, budget)
+            source = _RemoteFile(session, shard, budget)
             readers.append(pq.ParquetFile(source, pre_buffer=False))
         plans = []
         randomizer = random.Random(20261026)
@@ -448,7 +476,7 @@ def _export(
                 _observe(row, wanted, state)
             state["sampling"].append(dict(item, examined=len(rows)))
             state["next_group"] = index + 1
-            _save(checkpoint, state)
+            _checkpoint(checkpoint, state, binding)
         if state["stats"]["examined_documents"] >= max_documents:
             stop_reason = "document_limit"
     except _Stop as exc:
@@ -539,4 +567,13 @@ def export_fineweb_frequencies(vocabulary_csv, shards_json, output_dir, **option
             p.name != ".lock" for p in output_dir.iterdir()
         ):
             raise ValueError("Campaign budget missing; refusing reset")
-        return _export(vocabulary_csv, shards_json, output_dir, **options)
+        from .fineweb_transport import HTTP
+
+        owned_transport = options.get("session") is None
+        if owned_transport:
+            options["session"] = HTTP()
+        try:
+            return _export(vocabulary_csv, shards_json, output_dir, **options)
+        finally:
+            if owned_transport:
+                options["session"].close()
