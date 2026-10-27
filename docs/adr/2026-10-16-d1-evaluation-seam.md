@@ -76,3 +76,36 @@ corpus, source ledger, extractor and checked derivation; hashing a bare counts C
 is insufficient provenance. Explicit singular/plural restrictions participate in
 sense alignment. A child's explicit number scope overrides its parent's; usage
 preferences such as “mai ales la plural” are not exclusive restrictions.
+
+
+## 2026-10-27: bounded FineWeb2 evidence and comparison
+
+Keep source extraction and fold-local evaluation as independent CSV functions.
+FineWeb2 is optional offline research, never a production scorer/DB integration.
+PyArrow21 reads only required column chunks through an explicit seek/read adapter;
+pre_buffer=False/use_threads=False. HTTPAdapter.send returns headers without the
+Requests Session redirect-body drain; all body reads and redirects are controlled.
+
+One locked campaign binds inventory, pinned shard metadata, policy and implementation
+hashes. Reserve payload+8192bytes/request before transport, and document attempts
+before decoding; uncertain reservations survive interruption. Default transfer cap
+1GiB includes40MiB dependency allowance. No corpus cache or full shard file; range
+cap64MiB, selected-group uncompressed cap128MiB, free-disk floor5GiB. HTTP accounting
+is conservative application payload/reservations, not a TCP/TLS wire-byte meter.
+
+Checkpoint schema, campaign binding, state digest and progress validated on resume.
+CSV generation becomes readable only when its manifest is published; a low-space
+provisional manifest is invalidated before rebuilding resumed projections. Complete
+runs replay locally without network; exhausted hard budgets cannot be reset in place.
+
+Freeze seeded rowgroup order across all shards and per-shard document quotas before
+labels. Partial groups use leading rows; frequencies describe this bounded sample,
+not a uniform document sample or unbiased whole-corpus estimate. Count attempted
+documents before filtering. Exact Unicode token policy retained; temporal-slice-local
+text deduplication, explicit source/language exclusions and bounded concordances.
+Primary2020–2024 and older2013–2019 counts remain separate.
+
+Evaluator validates complete-inventory source CSV/hash binding and keeps the shared
+wordfreq path fold-local. Only balanced sample plus5tokens/3docs/2hosts can enter
+the fallback; minimum10 eligible training forms/two levels. Unsupported inputs
+remain4. Three existing label views/4vs5 diagnostics, no new annotation or tuning.

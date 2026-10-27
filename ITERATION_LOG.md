@@ -808,3 +808,51 @@ preserving divergent historical logs. No remote push.
 Independent research review: no blocking source/licence findings. Clarified observed
 vs valid uses, unverified prefix recency and sample-only inference; require row-group
 sizes/selection probabilities before extrapolation. Markdown diff checks pass.
+
+
+## 2026-10-26 — FineWeb2 implementation preparation
+
+User authorized bounded TDD experiment,100k examined docs or1GiB transfer, lowdisk,
+150-label comparison; no D1/DB. Read lessons, implement/TDD skill and planner/architect
+instructions; background planner reviewed architecture. New HTTP→CSV seam confirmation
+pending; existing CSV evaluation seam retained. No tests or production code written.
+
+Disk57GiB free at start. Installed pyarrow21.0.0 into existing active-clone venv via
+uv --no-cache (29.8MiB reported); conservatively reserve40MiB inside total1GiB. Prepared
+input inventory/shard snapshot and protocol under build/d1/fineweb-2026-10-26. Planned
+durable pre-request reservation, strict206 range checks, sequential sampling across
+20shards,5GiB free-space floor, sample-only frequency claims and fold-local comparison.
+No corpus downloaded, model loaded or database accessed. Await seam confirmation
+before RED→GREEN implementation, per explicit TDD skill requirement.
+
+
+## 2026-10-27 — FineWeb2 bounded implementation and experiment completed
+
+User confirmed HTTP→CSV andCSV→comparison seams. VerticalTDD; source/sequential
+transport/evaluator andtwoCLIcommands. Optionalpyarrow21.0.0 pinned. Stricttransfer/
+docattemptreservations,resumeidentity,5GiBdiskfloor,64MiBrange/128MiBdecompression
+limits, exacttokens/dedup/sourcefilters,completeinventoryCSV andtemporalstrata.
+
+Review found realRequests Session redirectdrain despiteallow_redirects=False;
+headers-firstHTTPAdapter transport plusrealResponseregression. Checkpointintegrity
+anddisk-recoverypublication regressionsfixed.860tests/200subtests+Ruff pass; no
+remainingblockingstandards/specfindings. Samplingdescriptiveonly; no numeric
+wholecorpusinclusionprobability claim.
+
+Run100,000docs/20shards:385,836,138bytespayload,436,626,538charged incl40MiBdependency
+reserve;1080requests/0pending.70,255primarydocs/35,932,359tokens,olderseparate.
+No fullcorpuscache; experimentartifacts~180MiB. Full77,698rows exported. Missing
+66,088rows:25,211observed,12,110supported. Pilotmissing49:24observed,8supported,
+noneof8human5. Thusminimum10trainingrows nevermet; all449candidatepredictions
+identicalbaseline. Latest150MAE.520/11severe; tail49.653/2severe; first149.624/13.
+Tail4vs5all4,19/38correct; no validatedimprovement. No posthocfloorrelaxation.
+
+Label-blind20form+8pilotconcordanceaudit confirmedwebnoise/copiedpassages/brands
+andoldpublicationrecentcrawl. Recommendkeepfrozen4; CoRoLaeligibleNCfrequency
+lookupnext, morecleanrareclasssupport beforecalibration; qualityhandlingbefore
+largerwebsamples. No newuserannotation,D1orDBaccess.
+
+Independent sourceartifactaudit and449fold/36metricrecomputationpass; baseline
+paritywithpreviousrun. Realcompletedsource replay underHTTP/DBblocks byteidentical.
+Frozeninventory/input/scoreshashes unchanged. Researchreport,plan,guide,ADR updated;
+rootmirrorsappendonly. Localcommits; no remotes modified.

@@ -200,3 +200,51 @@ Local lexical fallback experiment (2026-10-25): `evaluation-local-evidence` and
 `evaluation-local-fallback` provide reproducible offline extraction and grouped
 validation. All150 scored; modest latest-label gain fails first-independent checks.
 Keep frozen fallback4. [Results, limitations and commands](research/2026-10-25-local-lexical-fallback.md).
+
+
+## Bounded FineWeb2 experiment (2026-10-27)
+
+Install the evaluation extra (`pyarrow==21.0.0` included). Use a pinned HF train-file
+listing for revision `af9c13333eb981300149d5ca60a8e9d659b276b9`, configuration
+`ron_Latn`, with path/size entries. The existing experiment stores that verified
+listing in `build/d1/fineweb-2026-10-26/inputs/shards.json`.
+
+```sh
+classificator evaluation-fineweb \
+  --vocabulary-csv build/rarity/step1_words.csv \
+  --shards-json build/d1/fineweb-2026-10-26/inputs/shards.json \
+  --campaign-dir build/d1/fineweb-2026-10-26/source \
+  --max-documents 100000 --max-transfer-bytes 1073741824
+```
+
+The same command resumes with the same inputs/code/limits. Never delete a budget
+ledger to restart an interrupted run. Failed/uncertain transfer and document
+reservations remain spent. Hard caps cannot be raised; the default1GiB budget
+includes a conservative40MiB allowance for installing the optional parser.
+5GiB free-disk floor pauses safely. Complete runs replay without network. Source
+files are read via bounded HTTP ranges; no full shard or corpus cache is written.
+
+Outputs: full inventory `frequencies.csv` (2020–2024 crawl dates), separate
+`older-frequencies.csv`, sampled-group plan/ledger, bounded local concordances,
+validated checkpoint and manifest. Missing counts stay explicit, never imply5.
+Frequencies are descriptive of the selected sample; dates are crawl dates, not
+publication dates. Multiple hosts can repeat a passage and are not independent
+attestations. Check source quality before interpreting calibration.
+
+```sh
+classificator evaluation-fineweb-fallback \
+  --reference-csv PATH_TO_WORKING_REFERENCE_150 \
+  --features-csv PATH_TO_EXISTING_FREQUENCY_FEATURES \
+  --evidence-dir build/d1/fineweb-2026-10-26/source \
+  --first-independent-csv PATH_TO_FIRST_INDEPENDENT_149 \
+  --groups-csv PATH_TO_FROZEN_GROUPS \
+  --campaign-dir build/d1/fineweb-2026-10-26/comparison
+```
+
+Evaluation is CSV-only: complete predictions, shared fold-fitted wordfreq path,
+source-supported fallback fitted outside each held-out group, unknown→4. No D1,
+database access, production scorer changes or automatic upload. Dataset attribution
+and original content rights remain applicable; concordance snippets stay local.
+
+Completed run: [FineWeb2 bounded results](research/2026-10-27-fineweb-bounded-experiment.md).
+Source coverage improved; the declared training gate did not pass. Frozen wordfreq+4 retained.

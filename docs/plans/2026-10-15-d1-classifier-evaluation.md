@@ -792,3 +792,54 @@ No new user annotation. Retain frozen wordfreq+4 pending validated improvement.
 robust4/5 discrimination; larger sample only if coverage justifies cost. No D1,
 database access, raw-text corpus redistribution or frozen config/export changes.
 [Source/access/licence audit and experiment protocol](../research/2026-10-25-romanian-running-text-corpora.md).
+
+
+## FineWeb2 bounded experiment completed — 2026-10-27 (current recommendation)
+
+Both public CSV seams confirmed; vertical TDD implemented source exporter, bounded
+HTTP transport and grouped evaluator. 860 tests / 200 subtests + Ruff pass. Review
+fixed hidden Requests redirect-body reads, checkpoint integrity and interrupted
+publication after disk recovery. No remaining blocking findings.
+
+Real sequential run: 100,000 examined documents; 100 row groups across 20 shards,
+5,000 documents per shard. Payload 385,836,138 bytes; charged 436,626,538 bytes
+(~416 MiB), including 40 MiB parser allowance and request overhead; below 1 GiB.
+No full shard cache; local artifacts ~180 MiB. Primary 2020–2024: 70,255 documents /
+35,932,359 tokens; older 29,715 documents separate; 30 dictionary pages excluded.
+Crawl date does not prove publication recency.
+
+Missing wordfreq: 25,211/66,088 rows observed (38.15%); 12,110 meet the fixed
+5 occurrences / 3 documents / 2 hosts rule (18.32%). Distinct forms: 24,319/64,226
+observed; 11,650 supported. Operational scoring coverage remains 100%.
+Pilot: 125/150 observed, 109 supported. Missing 49: 24 observed, only 8 supported.
+Those 8 have latest labels 2×level2, 1×level3, 5×level4, none level5. Among the 19
+level5 tail forms, 5 are observed and none supported. No training fold reaches 10.
+
+Comparison completed on all three existing label views. No FineWeb model fitted;
+all candidate predictions equal baseline. Latest 150: MAE 0.520, 86 exact, 11 severe
+errors; missing 49: MAE 0.653, 19 exact, 2 severe. First-independent 149: MAE 0.624,
+13 severe. Tail 4 vs 5: 19 human4 + 19 human5 all predicted4; 19/38 correct and
+zero level5 recall. This is insufficient calibration data, not a tie between two
+successfully trained classifiers. Floors unchanged.
+
+Label-blind audit: 20 deterministic forms + all 8 supported pilot forms. Found
+copied passages across unrelated hosts, SEO lists, malformed translations and
+names/brands. Small snippets cannot estimate corpus precision. Whole-body dedup
+and host count do not establish independent valid uses. No posthoc filter tuning
+or additional annotation.
+
+**Recommendation:** keep frozen wordfreq + fallback4. **Next:** eligible noncommercial
+CoRoLa complete exact-word frequency-list diagnostic; first measure support for
+existing level5 examples under its BY-NC-ND terms. Keep corpus denominators separate;
+no automatic redistribution of restricted derived data. Further FineWeb work needs
+predeclared passage/source-quality handling before another download.
+
+**Leftovers:** clean rare-class evidence, 4/5 discrimination and generalization.
+A learned FineWeb fallback remains untested because its data gate did not pass.
+Independent source/budget/checkpoint/identity audit passes; 449 folds / 36 metric
+sections independently recomputed; baseline matches the earlier experiment.
+Completed-source replay with HTTP/DB forbidden is byte-identical. Frozen inputs
+and scores unchanged. No D1, DB connection, production promotion, push or new PR.
+
+[Full results and reproduction](../research/2026-10-27-fineweb-bounded-experiment.md).
+Artifacts: `build/d1/fineweb-2026-10-26/` (prepared 26th, run 27th).

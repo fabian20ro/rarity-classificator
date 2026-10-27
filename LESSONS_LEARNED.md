@@ -213,3 +213,21 @@ archive terms (Leipzig), and a language project may be absent from full releases
 Web corpus prefixes can be old; freeze balanced sampling and byte budgets. Missing
 in a bounded sample is not evidence for level5, and Common Crawl derivatives are
 not automatically independent of wordfreq's Romanian OSCAR source.
+
+
+**[2026-10-27]** Streaming Requests can still consume redirect bodies —
+Session.get(stream=True,allow_redirects=False) prepares Response.next by draining
+the redirect payload. A hard transfer cap needs headers-first transport (here
+HTTPAdapter.send) and bounded caller-owned reads; regression tests must exercise
+real Requests response/redirect behavior, not only a fake get method. Reserve
+uncertain work before execution. Bind/hash checkpoints and invalidate provisional
+manifests before rebuilding projections after a disk pause.
+
+
+**[2026-10-27]** Multiple hosts are not independent lexical attestations — the
+bounded FineWeb2 audit found copied passages, keyword lists and commercial names
+on unrelated hosts. A recent crawl can contain a much older publication. Preserve
+raw frequency support separately from source-quality and valid-sense evidence.
+In this pilot,24/49 tail forms were observed but only8 met5/3/2support andnonewas
+level5; no foldmetminimum10trainingrows. An unchanged gatedbaseline is not an
+evaluated learnedfallback or proof of4/5discrimination.
