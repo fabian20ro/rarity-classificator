@@ -629,3 +629,22 @@ class LocalEvidenceTests(unittest.TestCase):
             self.assertEqual(json.loads(row["tags"]), ["Maramureș"])
             self.assertNotIn("lat.", row["witness_text"])
             self.assertEqual(row["status"], "unresolved")
+
+    def test_variant_closing_bracket_bounds_prose_in_the_same_text_node(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            raw = '<div class="defWrapper"><span class="def"><b>ANTERIU,</b> <i>anterie,</i> <abbr data-bs-content="substantiv neutru">s. n.</abbr> Haină. [<abbr data-bs-content="variantă">Var.</abbr>: <b>antereu</b> <abbr data-bs-content="substantiv neutru">s. n.</abbr>] – Din <abbr data-bs-content="limba turcă">tc.</abbr> anteri.</span><a class="ref" href="/sursa/dex09" title="DEX09">DEX09</a><a href="/definitie/anteriu/1">permalink</a></div>'
+            sourced = meaning("1", "Haină preoțească.").replace(
+                "</div></li>", '<span class="badge-source" title="DEX09">DEX09</span></div></li>'
+            )
+            inputs = self.inputs(
+                root,
+                raw + heading("anteriu", "substantiv neutru") + body(sourced),
+                word="antereu",
+                loc="antereu N1\n",
+            )
+            export_local_evidence(*inputs, root / "out")
+            self.assertEqual(read(root / "out/evidence.csv")[0]["alignment"], "source_bounded")
+            witness = read(root / "out/variants.csv")[0]
+            self.assertNotIn("Din", witness["witness_text"])
+            self.assertEqual(json.loads(witness["tags"]), [])

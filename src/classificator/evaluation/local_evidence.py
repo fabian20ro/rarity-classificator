@@ -493,6 +493,9 @@ def _variants(html, target):
             clause = []
             seen_variant, trailing_prose = False, False
             for text, label, tag in parts[index + 1 :]:
+                match = re.search(r"[/\]–—]", text)
+                if match:
+                    text, label = text[: match.start()], ""
                 if (
                     seen_variant
                     and not tag
@@ -502,10 +505,7 @@ def _variants(html, target):
                     trailing_prose = True
                     break
                 seen_variant |= not label and _lexeme(text.strip(" :()[],.")) == target
-                match = re.search(r"[/\]–—]", text)
-                clause.append(
-                    (text[: match.start()] if match else text, label if not match else "", tag)
-                )
+                clause.append((text, label, tag))
                 if match:
                     break
             words = [
