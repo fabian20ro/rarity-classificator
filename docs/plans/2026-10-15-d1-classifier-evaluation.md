@@ -983,3 +983,23 @@ protected inputs unchanged. [Report](../research/2026-10-28-lexical-variant-extr
 Authoritative local artifacts: `build/d1/lexical-variants-2026-10-28/evidence-reviewed/`,
 `evidence-reviewed-comparison.json`, `verification-reviewed.json`.
 Implementation in `build/d1/exact-form-code`; committed locally, no push this iteration.
+
+
+## Model target and reproducible code map — 2026-10-29
+
+Active D1 evaluation target is now **d1-omni-2b**; old d1-3b run records remain
+historical. LM Studio inventory confirms a recognized, unloaded F16 decision model.
+Generic adapter and sequential request contract retained. Updated invocation examples
+use new campaign/output names and an explicit actual runtime version; no inference
+or model load performed. Wordfreq + fallback 4 and all scores remain unchanged.
+
+Generated a local AST graph before model edits, then regenerated after compatibility
+tests. 126 Python modules / 381 import-site edges; JSON plus focused Mermaid view,
+source hashes, one-command regeneration, stale check and importer-impact query.
+Graphify calls returned `Unknown tool`; this graph is explicitly a local fallback.
+Repository Graphify skill saved and installed in Codex for reuse.
+
+Next: use bounded graph queries to scope source reading and test selection. Restore
+Graphify connectivity/index freshness before relying on its hosted results. Actual
+Omni quality, Romanian support and reliable 4/5 discrimination remain unverified;
+no new annotations or automatic score promotion. [Details](../research/2026-10-29-d1-omni-graph.md).

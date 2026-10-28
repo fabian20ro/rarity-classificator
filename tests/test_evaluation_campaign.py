@@ -13,6 +13,44 @@ from tests.test_d1_scorer import response, models, answer
 
 
 class CampaignTests(unittest.TestCase):
+    def test_omni_migration_refuses_old_campaign_without_touching_scores(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "run"
+            http = Mock()
+            http.get.return_value = response(models())
+            http.post.return_value = response(answer())
+            items = [BaseWordRow(1, "casă", "")]
+            run_campaign(
+                items,
+                D1Scorer(model="d1-3b", http=http),
+                path,
+                config={"model": "d1-3b"},
+            )
+            before = {
+                p.relative_to(path): p.read_bytes()
+                for p in path.rglob("*")
+                if p.is_file()
+            }
+            omni_http = Mock()
+            with self.assertRaisesRegex(ValueError, "changed"):
+                run_campaign(
+                    items,
+                    D1Scorer(model="d1-omni-2b", http=omni_http),
+                    path,
+                    config={"model": "d1-omni-2b"},
+                )
+            self.assertEqual(
+                before,
+                {
+                    p.relative_to(path): p.read_bytes()
+                    for p in path.rglob("*")
+                    if p.is_file()
+                },
+            )
+            omni_http.get.assert_not_called()
+            omni_http.post.assert_not_called()
+
+
     def test_retry_batches_csv_writes_instead_of_rewriting_per_word(self):
         import requests
 

@@ -1,7 +1,7 @@
 {
   "schema": "python-module-graph-v1",
   "scope": "git-tracked Python under src/, tests/, scripts/",
-  "source_tree_sha256": "cb1074dc544108ab222970065f72de962e6510724ae23f034056f64b8abe25a6",
+  "source_tree_sha256": "53e66ae8b53c04513f1e0658c29aed8a17414a88c4a1a0bc815f4aa3af393a38",
   "nodes": [
     {
       "module": "scripts.check",
@@ -4725,7 +4725,7 @@
     {
       "module": "tests.test_d1_scorer",
       "path": "tests/test_d1_scorer.py",
-      "sha256": "8b5a5d47b9b7ac3052f3d33c5342b87f4a916ee0adf22263ce56ab90e3ac14ff",
+      "sha256": "d413001caa12ed99603ea68052aca9de8032735d8e791e273e9fb7951a11c0d3",
       "definitions": [
         {
           "name": "response",
@@ -4748,64 +4748,69 @@
           "line": 41
         },
         {
-          "name": "D1ScorerTests.test_scores_original_spelling_with_explicit_levels_and_full_distribution",
+          "name": "D1ScorerTests.test_omni_identity_is_explicit_and_unloaded_model_never_runs",
           "kind": "FunctionDef",
           "line": 42
         },
         {
+          "name": "D1ScorerTests.test_scores_original_spelling_with_explicit_levels_and_full_distribution",
+          "kind": "FunctionDef",
+          "line": 73
+        },
+        {
           "name": "D1ScorerTests.test_exact_form_contract_keeps_all_pos_and_does_not_restrict_to_inventory_type",
           "kind": "FunctionDef",
-          "line": 59
+          "line": 90
         },
         {
           "name": "D1ScorerTests.test_unloaded_or_wrong_model_never_triggers_an_inference_request",
           "kind": "FunctionDef",
-          "line": 91
+          "line": 122
         },
         {
           "name": "D1ScorerTests.test_invalid_distributions_are_explicit_failures_not_rare_predictions",
           "kind": "FunctionDef",
-          "line": 104
+          "line": 135
         },
         {
           "name": "D1ScorerTests.test_duplicate_json_keys_fail_and_request_failure_does_not_skip_later_words",
           "kind": "FunctionDef",
-          "line": 132
+          "line": 163
         },
         {
           "name": "D1ScorerTests.test_evidence_and_serial_request_order_are_preserved",
           "kind": "FunctionDef",
-          "line": 146
+          "line": 177
         },
         {
           "name": "D1ScorerTests.test_evidence_and_serial_request_order_are_preserved.get",
           "kind": "FunctionDef",
-          "line": 150
+          "line": 181
         },
         {
           "name": "D1ScorerTests.test_evidence_and_serial_request_order_are_preserved.post",
           "kind": "FunctionDef",
-          "line": 154
+          "line": 185
         },
         {
           "name": "D1ScorerTests.test_identity_change_aborts_before_another_inference",
           "kind": "FunctionDef",
-          "line": 168
+          "line": 199
         },
         {
           "name": "D1ScorerTests.test_raw_exchange_is_available_for_audit",
           "kind": "FunctionDef",
-          "line": 180
+          "line": 211
         },
         {
           "name": "D1ScorerTests.test_probability_threshold_retains_abstained_distribution",
           "kind": "FunctionDef",
-          "line": 188
+          "line": 219
         },
         {
           "name": "D1ScorerTests.test_preflight_returns_pin_without_inference_and_configuration_can_be_reused",
           "kind": "FunctionDef",
-          "line": 198
+          "line": 229
         }
       ]
     },
@@ -4829,7 +4834,7 @@
     {
       "module": "tests.test_evaluation_campaign",
       "path": "tests/test_evaluation_campaign.py",
-      "sha256": "0a80e29681a8dd7115c4120598f7975bdd4747fb83c9aa7da59bca4327e35ff4",
+      "sha256": "d2b9ef48266a39cdb04ca8ca7a8a19c355e85c1c0b76aed164626bf044714dca",
       "definitions": [
         {
           "name": "CampaignTests",
@@ -4837,54 +4842,59 @@
           "line": 15
         },
         {
-          "name": "CampaignTests.test_retry_batches_csv_writes_instead_of_rewriting_per_word",
+          "name": "CampaignTests.test_omni_migration_refuses_old_campaign_without_touching_scores",
           "kind": "FunctionDef",
           "line": 16
         },
         {
+          "name": "CampaignTests.test_retry_batches_csv_writes_instead_of_rewriting_per_word",
+          "kind": "FunctionDef",
+          "line": 54
+        },
+        {
           "name": "CampaignTests.test_retry_batches_csv_writes_instead_of_rewriting_per_word.record_write",
           "kind": "FunctionDef",
-          "line": 32
+          "line": 70
         },
         {
           "name": "CampaignTests.test_csv_campaign_resumes_completed_ids_without_another_request",
           "kind": "FunctionDef",
-          "line": 42
+          "line": 80
         },
         {
           "name": "CampaignTests.test_refuses_invalid_inventory_before_any_request_or_output",
           "kind": "FunctionDef",
-          "line": 61
+          "line": 99
         },
         {
           "name": "CampaignTests.test_interrupted_campaign_recovers_and_refuses_changed_inputs",
           "kind": "FunctionDef",
-          "line": 76
+          "line": 114
         },
         {
           "name": "CampaignTests.test_corrupt_checkpoint_fails_before_resuming",
           "kind": "FunctionDef",
-          "line": 95
+          "line": 133
         },
         {
           "name": "CampaignTests.test_failure_is_visible_and_only_explicit_retry_reissues_it",
           "kind": "FunctionDef",
-          "line": 111
+          "line": 149
         },
         {
           "name": "CampaignTests.test_orphan_records_are_not_adopted_as_a_new_campaign",
           "kind": "FunctionDef",
-          "line": 131
+          "line": 169
         },
         {
           "name": "CampaignTests.test_invalid_checkpoint_level_is_rejected",
           "kind": "FunctionDef",
-          "line": 142
+          "line": 180
         },
         {
           "name": "CampaignTests.test_summary_exposes_partial_coverage_and_request_timing",
           "kind": "FunctionDef",
-          "line": 161
+          "line": 199
         }
       ]
     },
@@ -13207,7 +13217,7 @@
     },
     {
       "source": "tests.test_d1_scorer",
-      "line": 133,
+      "line": 164,
       "statement": "import requests",
       "resolved_modules": []
     },
@@ -13335,19 +13345,19 @@
     },
     {
       "source": "tests.test_evaluation_campaign",
-      "line": 17,
+      "line": 55,
       "statement": "import requests",
       "resolved_modules": []
     },
     {
       "source": "tests.test_evaluation_campaign",
-      "line": 112,
+      "line": 150,
       "statement": "import requests",
       "resolved_modules": []
     },
     {
       "source": "tests.test_evaluation_campaign",
-      "line": 162,
+      "line": 200,
       "statement": "import requests",
       "resolved_modules": []
     },

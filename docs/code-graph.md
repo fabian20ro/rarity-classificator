@@ -75,3 +75,28 @@ without overwriting artifacts. Run:
 python3 -m pytest tests/test_code_graph.py -q
 python3 -m ruff check scripts/code_graph.py tests/test_code_graph.py
 ```
+
+## Graphify plugin and reusable skill
+
+[Repository skill](../skills/graphify/SKILL.md) describes bounded Graphify queries,
+index freshness checks and this fallback. A copy was installed in
+`~/.codex/skills/graphify/SKILL.md`; refresh that copy after changing the repository
+skill. Invoke `$graphify`, or explicitly ask to read the repository skill.
+
+On 2026-10-29, Graphify's tools were advertised but `list_repositories` and
+`graph_stats` returned `Unknown tool`, including a retry after the user tagged the
+plugin. No repository index or remote graph export was obtained. The plugin manifest
+points to hosted `https://api.graphify.com/mcp`; a Homebrew package is not required
+for that connector. Reconnection/service repair is separate from repository indexing.
+The exposed tools query promoted snapshots; they do not expose a full index-build
+or full-graph export operation. After connection works, check repository/index
+readiness before treating a bounded subgraph as evidence of current code.
+
+[Before-model snapshot](code-graph/before-omni/graph.json) preserves the graph made
+before updating the active model examples/tests. Its Python source digest is
+`cb1074dc544108ab222970065f72de962e6510724ae23f034056f64b8abe25a6`;
+the initial graph generator/output is also preserved in commit `52745da`.
+The local baseline was `b874395` plus the newly staged generator and graph test.
+Only after saving this snapshot were the model examples/tests changed. The current
+map was then regenerated; historical snapshots intentionally do not pass a check
+against the newer working tree.

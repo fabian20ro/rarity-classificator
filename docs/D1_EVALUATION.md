@@ -1,5 +1,12 @@
 # Evaluate D1 on Romanian Scrabble words
 
+Current evaluation target: **d1-omni-2b** (updated 2026-10-29). Model selection stays
+explicit through `--model`; the production offline wordfreq configuration is unchanged.
+LM Studio's read-only model inventory reports `type=decision`, `architecture=lfm3`,
+`decision_type=lfm3-d1-omni`, F16, 4,076,585,920 bytes and no loaded instances.
+This establishes recognition, not inference compatibility or measured Romanian quality.
+The separate `mmproj-*.gguf` is not the `--model-file` argument for this text campaign.
+
 Experimental, sequential path. No command loads a model. Preparation, frequency baseline and reporting work offline. Run inference only after a matching D1 GGUF has been manually loaded and sufficient RAM is available.
 
 Start from an explicit Scrabble inventory CSV with `word_id,word,type`; optional `family` groups related spellings. Source version is required provenance supplied by the operator, not an eligibility certification. Preserve diacritics; do not expand inflections. Select a curated 150-word pilot inventory before preparing it; keep representative and rare-word challenge sampling records separately.
@@ -30,13 +37,13 @@ Have Romanian speakers label familiarity 1..5 without model predictions or defin
 ```sh
 python -m classificator evaluation-run \
   --vocabulary-csv build/d1/dataset/vocabulary.csv \
-  --campaign-dir build/d1/word-only \
-  --model d1-3b \
-  --model-file /Users/fabian/.lmstudio/models/LiquidAI/d1-3B-GGUF/d1-3B-Q8_0.gguf \
-  --runtime-version 'llama.cpp-2.58.0-lmstudio-0.4.26+4'
+  --campaign-dir build/d1/omni-2b-word-only \
+  --model d1-omni-2b \
+  --model-file "$HOME/.lmstudio/models/LiquidAI/d1-Omni-2B-GGUF/d1-Omni-2B-F16.gguf" \
+  --runtime-version ACTUAL_INSTALLED_RUNTIME_VERSION
 ```
 
-Use the actual installed runtime version and matching model file; values above describe the inspected setup. A second campaign with `--evidence-csv build/d1/dataset/evidence.csv` evaluates evidence assistance. For a definitions-only ablation, supply a derived CSV containing `word_id,definition,definition_status`; for frequency-assisted evaluation include `frequency,frequency_present`. Unknown evidence columns, including human labels, are rejected. Inputs and implementation changes require a new campaign directory.
+Replace the runtime placeholder with the actual installed runtime version. The model key and F16 file above were verified locally on 2026-10-29; inference was not run. Never reuse a d1-3b campaign directory for this model. A second campaign with `--evidence-csv build/d1/dataset/evidence.csv` evaluates evidence assistance. For a definitions-only ablation, supply a derived CSV containing `word_id,definition,definition_status`; for frequency-assisted evaluation include `frequency,frequency_present`. Unknown evidence columns, including human labels, are rejected. Inputs and implementation changes require a new campaign directory.
 
 Default English familiarity rubric is versioned in `scoring/d1.py`; no offensive-word rarity penalty. Comparing a Romanian rubric remains a development experiment. Full probabilities are saved; argmax selects the integer class, lower label wins an exact tie. `--min-probability` optionally abstains below a chosen maximum-class-probability threshold; default0 retains all valid predictions for unbiased initial evaluation. This threshold is not an estimated accuracy guarantee.
 
@@ -47,12 +54,12 @@ Repeat the command to resume without repeating completed IDs. Add `--retry-faile
 The standard Step2 entrypoint also accepts D1:
 
 ```sh
-python -m classificator step2-score --backend d1 --run d1-pilot \
-  --base-csv build/d1/dataset/vocabulary.csv --output-csv build/d1/scored.csv \
-  --model d1-3b --model-file /path/to/matching-model.gguf --runtime-version ACTUAL_VERSION
+python -m classificator step2-score --backend d1 --run d1-omni-2b-pilot \
+  --base-csv build/d1/dataset/vocabulary.csv --output-csv build/d1/omni-2b-scored.csv \
+  --model d1-omni-2b --model-file /path/to/matching-model.gguf --runtime-version ACTUAL_VERSION
 ```
 
-Sidecars live in `scored.csv.campaign/`. This path rejects force, skipped preflight, alternate endpoint, input overrides and limits: prepare the intended frozen inventory instead. For explicit failure retry, use `evaluation-run` against the same sidecar directory and matching `--run d1-pilot` identity, or a new campaign. No upload occurs. `--dry-run` never contacts the model. Production chat scoring remains the default.
+Sidecars live beside the output, here `omni-2b-scored.csv.campaign/`. This path rejects force, skipped preflight, alternate endpoint, input overrides and limits: prepare the intended frozen inventory instead. For explicit failure retry, use `evaluation-run` against the same sidecar directory and matching `--run d1-omni-2b-pilot` identity, or a new campaign. No upload occurs. `--dry-run` never contacts the model. Production chat scoring remains the default.
 
 ## Baselines and held-out report
 
@@ -67,7 +74,7 @@ python -m classificator evaluation-frequency \
 
 python -m classificator evaluation-report \
   --labels-csv build/d1/adjudicated-labels.csv \
-  --predictions-csv build/d1/word-only/predictions.csv \
+  --predictions-csv build/d1/omni-2b-word-only/predictions.csv \
   --baseline-csv build/d1/frequency-baseline/predictions.csv \
   --split test --bootstrap-samples 1000 --seed 42 \
   --report build/d1/comparison.json
