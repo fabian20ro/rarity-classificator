@@ -398,7 +398,13 @@ def _raw_variant_senses(variant):
         tags = sorted(set(json.loads(variant["tags"]) + own_tags))
         number = _number_restriction(own_tags) or ""
         variant_number = variant["number_restriction"]
-        valid = not number or number == (variant_number or "singular")
+        own_pos = {_pos(tag) for tag in own_tags if _pos(tag)}
+        reason = "explicit_variant_raw_meaning"
+        if own_pos and own_pos != {variant["pos"]}:
+            reason = "conflicting_meaning_pos"
+        elif number and number != (variant_number or "singular"):
+            reason = "number_restriction"
+        valid = reason == "explicit_variant_raw_meaning"
         yield dict(
             heading=variant["base_heading"],
             pos=variant["pos"],
@@ -408,7 +414,7 @@ def _raw_variant_senses(variant):
             definition=definition,
             tags=json.dumps(tags, ensure_ascii=False),
             alignment="exact" if valid else "unresolved",
-            alignment_reason="explicit_variant_raw_meaning" if valid else "number_restriction",
+            alignment_reason=reason,
             number_restriction=number,
             variant_number_restriction=variant_number,
             variant_id=variant["variant_id"],

@@ -489,6 +489,20 @@ class LocalEvidenceTests(unittest.TestCase):
             )
             self.assertEqual(read(root / "out/evidence.csv")[0]["alignment"], "source_bounded")
 
+    def test_raw_variant_meaning_with_conflicting_pos_remains_unresolved(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            html = '<div class="defWrapper"><span class="def"><b>atu</b> <abbr data-bs-content="substantiv neutru">sn</abbr> [<abbr data-bs-content="variantă">V:</abbr> <b>ata</b> <abbr data-bs-content="substantiv feminin">sf</abbr>] <b>1</b> Carte de joc. <b>2</b> (<abbr data-bs-content="adjectiv">a</abbr>) Referitor la joc.</span><a class="ref" href="/sursa/mda2" title="MDA 2010">MDA</a><a href="/definitie/atu/9">permalink</a></div>'
+            inputs = self.inputs(root, html, word="ata", loc="ata F1\n")
+            export_local_evidence(*inputs, root / "out")
+            rows = read(root / "out/senses.csv")
+            self.assertEqual(rows[0]["alignment"], "exact")
+            self.assertEqual(rows[1]["alignment"], "unresolved")
+            self.assertEqual(rows[1]["alignment_reason"], "conflicting_meaning_pos")
+            self.assertIn("adjectiv", json.loads(rows[1]["tags"]))
+            self.assertEqual(rows[1]["source_entry_id"], "/definitie/atu/9")
+            self.assertEqual(read(root / "out/evidence.csv")[0]["aligned_senses"], "1")
+
     def test_variant_verb_conjugation_is_not_a_second_variant_or_pos(self):
         with TemporaryDirectory() as temp:
             root = Path(temp)
