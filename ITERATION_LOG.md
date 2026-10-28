@@ -930,3 +930,24 @@ Final campaign output: build/d1/lexical-variants-2026-10-28/evidence-reviewed/;
 verification-reviewed.json. Earlier output candidates retained, not authoritative.
 Plan/report/ADR/runbook updated. Retain frozen wordfreq+4; use evidence for
 explanations; unsupported formats and robust 4/5 separation remain. No push/PR.
+
+## 2026-10-29 — Publish accumulated offline work; map code before Omni target update
+
+User requested push/PR of local commits plus reproducible Graphify map, then switch
+active evaluation target to installed d1-omni-2b. Active implementation checkout:
+build/d1/exact-form-code, codex/independent-form-benchmark; PR stacked on existing
+codex/exact-form-frequency-evaluation (#82) because offline experiment dependencies
+were still local. Historical scores/results retained.
+Graphify tools advertised but list_repositories/graph_stats returned Unknown tool,
+including retry after user plugin mention. Hosted connector needs no Homebrew;
+service/index readiness unresolved. Created/validated repository Graphify skill,
+installed copy at ~/.codex/skills/graphify. Clearly labeled local AST fallback:
+126 tracked Python modules / 381 import-site edges; complete JSON, focused Mermaid,
+source hashes, regeneration/staleness/impact commands. Pre-model snapshot saved
+before invocation/test edits; post-change graph regenerated. No runtime call claims.
+Read-only LM Studio inventory confirmed Omni decision/lfm3/F16, no loaded instances.
+Updated active model examples/fresh campaign names; generic adapter unchanged.
+Offline tests verify Omni identity, no POST while unloaded, sequential requests,
+and rejection of old-model campaign reuse without file changes. No inference/load,
+DB operations, score updates or new annotations. 883 tests + 220 subtests, Ruff,
+graph freshness, skill validation PASS; all 1,150 protected file hashes unchanged.

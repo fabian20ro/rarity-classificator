@@ -59,6 +59,8 @@ its existing files. These use mock HTTP and do not constitute an inference bench
 The graph CLI test covers relative imports, scope, definitions, deterministic outputs,
 transitive importers and stale detection without overwriting artifacts.
 
+**883 tests + 220 subtests passed**, Ruff passed, graph freshness check passed,
+and the installed/repository skill passed the skill validator.
 1,150 protected score/evaluation/input files matched their previous hashes. No new
 human evaluations, model execution, database changes or corpus download. The lexical
 variant repair results remain 127/150 aligned forms, 45/49 in the missing-wordfreq

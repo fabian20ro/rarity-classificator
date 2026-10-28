@@ -1003,3 +1003,6 @@ Next: use bounded graph queries to scope source reading and test selection. Rest
 Graphify connectivity/index freshness before relying on its hosted results. Actual
 Omni quality, Romanian support and reliable 4/5 discrimination remain unverified;
 no new annotations or automatic score promotion. [Details](../research/2026-10-29-d1-omni-graph.md).
+
+Verification: 883 tests + 220 subtests, Ruff, deterministic graph freshness check
+and skill validation passed; 1,150 protected input hashes unchanged.

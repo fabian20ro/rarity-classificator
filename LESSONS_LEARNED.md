@@ -261,3 +261,12 @@ own conflicting POS: retain them unresolved, never overwrite the conflict silent
 Clip structural clause delimiters before checking trailing prose: real HTML can put
 `] – Din` in one text node. Public CSV regressions plus real-source replay caught
 both issues; protect scores/labels with hashes during evidence-only repairs.
+
+**[2026-10-29]** Advertised Graphify tools can fail at the service boundary with
+`Unknown tool`; this is neither an empty index nor a missing local executable.
+The installed connector targets hosted api.graphify.com/mcp. Check repository/index
+freshness once connected; distinguish a bounded hosted subgraph from a local AST
+fallback. Local import maps locate inspection/test candidates, not runtime calls or
+coverage. A newer installed decision model can reuse the generic adapter; change
+explicit invocation and campaign identity, preserve old scores, and test compatibility
+without claiming that inventory recognition proves inference quality.
