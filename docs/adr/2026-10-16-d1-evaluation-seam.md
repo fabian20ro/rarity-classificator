@@ -131,3 +131,23 @@ corpus token count. Normalize only NFC/cedilla/casefold, preserve all IDs/POS, s
 source spelling aliases. Missing source counts remain4. The source improves coverage
 but fails the severe-error gate; neither frozen scorer configuration nor upload
 workflow changes.
+
+
+## 2026-10-28: Source-scoped lexical variant witnesses
+
+Keep `export_local_evidence` as the public CSV seam and `evidence.csv` compatible.
+Add `variants.csv` plus additive sense fields for target POS detail, source entry,
+dictionary, declaration and variant number restriction. Manifest extraction revision
+`explicit-variants-v1` distinguishes the repaired algorithm; all outputs remain hashed.
+
+A relation needs an explicit semantic variant declaration and identifiable target POS.
+Bind structured meanings to the same dictionary/headword/POS; reject ambiguous
+homographs. Raw MDA2 extraction supports only bracket headers and consecutive numbered
+meanings. Preserve variant gender/usage and meaning restrictions; contradictory own
+POS or number scope remains unresolved with a reason. Relation support does not imply
+all meanings recovered. No inference from redirects, spelling similarity or examples.
+
+Keep format-specific parsing local; no new framework, scorer coupling, frequency
+transfer or database/model path. Coverage is source-bounded, never a completeness or
+familiarity claim. Test CSV behavior, negative cases and provenance through the public
+function. Frozen scoring configuration and human labels remain outside this repair.

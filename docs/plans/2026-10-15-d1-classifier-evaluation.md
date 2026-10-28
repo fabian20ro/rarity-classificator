@@ -894,7 +894,7 @@ Local artifacts: `build/d1/corola-2026-10-28/`; implementation in
 `build/d1/exact-form-code` on current branch. No push/PR this iteration.
 
 
-## Local divergence audit completed — 2026-10-28 (current recommendation)
+## Local divergence audit completed — 2026-10-28 (decision before extraction repair)
 
 Audited the nine forms changed in at least one CoRoLa label view plus ata/carter/
 dorian on the direct wordfreq path. Existing local dictionary records, human
@@ -943,3 +943,43 @@ case-count reconciliation and existinghuman minima. No production code changes;
 no repeat scorer test run required. [Audit report](../research/2026-10-28-corola-divergence-audit.md).
 Artifacts: `build/d1/corola-divergence-audit-2026-10-28/` including CSV ledger,
 source/context receipts, audit script and independent `verification.json`.
+
+
+## Lexical variant extraction repaired — 2026-10-28 (current recommendation)
+
+Completed with TDD through the existing `export_local_evidence` CSV boundary.
+Explicit variant declarations retain target POS/gender, usage/number restrictions,
+dictionary/entry identity and source path/hash. Structured sense transfer requires
+matching source, headword and POS; raw parsing accepts only the bounded MDA2 format.
+Contradictory meaning POS, ambiguous homographs and insufficient restrictions remain
+unresolved. New `variants.csv` ledger; additive sense provenance fields; unchanged
+`evidence.csv` schema and scorer seam. No frequency or familiarity transfer.
+
+Local replay: all 150 forms, 169 source records; 14 added exact source-backed sense
+records (12 distinct form–sense identities), covering antereu, sezisa, ata and
+văietare. Aligned forms **123→127/150**, missing-wordfreq slice **42→45/49**.
+All 978 prior exact records retained; 26 variant witnesses (22 supported relations,
+4 unresolved). Supported relation is not exhaustive sense recovery. Ata remains
+feminine and “învechit și rar”; no money sense imported from another dictionary.
+
+**Decision:** retain frozen wordfreq + fallback 4. Existing scores, human ratings,
+thresholds and evaluations unchanged; no new labels, D1, DB access or downloads.
+This repairs evidence extraction, not demonstrated scoring quality. No new accuracy
+claim or threshold search on the reused pilot.
+
+**Next recommendation:** use the versioned evidence as explanations alongside frozen
+scores, distinguishing supported relation, recovered sense and unresolved evidence.
+Any later scorer experiment requires a predeclared general hypothesis and separate
+validation; no additional human evaluation round requested.
+
+**Leftovers:** unsupported raw dictionary formats (including ata's separate money
+sense), incomplete source/POS coverage, contextual ambiguity, reliable 4/5 separation
+and external generalization. These remain explicit limits, not guessed senses or
+per-word scoring exceptions.
+
+Verification: **880 tests + 220 subtests**, Ruff and two-axis review passed after
+fixing a raw-meaning POS conflict. Independent source/hash verifier PASS; all 1,150
+protected inputs unchanged. [Report](../research/2026-10-28-lexical-variant-extraction.md).
+Authoritative local artifacts: `build/d1/lexical-variants-2026-10-28/evidence-reviewed/`,
+`evidence-reviewed-comparison.json`, `verification-reviewed.json`.
+Implementation in `build/d1/exact-form-code`; committed locally, no push this iteration.

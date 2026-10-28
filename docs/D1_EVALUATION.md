@@ -266,3 +266,21 @@ source plus new output directories; no model/database setup is required. Source
 and derived CSVs are not repository resources for commercial/distributed use.
 Current recommendation remains frozen wordfreq+4; more coverage did not reduce
 severe errors in this experiment.
+
+
+## Local lexical variants — 2026-10-28
+
+[Extraction report](research/2026-10-28-lexical-variant-extraction.md): existing
+`export_local_evidence` now emits a source-scoped `variants.csv` ledger and additive
+POS/restriction/provenance fields in `senses.csv`. `evidence.csv` stays compatible.
+`explicit-variants-v1` is recorded in the manifest. Supported variant relations and
+recovered exact senses are separate; unresolved records do not become aligned evidence.
+
+Campaign: `build/d1/lexical-variants-2026-10-28/`. The 169-row source ledger includes
+already-local atu.html explicitly bound to ata; this does not bypass witness checks.
+Authoritative output: `evidence-reviewed/`; independent verification:
+`verification-reviewed.json`. Earlier output directories are retained development
+artifacts. Reproduce with the campaign's `run.py NEW_OUTPUT_NAME`, then
+`compare_evidence.py NEW_OUTPUT_NAME` and `verify.py OUTPUT_PATH`, using the project
+Python environment for export. Existing outputs are never overwritten. Scores and
+ratings remain frozen; no model, database or network needed.

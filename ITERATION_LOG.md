@@ -911,3 +911,22 @@ rootmirrorsappendonly. Localcommits; no remotes modified.
   per-wordexceptions. NoD1, DBaccess, newannotations, remote push or PR.
 - Artifacts:build/d1/corola-divergence-audit-2026-10-28/. Rootdocs mirrored; logs
   append-only and existingsource/score/input hashes verified unchanged.
+
+
+## 2026-10-28 — Source-scoped lexical variants, evidence-only TDD repair
+
+Implemented in build/d1/exact-form-code on codex/independent-form-benchmark.
+Public CSV TDD: explicit declarations, target POS/gender, usage/number scope,
+dictionary/entry witnesses, negative ambiguity cases; new variants ledger and
+additive sense provenance. Real-source replay exposed closing delimiter + etymology
+in one HTML node; RED/GREEN fix. Spec review exposed conflicting raw-meaning POS;
+RED/GREEN fix, review closed. Standards review had no actionable findings.
+Final checks: 880 tests + 220 subtests, Ruff, independent source/hash verifier PASS.
+150 forms / 169 source records; 14 new exact records / 12 distinct form–sense pairs;
+123→127 aligned forms, tail 42→45/49. All 978 old exact senses retained.
+Four changed evidence forms: antereu, sezisa, ata, văietare. 1,150 protected input
+hashes unchanged. No new evaluations, scoring, network, D1 or DB access.
+Final campaign output: build/d1/lexical-variants-2026-10-28/evidence-reviewed/;
+verification-reviewed.json. Earlier output candidates retained, not authoritative.
+Plan/report/ADR/runbook updated. Retain frozen wordfreq+4; use evidence for
+explanations; unsupported formats and robust 4/5 separation remain. No push/PR.

@@ -251,3 +251,13 @@ slightly different totals even when every audited target reconciles; keep separa
 member denominators. Explicit variant witnesses may exist outside a main dictionary
 heading (antereu/sezisa/ata); preserve the variant's POS and source scope, never
 transfer frequency or familiarity from the linked lemma automatically.
+
+
+**[2026-10-28]** Bound lexical variants to their own source and grammar — target
+POS/gender can differ from the main heading (ata feminine, atu neuter). Require
+matching dictionary provenance before inheriting structured senses; a supported
+relation alone does not establish all senses. Raw numbered meanings can carry their
+own conflicting POS: retain them unresolved, never overwrite the conflict silently.
+Clip structural clause delimiters before checking trailing prose: real HTML can put
+`] – Din` in one text node. Public CSV regressions plus real-source replay caught
+both issues; protect scores/labels with hashes during evidence-only repairs.
