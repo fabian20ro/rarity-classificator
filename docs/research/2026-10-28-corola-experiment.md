@@ -158,6 +158,11 @@ strata and fold models remain in the comparison artifacts.
 
 ## Recommendation and leftovers
 
+Follow-up completed: [local divergence audit](2026-10-28-corola-divergence-audit.md).
+The baseline decision remains; next engineering work is evidence extraction and
+provenance, with no new annotation or scoring change. The list below records the
+recommendation immediately after this experiment.
+
 1. **Retain frozen wordfreq+4.** CoRoLa adds useful frequency evidence, but this
    predeclared frequency-only fallback fails the severe-error gate in every view.
    Do not lower support, relabel examples, infer 5 from absence, or search for a

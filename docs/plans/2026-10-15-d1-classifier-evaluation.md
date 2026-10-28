@@ -845,7 +845,7 @@ and scores unchanged. No D1, DB connection, production promotion, push or new PR
 Artifacts: `build/d1/fineweb-2026-10-26/` (prepared 26th, run 27th).
 
 
-## CoRoLa noncommercial experiment completed — 2026-10-28 (current recommendation)
+## CoRoLa noncommercial experiment completed — 2026-10-28 (experiment decision)
 
 User authorized noncommercial research. Published CoRoLa v1 complete lowercase
 word-form list acquired and verified: 114 MB ZIP; one 23.7 MB TSV; retained campaign
@@ -892,3 +892,54 @@ models and36 metric sections pass; all449 baseline predictions match prior run;
 frozen scorer/input hashes unchanged. [Full report](../research/2026-10-28-corola-experiment.md).
 Local artifacts: `build/d1/corola-2026-10-28/`; implementation in
 `build/d1/exact-form-code` on current branch. No push/PR this iteration.
+
+
+## Local divergence audit completed — 2026-10-28 (current recommendation)
+
+Audited the nine forms changed in at least one CoRoLa label view plus ata/carter/
+dorian on the direct wordfreq path. Existing local dictionary records, human
+annotations,35foldrecords, saved FineWeb contexts and the case-preserving member of
+the already-downloaded ZIP only. No new labels, fitting, download, D1 or DB access.
+
+**Findings:**
+- Exact frequency collisions: antereu/diorit both20 occurrences but latest labels3/5;
+  clevetitor/xilem both18 but labels4/5. A single frequency-only mapping cannot
+  distinguish each pair. Different out-of-fold predictions reflect different
+  training folds; latest audited4/5 cutoffs correspond to16.02 or25.39 occurrences.
+- Human decisions already settle the familiar valid sense: antereu3 after explicit
+  form review; sezisa3=min(3,5,5,5); ițar4=min(cloth4,loom5), excluding plural-only
+  trousers. Ata and both carter meanings remain5. No relabeling needed or done.
+- Case-preserving CoRoLa: carter1427/1532 anddorian844/853 occurrences have uppercase;
+  saved FineWeb snippets are person names. This is an ambiguity risk, not a measured
+  proper-name fraction in CoRoLa/wordfreq. Ata snippets reflect unaccented ață.
+  Blanket uppercase exclusion would leave hipochinezie2/12, removing its support.
+- Lexical extractor gap: antereu/sezisa marked unresolved despite explicit variant/
+  exact historical-entry witnesses; ata's selected source resolves to ață, while
+  local ata/atu records contain the needed explicit relation and femininePOS.
+  This is evidence coverage, not a CoRoLa counting/scoring bug.
+- Secondary case-preserving list denominator differs by2725tokens from primary
+  lowercase list; cause unresolved. All12target counts reconcile. Primary counts,
+  denominator, predictions and frozen scorer remain unchanged.
+
+**Decision:** retain frozen wordfreq+4; no candidate promotion, per-word exceptions,
+uppercase filtering or new threshold search. Existing CoRoLa results still apply.
+
+**Next engineering step:** repair the general local lexical-evidence path with
+explicit variant/entry witnesses, target-specific POS/number scope and raw-source
+provenance; include already-saved linked sources such as atu when justified for
+ata. Keep casing/diacritic ambiguity as separate diagnostic metadata. Do not merge
+variant frequencies, substitute lemma familiarity, or change production scores.
+Public CSV regression cases: positive antereu/sezisa/ata witnesses; negatives for
+ata←ață, ițar←plural-only ițari, and unverified spelling similarity. No additional
+user evaluation or corpus acquisition needed for this work. Any later scorer trial
+needs a predeclared general hypothesis; evidence repair alone does not prove gain.
+
+**Leftovers:** validated4/5 discrimination, context-aware sense/POS evidence and
+external generalization; existing opaque form/POS labels retain their provenance.
+Audit closed—no UI review queue. Source/derived CoRoLa data stay local noncommercial.
+
+Independent audit passed:492input hashes,12cases,35foldrecords,16rawlexical witnesses,
+case-count reconciliation and existinghuman minima. No production code changes;
+no repeat scorer test run required. [Audit report](../research/2026-10-28-corola-divergence-audit.md).
+Artifacts: `build/d1/corola-divergence-audit-2026-10-28/` including CSV ledger,
+source/context receipts, audit script and independent `verification.json`.

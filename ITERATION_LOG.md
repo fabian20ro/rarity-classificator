@@ -885,3 +885,29 @@ rootmirrorsappendonly. Localcommits; no remotes modified.
   ata/carter/dorian; no newannotation or thresholdsearch. RestrictsourceandderivedCSV
   tolocalresearch. Updated report/plan/ADR/runbook; mirrored docs to rootworkspace.
 - No D1 loaded, DB access/writes, remote push or PR. Artifacts:build/d1/corola-2026-10-28/.
+
+
+## 2026-10-28 — Local CoRoLa divergence audit
+
+- Audited9cross-view divergences plusata/carter/dorian using saved evidence only.
+  Produced12-case CSV ledger,35fold diagnostics, raw lexical witnesses, human-history
+  linkage, saved-context extracts, case-frequency diagnostic and492input hashes.
+- Read case-preserving member inside existing ZIP locally, no newdownload; all12
+  target sums match primarylowercase counts. Surprising member-total difference2725
+  confirmed independently; primarydenominator/scoring unaffected, cause unknown.
+- Found exactcount collisions20antereu/diorit withlabels3/5 and18clevetitor/xilem
+  withlabels4/5; fold cutoff instability is not evidence of heldout-label leakage.
+- Existingratings resolveantereu3,sezisa3,ițar4,ata5,carter5. Preserve opaque
+  labels/provenance; no synthetic per-sense labels or requests for further review.
+- Raw sources explicitly attestantereu/sezisa/ata while prior lexical extractor
+  leaves themunresolved. Ata requires target femininePOS/atu-source relation,
+  never ață accentfolding. Evidence extraction improvement is separate from scoring.
+- CoRoLa carter93.1%/dorian98.9%uppercase; savedFineWeb shows names. No corpuswide
+  namefraction inferred. Hipochinezie10/12uppercase refutes blanket casing exclusion.
+- Independent auditPASS:492hashes,12cases,35folds,16witnesses,bothZIPmembertotals,
+  labelminima/countreconciliation. No productioncode changed; fullsuite not rerun.
+- Updated report and plan; next general lexical evidence repair + provenance and
+  separate ambiguity metadata. Keep frozenwordfreq+4; no threshold tuning or
+  per-wordexceptions. NoD1, DBaccess, newannotations, remote push or PR.
+- Artifacts:build/d1/corola-divergence-audit-2026-10-28/. Rootdocs mirrored; logs
+  append-only and existingsource/score/input hashes verified unchanged.

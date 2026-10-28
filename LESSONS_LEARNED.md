@@ -240,3 +240,14 @@ Use the downloaded list sum, preserve source filters and orthographic distinctio
 Observed/support coverage and scoring coverage differ: CoRoLa supplied35eligible
 pilot tail forms, yet its fitted fallback worsened severe errors in all3labelviews.
 A one-point historical total-error gain does not pass a severe-error promotion gate.
+
+
+**[2026-10-28]** Case-preserving counts diagnose ambiguity, not a name filter —
+local CoRoLa audit found1427/1532carter and844/853dorian occurrences with uppercase,
+with person-name uses in saved FineWeb snippets; those snippets cannot establish
+CoRoLa/wordfreq name fractions. Hipochinezie is10/12capitalized, so blanket filtering
+would also remove supported rare terms. Published case/lowercase lists can have
+slightly different totals even when every audited target reconciles; keep separate
+member denominators. Explicit variant witnesses may exist outside a main dictionary
+heading (antereu/sezisa/ata); preserve the variant's POS and source scope, never
+transfer frequency or familiarity from the linked lemma automatically.
