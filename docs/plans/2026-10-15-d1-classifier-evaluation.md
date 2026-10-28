@@ -1010,3 +1010,14 @@ and skill validation passed; 1,150 protected input hashes unchanged.
 Published: [PR #85](https://github.com/fabian20ro/rarity-classificator/pull/85),
 stacked on #82; branch `codex/independent-form-benchmark`. Includes accumulated
 local offline work, lexical repair, graph tooling and Omni preparation.
+
+
+## Local Graphify generation completed — 2026-10-29
+
+Used the user-provided ~/git/graphify checkout (0.9.97, 0a8cd4e1), code-only,
+no LLM community naming. Actual Graphify JSON/interactive HTML/report generated:
+2,119 nodes / 6,057 edges / 87 communities; 131 code files scanned, 2 without symbols.
+`scripts/graphify_local.sh` repeats the frozen-dependency workflow; source/tool/output
+receipt and incremental manifests retained. D1Scorer query and graph integrity checks
+passed. Hosted-plugin connectivity remains separate; local generation is unblocked.
+No score/model/database changes. [Workflow](../code-graph.md).

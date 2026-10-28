@@ -6,9 +6,26 @@ description: Inspect code dependencies and change impact with the Graphify plugi
 # Graphify
 
 Use the active checkout's Git remote and commit, not its directory name, to identify
-the repository. Start with `list_repositories` and `graph_stats`. Record indexed
+the repository. If the user supplies a local Graphify checkout, use it first (below).
+For the hosted plugin, start with `list_repositories` and `graph_stats`. Record indexed
 commit, readiness and coverage when returned; unknown freshness stays unknown.
 Compare with local HEAD and uncommitted files before relying on a graph result.
+
+## Local Graphify checkout
+
+When asked to generate from `~/git/graphify`, read that checkout's README/CLI before
+choosing flags. This repository provides `scripts/graphify_local.sh OUTPUT_PARENT`:
+it uses the supplied source through PYTHONPATH and dependencies pinned by its uv.lock,
+inside an isolated environment. Override GRAPHIFY_SOURCE / GRAPHIFY_ENV when needed.
+The wrapper runs `extract --code-only` and `cluster-only --no-label` with
+GRAPHIFY_BACKEND=none: no model requests, semantic LLM pass or automatic label calls.
+It saves graph.json, graph.html, GRAPH_REPORT.md and a source/tool/hash receipt.
+
+Read `docs/code-graph.md` for actual output locations and query commands. Use Graphify's
+EXTRACTED/INFERRED tags; neither is proof of runtime coverage. Preserve earlier maps
+as historical artifacts. Local CLI generation does not require the hosted plugin,
+Homebrew installation, a remote index, hooks or edits to AGENTS.md. Do not replace
+the installed skill using Graphify's broad automatic installer just to build a graph.
 
 ## Narrow the question
 

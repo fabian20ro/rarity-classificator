@@ -100,3 +100,60 @@ The local baseline was `b874395` plus the newly staged generator and graph test.
 Only after saving this snapshot were the model examples/tests changed. The current
 map was then regenerated; historical snapshots intentionally do not pass a check
 against the newer working tree.
+
+## Actual local Graphify graph — 2026-10-29
+
+The user supplied `~/git/graphify`, version **0.9.97**, Git commit
+`0a8cd4e1e342235fe53e881fb5d591bf0460071f`. This CLI works independently of the
+hosted plugin that returned `Unknown tool`. No Homebrew installation was needed;
+existing uv installed 30 locked runtime dependencies in an isolated environment.
+The source checkout was read directly through PYTHONPATH and left unchanged.
+
+Generation and incremental regeneration from the active checkout:
+
+```sh
+bash scripts/graphify_local.sh
+```
+
+Default output: `build/graphify-local/graphify-out/`. Optional first argument sets
+another output parent. `GRAPHIFY_SOURCE` defaults to `$HOME/git/graphify`;
+`GRAPHIFY_ENV` and `UV_CACHE_DIR` can select existing dependency/cache directories.
+The wrapper uses the checkout's frozen uv.lock, `extract --code-only --no-dedup`
+and `cluster-only --no-label`, with `GRAPHIFY_BACKEND=none`. No LLM, model loading,
+semantic document extraction, database access, hooks or hosted index required.
+Docs/configs/skills/prompts and standard generated/environment directories are
+excluded; build metadata with supported code syntax can still appear. AST-derived
+and inferred relations remain distinguishable; they are not runtime observations.
+
+The completed run uses this workspace-local location:
+
+`/Users/fabian/git/word-rarity-classifier/build/d1/graphify-2026-10-29/graphify-out/`
+
+- `graph.html`: interactive graph, 2,119 nodes and 6,057 relations.
+- `graph.json`: complete Graphify format, source locations and confidence tags.
+- `GRAPH_REPORT.md`: 87 communities; placeholder names avoid LLM labeling.
+- `manifest.json`: extraction cache/freshness metadata.
+- `local-run.json`: repository/tool identity, source/lock/output hashes and checks.
+
+131 code files scanned after adding the wrapper. Two yielded no symbols:
+`pyproject.toml` and the thin `src/classificator/__main__.py` entrypoint. Five
+unclassified files were skipped, including blind.css and uv.lock; non-code documents
+were deliberately excluded. Graph completeness remains bounded by these extractors.
+A successful D1Scorer query returned the scorer, CLI, campaign and relevant tests;
+its 1,200-token output was explicitly truncated. Increase the budget or narrow the
+query, not assume omitted neighbors are absent.
+
+Query the completed graph without rebuilding:
+
+```sh
+PYTHONPATH="$HOME/git/graphify" GRAPHIFY_BACKEND=none \
+  /Users/fabian/git/word-rarity-classifier/build/graphify-venv/bin/python \
+  -m graphify query 'D1Scorer' --budget 1500 \
+  --graph /Users/fabian/git/word-rarity-classifier/build/d1/graphify-2026-10-29/graphify-out/graph.json
+```
+
+Generation verified node-ID uniqueness and no dangling edges. Incremental replay
+processed only the added wrapper while retaining 130 unchanged files. Existing
+simplified Python maps remain historical/separate artifacts, not overwritten or
+renamed as Graphify outputs. Generated Graphify artifacts stay local under build/;
+script and workflow are versioned for regeneration.

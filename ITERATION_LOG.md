@@ -956,3 +956,17 @@ Published PR #85: https://github.com/fabian20ro/rarity-classificator/pull/85,
 base codex/exact-form-frequency-evaluation (#82). Two-axis current-delta review
 passed with no findings; historical lexical correction already reviewed.
 Generated JSON graphs marked generated for readable PR review.
+
+
+## 2026-10-29 — Generate actual Graphify graph from user checkout
+
+Used ~/git/graphify at 0a8cd4e1 (0.9.97); uv frozen runtime-only dependencies in
+isolated build environment. Source checkout unchanged. Code-only extraction,
+GRAPHIFY_BACKEND=none, no-label clustering; no semantic LLM pass or model calls.
+Saved build/d1/graphify-2026-10-29/graphify-out: JSON, interactive HTML, report,
+manifest and local-run provenance. Final 2,119 nodes / 6,057 edges / 87 communities.
+131 code files scanned; pyproject.toml and thin __main__.py yielded no symbols.
+Verified unique IDs, edge endpoints, D1Scorer query and incremental 130-unchanged /
+1-added-file extraction. Added reproducible scripts/graphify_local.sh, updated skill
+and docs. No D1 load, DB access, score/evaluation changes. Local CLI works despite
+hosted plugin Unknown tool; retain distinction and extractor coverage caveats.

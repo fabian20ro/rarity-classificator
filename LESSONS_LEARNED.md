@@ -270,3 +270,11 @@ fallback. Local import maps locate inspection/test candidates, not runtime calls
 coverage. A newer installed decision model can reuse the generic adapter; change
 explicit invocation and campaign identity, preserve old scores, and test compatibility
 without claiming that inventory recognition proves inference quality.
+
+
+**[2026-10-29]** Local Graphify CLI is independent of the hosted plugin — user
+checkout ~/git/graphify supports extract --code-only and cluster-only --no-label.
+Set GRAPHIFY_BACKEND=none, use its frozen uv.lock in an isolated runtime, import
+from that checkout and preserve source/tool/hash receipts. No Homebrew, LLM key,
+model loading or broad skill/hook installer is required for this structural graph.
+EXTRACTED/INFERRED relations and zero-symbol files remain coverage caveats.
