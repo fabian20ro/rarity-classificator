@@ -1006,3 +1006,7 @@ no new annotations or automatic score promotion. [Details](../research/2026-10-2
 
 Verification: 883 tests + 220 subtests, Ruff, deterministic graph freshness check
 and skill validation passed; 1,150 protected input hashes unchanged.
+
+Published: [PR #85](https://github.com/fabian20ro/rarity-classificator/pull/85),
+stacked on #82; branch `codex/independent-form-benchmark`. Includes accumulated
+local offline work, lexical repair, graph tooling and Omni preparation.

@@ -951,3 +951,8 @@ Offline tests verify Omni identity, no POST while unloaded, sequential requests,
 and rejection of old-model campaign reuse without file changes. No inference/load,
 DB operations, score updates or new annotations. 883 tests + 220 subtests, Ruff,
 graph freshness, skill validation PASS; all 1,150 protected file hashes unchanged.
+
+Published PR #85: https://github.com/fabian20ro/rarity-classificator/pull/85,
+base codex/exact-form-frequency-evaluation (#82). Two-axis current-delta review
+passed with no findings; historical lexical correction already reviewed.
+Generated JSON graphs marked generated for readable PR review.
