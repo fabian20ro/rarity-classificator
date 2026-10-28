@@ -231,3 +231,12 @@ raw frequency support separately from source-quality and valid-sense evidence.
 In this pilot,24/49 tail forms were observed but only8 met5/3/2support andnonewas
 level5; no foldmetminimum10trainingrows. An unchanged gatedbaseline is not an
 evaluated learnedfallback or proof of4/5discrimination.
+
+
+**[2026-10-28]** Published frequency-list totals are source-specific — CoRoLa's
+complete lowercase word-form list sums to637,764,339 counted letter-only tokens;
+the project-level “over1billion” figure is not its normalization denominator.
+Use the downloaded list sum, preserve source filters and orthographic distinctions.
+Observed/support coverage and scoring coverage differ: CoRoLa supplied35eligible
+pilot tail forms, yet its fitted fallback worsened severe errors in all3labelviews.
+A one-point historical total-error gain does not pass a severe-error promotion gate.

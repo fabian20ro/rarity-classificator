@@ -794,7 +794,7 @@ database access, raw-text corpus redistribution or frozen config/export changes.
 [Source/access/licence audit and experiment protocol](../research/2026-10-25-romanian-running-text-corpora.md).
 
 
-## FineWeb2 bounded experiment completed — 2026-10-27 (current recommendation)
+## FineWeb2 bounded experiment completed — 2026-10-27 (historical recommendation)
 
 Both public CSV seams confirmed; vertical TDD implemented source exporter, bounded
 HTTP transport and grouped evaluator. 860 tests / 200 subtests + Ruff pass. Review
@@ -843,3 +843,52 @@ and scores unchanged. No D1, DB connection, production promotion, push or new PR
 
 [Full results and reproduction](../research/2026-10-27-fineweb-bounded-experiment.md).
 Artifacts: `build/d1/fineweb-2026-10-26/` (prepared 26th, run 27th).
+
+
+## CoRoLa noncommercial experiment completed — 2026-10-28 (current recommendation)
+
+User authorized noncommercial research. Published CoRoLa v1 complete lowercase
+word-form list acquired and verified: 114 MB ZIP; one 23.7 MB TSV; retained campaign
+about 141 MiB. CC BY-NC-ND 4.0 source/derived CSVs remain local. No D1, database,
+production-score change, new annotations or remote publication.
+
+Completed with TDD at existing CSV seams. Full inventory projection retains all
+77,698 IDs/POS, exact normalized spellings and source/hash provenance. Shared grouped
+comparison engine preserves FineWeb behavior; CoRoLa adds no fabricated document/
+host support. Fixed before counts: count≥5, minimum10 eligible training forms/two
+levels, monotone thresholds fitted outside each held-out group; otherwise4.
+
+**Coverage:** 144/150 pilot forms observed,136 with count≥5. Missing-wordfreq pilot:
+43/49 observed,35 supported, including7 latest-human5 forms. All22 latest-human5:
+16 observed,10 supported. Full missing inventory:49,464/66,088 rows observed
+(74.85%);37,614 supported. Every method still returns150/150 scores.
+
+**Results:** latest MAE0.520→0.533, severe errors11→13; tail49 MAE0.653→0.694;
+clarified37 MAE0.568→0.649. First-independent149 MAE0.624→0.617 but severe13→15;
+original-final150 MAE0.707→0.700 but severe18→19. Unlike FineWeb, all35 supported
+tail forms actually use fitted CoRoLa fallback models. Latest6 changes all4→5:
+bromocet/hipochinezie corrected; clevetitor/ițar become wrong; antereu/sezisa gain
+errors of two levels. Latest precision5=2/6, recall5=2/22; tail4/5 exact stays19/38.
+
+**Decision:** keep frozen wordfreq+4; do not promote CoRoLa fallback. Coverage improves,
+but severe errors worsen in every label view. Do not tune support/cutoffs on these
+results or infer5 from absence. Preserve intentional human labels, including micșurat5.
+
+**Next:** small diagnostic audit using existing local source records for the nine
+changed forms across views plus ata/carter/dorian on the direct path. Separate
+sense/form ambiguity, historical label changes and overlap between frequency and
+familiarity. No new user evaluation required. Explanations based on these known
+labels are not independent training features. If no general defensible rule emerges,
+stop tuning this pilot and retain the baseline pending independent evidence.
+
+**Leftovers:** robust4/5 separation; absent/weak evidence; valid-sense/POS corpus
+attribution; external generalization; permission before future commercial/distributed
+CoRoLa-derived resources. No larger web download or additional threshold search
+recommended from this result alone.
+
+Verification:871tests+211subtests and Ruff pass; two-axis code review clear.
+Independent raw-source/count/hash audit,449 folds,554 independently reoptimized
+models and36 metric sections pass; all449 baseline predictions match prior run;
+frozen scorer/input hashes unchanged. [Full report](../research/2026-10-28-corola-experiment.md).
+Local artifacts: `build/d1/corola-2026-10-28/`; implementation in
+`build/d1/exact-form-code` on current branch. No push/PR this iteration.

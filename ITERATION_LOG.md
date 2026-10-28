@@ -856,3 +856,32 @@ Independent sourceartifactaudit and449fold/36metricrecomputationpass; baseline
 paritywithpreviousrun. Realcompletedsource replay underHTTP/DBblocks byteidentical.
 Frozeninventory/input/scoreshashes unchanged. Researchreport,plan,guide,ADR updated;
 rootmirrorsappendonly. Localcommits; no remotes modified.
+
+
+## 2026-10-28 — CoRoLa noncommercial exact-form experiment
+
+- User authorized noncommercial research; reused approved CSV seams and Matt TDD/
+  implement/review workflow. Task-start baseline a02963f; code commit abd5554.
+- Pinned protocol before counts: count≥5, minimum10trainingforms/twolevels,
+  grouped monotone fallback for wordfreq-missing forms; otherwise4. No tuning.
+- Downloaded114,091,202-byte ZIP, verified publishedMD5; extracted only23,732,979-byte
+  lowercase word-form TSV, verifiedCRC/SHA. Local campaign~141MiB, free~88GiB.
+- Parsed1,813,746entries, denominator637,764,339. Surprising distinction: published
+  filtered-list token total is smaller than headline corpus size; use exact listsum.
+- Exported77,698IDs. CoRoLa coverage144/150; latesthuman5=16/22observed,10supported.
+  Missing-wordfreq49:43observed,35supported including7human5. Inventorytail66,088:
+ 49,464observed,37,614supported. Preserved allPOS and original labels.
+- New source/evaluation CSV adapters; private grouped engine shared withFineWeb.
+  No production scorer integration. RED/GREEN for source integrity/counts/normalization
+  and public evaluation support/group-label invariance. Full871tests+211subtests,
+  Ruff and two-axis code review pass.
+- All3labelviews compared at100%scorecoverage. LatestMAE.520→.533,severe11→13;
+  first-independentMAE.624→.617,severe13→15; originalfinalMAE.707→.700,severe18→19.
+  Latest6changes4→5:2corrections,2newone-levelerrors,2newtwo-levelerrors.
+- Independent stdlib verifier recomputed rawsource/projections/coverage,449folds,
+  554fittedmodels with independentDP,36metricslices. All449baselinepredictions
+  matchpriorFineWeb; frozenconfig/scores/inputs unchanged. HTTP/DB blocked offline.
+- Recommendation: keepwordfreq+4; next local diagnostic audit9changedforms plus
+  ata/carter/dorian; no newannotation or thresholdsearch. RestrictsourceandderivedCSV
+  tolocalresearch. Updated report/plan/ADR/runbook; mirrored docs to rootworkspace.
+- No D1 loaded, DB access/writes, remote push or PR. Artifacts:build/d1/corola-2026-10-28/.

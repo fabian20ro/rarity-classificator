@@ -248,3 +248,21 @@ and original content rights remain applicable; concordance snippets stay local.
 
 Completed run: [FineWeb2 bounded results](research/2026-10-27-fineweb-bounded-experiment.md).
 Source coverage improved; the declared training gate did not pass. Frozen wordfreq+4 retained.
+
+
+## CoRoLa noncommercial frequency diagnostic — 2026-10-28
+
+Completed experiment and interpretation:
+[CoRoLa report](research/2026-10-28-corola-experiment.md).
+Public offline functions:
+`evaluation.corola.export_corola_frequencies(vocabulary_csv, source_tsv, source_record_json, output_dir)`
+and `evaluation.corola_fallback.evaluate_corola_fallback(reference_csv, frequency_features_csv, evidence_dir, first_independent_csv, groups_csv, output_dir)`.
+Use `pathlib.Path` arguments. Outputs publish atomically and refuse existing targets.
+
+Workspace-local `build/d1/corola-2026-10-28/` contains the frozen protocol, original
+source, receipts, executable export/comparison scripts and independent verifier.
+Do not rerun acquisition into existing files. Offline reproduction uses retained
+source plus new output directories; no model/database setup is required. Source
+and derived CSVs are not repository resources for commercial/distributed use.
+Current recommendation remains frozen wordfreq+4; more coverage did not reduce
+severe errors in this experiment.

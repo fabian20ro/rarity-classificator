@@ -109,3 +109,25 @@ Evaluator validates complete-inventory source CSV/hash binding and keeps the sha
 wordfreq path fold-local. Only balanced sample plus5tokens/3docs/2hosts can enter
 the fallback; minimum10 eligible training forms/two levels. Unsupported inputs
 remain4. Three existing label views/4vs5 diagnostics, no new annotation or tuning.
+
+
+## 2026-10-28: CoRoLa research evidence and shared grouped comparison
+
+Keep public CSV seams: `export_corola_frequencies` consumes a local published TSV,
+release receipt and full inventory; `evaluate_corola_fallback` consumes validated
+CSV artifacts plus existing labels/groups. No new production scorer or DB/LM path.
+CoRoLa source identity, complete counts/denominator and exact-form consistency are
+validated independently; no invented document/host fields. Published source and
+modified lookup artifacts stay local to the authorized noncommercial experiment.
+
+FineWeb and CoRoLa now use one private grouped-frequency engine with a small
+validated evidence record. Source validators and support rules remain in adapters.
+This consolidates repeated grouped orchestration while preserving FineWeb's public
+CSV/result behavior and source-specific policy. Local lexical-tree evaluation keeps
+its distinct model. Test public CSV functions, not helper internals.
+
+CoRoLa denominator is the complete published filtered word list, not a guessed full
+corpus token count. Normalize only NFC/cedilla/casefold, preserve all IDs/POS, sum
+source spelling aliases. Missing source counts remain4. The source improves coverage
+but fails the severe-error gate; neither frozen scorer configuration nor upload
+workflow changes.
