@@ -970,3 +970,15 @@ Verified unique IDs, edge endpoints, D1Scorer query and incremental 130-unchange
 1-added-file extraction. Added reproducible scripts/graphify_local.sh, updated skill
 and docs. No D1 load, DB access, score/evaluation changes. Local CLI works despite
 hosted plugin Unknown tool; retain distinction and extractor coverage caveats.
+
+
+## 2026-10-30 — Consolidated 1,000-form / 50-review plan
+
+Published a focused successor plan: exact-form/all-POS evidence, sequential Qwen/GPT
+pilot on existing150, frozen cascade with100% score coverage, severe-error/excess-loss
+gates, causal audit and at most50 user review cards. Separated prepared candidates
+from new model/human validation; retained baseline and explicit unknown confidence.
+Added aggregate severity/sample snapshots; kept CoRoLa-derived counts local.
+Documentation-only branch stacked on#85; unrelated local code/artifacts preserved.
+Verification: cross-checked snapshots, plan links, scope and whitespace; no new model
+inference or DB writes. Implementation/testing of proposed stages remains pending.

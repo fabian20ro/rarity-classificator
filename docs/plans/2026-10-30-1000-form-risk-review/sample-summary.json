@@ -1,0 +1,22 @@
+{
+  "forms": 1000,
+  "unique_groups": 1000,
+  "slices": {
+    "general600": 600,
+    "orthography100": 100,
+    "pos100": 100,
+    "corpus100": 100,
+    "weak100": 100
+  },
+  "inventory_rows_represented": 1146,
+  "eligible_forms": 74940,
+  "eligible_families": 73491,
+  "excluded_previous_families": 185,
+  "wordfreq_present": 149,
+  "wordfreq_missing": 851,
+  "exact_query_lexeme_cache_witness": 97,
+  "review_budget": 50,
+  "new_human_labels": 0,
+  "new_model_calls": 0,
+  "baseline_scores_are_not_validation": true
+}
