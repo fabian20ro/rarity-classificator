@@ -1029,3 +1029,35 @@ aggregate reports/receipts published. No newratings,D1/GPTclassification,DBwrite
 Plan: retain operationalwordfreq+4; Qwen diagnosticcandidate. NextcomparableGPTpilot
 uses same finalCSV/prompt; concreteprovidercompatibilityuntested. Address870/1000
 missingcontexts before blanketrollout; nocertifiedconfidence or automaticpromotion.
+
+
+## 2026-10-31 — GPT-through-Codex150 pilot and three-way comparison
+
+No APIcredentialconfigured; used existing Codex login viaofficialCLI0.166.0,
+gpt-6.1-sol/low requested. Syntheticpreflight found ignored option and persistent
+generic managedwrapper/tools; retained attempts, inspected assembledcontext and
+reportedconfiguredidentity/wrapperlimits insteadofclaimingrawmodel-onlyequivalence.
+No taskhistory/gold in context. SamefinalQwen evidence/rubric/schema; onefresh ephemeral
+session/form, minimalenvironment, readonlychild, rawreceipts beforeparsing. Modeltools
+availablebutzeroobserveduse; unknown/tool/warning eventsquarantineentirecampaign.
+
+TDDnativeCSVcollector reusescampaign/Outcome/comparator, no fabricatedHTTPresponse or
+confidence.6newtests19subtests; full915tests303subtests/RuffPASS. Reviewcaught stderr
+warningsaccepted andmalformeditemmaskinglater tool; regressionsRED/GREENfixedbefore
+anytargetclassification. All150completednatively,0fallbacks,~13minutes,149nonoverlap,
+150uniquethreads.2092protectedfilesunchanged; replaywithprocess/network/DBblocked and
+independentraw-event/metrics/bootstrap/triageauditPASS. No Qwen/D1/localmodelloading,
+newhumanratings,scoreoverwrites orprojectDBwrites.
+
+GPTsevere3/excess3/within1=147, versusQwen5/9/145 andbaseline11/14/139. AllGPTerrors
+distance2; exact77,MAE.507. Rescues10baseline/new2; rescuesall5Qwen/new3. GPTsevere:
+carter5→3,catalige4→2,târfă3→1. No severeintersectionQwen/GPT on150; notoracleensemble.
+Top8GPTfinds6/11baselinesevere with2falsealarms versusQwen4/11/evidenceonly1/11.
+True4/5severe2likeQwen,baseline5. Missingwordfreq49 GPT2tiesbaseline,Qwen1.
+No-context19 GPT0,Qwen3,baseline1—but17/19common1–2 andonly2withoutwordfreq; target
+newno-context870has764withoutwordfreq. GPT-vs-QwenCIsincludezero; noindependentgold.
+
+Planupdated: GPTprimarysemanticresearchcandidate,Qwendiagnosticcomplement; baseline
+operationalunchanged. Nextprepare1000evidenceCSV/freezerouting andcheckofflineonexisting
+predictions, thennewsequentialcampaign/causalaudit/max50reviews. No newpromptsearch.
+Aggregateartifacts+verificationpublished; rawlexicaltext/processreceiptsstaylocal.

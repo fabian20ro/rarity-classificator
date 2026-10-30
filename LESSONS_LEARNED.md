@@ -304,3 +304,15 @@ before results and label the larger queue secondary. Backend-advertised reasonin
 values may differ from Chat Completions values: Qwen Splash rejected off but accepted
 none. Probe the actual transport synthetically before lexical collection; retain
 failed preflight and pin the accepted options without fabricating confidence.
+
+
+**[2026-10-31]** A Codex CLI probe is not a bare API model request. With existing
+ChatGPT authentication, fresh ephemeral sessions can reuse a frozen lexical CSV,
+but generic managed instructions/tools may remain despite local feature toggles.
+Inspect assembled context, omit project history/labels, and report requested/configured
+identity when events do not attest the served model. Zero observed tool calls does
+not prove tool unavailability. Native event parsing must quarantine unknown/tool
+activity and runtime warnings, including stderr; malformed items or nonzero exit
+must not mask a later tool event. Persist raw receipts before fatal propagation.
+Keep this transport distinction explicit in model comparisons; do not synthesize
+HTTP responses or claim calibrated confidence from strict JSON success.

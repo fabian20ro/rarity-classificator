@@ -369,3 +369,42 @@ in provenance. There is no automatic blacklist or lexical rewriting. The argumen
 is optional for already lexical-only input, but **required to reproduce this pilot's
 corrected arm**. Its218-row projection changes exactly five review clauses;213
 meanings remain identical. The separate interrupted30-record arm is not a result.
+
+## GPT through Codex — 2026-10-31
+
+When only an existing Codex login is available, the public boundary
+`evaluation.codex_judge.collect_codex_csv(vocabulary_csv, evidence_csv, output_dir,
+executor=..., model=..., runtime=...)` consumes the same lexical CSV as the HTTP
+collector. The executor receives a label-free request with the fixed rubric, JSON
+schema, configured model/effort and one exact form. It returns the native process
+receipt `{returncode, stdout, stderr}`. No simulated HTTP response or served-model
+identity is added.
+
+The measured local campaign is `build/d1/gpt-judge-2026-10-31/`. `prepare.py` freezes
+inputs; `preflight/final_check.py` verifies a synthetic transport probe and captures
+assembled context; `run.py` starts one fresh ephemeral Codex process per form with
+minimal environment and a separate empty cwd. Its native process receipts precede
+campaign parsing/checkpointing. Re-running the unchanged runner resumes persisted
+records without asking the model again. A model/config/source change requires a new
+campaign. Preserve raw files; do not edit manifests to force compatibility.
+
+Run the saved runner using the project Python environment. Its `protocol.json` pins
+the source checkout/binary/catalog paths; inspect these instead of assuming any clone
+or newer installed CLI is equivalent. API credentials are not extracted or copied.
+The runner requires the existing CLI authentication and permission to initialize its
+local runtime; child model commands retain the declared read-only mode.
+
+Codex has a generic managed instruction/tool wrapper, so this is not an identical
+provider prompt to Qwen. Tools are not claimed unavailable: every accepted run must
+have no observed tool events. Unknown/tool events, configuration warnings or stderr
+save a quarantine receipt and stop collection; a quarantined directory cannot resume.
+Review that failure and start a separately documented campaign if needed. Invalid
+final JSON/levels/identities produce explicit native failures; the offline comparator
+uses the original frozen baseline fallback, never a fabricated model score.
+
+After all150 records: `evaluate.py`, `replay.py`, then the separate `audit.py`.
+Comparison uses the existing `compare_judge_csv`; pairwise analysis additionally joins
+corrected Qwen scores by exact ID/spelling and identical human reference. These files
+are never supplied to the model. GPT configured identity and reasoning effort are
+reported explicitly; a provider-served model ID is not exposed by this CLI's event
+stream. [Pilot report](research/2026-10-31-gpt-judge-pilot.md).

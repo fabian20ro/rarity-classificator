@@ -1,7 +1,7 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Data: 2026-10-30. Stare: etapa1 și pilotul Qwen din etapa2 implementate/verificate.
-Comparatorul GPT, cascada pentru1000 și maximum50 revizuiri rămân de făcut.
+Actualizat: 2026-10-31. Stare: etapa1 și piloții Qwen/GPT din etapa2 încheiați.
+Pregătirea intrărilor1000, cascada/rutarea și maximum50 revizuiri rămân de făcut.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -150,11 +150,14 @@ technical_status, risk_band, reason_flags, manifest_id. O combinație numerică 
 metodelor este permisă doar dacă regula sa a trecut aceeași evaluare fără leakage;
 în lipsa ei, scorul final rămâne baseline și judecătorii furnizează semnale de audit.
 
-**Regulă inițială pentru al doilea judecător:** conflict de minimum 2 niveluri cu
-baseline-ul, identitate/POS/sens nerezolvat sau contradicție corpus–sens. Simpla lipsă
-wordfreq nu declanșează încă un apel pentru toate cele 851 de forme; rămâne un flag.
-Validăm acoperirea erorilor severe a acestei rute pe pilot și o fixăm înainte de rulare.
-Orice schimbare înseamnă protocol nou, declarat ca exploratoriu.
+**Rutare propusă după piloți, încă de verificat:** GPT pentru trecerea semantică;
+Qwen pentru conflicte de minimum2 niveluri sau contradicții între dovezi, preferabil
+numai când există contexte lexicale utilizabile. Verificăm această condiție pe
+predicțiile150 existente înainte de înghețare; nu o prezentăm drept regulă validată.
+Lipsa wordfreq ori a definițiilor rămâne flag de incertitudine și motiv de audit al
+surselor, nu declanșator pentru sute de apeluri Qwen fără contexte. Măsurăm erorile
+severe recuperate și introduse de rutare, inclusiv cazurile ratate fără dezacord≥2.
+Orice schimbare ulterioară cere protocol nou, declarat exploratoriu.
 
 Riscul vizează `P(eroare >= 2)`, nu probabilitatea clasei favorite. Implicit folosim
 benzi ordinale și `unknown`. Fiecare bandă publică numitorul și erorile observate;
@@ -236,12 +239,12 @@ numai un export nou, niciodată scorurile originale. Nu există operații DB de 
 
 ## Următoarea acțiune concretă
 
-**Comparator GPT pe aceleași150 și același CSV lexical final**, când activăm acel
-experiment. Qwen este încheiat; colectorul și comparatorul sunt reutilizabile,
-compatibilitatea modelului GPT concret rămâne de verificat. Baseline-ul rămâne scorul
-operațional. Înainte de extinderea semantică la1000, tratăm lipsurile de context și
-fixăm ruta/criteriile; nu interpretăm acordul modelelor drept etichetă gold.
-Fără noi evaluări umane în această etapă.
+**Pregătirea dovezilor pentru1000 și înghețarea rutării**, verificată offline pe
+predicțiile150 existente, fără noi evaluări umane. GPT devine candidatul principal
+pentru judecata semantică; Qwen, al doilea diagnostic pe conflicte importante, preferabil
+cu sensuri utilizabile. Baseline-ul rămâne scorul operațional și controlul pentru toate.
+Regula de combinare/rutare nu este încă implementată sau validată; nu facem medie/vot
+implicit. După fixarea ei urmează rularea secvențială1000 și maximum50 fișe într-o rundă.
 
 
 ## Rezultatul etapei 1 — implementat și verificat
@@ -258,7 +261,7 @@ calitatea pe cele150 asupra celor870 cu lipsuri și nu cerem utilizatorului să 
 completeze manual. Relațiile lexicale fără martor rămân necunoscute.
 
 
-## Rezultatul etapei 2 — Qwen încheiat; GPT restant
+## Rezultatul etapei 2 — Qwen, 2026-10-30
 
 150/150 răspunsuri native valide în ambele campanii complete; secvențial, RAM verificat.
 Scoruri și răspunsuri umane intacte. Modelul Qwen preexistent păstrat; fără D1/GPT/DB.
@@ -288,6 +291,50 @@ abia apoi testăm o regulă combinată, înghețată explicit, și coada de maxi
 
 Verificare:909teste+284subteste/Ruff, replay offline identic, audit independent;
 1721fișiere protejate neschimbate. [Raport complet](../research/2026-10-30-qwen-judge-pilot.md).
-Leftovers: compatibilitatea/pilotul GPT, acoperirea lexicală a lotului nou, politica
-cascadei și validarea riscului, inferența1000, auditul cauzelor, interfața≤50.
+Leftovers actualizate după pilotul GPT de mai jos: acoperirea lexicală a lotului nou,
+politica cascadei și validarea riscului, inferența1000, auditul cauzelor, interfața≤50.
 Nu există încă1000 etichete validate sau probabilități calibrate.
+
+
+## Rezultatul etapei 2 — GPT prin Codex, 2026-10-31
+
+150/150 răspunsuri native valide, sesiuni noi/secvențiale. Aceleași forme, dovezi finale
+Qwen, rubrică și schemă; fără scoruri umane, frecvențe sau predicții în cereri.
+GPT-6.1-sol/low configurat prin autentificarea Codex existentă; fără cheie API extrasă.
+Înveliș generic Codex diferit de Qwen, instrumente disponibile dar zero utilizări
+observate. Identitate configurată, nu ID servit atestat. Nu este comparație pură de
+model sau test independent; contextele curate au expunere istorică la etichete.
+
+| Metodă | Erori≥2 | Erori≥3 | Cost suplimentar | În±1 | MAE |
+|---|---:|---:|---:|---:|---:|
+| Baseline |11|3|14|139/150|0,520|
+| Qwen corectat |5|4|9|145/150|0,527|
+| GPT prin Codex |3|0|3|147/150|0,507|
+
+GPT corectează10 erori grave baseline și introduce2; corectează toate5 Qwen și
+introduce3 diferite: carter5→3, catalige4→2, târfă3→1. Zero intersecție a erorilor
+grave GPT/Qwen observate; aceasta nu garantează că putem alege automat răspunsul
+corect. Scorurile umane originale rămân intacte, inclusiv micșurat5 (GPT4, Qwen3).
+
+Pe true4/5: baseline5, Qwen2, GPT2 erori grave. Missing-wordfreq49:2/1/2; GPT doar
+îl egalează pe baseline. Cu sensuri131:10/2/3. Fără sensuri19:1/3/0, dar17/19 sunt
+referințe1–2 și doar2/19 nu au wordfreq. Lotul nou are764/870 fără context și fără
+wordfreq: performanța pe aceste forme rămâne necunoscută.
+
+Top8 găsește6/11 erori baseline cu GPT (2alarme false),4/11 cu Qwen și1/11 numai prin
+dovezi. Top25 GPT10/11 rămâne secundar, la16,7% revizuire. Bootstrap GPT-minus-baseline
+favorabil exploratoriu; intervalele GPT-minus-Qwen includ zero. Acord exact GPT77
+versus baseline86, dar criteriul acceptat este distanța≥2, nu potrivirea exactă.
+
+**Decizie:** porțile exploratorii trecute; GPT candidat principal pentru experimentul
+nou, Qwen diagnostic complementar, baseline operațional păstrat. Fără promovare DB,
+încredere numerică sau ansamblu implicit. Nu mai căutăm prompturi pe aceleași150.
+
+Verificare:915teste+303subteste/Ruff, replay fără procese/rețea/DB identic, audit
+independent PASS,2092fișiere protejate intacte.150sesiuni distincte/149verificări de
+neconcurență; aproximativ13minute. [Raport GPT](../research/2026-10-31-gpt-judge-pilot.md).
+
+Rămân: CSV-ul lexical1000 în schema judecătorilor, reguli de rutare/risc înghețate și
+verificate pe predicțiile existente, campania1000, comparație pe600/400 și lipsuri,
+auditul cauzelor, maximum50 fișe și decizia separată despre scorurile finale.
+Compatibilitatea API directă rămâne netestată; transportul Codex este cel măsurat.

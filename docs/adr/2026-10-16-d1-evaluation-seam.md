@@ -206,3 +206,24 @@ audited complete projection CSV; validate original identity/POS/meaning, hash it
 and retain original/projected text in provenance. No word-specific scoring rules or
 automatic lexical blacklist. Curated, label-exposed evidence remains exploratory;
 source fidelity is not the same as independence or exhaustive semantic coverage.
+
+## 2026-10-31: native Codex judgments when no API credential is configured
+
+Add a small `collect_codex_csv` adapter at the existing CSV/campaign boundary. Reuse
+the frozen chat rubric/schema/evidence validator, `Outcome`, campaign checkpoints and
+offline comparator. The executor owns a fresh sequential CLI process, environment,
+raw receipt and configuration; collection validates native JSONL directly. Do not
+fabricate an HTTP response or claim the requested model is a server-attested identity.
+
+Codex contributes a generic managed wrapper and may expose tools despite local
+feature toggles. Treat this as a separately disclosed GPT-through-Codex evaluator.
+An empty non-repository cwd, ephemeral sessions, minimal inherited environment and
+inspected context exclude project history/labels. Accepted runs require zero tool
+events. Any tool/unknown event, malformed event stream/item, runtime warning or stderr
+quarantines the campaign and stops; quarantine cannot be resumed. Native answer-schema
+failures remain explicit failed outcomes. Model output is never silently repaired.
+
+The runner saves stdout/stderr before validation. Only post-collection analysis reads
+references or other predictions. Source, CLI binary/catalog, configuration and runner
+hashes are pinned. Confidence remains unset and legacy run.csv stays empty. Existing
+HTTP collection stays available for a later directly authenticated API experiment.
