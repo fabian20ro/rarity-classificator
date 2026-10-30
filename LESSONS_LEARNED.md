@@ -130,3 +130,151 @@ Validate language/package/versioned policy and source-ledger hashes; pin extract
 code. Exclude pilot/collision pages from dictionary token counts to reduce self-entry
 contamination. Dictionary coverage is not familiarity: this pilot's rebus corpus
 observed29/37 forms but none of the4 rated5; report paired coverage and missingness.
+
+**[2026-10-23]** Blind review means removing predictions from the public payload —
+CSS-hidden panels still expose estimates. Publish only lexical fields, use a new
+pack-bound storage namespace, preserve old labels/events, and freeze predictions
+outside the web root before annotation. Rebuild shared dictionary frequencies
+excluding both development and held-out target pages before fitting thresholds.
+
+**[2026-10-23]** Preparing an independent batch does not authorize more user
+annotation workload — the user explicitly declined after150 pilot forms. Reuse
+existing labels with rubric/provenance strata and internal validation; keep new
+unlabelled forms optional. Never invent independent gold from assistant estimates.
+
+**[2026-10-23]** Coverage-conditioned baselines matter — missing frequencies are
+concentrated among rare forms. Compare each frequency method with a median fitted
+on the same observed training labels, excluding the held-out label, alongside a
+global median. Validated here: rebus matched26 CV MAE0.500 equals the source-matched
+constant1 baseline, despite beating the global-median0.808. Always report per-level
+coverage and rare-word abstentions; pooled MAE alone can hide this selection effect.
+
+**[2026-10-23]** initial_level is not necessarily a blind first response — in this
+pilot it equals the first round's FINAL labels150, including post-AI revisions.
+Use immutable labels-first-independent149 for exposure sensitivity and refit
+learned baselines on those labels when comparing to saved AI. Keep latest mixed
+150, original-final150, and first-independent149 as distinct named experiments.
+
+
+**[2026-10-24]** Full coverage is an operational requirement — user requires a
+score for every form. Exclude abstaining methods from the primary comparison;
+conditional MAE on101/150 cannot outrank a complete150-score method. Evaluate an
+explicit fold-trained fallback on all forms, keep raw coverage as diagnostics,
+and retain support/route provenance. Missing-group medians learn pilot composition,
+not lexical truth; compare large errors and clarified-label strata as well as MAE.
+
+
+**[2026-10-24]** Group-held-out stability needs an affected-form denominator —
+only16 of150 pilot forms belong to the8 declared pair groups;134 singleton folds
+are identical to LOO by construction. Report grouped subsets and unique training
+exclusion counts, not just a stable aggregate. Source-presence controls distinguish
+frequency magnitude from corpus coverage; here two presence bits match Ridge on
+first-independent149. Shared prefixes are not verified lexical families.
+
+
+**[2026-10-24]** Bind complete-scorer evidence to the exact inventory — a valid
+subset frequency file cannot distinguish genuinely missing words from unqueried
+ones. Validate inventory hash/count, export hash/count, lookup policy and corpus
+identity before fallback. Full export exposed85.06% missing rows versus32.67% in
+pilot; all missing→4 and positive-frequency floor above rare boundaries yields
+zero5. Coverage100% is an operational guarantee, not evidence of discrimination.
+
+
+**[2026-10-24]** Dictionary source coverage is not sense validity — local cache
+keys fold diacritics; exact query/status or a lemma witness still does not establish
+all valid senses. Whole-page usage regexes match navigation; definition-local tags
+can qualify synonyms/variants. Audit confirms even human2 forms have obsolete/
+regional page hints. Prior review raw snapshots cover all49 missing-wordfreq pilot
+forms, but assistant-authored, label-exposed contexts are not independent features.
+Never infer5 from dictionary absence, selection flags or an unscoped obsolete tag.
+
+**[2026-10-25]** Structured lexical alignment needs explicit inflections and inherited
+scope — DEX headings may have multiple POS blocks and inflected alternatives;
+lexemeName includes superscript/POS text. Match literal heading/explicit alternatives,
+inherit parent meaning tags, exclude examples/etymology, and retain nearby-lemma
+redirects as unresolved. Raw snapshots covered49 pilot tail forms, but only42
+passed source-bounded exact-form/POS alignment. More source files do not imply more
+verified meanings. A small latest-label gain that reverses on first-independent
+ratings does not justify replacing a frozen fallback.
+
+**[2026-10-25]** Exact heading match still needs grammatical scope — ițar's trousers
+sense is explicitly plural-only and cannot witness singular ițar. Keep literal noun
+plural alternatives and invariant forms; a child singular restriction can override
+a parent plural restriction. Nonexclusive “mai ales la plural” is not exclusion.
+Validated against local source records and public CSV regression tests;19 exported
+sense records corrected. Corpus-derived mention counts also need a versioned
+sidecar and derivation checks, not only a projected CSV hash.
+
+
+**[2026-10-25]** Verify corpus access and licence at the actual release/file layer —
+a dataset badge may cover metadata only (OSCAR), an API licence need not establish
+archive terms (Leipzig), and a language project may be absent from full releases
+(ParlaMint-RO). Anonymous range probes establish availability, not inventory coverage.
+Web corpus prefixes can be old; freeze balanced sampling and byte budgets. Missing
+in a bounded sample is not evidence for level5, and Common Crawl derivatives are
+not automatically independent of wordfreq's Romanian OSCAR source.
+
+
+**[2026-10-27]** Streaming Requests can still consume redirect bodies —
+Session.get(stream=True,allow_redirects=False) prepares Response.next by draining
+the redirect payload. A hard transfer cap needs headers-first transport (here
+HTTPAdapter.send) and bounded caller-owned reads; regression tests must exercise
+real Requests response/redirect behavior, not only a fake get method. Reserve
+uncertain work before execution. Bind/hash checkpoints and invalidate provisional
+manifests before rebuilding projections after a disk pause.
+
+
+**[2026-10-27]** Multiple hosts are not independent lexical attestations — the
+bounded FineWeb2 audit found copied passages, keyword lists and commercial names
+on unrelated hosts. A recent crawl can contain a much older publication. Preserve
+raw frequency support separately from source-quality and valid-sense evidence.
+In this pilot,24/49 tail forms were observed but only8 met5/3/2support andnonewas
+level5; no foldmetminimum10trainingrows. An unchanged gatedbaseline is not an
+evaluated learnedfallback or proof of4/5discrimination.
+
+
+**[2026-10-28]** Published frequency-list totals are source-specific — CoRoLa's
+complete lowercase word-form list sums to637,764,339 counted letter-only tokens;
+the project-level “over1billion” figure is not its normalization denominator.
+Use the downloaded list sum, preserve source filters and orthographic distinctions.
+Observed/support coverage and scoring coverage differ: CoRoLa supplied35eligible
+pilot tail forms, yet its fitted fallback worsened severe errors in all3labelviews.
+A one-point historical total-error gain does not pass a severe-error promotion gate.
+
+
+**[2026-10-28]** Case-preserving counts diagnose ambiguity, not a name filter —
+local CoRoLa audit found1427/1532carter and844/853dorian occurrences with uppercase,
+with person-name uses in saved FineWeb snippets; those snippets cannot establish
+CoRoLa/wordfreq name fractions. Hipochinezie is10/12capitalized, so blanket filtering
+would also remove supported rare terms. Published case/lowercase lists can have
+slightly different totals even when every audited target reconciles; keep separate
+member denominators. Explicit variant witnesses may exist outside a main dictionary
+heading (antereu/sezisa/ata); preserve the variant's POS and source scope, never
+transfer frequency or familiarity from the linked lemma automatically.
+
+
+**[2026-10-28]** Bound lexical variants to their own source and grammar — target
+POS/gender can differ from the main heading (ata feminine, atu neuter). Require
+matching dictionary provenance before inheriting structured senses; a supported
+relation alone does not establish all senses. Raw numbered meanings can carry their
+own conflicting POS: retain them unresolved, never overwrite the conflict silently.
+Clip structural clause delimiters before checking trailing prose: real HTML can put
+`] – Din` in one text node. Public CSV regressions plus real-source replay caught
+both issues; protect scores/labels with hashes during evidence-only repairs.
+
+**[2026-10-29]** Advertised Graphify tools can fail at the service boundary with
+`Unknown tool`; this is neither an empty index nor a missing local executable.
+The installed connector targets hosted api.graphify.com/mcp. Check repository/index
+freshness once connected; distinguish a bounded hosted subgraph from a local AST
+fallback. Local import maps locate inspection/test candidates, not runtime calls or
+coverage. A newer installed decision model can reuse the generic adapter; change
+explicit invocation and campaign identity, preserve old scores, and test compatibility
+without claiming that inventory recognition proves inference quality.
+
+
+**[2026-10-29]** Local Graphify CLI is independent of the hosted plugin — user
+checkout ~/git/graphify supports extract --code-only and cluster-only --no-label.
+Set GRAPHIFY_BACKEND=none, use its frozen uv.lock in an isolated runtime, import
+from that checkout and preserve source/tool/hash receipts. No Homebrew, LLM key,
+model loading or broad skill/hook installer is required for this structural graph.
+EXTRACTED/INFERRED relations and zero-symbol files remain coverage caveats.

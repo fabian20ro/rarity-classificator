@@ -14,6 +14,14 @@ from ..scoring.d1 import D1Scorer, RUBRIC, INSTRUCTIONS
 
 
 def add_commands(sub) -> None:
+    source = sub.add_parser('evaluation-fineweb',help='Bounded sequential FineWeb2 sample; no DB or models')
+    source.add_argument('--vocabulary-csv',type=Path,required=True)
+    source.add_argument('--shards-json',type=Path,required=True)
+    source.add_argument('--campaign-dir',type=Path,required=True)
+    source.add_argument('--max-documents',type=int,default=100000)
+    source.add_argument('--max-transfer-bytes',type=int,default=1<<30)
+    source.set_defaults(evaluation_handler=_fineweb)
+
     forms = sub.add_parser(
         "evaluation-exact-forms", help="Freeze exact surfaces and all source-attested POS"
     )
@@ -94,6 +102,51 @@ def add_commands(sub) -> None:
     wordfreq.add_argument("--vocabulary-csv", type=Path, required=True)
     wordfreq.add_argument("--output-csv", type=Path, required=True)
     wordfreq.set_defaults(evaluation_handler=_wordfreq)
+    freeze = sub.add_parser("evaluation-freeze-wordfreq", help="Freeze complete offline wordfreq model from working labels")
+    freeze.add_argument("--vocabulary-csv", type=Path, required=True)
+    freeze.add_argument("--reference-csv", type=Path, required=True)
+    freeze.add_argument("--wordfreq-csv", type=Path, required=True)
+    freeze.add_argument("--campaign-dir", type=Path, required=True)
+    freeze.set_defaults(evaluation_handler=_freeze_wordfreq)
+    score = sub.add_parser("evaluation-score-wordfreq", help="Complete shadow CSV from frozen wordfreq model; no DB or LLM")
+    score.add_argument("--vocabulary-csv", type=Path, required=True)
+    score.add_argument("--wordfreq-csv", type=Path, required=True)
+    score.add_argument("--model-json", type=Path, required=True)
+    score.add_argument("--campaign-dir", type=Path, required=True)
+    score.set_defaults(evaluation_handler=_score_wordfreq)
+
+    evidence = sub.add_parser(
+        "evaluation-local-evidence", help="Extract exact-form lexical evidence from local snapshots"
+    )
+    evidence.add_argument("--vocabulary-csv", type=Path, required=True)
+    evidence.add_argument("--loc-file", type=Path, required=True)
+    evidence.add_argument("--sources-csv", type=Path, required=True)
+    evidence.add_argument("--mentions-csv", type=Path, required=True)
+    evidence.add_argument("--campaign-dir", type=Path, required=True)
+    evidence.set_defaults(evaluation_handler=_local_evidence)
+    fallback = sub.add_parser(
+        "evaluation-local-fallback", help="Grouped offline lexical fallback comparison; no DB or LLM"
+    )
+    fallback.add_argument("--reference-csv", type=Path, required=True)
+    fallback.add_argument("--features-csv", type=Path, required=True)
+    fallback.add_argument("--evidence-dir", type=Path, required=True)
+    fallback.add_argument("--first-independent-csv", type=Path, required=True)
+    fallback.add_argument("--groups-csv", type=Path, required=True)
+    fallback.add_argument("--campaign-dir", type=Path, required=True)
+    fallback.set_defaults(evaluation_handler=_local_fallback)
+    fineweb = sub.add_parser(
+        "evaluation-fineweb-fallback",
+        help="Grouped FineWeb2 CSV fallback comparison; no network, DB or LLM",
+    )
+    fineweb.add_argument("--reference-csv", type=Path, required=True)
+    fineweb.add_argument("--features-csv", type=Path, required=True)
+    fineweb.add_argument("--evidence-dir", type=Path, required=True)
+    fineweb.add_argument("--first-independent-csv", type=Path, required=True)
+    fineweb.add_argument("--groups-csv", type=Path, required=True)
+    fineweb.add_argument("--campaign-dir", type=Path, required=True)
+    fineweb.set_defaults(evaluation_handler=_fineweb_fallback)
+
+
 
 
 def _prepare(args) -> int:
@@ -299,4 +352,60 @@ def _form_report(args):
         args.campaign_dir,
     )
     print(json.dumps(result, indent=2))
+    return 0
+
+
+def _freeze_wordfreq(args) -> int:
+    from .wordfreq_baseline import freeze_wordfreq_model
+
+    result = freeze_wordfreq_model(args.vocabulary_csv, args.reference_csv, args.wordfreq_csv, args.campaign_dir)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _score_wordfreq(args) -> int:
+    from .wordfreq_baseline import score_wordfreq_inventory
+
+    result = score_wordfreq_inventory(args.vocabulary_csv, args.wordfreq_csv, args.model_json, args.campaign_dir)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _local_evidence(args) -> int:
+    from .local_evidence import export_local_evidence
+
+    result = export_local_evidence(args.vocabulary_csv, args.loc_file, args.sources_csv,
+                                   args.mentions_csv, args.campaign_dir)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _local_fallback(args) -> int:
+    from .local_fallback import evaluate_local_fallback
+
+    result = evaluate_local_fallback(args.reference_csv, args.features_csv, args.evidence_dir,
+                                     args.first_independent_csv, args.groups_csv, args.campaign_dir)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _fineweb_fallback(args) -> int:
+    from .fineweb_fallback import evaluate_fineweb_fallback
+
+    result = evaluate_fineweb_fallback(
+        args.reference_csv,
+        args.features_csv,
+        args.evidence_dir,
+        args.first_independent_csv,
+        args.groups_csv,
+        args.campaign_dir,
+    )
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _fineweb(args):
+    from .fineweb import export_fineweb_frequencies
+    result=export_fineweb_frequencies(args.vocabulary_csv,args.shards_json,args.campaign_dir,max_documents=args.max_documents,max_bytes=args.max_transfer_bytes)
+    print(json.dumps(result,ensure_ascii=False,indent=2))
     return 0

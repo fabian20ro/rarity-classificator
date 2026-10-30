@@ -1,5 +1,12 @@
 # Evaluate D1 on Romanian Scrabble words
 
+Current evaluation target: **d1-omni-2b** (updated 2026-10-29). Model selection stays
+explicit through `--model`; the production offline wordfreq configuration is unchanged.
+LM Studio's read-only model inventory reports `type=decision`, `architecture=lfm3`,
+`decision_type=lfm3-d1-omni`, F16, 4,076,585,920 bytes and no loaded instances.
+This establishes recognition, not inference compatibility or measured Romanian quality.
+The separate `mmproj-*.gguf` is not the `--model-file` argument for this text campaign.
+
 Experimental, sequential path. No command loads a model. Preparation, frequency baseline and reporting work offline. Run inference only after a matching D1 GGUF has been manually loaded and sufficient RAM is available.
 
 Start from an explicit Scrabble inventory CSV with `word_id,word,type`; optional `family` groups related spellings. Source version is required provenance supplied by the operator, not an eligibility certification. Preserve diacritics; do not expand inflections. Select a curated 150-word pilot inventory before preparing it; keep representative and rare-word challenge sampling records separately.
@@ -30,13 +37,13 @@ Have Romanian speakers label familiarity 1..5 without model predictions or defin
 ```sh
 python -m classificator evaluation-run \
   --vocabulary-csv build/d1/dataset/vocabulary.csv \
-  --campaign-dir build/d1/word-only \
-  --model d1-3b \
-  --model-file /Users/fabian/.lmstudio/models/LiquidAI/d1-3B-GGUF/d1-3B-Q8_0.gguf \
-  --runtime-version 'llama.cpp-2.58.0-lmstudio-0.4.26+4'
+  --campaign-dir build/d1/omni-2b-word-only \
+  --model d1-omni-2b \
+  --model-file "$HOME/.lmstudio/models/LiquidAI/d1-Omni-2B-GGUF/d1-Omni-2B-F16.gguf" \
+  --runtime-version ACTUAL_INSTALLED_RUNTIME_VERSION
 ```
 
-Use the actual installed runtime version and matching model file; values above describe the inspected setup. A second campaign with `--evidence-csv build/d1/dataset/evidence.csv` evaluates evidence assistance. For a definitions-only ablation, supply a derived CSV containing `word_id,definition,definition_status`; for frequency-assisted evaluation include `frequency,frequency_present`. Unknown evidence columns, including human labels, are rejected. Inputs and implementation changes require a new campaign directory.
+Replace the runtime placeholder with the actual installed runtime version. The model key and F16 file above were verified locally on 2026-10-29; inference was not run. Never reuse a d1-3b campaign directory for this model. A second campaign with `--evidence-csv build/d1/dataset/evidence.csv` evaluates evidence assistance. For a definitions-only ablation, supply a derived CSV containing `word_id,definition,definition_status`; for frequency-assisted evaluation include `frequency,frequency_present`. Unknown evidence columns, including human labels, are rejected. Inputs and implementation changes require a new campaign directory.
 
 Default English familiarity rubric is versioned in `scoring/d1.py`; no offensive-word rarity penalty. Comparing a Romanian rubric remains a development experiment. Full probabilities are saved; argmax selects the integer class, lower label wins an exact tie. `--min-probability` optionally abstains below a chosen maximum-class-probability threshold; default0 retains all valid predictions for unbiased initial evaluation. This threshold is not an estimated accuracy guarantee.
 
@@ -47,12 +54,12 @@ Repeat the command to resume without repeating completed IDs. Add `--retry-faile
 The standard Step2 entrypoint also accepts D1:
 
 ```sh
-python -m classificator step2-score --backend d1 --run d1-pilot \
-  --base-csv build/d1/dataset/vocabulary.csv --output-csv build/d1/scored.csv \
-  --model d1-3b --model-file /path/to/matching-model.gguf --runtime-version ACTUAL_VERSION
+python -m classificator step2-score --backend d1 --run d1-omni-2b-pilot \
+  --base-csv build/d1/dataset/vocabulary.csv --output-csv build/d1/omni-2b-scored.csv \
+  --model d1-omni-2b --model-file /path/to/matching-model.gguf --runtime-version ACTUAL_VERSION
 ```
 
-Sidecars live in `scored.csv.campaign/`. This path rejects force, skipped preflight, alternate endpoint, input overrides and limits: prepare the intended frozen inventory instead. For explicit failure retry, use `evaluation-run` against the same sidecar directory and matching `--run d1-pilot` identity, or a new campaign. No upload occurs. `--dry-run` never contacts the model. Production chat scoring remains the default.
+Sidecars live beside the output, here `omni-2b-scored.csv.campaign/`. This path rejects force, skipped preflight, alternate endpoint, input overrides and limits: prepare the intended frozen inventory instead. For explicit failure retry, use `evaluation-run` against the same sidecar directory and matching `--run d1-omni-2b-pilot` identity, or a new campaign. No upload occurs. `--dry-run` never contacts the model. Production chat scoring remains the default.
 
 ## Baselines and held-out report
 
@@ -67,7 +74,7 @@ python -m classificator evaluation-frequency \
 
 python -m classificator evaluation-report \
   --labels-csv build/d1/adjudicated-labels.csv \
-  --predictions-csv build/d1/word-only/predictions.csv \
+  --predictions-csv build/d1/omni-2b-word-only/predictions.csv \
   --baseline-csv build/d1/frequency-baseline/predictions.csv \
   --split test --bootstrap-samples 1000 --seed 42 \
   --report build/d1/comparison.json
@@ -81,7 +88,11 @@ Reports include coverage/status counts, confusion with a missing column, ordinal
 
 `python scripts/check.py` runs Ruff and the complete offline suite. New tests use unittest interfaces, real temporary CSV/checkpoint files and simulated external HTTP/corpus data. No live D1 quality claim follows from those tests.
 
-The original pilot annotation phase is complete. Next: independent held-out labels under the clarified exact-form rubric; D1 only when RAM permits. See the current recommendation below. Review rare-to-common errors before expanding to the locked benchmark or fitting a hybrid. Keep mandatory Jaccard/anchor gates and partial upload default.
+The pilot annotation phase is complete; no new user annotation is required. The
+full150 baseline suite and independent-first-response149 sensitivity are available
+in [the current results](research/2026-10-23-full-pilot-baselines.md). Keep the latest
+plan as the current recommendation. D1 remains unloaded unless explicitly authorized
+with sufficient RAM. Mandatory semantic upload gates and partial default remain.
 
 
 ## Exact-form/all-POS evaluation (2026-10-21)
@@ -134,11 +145,149 @@ No live inference is part of preparation or comparison.
 
 See [pilot results](research/2026-10-21-exact-form-frequency-results.md) and the
 latest section of [the plan](plans/2026-10-15-d1-classifier-evaluation.md). The pilot
-annotation phase is closed; next is an independent held-out evaluation before
-calibration. `scripts/run_exact_form_pilot.py` reproduces this local experiment:
+annotation phase is closed; the latest plan reuses existing150 labels and149
+first-independent responses for explicitly internal validation. `scripts/run_exact_form_pilot.py` reproduces this local experiment:
 
 ```sh
 python scripts/run_exact_form_pilot.py --pilot /path/to/pilot-2026-10-17 \
   --loc-file /path/to/LOC/words.txt --dex-cache /path/to/rebus/.cache/dex_definitions \
   --output /path/to/new-experiment-directory
 ```
+
+## Full-pilot offline baselines (2026-10-23)
+
+Install optional `evaluation` dependencies for Ridge: `pip install -e '.[evaluation]'`.
+`evaluation.full_pilot_baselines.evaluate_full_pilot` compares saved legacy/AI,
+constants, frequency thresholds and a fixed Ridge model using fold-only preprocessing.
+Three distinct views: original-round-final150, revised-working150, independent-first149.
+No model-server calls. [Results and reproduction](research/2026-10-23-full-pilot-baselines.md).
+
+
+### Mandatory100% coverage (2026-10-24)
+
+The full-pilot API now returns `views.<view>.operational` as the primary comparison.
+`wordfreq_complete` and `rebus_complete` use unchanged observed-frequency thresholds
+plus an explicit training-only missing-group median fallback (global training median
+if necessary). Raw source-only columns remain diagnostics. Every operational method
+must emit integer1–5 scores for the full view. Fold support, prediction route and route
+metrics are saved. [Updated results and recommendation](research/2026-10-24-complete-coverage-baselines.md).
+
+### Presence controls and grouped validation (2026-10-24)
+
+`evaluate_full_pilot(..., groups_csv=path)` accepts an optional exact-reference CSV
+with `word_id,word,group`. All group mates are excluded from training together;
+omitting the argument preserves one-form-out validation. Presence-only baselines
+use each source flag and the exact ordered pair of flags with fold-trained medians.
+Reports include singleton/non-singleton slices to show how many forms actually
+exercise group exclusion. [Robustness results and next implementation](research/2026-10-24-frequency-robustness.md).
+
+### Frozen offline scorer and full shadow export (2026-10-24)
+
+`evaluation-freeze-wordfreq` freezes the complete-source baseline from explicit
+pilot vocabulary, latest working labels and a bound wordfreq export.
+`evaluation-score-wordfreq` consumes that config and an exact-inventory frequency
+snapshot; it never refits or connects to a database/model service. Both refuse
+existing output directories. Install optional `.[frequency]` only to generate fresh
+wordfreq exports; saved CSV scoring does not require wordfreq or sklearn.
+
+Frozen configuration: `configs/wordfreq-ro-pilot-2026-10-24.json`.
+[Commands, verification and full-inventory results](research/2026-10-24-offline-wordfreq-export.md).
+All77,698 saved rows scored, but85.06% use fallback4 and none score5. Keep the model
+as a shadow baseline; complete coverage is not evidence of full-inventory accuracy.
+
+### Local evidence audit (2026-10-24)
+
+[Local-source audit](research/2026-10-24-local-fallback-source-audit.md) inventories
+LEX/DEX/rebus evidence for the66,088 fallback rows. Combined positive-source coverage
+is18,769 rows; all49 pilot tail forms have raw local snapshots through prior reviews.
+Sense-aware extraction and validation are the next step. Page tags, missing corpus
+entries and inherited classifier scores are not reliable automatic level5 labels.
+
+Local lexical fallback experiment (2026-10-25): `evaluation-local-evidence` and
+`evaluation-local-fallback` provide reproducible offline extraction and grouped
+validation. All150 scored; modest latest-label gain fails first-independent checks.
+Keep frozen fallback4. [Results, limitations and commands](research/2026-10-25-local-lexical-fallback.md).
+
+
+## Bounded FineWeb2 experiment (2026-10-27)
+
+Install the evaluation extra (`pyarrow==21.0.0` included). Use a pinned HF train-file
+listing for revision `af9c13333eb981300149d5ca60a8e9d659b276b9`, configuration
+`ron_Latn`, with path/size entries. The existing experiment stores that verified
+listing in `build/d1/fineweb-2026-10-26/inputs/shards.json`.
+
+```sh
+classificator evaluation-fineweb \
+  --vocabulary-csv build/rarity/step1_words.csv \
+  --shards-json build/d1/fineweb-2026-10-26/inputs/shards.json \
+  --campaign-dir build/d1/fineweb-2026-10-26/source \
+  --max-documents 100000 --max-transfer-bytes 1073741824
+```
+
+The same command resumes with the same inputs/code/limits. Never delete a budget
+ledger to restart an interrupted run. Failed/uncertain transfer and document
+reservations remain spent. Hard caps cannot be raised; the default1GiB budget
+includes a conservative40MiB allowance for installing the optional parser.
+5GiB free-disk floor pauses safely. Complete runs replay without network. Source
+files are read via bounded HTTP ranges; no full shard or corpus cache is written.
+
+Outputs: full inventory `frequencies.csv` (2020–2024 crawl dates), separate
+`older-frequencies.csv`, sampled-group plan/ledger, bounded local concordances,
+validated checkpoint and manifest. Missing counts stay explicit, never imply5.
+Frequencies are descriptive of the selected sample; dates are crawl dates, not
+publication dates. Multiple hosts can repeat a passage and are not independent
+attestations. Check source quality before interpreting calibration.
+
+```sh
+classificator evaluation-fineweb-fallback \
+  --reference-csv PATH_TO_WORKING_REFERENCE_150 \
+  --features-csv PATH_TO_EXISTING_FREQUENCY_FEATURES \
+  --evidence-dir build/d1/fineweb-2026-10-26/source \
+  --first-independent-csv PATH_TO_FIRST_INDEPENDENT_149 \
+  --groups-csv PATH_TO_FROZEN_GROUPS \
+  --campaign-dir build/d1/fineweb-2026-10-26/comparison
+```
+
+Evaluation is CSV-only: complete predictions, shared fold-fitted wordfreq path,
+source-supported fallback fitted outside each held-out group, unknown→4. No D1,
+database access, production scorer changes or automatic upload. Dataset attribution
+and original content rights remain applicable; concordance snippets stay local.
+
+Completed run: [FineWeb2 bounded results](research/2026-10-27-fineweb-bounded-experiment.md).
+Source coverage improved; the declared training gate did not pass. Frozen wordfreq+4 retained.
+
+
+## CoRoLa noncommercial frequency diagnostic — 2026-10-28
+
+Completed experiment and interpretation:
+[CoRoLa report](research/2026-10-28-corola-experiment.md).
+Public offline functions:
+`evaluation.corola.export_corola_frequencies(vocabulary_csv, source_tsv, source_record_json, output_dir)`
+and `evaluation.corola_fallback.evaluate_corola_fallback(reference_csv, frequency_features_csv, evidence_dir, first_independent_csv, groups_csv, output_dir)`.
+Use `pathlib.Path` arguments. Outputs publish atomically and refuse existing targets.
+
+Workspace-local `build/d1/corola-2026-10-28/` contains the frozen protocol, original
+source, receipts, executable export/comparison scripts and independent verifier.
+Do not rerun acquisition into existing files. Offline reproduction uses retained
+source plus new output directories; no model/database setup is required. Source
+and derived CSVs are not repository resources for commercial/distributed use.
+Current recommendation remains frozen wordfreq+4; more coverage did not reduce
+severe errors in this experiment.
+
+
+## Local lexical variants — 2026-10-28
+
+[Extraction report](research/2026-10-28-lexical-variant-extraction.md): existing
+`export_local_evidence` now emits a source-scoped `variants.csv` ledger and additive
+POS/restriction/provenance fields in `senses.csv`. `evidence.csv` stays compatible.
+`explicit-variants-v1` is recorded in the manifest. Supported variant relations and
+recovered exact senses are separate; unresolved records do not become aligned evidence.
+
+Campaign: `build/d1/lexical-variants-2026-10-28/`. The 169-row source ledger includes
+already-local atu.html explicitly bound to ata; this does not bypass witness checks.
+Authoritative output: `evidence-reviewed/`; independent verification:
+`verification-reviewed.json`. Earlier output directories are retained development
+artifacts. Reproduce with the campaign's `run.py NEW_OUTPUT_NAME`, then
+`compare_evidence.py NEW_OUTPUT_NAME` and `verify.py OUTPUT_PATH`, using the project
+Python environment for export. Existing outputs are never overwritten. Scores and
+ratings remain frozen; no model, database or network needed.

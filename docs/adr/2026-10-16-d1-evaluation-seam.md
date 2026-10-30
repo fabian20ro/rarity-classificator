@@ -40,3 +40,114 @@ initial pilot labels from entering the clarified-target comparison. Raw frequenc
 and ranking comparisons precede any threshold fitting. Rebus uses sequential local
 cache extraction with target-page exclusion and exact-definition deduplication.
 No new scoring framework, parallel inference, automatic model load or upload path.
+
+## 2026-10-24: frozen complete wordfreq scorer
+
+Use two plain CSV functions in `evaluation.wordfreq_baseline`: freeze a model from
+an explicit pilot/reference/frequency snapshot, then score an explicit inventory
+from that model and compatible exported frequencies. Calibration imports the fitter
+lazily; scoring never refits or imports wordfreq, sklearn, DB clients or model
+transport. CLI handlers dispatch before database configuration. Keep the existing
+abstaining FrequencyScorer unchanged; the offline workflow applies an explicit
+recorded fallback to its unresolved outcomes. No integration with production Step2.
+
+Frequency exports now pin exact lookup policy and normalized full-corpus digest,
+in addition to package/version/language and inventory/export hashes. Each scoring
+input must be an export for that exact inventory; a subset cannot masquerade as
+missing evidence. Configuration identity is a canonical-content SHA256. Every CSV
+row carries the model identity, frequency and direct/fallback route. Preserve all
+inventory IDs/POS, including repeated forms; no lemmatization or diacritic stripping.
+Publish staged output directories atomically and refuse existing output paths.
+A shadow export is an operational artifact, not authorization to upload or evidence
+of accuracy on unlabelled inventory. Step5 and upload gates remain independent.
+
+## 2026-10-25: local lexical evidence and fallback experiment
+
+Two plain offline CSV functions: local_evidence exports source-bound senses and
+features; local_fallback validates artifacts and runs grouped comparisons. Reuse
+exact normalization, threshold fitter and metrics. Keep extraction label-free and
+retain unresolved identities/POS instead of transferring lemma evidence. A small
+fixed tree is evaluation-only; shared direct thresholds fit inside training folds.
+No production scorer integration or alteration of the frozen wordfreq configuration.
+Local sources stream sequentially by file; outputs publish atomically with hashes.
+
+Mention counts carry a mandatory sidecar tying the exact inventory to a versioned
+corpus, source ledger, extractor and checked derivation; hashing a bare counts CSV
+is insufficient provenance. Explicit singular/plural restrictions participate in
+sense alignment. A child's explicit number scope overrides its parent's; usage
+preferences such as “mai ales la plural” are not exclusive restrictions.
+
+
+## 2026-10-27: bounded FineWeb2 evidence and comparison
+
+Keep source extraction and fold-local evaluation as independent CSV functions.
+FineWeb2 is optional offline research, never a production scorer/DB integration.
+PyArrow21 reads only required column chunks through an explicit seek/read adapter;
+pre_buffer=False/use_threads=False. HTTPAdapter.send returns headers without the
+Requests Session redirect-body drain; all body reads and redirects are controlled.
+
+One locked campaign binds inventory, pinned shard metadata, policy and implementation
+hashes. Reserve payload+8192bytes/request before transport, and document attempts
+before decoding; uncertain reservations survive interruption. Default transfer cap
+1GiB includes40MiB dependency allowance. No corpus cache or full shard file; range
+cap64MiB, selected-group uncompressed cap128MiB, free-disk floor5GiB. HTTP accounting
+is conservative application payload/reservations, not a TCP/TLS wire-byte meter.
+
+Checkpoint schema, campaign binding, state digest and progress validated on resume.
+CSV generation becomes readable only when its manifest is published; a low-space
+provisional manifest is invalidated before rebuilding resumed projections. Complete
+runs replay locally without network; exhausted hard budgets cannot be reset in place.
+
+Freeze seeded rowgroup order across all shards and per-shard document quotas before
+labels. Partial groups use leading rows; frequencies describe this bounded sample,
+not a uniform document sample or unbiased whole-corpus estimate. Count attempted
+documents before filtering. Exact Unicode token policy retained; temporal-slice-local
+text deduplication, explicit source/language exclusions and bounded concordances.
+Primary2020–2024 and older2013–2019 counts remain separate.
+
+Evaluator validates complete-inventory source CSV/hash binding and keeps the shared
+wordfreq path fold-local. Only balanced sample plus5tokens/3docs/2hosts can enter
+the fallback; minimum10 eligible training forms/two levels. Unsupported inputs
+remain4. Three existing label views/4vs5 diagnostics, no new annotation or tuning.
+
+
+## 2026-10-28: CoRoLa research evidence and shared grouped comparison
+
+Keep public CSV seams: `export_corola_frequencies` consumes a local published TSV,
+release receipt and full inventory; `evaluate_corola_fallback` consumes validated
+CSV artifacts plus existing labels/groups. No new production scorer or DB/LM path.
+CoRoLa source identity, complete counts/denominator and exact-form consistency are
+validated independently; no invented document/host fields. Published source and
+modified lookup artifacts stay local to the authorized noncommercial experiment.
+
+FineWeb and CoRoLa now use one private grouped-frequency engine with a small
+validated evidence record. Source validators and support rules remain in adapters.
+This consolidates repeated grouped orchestration while preserving FineWeb's public
+CSV/result behavior and source-specific policy. Local lexical-tree evaluation keeps
+its distinct model. Test public CSV functions, not helper internals.
+
+CoRoLa denominator is the complete published filtered word list, not a guessed full
+corpus token count. Normalize only NFC/cedilla/casefold, preserve all IDs/POS, sum
+source spelling aliases. Missing source counts remain4. The source improves coverage
+but fails the severe-error gate; neither frozen scorer configuration nor upload
+workflow changes.
+
+
+## 2026-10-28: Source-scoped lexical variant witnesses
+
+Keep `export_local_evidence` as the public CSV seam and `evidence.csv` compatible.
+Add `variants.csv` plus additive sense fields for target POS detail, source entry,
+dictionary, declaration and variant number restriction. Manifest extraction revision
+`explicit-variants-v1` distinguishes the repaired algorithm; all outputs remain hashed.
+
+A relation needs an explicit semantic variant declaration and identifiable target POS.
+Bind structured meanings to the same dictionary/headword/POS; reject ambiguous
+homographs. Raw MDA2 extraction supports only bracket headers and consecutive numbered
+meanings. Preserve variant gender/usage and meaning restrictions; contradictory own
+POS or number scope remains unresolved with a reason. Relation support does not imply
+all meanings recovered. No inference from redirects, spelling similarity or examples.
+
+Keep format-specific parsing local; no new framework, scorer coupling, frequency
+transfer or database/model path. Coverage is source-bounded, never a completeness or
+familiarity claim. Test CSV behavior, negative cases and provenance through the public
+function. Frozen scoring configuration and human labels remain outside this repair.

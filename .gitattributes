@@ -1,0 +1,3 @@
+# Deterministic generated code inventories; inspect source changes first.
+docs/code-graph/**/*.json linguist-generated=true
+docs/code-graph/graph.json linguist-generated=true

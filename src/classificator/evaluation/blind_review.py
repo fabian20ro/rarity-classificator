@@ -1,0 +1,84 @@
+"""Publish an estimate-free annotation pack; predictions stay outside the web root."""
+
+import hashlib
+import json
+import random
+import re
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from .dataset import _sha256
+from .exact_form import RUBRIC_ID
+
+
+def build_blind_review(forms_json: Path, output_dir: Path, *, version: str, seed: int):
+    if output_dir.exists() or output_dir.is_symlink():
+        raise FileExistsError(output_dir)
+    if not re.fullmatch(r"[a-z0-9-]+", version) or type(seed) is not int:
+        raise ValueError("Explicit version and integer seed required")
+    payload = json.loads(forms_json.read_text())
+    if set(payload) != {"forms"} or not isinstance(payload["forms"], list) or not payload["forms"]:
+        raise ValueError("Expected lexical forms only")
+    ids = set()
+    words = set()
+    for form in payload["forms"]:
+        if set(form) != {"word_id", "word", "contexts"}:
+            raise ValueError("Public forms must not contain scores, strata or frequency")
+        if (
+            not isinstance(form["word_id"], str)
+            or not form["word_id"].isdigit()
+            or int(form["word_id"]) <= 0
+        ):
+            raise ValueError("Invalid form ID")
+        if form["word_id"] in ids or form["word"] in words:
+            raise ValueError("Duplicate form")
+        ids.add(form["word_id"])
+        words.add(form["word"])
+        if not isinstance(form["word"], str) or not form["word"].strip():
+            raise ValueError("Invalid form spelling")
+        if not isinstance(form["contexts"], list) or not form["contexts"]:
+            raise ValueError("Every card requires relevant lexical contexts")
+        context_ids = set()
+        for context in form["contexts"]:
+            if set(context) != {"context_id", "pos", "meaning", "example", "source"}:
+                raise ValueError("Unexpected context fields")
+            if any(not isinstance(value, str) or not value.strip() for value in context.values()):
+                raise ValueError("Lexical fields must be nonempty text")
+            if not context["source"].startswith("https://"):
+                raise ValueError("Expected HTTPS dictionary source")
+            if (
+                not context["context_id"].startswith(form["word_id"] + ":")
+                or context["context_id"] in context_ids
+            ):
+                raise ValueError("Invalid context identity")
+            context_ids.add(context["context_id"])
+    random.Random(seed).shuffle(payload["forms"])
+    data = dict(version=version, rubric=RUBRIC_ID, forms=payload["forms"])
+    serialized = json.dumps(data, ensure_ascii=False, sort_keys=True)
+    data["pack_sha256"] = hashlib.sha256(serialized.encode()).hexdigest()
+    assets = Path(__file__).with_name("assets")
+    output_dir.parent.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(dir=output_dir.parent, prefix=".blind-") as temp:
+        staged = Path(temp) / "public"
+        staged.mkdir()
+        serialized = json.dumps(data, ensure_ascii=False, indent=2)
+        (staged / "cases.json").write_text(serialized + "\n")
+        html = (
+            (assets / "blind.html")
+            .read_text()
+            .replace("__DATA__", serialized.replace("<", "\\u003c"))
+        )
+        (staged / "index.html").write_text(html)
+        for source, target in [("blind.js", "app.js"), ("blind.css", "style.css")]:
+            (staged / target).write_bytes((assets / source).read_bytes())
+        manifest = dict(
+            version=version,
+            pack_sha256=data["pack_sha256"],
+            files={
+                name: _sha256(staged / name)
+                for name in ("cases.json", "index.html", "app.js", "style.css")
+            },
+        )
+        (staged / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+        staged.rename(output_dir)
+    return dict(count=len(data["forms"]), version=version, pack_sha256=data["pack_sha256"])

@@ -39,6 +39,37 @@ def answer():
 
 
 class D1ScorerTests(unittest.TestCase):
+    def test_omni_identity_is_explicit_and_unloaded_model_never_runs(self):
+        http = Mock()
+        omni = dict(
+            models()["models"][0],
+            key="d1-omni-2b",
+            architecture="lfm3",
+            decision_type="lfm3-d1-omni",
+            loaded_instances=[],
+        )
+        http.get.return_value = response({"models": [omni]})
+        scorer = D1Scorer(model="d1-omni-2b", http=http)
+        with self.assertRaisesRegex(ValueError, "already loaded"):
+            scorer.score_batch([BaseWordRow(1, "casă", "")])
+        http.post.assert_not_called()
+
+        omni["loaded_instances"] = [{"id": "omni-test-instance"}]
+        http.get.return_value = response({"models": [omni]})
+        http.post.return_value = response(answer())
+        outcomes = scorer.score_batch(
+            [BaseWordRow(1, "casă", ""), BaseWordRow(2, "ac", "")]
+        )
+        self.assertEqual([o.rarity_level for o in outcomes], [4, 4])
+        self.assertTrue(
+            all(o.request["model"] == "omni-test-instance" for o in outcomes)
+        )
+        self.assertEqual(
+            [c[0] for c in http.mock_calls if c[0] in {"get", "post"}],
+            ["get", "get", "post", "get", "post"],
+        )
+
+
     def test_scores_original_spelling_with_explicit_levels_and_full_distribution(self):
         http = Mock()
         http.get.return_value = response(models())
