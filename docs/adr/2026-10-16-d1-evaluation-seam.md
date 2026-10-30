@@ -168,3 +168,41 @@ LOC POS coverage is source bounded, never exhaustive semantic completeness or sc
 confidence. Empty example-based form contexts are valid: do not fabricate examples
 just to adapt lexical definitions into that older schema. Atomic new directories,
 no overwrites; tests at the CSV seam. Native scores and labels remain separate.
+
+## 2026-10-30: provider-neutral sequential chat judges
+
+Reuse `run_campaign` and `Outcome` for durable per-form receipts and predictions.csv.
+The new CSV collector validates complete exact-form lexical evidence before HTTP;
+its small Chat Completions adapter returns a strict integer judgment or explicit
+failed outcome. Model loading, RAM/live-instance checks and credentials stay outside
+in the runner/session. No Step2 default or upload integration.
+
+No fabricated probabilities or confidence: use `probabilities=()`, `confidence=None`.
+The legacy run.csv projection therefore stays empty; evaluate predictions.csv. This
+prevents research-only judgments from masquerading as upload-ready scored runs.
+
+Pin endpoint, requested model, provider options, lexical/prompt implementation
+hashes and runtime metadata in the existing campaign manifest. Options are copied
+before the manifest and scorer are created. Raw failed HTTP/JSON results are retained;
+no repair, retry or implicit alternate-model route. One final assistant response,
+matching identity, stop finish reason, exact schema, no duplicate keys/refusal/tools.
+
+The same fixed evidence CSV and prompt can be reused with another compatible
+Chat Completions endpoint. Provider-specific reasoning/token options remain explicit;
+GPT availability, alias resolution and concrete parameter support require a later
+separate probe/campaign. No GPT inference is implied by this interface reuse.
+
+A separate offline CSV comparison joins human references only after inference.
+It requires full identity coverage, reports native failures separately, uses the
+frozen baseline explicitly for complete coverage, and reports severe>=2/excess loss,
+4/5 diagnostics and deterministic review queues. Ranking has no human-label input;
+selected cases are assessed afterward. No calibrated confidence or automatic promotion.
+
+Curated contract contexts are a separate evidence source and must not disappear
+when projecting parsed dictionary senses. Merge all contexts, preserving every POS
+and existing restriction. Keep source metadata and illustrative examples out of
+model state. If meaning prose contains reviewer instructions, use an explicitly
+audited complete projection CSV; validate original identity/POS/meaning, hash it,
+and retain original/projected text in provenance. No word-specific scoring rules or
+automatic lexical blacklist. Curated, label-exposed evidence remains exploratory;
+source fidelity is not the same as independence or exhaustive semantic coverage.

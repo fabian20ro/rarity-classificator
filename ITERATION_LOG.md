@@ -999,3 +999,33 @@ files unchanged. Independent audit rejoined original frequency sources; scores i
 Surprise: source availability is much narrower than total frequency-signal coverage;
 870forms still lack usable lexical contexts. Next: independent150judgepilot with
 explicit missing-evidence strata; no new human review, models or DB writes this stage.
+
+
+## 2026-10-30 — Reusable sequential Qwen judge pilot (GPT deferred)
+
+Implemented CSV collection/comparison over existing campaign/Outcome seam; strict
+JSON/identity/model validation, durable native failures, explicit baseline fallback,
+no fabricated confidence. Thin CLIs, fixed provider options/runtime hashes, no DB
+integration. TDD public seams:16new tests/43subtests; full909tests/284subtests and
+Ruff PASS. Architect caught malformed-message/options mutation issues before inference.
+
+Initial Qwen150:150native,7severe/excess11 versus baseline11/14; withoutsense24 worsened
+2→5severe. Discovered older formatter omitted218existing curated contexts/95forms.
+Systematic merge, allPOS/restrictions/source provenance. Further review found five
+reviewer clauses inside meaning prose; stopped first correction at30completed records,
+retained it without quality analysis. Explicit complete218row projection removesonly
+those clauses,213meanings unchanged, source/identity/POS checked; originals preserved.
+
+Final corrective150:150native,5severe/excess9,145within±1; exact80,MAE.527. Initial7/11
+retained;12scorechangesallamong95changedinputs,55unchangedidentical. True4/5 severe5→2;
+missingwordfreq2→1. No-context19 regresses1→3severe/excess1→6. Top8 recovers4/11baseline
+severe versus1evidence-only,4falsealarms. Bothpairedbootstrapintervalsincludezero.
+Correction is label-exposed development evidence, not independent validation.
+
+Sequential Qwen-only, RAM guard beforeeachcall, preexisting instance preserved.
+Finalminmemoryproxy2.94GiB/OSfree16%,~14.5minutes;0reasoningtokens. Independent audit
+and offline replay PASS;1721protectedfiles unchanged. Rawtext/records stay local,
+aggregate reports/receipts published. No newratings,D1/GPTclassification,DBwrites.
+Plan: retain operationalwordfreq+4; Qwen diagnosticcandidate. NextcomparableGPTpilot
+uses same finalCSV/prompt; concreteprovidercompatibilityuntested. Address870/1000
+missingcontexts before blanketrollout; nocertifiedconfidence or automaticpromotion.

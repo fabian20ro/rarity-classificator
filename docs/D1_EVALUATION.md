@@ -291,3 +291,81 @@ artifacts. Reproduce with the campaign's `run.py NEW_OUTPUT_NAME`, then
 `compare_evidence.py NEW_OUTPUT_NAME` and `verify.py OUTPUT_PATH`, using the project
 Python environment for export. Existing outputs are never overwritten. Scores and
 ratings remain frozen; no model, database or network needed.
+
+## Sequential chat judges (Qwen now; compatible GPT endpoint later)
+
+Use `collect_chat_csv` for a fixed, blinded prompt over the existing evidence CSV;
+use `compare_judge_csv` only after inference to join human references and baseline.
+Both public boundaries are CSV-first, tested independently and provider-neutral.
+The chat collector reuses campaign receipts/checkpoints; it does not manage local
+model loading or databases. For the measured Qwen pilot, use the saved local runner
+under `build/d1/qwen-judge-2026-10-30/run.py`: it checks RAM and exact live model
+configuration before each sequential request. The generic CLI below delegates
+transport only; local lifecycle/RAM checks remain the caller's responsibility.
+
+```sh
+PYTHONPATH=src python scripts/run_chat_judge.py \
+  --vocabulary /path/to/vocabulary.csv \
+  --evidence /path/to/evidence.csv \
+  --output-dir /path/to/new-campaign \
+  --model EXACT_SERVED_MODEL_ID \
+  --endpoint http://127.0.0.1:1234/v1/chat/completions \
+  --options-json /path/to/provider-options.json \
+  --runtime-json /path/to/runtime-provenance.json
+
+PYTHONPATH=src python scripts/compare_chat_judge.py \
+  --predictions /path/to/new-campaign/predictions.csv \
+  --reference /path/to/reference.csv \
+  --baseline /path/to/baseline-oof.csv \
+  --evidence /path/to/evidence.csv \
+  --folds /path/to/folds.csv \
+  --output-dir /path/to/new-comparison --review-budget 8
+```
+
+For a later compatible hosted model, keep the lexical CSV and rubric; change the
+endpoint, pinned model ID and explicit provider options. `--api-key-env ENV_NAME`
+reads credentials into the HTTP session only. The provider's concrete model/parameter
+support must be probed separately; this is not a claim that GPT has been run or that
+Chat Completions and Responses are interchangeable. Served model identity must match
+the requested ID; alias behavior requires separate verification.
+
+Labels, human estimates, baseline scores and other judges' predictions have no field
+in the inference evidence schema. No examples or target labels enter the fixed prompt.
+No regex repair or silent retries: invalid responses are persisted as native failures;
+the offline comparison uses the frozen baseline as an explicit fallback. All input
+IDs must still appear. Missing definitions are explicit, never an automatic level5.
+
+Chat judgments have no invented probabilities or confidence. `predictions.csv` is
+the research artifact; legacy `run.csv` intentionally has no scored rows because its
+confidence requirement is unmet. Nothing is uploaded from this pilot.
+
+Changed model/options/evidence/code reject resume. Use a fresh campaign; preserve
+source snapshots and raw receipts for old runs. Complete existing records are reused
+without another model call. Comparison reports >=2 errors, error2/3/4, excess loss,
+4/5 confusion, evidence/reference strata and matched-budget diagnostic recall/precision.
+
+To include all previously curated exact-form contexts in either provider's evidence:
+
+```sh
+PYTHONPATH=src python scripts/merge_judge_evidence.py \
+  --evidence /path/to/evidence.csv \
+  --form-contract-dir /path/to/verified-form-export \
+  --projection /path/to/audited-projection.csv \
+  --output-dir /path/to/new-merged-export
+```
+
+This preserves existing senses and adds every curated POS/meaning, retaining detailed
+POS/restriction text. It verifies the source export hashes and complete identities.
+Provenance is a separate CSV; illustrative examples are not corpus attestations and
+are excluded from model state. Curated pilot contexts may be label-exposed: reuse
+is transparent but does not establish independent validation. Existing outputs are
+never overwritten. [Measured Qwen pilot](research/2026-10-30-qwen-judge-pilot.md).
+
+When curated meaning fields contain reviewer prose, supply an explicit audited
+projection. Columns: word_id,word,context_id,pos,original_meaning,definition. It must
+cover every original context exactly once and preserve identity, POS and original
+text. Only definition replaces model-bound prose; the original/projected pair stays
+in provenance. There is no automatic blacklist or lexical rewriting. The argument
+is optional for already lexical-only input, but **required to reproduce this pilot's
+corrected arm**. Its218-row projection changes exactly five review clauses;213
+meanings remain identical. The separate interrupted30-record arm is not a result.

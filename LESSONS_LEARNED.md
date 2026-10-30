@@ -287,3 +287,20 @@ all inventory/POS IDs, report source absence separately from unresolved meanings
 never treat complete LOC-POS coverage as exhaustive senses or calibrated confidence.
 An audit manifest must require provenance sections/revisions; silently defaulting
 missing input hashes to an empty map can make an unverified export look verified.
+
+
+**[2026-10-30]** A label-free schema does not make meaning prose reviewer-free.
+The frozen form contract held218 curated contexts omitted by the older dictionary
+projection; five meanings also contained evaluator instructions. Merge all available
+contexts systematically, retain every POS/restriction, and use an explicit complete
+lexical projection with original-text checks and provenance for prose cleanup.
+Do not strip legitimate regional/historical qualifiers. Curated contexts may be
+label-exposed even when no numeric score enters the model; source fidelity is not
+independence. Preserve the initial arm when correcting evidence after results.
+
+**[2026-10-30]** Compare review budgets as fractions of the full population:
+top5 in each of five folds is25/150=16.7%, not50/1000=5%. Freeze matched top8/150
+before results and label the larger queue secondary. Backend-advertised reasoning
+values may differ from Chat Completions values: Qwen Splash rejected off but accepted
+none. Probe the actual transport synthetically before lexical collection; retain
+failed preflight and pin the accepted options without fabricating confidence.

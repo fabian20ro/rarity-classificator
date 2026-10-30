@@ -1,0 +1,12 @@
+{
+  "src/classificator/evaluation/chat_judge.py": "8636699ed8524bb865be68cb3747e5e9e684e4783a7cb0990695c18b62236e26",
+  "src/classificator/evaluation/judge_comparison.py": "fa0732009eab837d03f33290174f53adaa4f96e67d4e71ad43525df096d9482d",
+  "src/classificator/evaluation/judge_evidence.py": "ca97a61344051c8cfb718b8c135146cd11ec335485289eb903087cf2faffa915",
+  "src/classificator/evaluation/campaign.py": "d233ffc8728fb152bf39d92b923070fb1952960decf6c30a10e90a1bc168b428",
+  "src/classificator/evaluation/exact_form.py": "7afa64a0ebd27d6115fc1e0030caabbb141d6aa4508b5bdb2c4a5c9dc9def1f5",
+  "src/classificator/evaluation/dataset.py": "c6fd9f04362a9ce3811579e9a4aed71a1c5ae9d1e55de376020fe06e4726439d",
+  "src/classificator/evaluation/form_evidence_audit.py": "82cde1fe0e2b8ade605605a87407698f3db6aa2c7a4f6082cfd8f78f884b6e91",
+  "scripts/run_chat_judge.py": "1e212b659e53c8ad50f4c4806720cd4db6944a97ab8e4655b2bd9523cc98fcb7",
+  "scripts/compare_chat_judge.py": "7c21766509ead9bbb434db19023d1cb3c2b1de4da88f8983badf1f23f52d1b50",
+  "scripts/merge_judge_evidence.py": "6f41dc0877bb872389b2e4c588d8f0c051bfeaf3d7562c5de068b9920a21c43f"
+}

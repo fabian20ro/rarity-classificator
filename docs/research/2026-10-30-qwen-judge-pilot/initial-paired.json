@@ -1,0 +1,27 @@
+{
+  "paired": {
+    "improved": 29,
+    "worsened": 36,
+    "tied": 85,
+    "rescued_severe": 9,
+    "introduced_severe": 5
+  },
+  "bootstrap": {
+    "severe_rate_delta": {
+      "percentile95": [
+        -0.07947019867549669,
+        0.025806451612903226
+      ],
+      "scope": "Exploratory paired group bootstrap on reused development labels; not external validation or calibrated risk."
+    },
+    "excess_mean_delta": {
+      "percentile95": [
+        -0.08783783783783784,
+        0.05228758169934641
+      ],
+      "scope": "Exploratory paired group bootstrap on reused development labels; not external validation or calibrated risk."
+    }
+  },
+  "report_sha256": "0a3cf02280c88e063a8691a2ba4025e9d0e827b1e44c993c2c2f9a1a156cfb1d",
+  "analysis_clarification_sha256": "a74d46f6783780c2c21cb71bfbb81e3afb8188e7d4e6534354e0217c7e9c8eee"
+}

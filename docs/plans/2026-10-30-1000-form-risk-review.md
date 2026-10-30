@@ -1,7 +1,7 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Data: 2026-10-30. Stare: etapa 1 implementată și verificată pe lotul local.
-Evaluarea judecătorilor, cascada și maximum 50 de revizuiri rămân de făcut.
+Data: 2026-10-30. Stare: etapa1 și pilotul Qwen din etapa2 implementate/verificate.
+Comparatorul GPT, cascada pentru1000 și maximum50 revizuiri rămân de făcut.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -101,7 +101,7 @@ formei, fără un framework nou sau cuplare la upload.
 are proveniență; nealinierea nu produce sensuri inventate. Lipsurile nu blochează
 baseline-ul, dar blochează orice pretenție de încredere mare bazată pe sensuri complete.
 
-### 2. Pilot independent al judecătorilor pe cele 150 existente
+### 2. Pilot al judecătorilor pe cele 150 existente
 
 Depinde de: etapa 1 și intrările pilotului. Qwen Splash și GPT-6.1-sol, reasoning low,
 sunt candidați; verificăm identitatea/configurația exactă înainte de rulare.
@@ -125,12 +125,16 @@ independent. Judecătorii diferiți pot totuși împărți greșeli.
 **Poartă:** raport paired pe aceleași 150, cele 37 clarificate și missing49; distribuții,
 erori 2/3/4, cost și suprapunerea greșelilor. Un candidat general poate continua ca
 scorer propus numai dacă reduce erorile ≥2 sub 11 și nu crește costul peste 14,
-nici erorile severe pe missing49 sau referințele 4/5 față de baseline. Acesta este
+nici erorile severe pe missing49 sau referințele 4/5 față de baseline. Clarificarea
+înghețată înainte de analiză cere și cost suplimentar fără regresie pe aceste două
+segmente; raportăm separat poarta inițială și poarta completată. Acesta este
 filtru exploratoriu, nu certificare. Un candidat care nu trece poate continua numai
 ca detector de conflicte dacă îmbunătățește recuperarea erorilor severe baseline la
 același buget față de trierea numai prin dovezi. Comparăm recall, precizia cozii și
-alarmele false la top 5 din fiecare fold (aproximativ bugetul 50/1.000), fără alegerea
-ordinii pe etichetele foldului testat. Raportăm numărătorii mici, fără garanții; dacă
+alarmele false la **top8/150 global (5,33%)**, cu regulă fixată fără etichete.
+Corecție înghețată înainte de inferență: top5 per fold înseamnă25/150=16,7%,
+nu50/1000; rămâne doar diagnostic secundar. Nicio alegere a ordinii pe etichetele
+formelor evaluate. Raportăm numărătorii mici, fără garanții; dacă
 nu există câștig, oprim evaluatorul diagnostic.
 
 ### 3. Înghețarea cascadei, a riscului și rularea celor 1.000
@@ -232,10 +236,12 @@ numai un export nou, niciodată scorurile originale. Nu există operații DB de 
 
 ## Următoarea acțiune concretă
 
-**Pilotul Qwen/GPT pe cele 150**, după auditul local încheiat. Nu începem cu încă 1.000 de
-apeluri D1 și nu trimitem utilizatorului fișe înainte de trierea dovezilor și a riscului.
-PR-ul include acum și implementarea etapei 1, testele și raportul. Campaniile locale
-complete, implementarea experimentală D1 necomisă și datele CoRoLa rămân locale.
+**Comparator GPT pe aceleași150 și același CSV lexical final**, când activăm acel
+experiment. Qwen este încheiat; colectorul și comparatorul sunt reutilizabile,
+compatibilitatea modelului GPT concret rămâne de verificat. Baseline-ul rămâne scorul
+operațional. Înainte de extinderea semantică la1000, tratăm lipsurile de context și
+fixăm ruta/criteriile; nu interpretăm acordul modelelor drept etichetă gold.
+Fără noi evaluări umane în această etapă.
 
 
 ## Rezultatul etapei 1 — implementat și verificat
@@ -250,3 +256,38 @@ Nicio inferență nouă, evaluare umană sau modificare DB.
 Pilotul următor trebuie să măsoare explicit condiția fără definiții. Nu extrapolăm
 calitatea pe cele150 asupra celor870 cu lipsuri și nu cerem utilizatorului să le
 completeze manual. Relațiile lexicale fără martor rămân necunoscute.
+
+
+## Rezultatul etapei 2 — Qwen încheiat; GPT restant
+
+150/150 răspunsuri native valide în ambele campanii complete; secvențial, RAM verificat.
+Scoruri și răspunsuri umane intacte. Modelul Qwen preexistent păstrat; fără D1/GPT/DB.
+
+| Metodă | Erori≥2 | Cost suplimentar | În±1 | MAE |
+|---|---:|---:|---:|---:|
+| Baseline OOF |11|14|139/150|0,520|
+| Qwen, dovezi inițiale |7|11|143/150|0,553|
+| Qwen, toate contextele curate existente |5|9|145/150|0,527|
+
+Corecție sistematică după primul rezultat:218 contexte existente/95forme omise de
+proiecția veche. Proiecție lexicală explicită, cu cinci clauze adresate evaluatorului
+eliminate;213 sensuri identice. Încercarea intermediară oprită la30 rezultate rămâne
+separată, neanalizată. Campania finală rerulează toate150, prompt/opțiuni neschimbate.
+Contexte curate anterior, potențial expuse etichetelor; nu validare independentă.
+
+Pe43 referințe4/5: erori grave5→2. Missing-wordfreq49:2→1. Cu sensuri131:10→2;
+**fără sensuri19:1→3**, cost1→6. Qwen corectează9 erori grave baseline, introduce3.
+Top8 găsește4/11 erori baseline versus1/11 numai prin dovezi; patru alarme false.
+Intervalele bootstrap includ zero. 12 scoruri diferă față de prima campanie, toate
+în cele95 intrări completate;55 intrări neschimbate dau aceleași scoruri.
+
+**Decizie:** porțile numerice exploratorii trecute; fără promovare generală.
+870/1000 forme noi fără context blochează extrapolarea rezultatului agregat.
+Păstrăm baseline, Qwen candidat diagnostic. GPT se compară pe aceleași dovezi;
+abia apoi testăm o regulă combinată, înghețată explicit, și coada de maximum50.
+
+Verificare:909teste+284subteste/Ruff, replay offline identic, audit independent;
+1721fișiere protejate neschimbate. [Raport complet](../research/2026-10-30-qwen-judge-pilot.md).
+Leftovers: compatibilitatea/pilotul GPT, acoperirea lexicală a lotului nou, politica
+cascadei și validarea riscului, inferența1000, auditul cauzelor, interfața≤50.
+Nu există încă1000 etichete validate sau probabilități calibrate.

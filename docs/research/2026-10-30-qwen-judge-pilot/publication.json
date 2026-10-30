@@ -1,0 +1,48 @@
+{
+  "model": "qwen3.8-27b-splash",
+  "model_artifact_set_sha256": "b0ec3657c45418a0f9e92806e5e1f1a7893dd3c5d71ae7e3c7a35760e168da81",
+  "options": {
+    "temperature": 0,
+    "max_tokens": 256,
+    "reasoning_effort": "none"
+  },
+  "prompt_sha256": "18902572c6f770db8177db2e32f7195e844480d97521aa762f240a3e5ca840e9",
+  "schema_sha256": "dee69b3fd6da158fb0c7fb991c8e92f6bee411baa51886a6142fdfe52b44db58",
+  "protocol_sha256": "cef12f00a3c6d4eaf0212298e3406db382a39fff13e4d2e3ef8089d294731d71",
+  "inputs": {
+    "inputs/evidence.csv": "c7756bd5d12b5fde9482d8212c6c1d350aa34744044f32e36c0329406e5de40b",
+    "inputs/vocabulary.csv": "e31dc0d484cd27394a20756e90da829a2e2415c9b6234ecc33ea4540cb39b526",
+    "inputs/reference.csv": "32f36c283df1842065f3e72d8baab1a358792fa71b7ead34a55f17666fb16aa2",
+    "inputs/baseline-oof.csv": "27d4b379165581f09d7fa586f561978143f21aee1079cfb8a7be5b478f55eb59",
+    "inputs/folds.csv": "0ea64628d44d2fdf1c6240eecd66a5474e94ce63fdde8722db41729247c62ef9",
+    "prompt.txt": "18902572c6f770db8177db2e32f7195e844480d97521aa762f240a3e5ca840e9",
+    "response-schema.json": "dee69b3fd6da158fb0c7fb991c8e92f6bee411baa51886a6142fdfe52b44db58",
+    "options.json": "eba91281ffc2a1d2da80b19d9e8e6921bfc13fcf58f00e38c89883a84f08efb5",
+    "projection-review.json": "84fd6c172ae2581dc078d5cc92eff3729ba57f2a262cd9b202d12d29f9076a5b"
+  },
+  "collector_sha256": "8636699ed8524bb865be68cb3747e5e9e684e4783a7cb0990695c18b62236e26",
+  "evidence_summary": {
+    "forms": 150,
+    "forms_with_curated_contexts": 95,
+    "curated_contexts": 218,
+    "projected_contexts_changed": 5,
+    "with_senses": 131,
+    "scope": "Previously curated, potentially label-exposed contexts; not independent validation"
+  },
+  "scope": "Repeated development150 with previously curated, label-exposed contexts; not an independent holdout or independent dictionary-only evidence. Preserve initial campaign and all human labels.",
+  "interrupted_arm": "Separate30-record correction checkpoint retained locally; excluded from results and tuning.",
+  "published": {
+    "projection-verification.json": "f7955cd364f0515c56360468845b84e7f8eb87db9bcd2de23242ff823f20d9d2",
+    "initial-report.json": "0a3cf02280c88e063a8691a2ba4025e9d0e827b1e44c993c2c2f9a1a156cfb1d",
+    "corrected-verification.json": "280c1932581f20e0d237b44eb862e59408aa0b82b702f8d4e896df7aa64c086c",
+    "initial-paired.json": "83ba97051147bc443b342dba0cac12d98e873baa32659f66d0efde5eef0d32d3",
+    "arm-comparison.json": "c998611c518fde0edd170415c80f95064bed71d8eefbbd8cc08349d44ed5e435",
+    "initial-replay.json": "d627968644ee7c5a33316aad0b772f78b6b973627c3745815934ef46e9b6e655",
+    "corrected-paired.json": "f8831b21bbe5251d3bd76640227b5dad6560430941673a350d42b26cef28f5fa",
+    "corrected-report.json": "1185f2c4400609626d44986a10d1121da25c0b2e2aab9915bb161d35d3f7b65d",
+    "source-snapshots.json": "9a3f46d6b2ead6f4508d2a03793d631cdf36a6f65f210fe4cb7bad5e2392fd1b",
+    "corrected-replay.json": "d2eef573147d087947367e5f5888f24692015554bde1b68e9e12403c76179ee0",
+    "corrected-runtime.json": "e78d9d58b6b1ffc5ea921620de71a01837749b4267ad41380850db6feca0e26f",
+    "initial-verification.json": "a32649a4e8df544b3ff7a281077c6292f401cf4739171a09eb3f77bc9082d967"
+  }
+}
