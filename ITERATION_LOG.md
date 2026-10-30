@@ -514,3 +514,459 @@ claim; no fitted hybrid, calibration, weighted/subgroup reporting, or automatic
 promotion. Next: freeze 150-word pilot/rubric, blind labels, then explicit live
 smoke/ablations when RAM permits. Additional principles recommended: high
 cohesion/low coupling, explicit dependencies, composition and reproducibility.
+
+
+## 2026-10-21 — Exact-form/all-POS contract and offline frequency comparison
+
+- Recovered PR81 f990e6c sources into isolated `build/d1/exact-form-code`; primary
+  checkout main lacked experimental modules and contained unrelated dirty files.
+- Read Matt Pocock TDD and project lessons; planner supplied read-only seam/source
+  review. Red/green slices: CSV exact-form contract, nested label/identity rejection,
+  scorer request target, rebus extraction, paired development report, offline CLI,
+  source policy/hash checks and extractor provenance. Existing BatchScorer retained.
+- Frozen150 exact targets /218 lexical contexts. All LOC entries and curated POS
+  retained; inventory POS nonrestricting. No fabricated sense labels or added targets.
+- Reused frozen wordfreq3.1.1; streamed12,728 rebus cache records, excluding60 target
+  pages and147 non-ok records;114,689 unique definitions /1,280,002 tokens. Repeated
+  full extraction yielded identical frequency CSV bytes.
+- Compared37 clarified development labels, excluding113 opaque labels:29 observed
+  each,26 paired,32 union; paired Spearman0.451(wordfreq)/0.536(rebus). No threshold
+  fit or independent accuracy claim; rebus missing all4 L5 forms is material.
+- Review found source-identity validation and extractor fingerprint gaps; regression
+  tests demonstrated failures before fixes. Final Ruff +792 tests /108 subtests pass.
+  Verified34 current/previous artifact, input and implementation hashes; original
+  latest annotation import unchanged. D1 never loaded/contacted; tests simulate HTTP.
+- Plan/results/docs updated: retain separate frequency signals, next independent
+  held-out labels before thresholds/hybrid; no renewed172-context request. D1 later,
+  sequentially, conditional on RAM. Implementation retained as a separate Git branch;
+  primary checkout code left intact. No remote push or production upload.
+
+
+## 2026-10-21 — Publish exact-form frequency evaluation
+
+- User requested push and PR for `codex/exact-form-frequency-evaluation`.
+- Confirmed clean implementation checkout at085e71d and open PR81 headf990e6c.
+- PR base: `codex/d1-evaluation-adapter`; dependency explicit, avoiding duplicate
+  adapter changes in the review. Includes implementation, comparison results and
+  updated plan. Prior validation:792 tests /108 subtests and Ruff passed; no code
+  changed since validation. D1 remains unloaded.
+
+## 2026-10-23 — Independent40 blind round and frozen calibration
+
+Prepared40 unseen forms/70 contexts, deterministic frequency strata, collision and
+conservative family exclusions. Rebuilt rebus corpus excluding union190, fit only
+37 clarified pilot labels; froze190 predictions before annotation. Rebus has no
+observed pilot5: final boundary explicitly conventional. True blind public payload
+and separate storage namespace; old answers intact. TDD public APIs/UI, then
+format/review; note-clearing regression first failed and then passed. Ruff and795
+tests/112 subtests passed; browser QA rating/context/notes survive reload. D1 not
+loaded/contacted. Updated protocol/plan; held-out comparison awaits user's round.
+
+## 2026-10-23 — Withdraw additional annotation workload
+
+User clarified they will not evaluate another batch after the150-word pilot.
+Withdrawn40-card round from required work; retained all artifacts/answers unchanged.
+Plan now reuses150 existing latest labels, separates37 clarified from113 opaque
+initial targets, and recommends fold-local calibration for internal comparison.
+No new annotations requested, no AI estimates promoted to gold, no D1 load.
+Documentation-only correction; no code/tests changed.
+
+## 2026-10-23 — Frequency cross-validation on existing annotations
+
+Implemented public CSV orchestration with existing frozen calibrator:37 LOO folds,
+113 separate historical diagnostics, no mixed-rubric total accuracy. TDD red missing
+module→green; added source-conditioned median red→green. Mutating held-out truth
+does not alter its own prediction/baselines; opaque truth changes cannot affect CV.
+Verified150 identities,37 train-ID exclusions, all hashes and metric arithmetic.
+Matched26 MAE0.538/0.500; surprise: source-conditioned constant1 baseline also0.500.
+Own source coverage29/37; rare coverage3/8 vs2/8. Explicitly report this selection
+limitation; no frequency-only replacement. Added baseline diagnostic after initial
+run without changing frequency predictions; retainedv1, finalv2. Updated report/plan.
+Ruff +796 tests/112 subtests pass. No model calls/loading, no new annotation asked.
+
+## 2026-10-23 — Baseline inventory and full150 scope clarification
+
+Confirmed150 latest human scores,150 frozen legacy DB scores,150 original assistant
+estimates and149 first-independent initial ratings.37 is the explicitly clarified
+subset, not the number of available evaluations. Proposed operational comparison
+on all150 with original/latest-label views and37/113 breakdown, explicitly retaining
+mixed-target limitation. Prioritize frozen legacy/assistant comparisons, then
+constant/frequency baselines and a small regularized combined-feature model using
+fold-local preprocessing/fitting. No new benchmark or model executed in this Q&A;
+no D1 loaded and no additional annotation required.
+
+## 2026-10-23 — Full150 historical and learned baseline suite
+
+User authorized all proposed baselines. Reused150 labels in two separate views;
+added149 first-independent learned CV because original initial_level is exposed
+round-final, not first response.449 folds, shared frozen source evidence; no D1.
+TDD CSV seam: initial red→green; independent-view red→green; holdout label mutation
+leaves its model unchanged. Optional sklearn extra and CI installation added.
+Latest150 Ridge MAE0.533 vs legacy1.740; independent149 Ridge0.671 vs AI0.557 and
+legacy1.685. Recommend Ridge experimental baseline, not production replacement.
+Missingness selection remains material (25/29 fully missing forms rare).
+Surprise verified: original-final median LOO has0 exact due75/75 boundary split.
+Preserved initial two views byte-identical when adding independent149; finalv2.
+Audit449 train exclusions, imputation/scaling, hashes, CSV arithmetic;797 tests
++112 subtests/Ruff pass. Reports, plan and stale annotation guidance updated.
+
+
+## 2026-10-24 — Mandatory100% coverage baseline comparison
+
+User correction: no unclassified forms in operational comparison. Extended the
+existing CSV evaluation seam with source-specific missing-training-group lower
+median fallback; empty subgroup or unavailable threshold model uses global training
+median. All calibration excludes held-out labels. Primary operational summary
+requires complete integer1–5 predictions; raw abstentions retained diagnostically.
+
+TDD red: missing completion columns; green. Next red: missing route summaries;
+green. Regressions cover missing-group vs global fallback, missing model, zero/blank,
+all-missing data, no held-out-label leakage in3 views, full-denominator MAE and
+preservation of source predictions. Ruff +800 tests/115 subtests pass.
+449 folds run offline. Independent script and planner audit verify support, medians,
+completeness, arithmetic, hashes and unchanged old prediction columns.
+
+Latest150 MAE: wordfreq+fallback0.520, Ridge0.533, rebus+fallback0.680; all150 scored.
+Fallback counts49/40, all learned4. First-independent149:0.624/0.671/0.805.
+Surprise flagged to user: wordfreq wins MAE by only2 aggregate error points while
+Ridge has fewer large errors and wins the clarified37 slice; no broad winner claim.
+Recommendation: simple complete wordfreq baseline, Ridge challenger; next robustness
+checks on missingness alone and lexical families using existing labels. No new user
+annotation, D1 loading/inference, production change, upload or push.
+Artifacts: build/d1/complete-coverage-baselines-2026-10-24/. Report and plan updated;
+prior output directories preserved. Changes maintained in exact-form-code clone;
+root's unrelated dirty work preserved.
+
+
+## 2026-10-24 — Presence-only and grouped robustness checks
+
+Implemented at existing full-pilot CSV seam: source-specific presence medians,
+ordered two-bit presence-pattern median, global train median for unseen patterns;
+optional exact-reference groups CSV with complete group exclusion before all fits.
+Fail-fast group validation includes each label view. Per-form artifacts retain
+held-out group/members, training support and complete integer scores.
+
+TDD red/green for missing presence columns, then grouped API. Regression checks:
+family-wide label changes cannot alter that family's fits; singleton equivalence;
+source-bit identity, numeric-magnitude invariance, unseen patterns, invalid maps.
+Ruff +804 tests/122 subtests pass.898 prediction records independently audited,
+including group support, medians, Ridge train preprocessing, metrics and hashes.
+Planner review found no actionable defect.
+
+Frozen8 pair groups: original6 preserved, cover/discover and Europe-related links
+added using dictionary evidence. Candidate iț/ițar link not established by exact
+cached meanings; excluded rather than merging by prefix. Latest142 groups,16
+paired forms; first-independent142 groups,14 paired forms. Grouped426 unique
+training exclusions across3 views,449 per-form records; LOO449 more.
+
+Latest grouped MAE: wf+fallback0.520, Ridge0.533, joint-presence0.587, rebus0.693;
+source-presence0.767/0.867. Numeric values help; only16 forms exercise different
+training sets. Surprise flagged: joint-presence matches Ridge0.664 on first149;
+more complexity not consistently useful. No production-quality claim.
+
+Report/plan updated: retain complete wordfreq baseline, Ridge comparator; next
+freeze offline scorer/config and shadow-export full inventory with provenance.
+No parameter search, extra human annotations, D1/model calls, production upload,
+remote push. Artifacts build/d1/robustness-baselines-2026-10-24/; previous results
+preserved. Root unrelated changes untouched; docs/logs mirrored from code clone.
+
+
+## 2026-10-24 — Frozen offline wordfreq scorer and full inventory CSV
+
+Implemented plain CSV freeze/score APIs, two lazy CLI handlers and optional pinned
+wordfreq extra. Kept FrequencyScorer's old abstaining behavior. New workflow binds
+source to exact inventory and corpus, freezes config digest/support/thresholds,
+records every score's frequency/route/version, preserves all IDs/POS and publishes
+atomic staged outputs without overwriting. Runtime does not refit.
+
+TDD red/green: source-policy/corpus provenance, freeze/replay API, CLI command.
+Negative and edge tests: corrupted metadata/config, wrong inventory/version,
+malformed frequency never becoming fallback, duplicate/invalid labels/IDs,
+no missing/no observed training examples, threshold equality, diacritics and
+repeated POS. Ruff +811 tests/137 subtests pass; architect found no actionable flaw.
+
+Frozen on latest150:101 observed/49 missing, fallback4/global median2. Source
+values equal previous experiment for all150. Config version8f3061e2332cf9d6844ff4ea9dabd4fd23111c04b713a8a0cde886a23c82e0cc.
+Full saved inventory77,698 rows/75,147 forms:11,610 direct,66,088 fallback85.06%.
+Histogram1..5=972/6283/4355/66088/0. Surprise flagged: fallback dominates compared
+with pilot32.67%; positive frequency floor exceeds rare thresholds, so no5.
+Do not promote or manufacture a histogram; keep shadow baseline, prioritize
+additional evidence for missing/rare forms. Plan and ADR updated accordingly.
+
+Actual CLI run and byte-identical replay blocked requests.Session.request and
+psycopg.connect. Independent audit checked all scores/identities/routes/support,
+same-form POS consistency, hashes and summary arithmetic. No DB access/write,
+D1 loading/inference, production upload or remote push. Artifact directory:
+build/d1/offline-wordfreq-2026-10-24/; tracked config in configs/. Root's unrelated
+changes preserved; docs/logs/config mirrored from implementation clone.
+
+
+## 2026-10-24 — Local source audit for fallback4/5
+
+Read-only audit of classifier/generator-rebus/propozitii-nostime local artifacts,
+using Matt Pocock research skill/background source researcher. No product code,
+config, frozen scores, DB/API or model loading changes.66,088 fallback rows =64,226
+forms. LOC covers all.12,728 DEX payloads streamed/hash-checked; frozen1,273,283
+corpus tokens and190 prior counts reproduced. Initial span-count check found one
+empty structural span; retained for exact compatibility, zero token effect.
+
+Broad-cache exact-query pages7,334 rows, outside-own-page mentions13,991. Added117
+prior-review snapshots: combined pages7,375 rows, union positive evidence18,769
+rows/17,898 forms;47,319 rows lack both. Supplemental snapshots give all49 pilot
+missing-wordfreq forms raw lexical material. Query match is not sense validation.
+
+Validated traps: menu labels trigger regional/archaic HTML regexes; lexical page
+hints can describe another meaning/reference. Generator rarity is inherited and
+43,890 exact-match rows disagree with classifier legacy snapshot. Installed ro
+wordfreq has no large list; curated/generated clues are not independent use counts.
+Minimal CASA status-ok HTML41chars has unverified provenance; not silently removed
+from the frozen corpus. Source researcher/count scripts independently cross-checked.
+
+Tail49 latest existing grouped predictions: constant4 MAE.653,severe2; presence
+pattern.592,severe6, only16 correct of29 predictions5. Gain vanishes on first
+responses. Reported to user; no absence→5 rule justified. Recommended uniform
+sense/POS-aware raw-source extraction, then one small interpretable fallback test
+on existing labels, preserving100% coverage and unknown→4. Eleven tail labels are
+2/3, so do not force a binary4/5 target. No extra annotation needed for this step.
+
+Saved full/combined evidence CSVs, source ledger, scopes, diagnostics, verification
+and reproducible scripts under build/d1/local-source-audit-2026-10-24. Verified
+77,698 identities, hashes, summaries, all49 raw snapshots and merged coverage.
+Updated research note, plan and evaluation guide; root docs/logs mirrored. No
+production tests rerun because classifier code/config unchanged. No remote push.
+
+
+## 2026-10-25 — Local evidence implementation preparation
+
+Read lessons and Matt implement/TDD/code-review instructions; planner/architect
+subagent inspected local HTML and evaluation seams. Proposed two public CSV
+boundaries; explicit confirmation requested per TDD skill, pending. No tests or
+production implementation started before confirmation. Predeclared one depth2
+median-leaf fallback and leakage controls in local-fallback-2026-10-25 protocol.
+Structured headings support exact forms/explicit inflections/all POS; redirects
+stay unresolved, parent tags inherited. Fold-fitted wordfreq required to avoid
+using all150-trained frozen configuration in held-out metrics. Plan updated with
+pending implementation, not claimed results. No D1, DB, frozen artifact changes.
+
+## 2026-10-25 — Local lexical evidence implementation and experiment
+
+User confirmed both CSV test seams. Vertical TDD: exact/all-POS source export;
+scoped/inherited tags and exclusion guards; inflections/multiple headings/redirects;
+input hashes/schema/identity and atomic output; LOC gender/transitive codes;
+CLI offline integration. Evaluator agent used TDD for fold-local thresholds/tree,
+unknown→4, complete coverage, group-label mutation invariance,4/5 metrics and strict
+artifact contracts. Two modules and offline commands; frozen scorer untouched.
+
+168 sources/134 pilot forms;150 evidence rows,123 aligned (42/49 tail),7 tail unknown.
+Predeclared depth2/minleaf5 tree evaluated on latest150, original150 and first149.
+Latest MAE.520→.500 but severe11→12 and clarified37.568→.595; first149.624→.671.
+Tail predicted5 precision13/24=.542, false5=8human4+3human3; only mention-count
+feature selected. Recommendation: keep frozen4; investigate independent running-text
+corpus coverage/provenance, no extra annotation or pilot tree search. Report/plan/ADR
+updated. Full826 tests/157 subtests +Ruff pass; HTTP/DB blocked in integration/run.
+Independent code review and final artifact verification next. No D1, DB or push.
+
+### 2026-10-25 — Review fixes and final verification
+
+Spec review passed. Standards review found bare mention CSV lacked corpus contract;
+added mandatory schema/policy sidecar, input/ref hashes, corpus→ledger binding and
+per-row agreement with audited derivation. New public-export TDD regression slices.
+Independent artifact reviewer found plural-only ițar/zar sense alignment defect;
+added explicit number gate, literal plural/invariant witnesses, child singular
+scope override and nonexclusive preference handling. RED→GREEN regression;19
+sense rows corrected (16 distinct pairs), no change to the three prediction CSVs.
+
+Final832 tests/173 subtests and Ruff pass. Independent audit449 folds/126 trees/
+36 metric slices/168 source hashes passes. Guarded real CLI replay457 data artifacts
+byte-identical. Frozen model/input/export hashes unchanged. Final artifacts in
+local-fallback-2026-10-25/evidence-final andcomparison-final; manifests, projection,
+protocol, verifier and replay scripts retained. Plan/report/ADR updated. No open
+review findings. No D1, database access, production promotion or remote push.
+
+
+## 2026-10-25 — Romanian running-text corpus access and licence investigation
+
+Used Matt research skill plus background primary-source researcher. Inspected
+CoRoLa, Leipzig, SETIMES, ParlaMint, FineWeb2, CulturaX, OSCAR, CC-News, roTenTen and
+wROdfreq. Bounded anonymous probes verify FineWeb2 metadata/files/range/viewer,
+CoRoLa frequency ZIP segments, Leipzig exact-word API and SETIMES archive range.
+No full corpus download, gated-term acceptance, provider contact, D1 or DB access.
+
+Recommendation: bounded cross-shard FineWeb2 coverage experiment, recent crawl
+slice separately; ODC-By+Common Crawl rights recorded. CoRoLa optional eligible
+NC diagnostic. Surprises: OSCAR explicitly suspended, current full ParlaMint lacks
+RO despite project existence; FineFreq counts characters, not words. wROdfreq data
+binaries/licence not verified. New Common Crawl data is not automatically independent
+of wordfreq. No measured new inventory coverage or 4/5 improvement claimed.
+
+Research note and plan updated; protocol keeps all66,088 rows/64,226 forms, existing
+150-label strata, fold-local calibration and unknown→4. Frozen scorer/config/export
+unchanged. Documentation-only checks; production tests not rerun. Probe receipts in
+build/d1/romanian-corpora-research-2026-10-25. Root mirrors receive only new sections,
+preserving divergent historical logs. No remote push.
+
+Independent research review: no blocking source/licence findings. Clarified observed
+vs valid uses, unverified prefix recency and sample-only inference; require row-group
+sizes/selection probabilities before extrapolation. Markdown diff checks pass.
+
+
+## 2026-10-26 — FineWeb2 implementation preparation
+
+User authorized bounded TDD experiment,100k examined docs or1GiB transfer, lowdisk,
+150-label comparison; no D1/DB. Read lessons, implement/TDD skill and planner/architect
+instructions; background planner reviewed architecture. New HTTP→CSV seam confirmation
+pending; existing CSV evaluation seam retained. No tests or production code written.
+
+Disk57GiB free at start. Installed pyarrow21.0.0 into existing active-clone venv via
+uv --no-cache (29.8MiB reported); conservatively reserve40MiB inside total1GiB. Prepared
+input inventory/shard snapshot and protocol under build/d1/fineweb-2026-10-26. Planned
+durable pre-request reservation, strict206 range checks, sequential sampling across
+20shards,5GiB free-space floor, sample-only frequency claims and fold-local comparison.
+No corpus downloaded, model loaded or database accessed. Await seam confirmation
+before RED→GREEN implementation, per explicit TDD skill requirement.
+
+
+## 2026-10-27 — FineWeb2 bounded implementation and experiment completed
+
+User confirmed HTTP→CSV andCSV→comparison seams. VerticalTDD; source/sequential
+transport/evaluator andtwoCLIcommands. Optionalpyarrow21.0.0 pinned. Stricttransfer/
+docattemptreservations,resumeidentity,5GiBdiskfloor,64MiBrange/128MiBdecompression
+limits, exacttokens/dedup/sourcefilters,completeinventoryCSV andtemporalstrata.
+
+Review found realRequests Session redirectdrain despiteallow_redirects=False;
+headers-firstHTTPAdapter transport plusrealResponseregression. Checkpointintegrity
+anddisk-recoverypublication regressionsfixed.860tests/200subtests+Ruff pass; no
+remainingblockingstandards/specfindings. Samplingdescriptiveonly; no numeric
+wholecorpusinclusionprobability claim.
+
+Run100,000docs/20shards:385,836,138bytespayload,436,626,538charged incl40MiBdependency
+reserve;1080requests/0pending.70,255primarydocs/35,932,359tokens,olderseparate.
+No fullcorpuscache; experimentartifacts~180MiB. Full77,698rows exported. Missing
+66,088rows:25,211observed,12,110supported. Pilotmissing49:24observed,8supported,
+noneof8human5. Thusminimum10trainingrows nevermet; all449candidatepredictions
+identicalbaseline. Latest150MAE.520/11severe; tail49.653/2severe; first149.624/13.
+Tail4vs5all4,19/38correct; no validatedimprovement. No posthocfloorrelaxation.
+
+Label-blind20form+8pilotconcordanceaudit confirmedwebnoise/copiedpassages/brands
+andoldpublicationrecentcrawl. Recommendkeepfrozen4; CoRoLaeligibleNCfrequency
+lookupnext, morecleanrareclasssupport beforecalibration; qualityhandlingbefore
+largerwebsamples. No newuserannotation,D1orDBaccess.
+
+Independent sourceartifactaudit and449fold/36metricrecomputationpass; baseline
+paritywithpreviousrun. Realcompletedsource replay underHTTP/DBblocks byteidentical.
+Frozeninventory/input/scoreshashes unchanged. Researchreport,plan,guide,ADR updated;
+rootmirrorsappendonly. Localcommits; no remotes modified.
+
+
+## 2026-10-28 — CoRoLa noncommercial exact-form experiment
+
+- User authorized noncommercial research; reused approved CSV seams and Matt TDD/
+  implement/review workflow. Task-start baseline a02963f; code commit abd5554.
+- Pinned protocol before counts: count≥5, minimum10trainingforms/twolevels,
+  grouped monotone fallback for wordfreq-missing forms; otherwise4. No tuning.
+- Downloaded114,091,202-byte ZIP, verified publishedMD5; extracted only23,732,979-byte
+  lowercase word-form TSV, verifiedCRC/SHA. Local campaign~141MiB, free~88GiB.
+- Parsed1,813,746entries, denominator637,764,339. Surprising distinction: published
+  filtered-list token total is smaller than headline corpus size; use exact listsum.
+- Exported77,698IDs. CoRoLa coverage144/150; latesthuman5=16/22observed,10supported.
+  Missing-wordfreq49:43observed,35supported including7human5. Inventorytail66,088:
+ 49,464observed,37,614supported. Preserved allPOS and original labels.
+- New source/evaluation CSV adapters; private grouped engine shared withFineWeb.
+  No production scorer integration. RED/GREEN for source integrity/counts/normalization
+  and public evaluation support/group-label invariance. Full871tests+211subtests,
+  Ruff and two-axis code review pass.
+- All3labelviews compared at100%scorecoverage. LatestMAE.520→.533,severe11→13;
+  first-independentMAE.624→.617,severe13→15; originalfinalMAE.707→.700,severe18→19.
+  Latest6changes4→5:2corrections,2newone-levelerrors,2newtwo-levelerrors.
+- Independent stdlib verifier recomputed rawsource/projections/coverage,449folds,
+  554fittedmodels with independentDP,36metricslices. All449baselinepredictions
+  matchpriorFineWeb; frozenconfig/scores/inputs unchanged. HTTP/DB blocked offline.
+- Recommendation: keepwordfreq+4; next local diagnostic audit9changedforms plus
+  ata/carter/dorian; no newannotation or thresholdsearch. RestrictsourceandderivedCSV
+  tolocalresearch. Updated report/plan/ADR/runbook; mirrored docs to rootworkspace.
+- No D1 loaded, DB access/writes, remote push or PR. Artifacts:build/d1/corola-2026-10-28/.
+
+
+## 2026-10-28 — Local CoRoLa divergence audit
+
+- Audited9cross-view divergences plusata/carter/dorian using saved evidence only.
+  Produced12-case CSV ledger,35fold diagnostics, raw lexical witnesses, human-history
+  linkage, saved-context extracts, case-frequency diagnostic and492input hashes.
+- Read case-preserving member inside existing ZIP locally, no newdownload; all12
+  target sums match primarylowercase counts. Surprising member-total difference2725
+  confirmed independently; primarydenominator/scoring unaffected, cause unknown.
+- Found exactcount collisions20antereu/diorit withlabels3/5 and18clevetitor/xilem
+  withlabels4/5; fold cutoff instability is not evidence of heldout-label leakage.
+- Existingratings resolveantereu3,sezisa3,ițar4,ata5,carter5. Preserve opaque
+  labels/provenance; no synthetic per-sense labels or requests for further review.
+- Raw sources explicitly attestantereu/sezisa/ata while prior lexical extractor
+  leaves themunresolved. Ata requires target femininePOS/atu-source relation,
+  never ață accentfolding. Evidence extraction improvement is separate from scoring.
+- CoRoLa carter93.1%/dorian98.9%uppercase; savedFineWeb shows names. No corpuswide
+  namefraction inferred. Hipochinezie10/12uppercase refutes blanket casing exclusion.
+- Independent auditPASS:492hashes,12cases,35folds,16witnesses,bothZIPmembertotals,
+  labelminima/countreconciliation. No productioncode changed; fullsuite not rerun.
+- Updated report and plan; next general lexical evidence repair + provenance and
+  separate ambiguity metadata. Keep frozenwordfreq+4; no threshold tuning or
+  per-wordexceptions. NoD1, DBaccess, newannotations, remote push or PR.
+- Artifacts:build/d1/corola-divergence-audit-2026-10-28/. Rootdocs mirrored; logs
+  append-only and existingsource/score/input hashes verified unchanged.
+
+
+## 2026-10-28 — Source-scoped lexical variants, evidence-only TDD repair
+
+Implemented in build/d1/exact-form-code on codex/independent-form-benchmark.
+Public CSV TDD: explicit declarations, target POS/gender, usage/number scope,
+dictionary/entry witnesses, negative ambiguity cases; new variants ledger and
+additive sense provenance. Real-source replay exposed closing delimiter + etymology
+in one HTML node; RED/GREEN fix. Spec review exposed conflicting raw-meaning POS;
+RED/GREEN fix, review closed. Standards review had no actionable findings.
+Final checks: 880 tests + 220 subtests, Ruff, independent source/hash verifier PASS.
+150 forms / 169 source records; 14 new exact records / 12 distinct form–sense pairs;
+123→127 aligned forms, tail 42→45/49. All 978 old exact senses retained.
+Four changed evidence forms: antereu, sezisa, ata, văietare. 1,150 protected input
+hashes unchanged. No new evaluations, scoring, network, D1 or DB access.
+Final campaign output: build/d1/lexical-variants-2026-10-28/evidence-reviewed/;
+verification-reviewed.json. Earlier output candidates retained, not authoritative.
+Plan/report/ADR/runbook updated. Retain frozen wordfreq+4; use evidence for
+explanations; unsupported formats and robust 4/5 separation remain. No push/PR.
+
+## 2026-10-29 — Publish accumulated offline work; map code before Omni target update
+
+User requested push/PR of local commits plus reproducible Graphify map, then switch
+active evaluation target to installed d1-omni-2b. Active implementation checkout:
+build/d1/exact-form-code, codex/independent-form-benchmark; PR stacked on existing
+codex/exact-form-frequency-evaluation (#82) because offline experiment dependencies
+were still local. Historical scores/results retained.
+Graphify tools advertised but list_repositories/graph_stats returned Unknown tool,
+including retry after user plugin mention. Hosted connector needs no Homebrew;
+service/index readiness unresolved. Created/validated repository Graphify skill,
+installed copy at ~/.codex/skills/graphify. Clearly labeled local AST fallback:
+126 tracked Python modules / 381 import-site edges; complete JSON, focused Mermaid,
+source hashes, regeneration/staleness/impact commands. Pre-model snapshot saved
+before invocation/test edits; post-change graph regenerated. No runtime call claims.
+Read-only LM Studio inventory confirmed Omni decision/lfm3/F16, no loaded instances.
+Updated active model examples/fresh campaign names; generic adapter unchanged.
+Offline tests verify Omni identity, no POST while unloaded, sequential requests,
+and rejection of old-model campaign reuse without file changes. No inference/load,
+DB operations, score updates or new annotations. 883 tests + 220 subtests, Ruff,
+graph freshness, skill validation PASS; all 1,150 protected file hashes unchanged.
+
+Published PR #85: https://github.com/fabian20ro/rarity-classificator/pull/85,
+base codex/exact-form-frequency-evaluation (#82). Two-axis current-delta review
+passed with no findings; historical lexical correction already reviewed.
+Generated JSON graphs marked generated for readable PR review.
+
+
+## 2026-10-29 — Generate actual Graphify graph from user checkout
+
+Used ~/git/graphify at 0a8cd4e1 (0.9.97); uv frozen runtime-only dependencies in
+isolated build environment. Source checkout unchanged. Code-only extraction,
+GRAPHIFY_BACKEND=none, no-label clustering; no semantic LLM pass or model calls.
+Saved build/d1/graphify-2026-10-29/graphify-out: JSON, interactive HTML, report,
+manifest and local-run provenance. Final 2,119 nodes / 6,057 edges / 87 communities.
+131 code files scanned; pyproject.toml and thin __main__.py yielded no symbols.
+Verified unique IDs, edge endpoints, D1Scorer query and incremental 130-unchanged /
+1-added-file extraction. Added reproducible scripts/graphify_local.sh, updated skill
+and docs. No D1 load, DB access, score/evaluation changes. Local CLI works despite
+hosted plugin Unknown tool; retain distinction and extractor coverage caveats.

@@ -243,3 +243,16 @@ class TestWordfreqSource(unittest.TestCase):
         with self.assertRaisesRegex(OSError, "publication failed"):
             export_wordfreq(source, tmp_path / "frequencies.csv")
         self.assertEqual(list(tmp_path.iterdir()), [source])
+
+    def test_exports_pin_corpus_and_lookup_policy_independently_of_inventory(self):
+        root = self.tmp_path
+        a = write_vocabulary(root / 'a.csv', [[1, 'tara', 'V']])
+        b = write_vocabulary(root / 'b.csv', [[2, 'țară', 'N']])
+        install_fake_wordfreq(self, {'tara': .01, 'țară': .1})
+        first = export_wordfreq(a, root / 'first.csv')
+        second = export_wordfreq(b, root / 'second.csv')
+        self.assertEqual(first['lookup_policy'], 'exact-nfc-cedilla-casefold-v1')
+        self.assertEqual(first['corpus_sha256'], second['corpus_sha256'])
+        install_fake_wordfreq(self, {'tara': .02, 'țară': .1})
+        changed = export_wordfreq(a, root / 'changed.csv')
+        self.assertNotEqual(first['corpus_sha256'], changed['corpus_sha256'])

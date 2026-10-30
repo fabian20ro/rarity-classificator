@@ -58,6 +58,10 @@ def export_wordfreq(vocabulary_csv: Path, output_csv: Path) -> dict:
         repo.write_rows(staged_csv, ["word", "frequency"], exported)
         metadata = {
             "schema_version": 1,
+            "lookup_policy": "exact-nfc-cedilla-casefold-v1",
+            "corpus_sha256": hashlib.sha256(
+                json.dumps(frequencies, sort_keys=True, ensure_ascii=False, allow_nan=False).encode()
+            ).hexdigest(),
             "package": "wordfreq",
             "package_version": package_version,
             "language": "ro",

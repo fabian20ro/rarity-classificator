@@ -39,6 +39,37 @@ def answer():
 
 
 class D1ScorerTests(unittest.TestCase):
+    def test_omni_identity_is_explicit_and_unloaded_model_never_runs(self):
+        http = Mock()
+        omni = dict(
+            models()["models"][0],
+            key="d1-omni-2b",
+            architecture="lfm3",
+            decision_type="lfm3-d1-omni",
+            loaded_instances=[],
+        )
+        http.get.return_value = response({"models": [omni]})
+        scorer = D1Scorer(model="d1-omni-2b", http=http)
+        with self.assertRaisesRegex(ValueError, "already loaded"):
+            scorer.score_batch([BaseWordRow(1, "casă", "")])
+        http.post.assert_not_called()
+
+        omni["loaded_instances"] = [{"id": "omni-test-instance"}]
+        http.get.return_value = response({"models": [omni]})
+        http.post.return_value = response(answer())
+        outcomes = scorer.score_batch(
+            [BaseWordRow(1, "casă", ""), BaseWordRow(2, "ac", "")]
+        )
+        self.assertEqual([o.rarity_level for o in outcomes], [4, 4])
+        self.assertTrue(
+            all(o.request["model"] == "omni-test-instance" for o in outcomes)
+        )
+        self.assertEqual(
+            [c[0] for c in http.mock_calls if c[0] in {"get", "post"}],
+            ["get", "get", "post", "get", "post"],
+        )
+
+
     def test_scores_original_spelling_with_explicit_levels_and_full_distribution(self):
         http = Mock()
         http.get.return_value = response(models())
@@ -55,6 +86,38 @@ class D1ScorerTests(unittest.TestCase):
         self.assertEqual(
             set(request["questions"]["rarity"]["criteria"]), {"L1", "L2", "L3", "L4", "L5"}
         )
+
+    def test_exact_form_contract_keeps_all_pos_and_does_not_restrict_to_inventory_type(self):
+        http = Mock()
+        http.get.return_value = response(models())
+        http.post.return_value = response(answer())
+        contract = {
+            1: dict(
+                word="tău",
+                inventory_type="N",
+                loc_entries=[dict(pos="N"), dict(pos="P")],
+                contexts=[],
+            )
+        }
+        outcome = D1Scorer(model="d1-3b", http=http, form_contract=contract).score_batch(
+            [BaseWordRow(1, "tău", "N")]
+        )[0]
+        state = outcome.request["state"]
+        self.assertEqual(state["word"], "tău")
+        self.assertNotIn("type", state)
+        self.assertEqual(state["inventory_type"], "N")
+        self.assertEqual(state["form_contract"]["loc_entries"], [dict(pos="N"), dict(pos="P")])
+        instructions = outcome.request["questions"]["rarity"]["instructions"]
+        self.assertIn("most familiar valid sense", instructions)
+        self.assertIn("all valid parts of speech", instructions)
+        self.assertIn("Do not substitute", instructions)
+        http.reset_mock()
+        with self.assertRaises(ValueError):
+            D1Scorer(model="d1-3b", http=http, form_contract=contract).score_batch(
+                [BaseWordRow(1, "tau", "N")]
+            )
+        http.get.assert_not_called()
+        http.post.assert_not_called()
 
     def test_unloaded_or_wrong_model_never_triggers_an_inference_request(self):
         for model in [
