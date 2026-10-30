@@ -982,3 +982,20 @@ Added aggregate severity/sample snapshots; kept CoRoLa-derived counts local.
 Documentation-only branch stacked on#85; unrelated local code/artifacts preserved.
 Verification: cross-checked snapshots, plan links, scope and whitespace; no new model
 inference or DB writes. Implementation/testing of proposed stages remains pending.
+
+
+## 2026-10-30 — TDD exact-form evidence audit on independent 1,000
+
+Implemented public CSV audit + thin CLI, reusing lexical/form exporters. RED/GREEN
+covered full identity/POS membership, missing sources, source-scoped parent chains,
+hashes and manifest provenance/revisions. Review found empty provenance could bypass
+checks; regression added and fixed. 10 new tests/21 subtests. PR-isolated full check:
+893 tests/241 subtests + Ruff PASS; byte-identical offline replay PASS.
+
+Local run:1000forms/1146IDs;137exact-querysources,801absent,62wrongspellingexcluded.
+130forms with usable contexts (121allLOC-POS sourcebounded,9partial),7source-backed
+withoutusablecontext;515usable/418unaligned/1unknownPOS contexts. All1363protected
+files unchanged. Independent audit rejoined original frequency sources; scores intact.
+Surprise: source availability is much narrower than total frequency-signal coverage;
+870forms still lack usable lexical contexts. Next: independent150judgepilot with
+explicit missing-evidence strata; no new human review, models or DB writes this stage.

@@ -1,0 +1,65 @@
+{
+  "status": "pass",
+  "audited_at": "2026-10-30T11:17:19.231324+00:00",
+  "scope": "Final source-bounded local evidence export; independent verification, no inference/network/DB/scoring changes",
+  "verification_v1_sha256": "2c71a45a1153f7cf484f79f6801e881af0ec66c6dce807dc0573fa65fc94cec5",
+  "protocol_sha256": "dfba499a6979674fd87c2686fcc3927831b4c2feda1d0fccf2d582ae5e6f5f3c",
+  "protected_files_verified": 1363,
+  "manifest_input_hashes_verified": 15,
+  "implementation_hashes_verified": {
+    "/Users/fabian/git/word-rarity-classifier/build/d1/exact-form-code/src/classificator/evaluation/local_evidence.py": "366e6f95f77681b50b9681cc1d6358fa246eea5498ae4b65fb4ac72848c095c8",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/exact-form-code/src/classificator/evaluation/dataset.py": "c6fd9f04362a9ce3811579e9a4aed71a1c5ae9d1e55de376020fe06e4726439d",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/exact-form-code/src/classificator/evaluation/local_mentions.py": "3084dfd54cae903f87cd32b940c28178492415cb8469e25a42be90175d1b6b25",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/exact-form-code/src/classificator/evaluation/definition_frequency.py": "767ec81788b8e410567f1302d231cc67859d0292590c7713a2664b03a0789692",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/exact-form-code/src/classificator/evaluation/form_evidence_audit.py": "82cde1fe0e2b8ade605605a87407698f3db6aa2c7a4f6082cfd8f78f884b6e91"
+  },
+  "final_artifact_hashes_verified": {
+    "lexical/variants.csv": "a8ea6efafa2ad968acb179c82532a82fa874ca0ebbcfb982a27ab945afc5bbec",
+    "lexical/evidence.csv": "3ccd9fb0a6213e059b894cb9a5645b2b2f88b88a494aee70fd7086da06525a23",
+    "lexical/source-files.csv": "6013e9fcf8377cb5c960eac61ce488f7d68b9af2a7f8dc59c26f123f8566f6f0",
+    "lexical/senses.csv": "f444e67eabf05baa78fbe6aa7bb9a4a4e89d25d7141aea47586ebbe9733c8ecd",
+    "form-contract/forms.csv": "81c885393b4af061eee10649325f3891f7c5f9c91061f1bb4eea45a9dc175c89",
+    "audit/summary.json": "c27d8ae5aadd086c1e5ad6079bd5958561b5a1376e9439eed2e8ed2d8c68cff3",
+    "audit/contexts.csv": "ab33da43bac31c2b70f0a540d4c9992919b66c86acb7abbd5ba03dff979576df",
+    "audit/membership.csv": "4a5ef7030bffc5e14c7b6a769569103991d0ccdf4e91d532839b5f3b893a88a5",
+    "audit/form-evidence-audit.csv": "d73f7821e2f04ec3c21a75d50a20f0b30579560d403c06fac7e6040a436425ac"
+  },
+  "byte_identical_csvs_to_independently_audited_v1": {
+    "lexical/variants.csv": true,
+    "lexical/evidence.csv": true,
+    "lexical/source-files.csv": true,
+    "lexical/senses.csv": true,
+    "form-contract/forms.csv": true,
+    "audit/contexts.csv": true,
+    "audit/membership.csv": true,
+    "audit/form-evidence-audit.csv": true
+  },
+  "source_files_verified": 137,
+  "all_selected_or_excluded_existing_source_hashes_verified": 199,
+  "source_selection_counts": {
+    "cache_absent": 801,
+    "cache_exact_ok": 137,
+    "cache_identity_mismatch": 62
+  },
+  "forms": 1000,
+  "inventory_ids": 1146,
+  "coverage_counts": {
+    "no_source": 863,
+    "source_bounded_not_exhaustive": 121,
+    "no_usable_contexts": 7,
+    "partial_pos": 9
+  },
+  "context_status_counts": {
+    "usable_source_bounded": 515,
+    "unaligned": 418,
+    "empty_definition_or_pos": 1
+  },
+  "forms_with_usable_contexts": 130,
+  "original_scores_signals_and_labels_unchanged": true,
+  "prior_content_checks_inherited_by_byte_identity": true,
+  "limitations": [
+    "Source bounded; allPOS presence does not certify exhaustive senses.",
+    "No new model scores or human evaluations; candidate baseline values are not validated labels."
+  ],
+  "publication_scope": "Aggregate verification receipt only; no per-form corpus counts included"
+}

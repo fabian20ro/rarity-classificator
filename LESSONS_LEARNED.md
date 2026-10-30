@@ -278,3 +278,12 @@ Set GRAPHIFY_BACKEND=none, use its frozen uv.lock in an isolated runtime, import
 from that checkout and preserve source/tool/hash receipts. No Homebrew, LLM key,
 model loading or broad skill/hook installer is required for this structural graph.
 EXTRACTED/INFERRED relations and zero-symbol files remain coverage caveats.
+
+
+**[2026-10-30]** Exact-query cache availability is not usable semantic coverage.
+For the new1000 sample,137 exact-query sources yielded130 forms with usable contexts;
+62 available cache files belonged to another spelling and were excluded. Preserve
+all inventory/POS IDs, report source absence separately from unresolved meanings, and
+never treat complete LOC-POS coverage as exhaustive senses or calibrated confidence.
+An audit manifest must require provenance sections/revisions; silently defaulting
+missing input hashes to an empty map can make an unverified export look verified.

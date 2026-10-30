@@ -1,7 +1,7 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Data: 2026-10-30. Stare: plan aprobat ca direcție; lot local pregătit; implementarea
-cascadei, evaluarea judecătorilor noi și revizuirea celor maximum 50 sunt încă de făcut.
+Data: 2026-10-30. Stare: etapa 1 implementată și verificată pe lotul local.
+Evaluarea judecătorilor, cascada și maximum 50 de revizuiri rămân de făcut.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -232,7 +232,21 @@ numai un export nou, niciodată scorurile originale. Nu există operații DB de 
 
 ## Următoarea acțiune concretă
 
-**Etapa 1**, apoi **pilotul Qwen/GPT pe cele 150**. Nu începem cu încă 1.000 de
+**Pilotul Qwen/GPT pe cele 150**, după auditul local încheiat. Nu începem cu încă 1.000 de
 apeluri D1 și nu trimitem utilizatorului fișe înainte de trierea dovezilor și a riscului.
-Acest PR publică planul și două snapshoturi descriptive; campaniile locale complete,
-implementarea experimentală necomisă și datele CoRoLa nu sunt incluse.
+PR-ul include acum și implementarea etapei 1, testele și raportul. Campaniile locale
+complete, implementarea experimentală D1 necomisă și datele CoRoLa rămân locale.
+
+
+## Rezultatul etapei 1 — implementat și verificat
+
+1.000/1.000 forme, 1.146/1.146 ID-uri păstrate. 130 forme cu contexte utilizabile:
+121 acoperă POS din sursele disponibile, 9 parțial; 870 rămân fără context utilizabil.
+62 cache-uri cu altă grafie excluse. Semnalele originale reverificate; scoruri intacte.
+Ruff +893teste/241subteste pe branch-ul PR, replay identic și audit independent PASS.
+Nicio inferență nouă, evaluare umană sau modificare DB.
+
+[Rezultate, reproducere și limite](../research/2026-10-30-independent-evidence-audit.md).
+Pilotul următor trebuie să măsoare explicit condiția fără definiții. Nu extrapolăm
+calitatea pe cele150 asupra celor870 cu lipsuri și nu cerem utilizatorului să le
+completeze manual. Relațiile lexicale fără martor rămân necunoscute.

@@ -151,3 +151,20 @@ Keep format-specific parsing local; no new framework, scorer coupling, frequency
 transfer or database/model path. Coverage is source-bounded, never a completeness or
 familiarity claim. Test CSV behavior, negative cases and provenance through the public
 function. Frozen scoring configuration and human labels remain outside this repair.
+
+
+## 2026-10-30: exact-form evidence audit before independent judges
+
+Keep the approved sources-to-CSV boundary. `audit_form_evidence` consumes the frozen
+form sample, full inventory, and existing lexical/exact-form exports; outputs one
+coverage row per form, all original memberships and source-scoped contexts. Reuse
+existing parsers; do not add scoring, model or DB dependencies. A thin CLI delegates
+to the same public function.
+
+Validate complete membership/POS and mandatory hashed provenance/revision before
+export. Parent joins include source, heading, POS detail, dictionary/entry/variant;
+unresolved parents never become usable context. Missing evidence stays explicit.
+LOC POS coverage is source bounded, never exhaustive semantic completeness or score
+confidence. Empty example-based form contexts are valid: do not fabricate examples
+just to adapt lexical definitions into that older schema. Atomic new directories,
+no overwrites; tests at the CSV seam. Native scores and labels remain separate.
