@@ -227,3 +227,15 @@ The runner saves stdout/stderr before validation. Only post-collection analysis 
 references or other predictions. Source, CLI binary/catalog, configuration and runner
 hashes are pinned. Confidence remains unset and legacy run.csv stays empty. Existing
 HTTP collection stays available for a later directly authenticated API experiment.
+
+
+### 2026-10-31: research proposal, operational baseline and review remain separate
+
+Retain the approved CSV boundaries. Verified source audits project lexical-only judge
+inputs with separate provenance. Fixed label-free routing requires GPT–baseline gap≥2
+and a usable context for Qwen; no numeric blend or agreement-based review veto.
+`operational_level` remains baseline, `proposed_level` GPT or explicit technical
+fallback. Risk is ordinal/unknown, not inherited scalar confidence. The immutable
+review pack contains at most50 forms, real source senses or explicit missingness,
+and no model estimates; a distinct storage namespace preserves previous rounds.
+The1,000-run evidence supports orchestration/coverage, not population accuracy.

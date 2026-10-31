@@ -1,0 +1,185 @@
+{
+  "status": "pass",
+  "audited_at": "2026-10-31T01:29:35.532116+00:00",
+  "scope": "Independent stdlib audit, no model/network/database calls. Outcomes read only after both campaigns complete.",
+  "inputs": {
+    "forms": 1000,
+    "inventory_rows": 1146,
+    "with_context": 130,
+    "without_context": 870,
+    "without_wordfreq": 851,
+    "without_context_and_wordfreq": 764,
+    "source_contexts": 934,
+    "projected_contexts": 515,
+    "slices": {
+      "general600": 600,
+      "orthography100": 100,
+      "pos100": 100,
+      "corpus100": 100,
+      "weak100": 100
+    },
+    "protected_files": 2440
+  },
+  "gpt_native_scored": 1000,
+  "gpt_native_failed": 0,
+  "gpt_unique_sessions": 1000,
+  "gpt_nonoverlap_checks": 999,
+  "qwen_calls": 31,
+  "qwen_nonoverlap_checks": 30,
+  "qwen_after_gpt": true,
+  "tools_observed": 0,
+  "stderr_records": 0,
+  "event_counts": {
+    "thread.started": 1000,
+    "turn.started": 1000,
+    "item.completed": 1000,
+    "turn.completed": 1000
+  },
+  "review_eligible": 171,
+  "review_selected": 50,
+  "selected_ids": [
+    "131290",
+    "151373",
+    "88015",
+    "150864",
+    "150557",
+    "126508",
+    "142904",
+    "151920",
+    "88947",
+    "109456",
+    "126691",
+    "102382",
+    "105851",
+    "121780",
+    "136074",
+    "122247",
+    "132379",
+    "135827",
+    "134910",
+    "148711",
+    "96830",
+    "155264",
+    "154514",
+    "146862",
+    "154650",
+    "121375",
+    "96756",
+    "90527",
+    "134742",
+    "132469",
+    "82202",
+    "82443",
+    "146782",
+    "113283",
+    "78382",
+    "104854",
+    "112507",
+    "114101",
+    "135042",
+    "152072",
+    "98602",
+    "96614",
+    "103495",
+    "110457",
+    "110623",
+    "106529",
+    "114526",
+    "115427",
+    "112520",
+    "136544"
+  ],
+  "strata": {
+    "all": {
+      "n": 1000,
+      "gpt_failed": 0,
+      "qwen_routed": 31,
+      "review_eligible": 171,
+      "review_selected": 50,
+      "gpt_baseline_gap_histogram": {
+        "0": 453,
+        "1": 376,
+        "2": 160,
+        "3": 11
+      },
+      "proposed_distribution": {
+        "2": 206,
+        "4": 400,
+        "3": 169,
+        "1": 94,
+        "5": 131
+      }
+    },
+    "general600": {
+      "n": 600,
+      "gpt_failed": 0,
+      "qwen_routed": 18,
+      "review_eligible": 88,
+      "review_selected": 20,
+      "gpt_baseline_gap_histogram": {
+        "0": 283,
+        "1": 229,
+        "2": 84,
+        "3": 4
+      },
+      "proposed_distribution": {
+        "4": 259,
+        "3": 107,
+        "5": 82,
+        "1": 37,
+        "2": 115
+      }
+    },
+    "stress400": {
+      "n": 400,
+      "gpt_failed": 0,
+      "qwen_routed": 13,
+      "review_eligible": 83,
+      "review_selected": 30,
+      "gpt_baseline_gap_histogram": {
+        "0": 170,
+        "1": 147,
+        "2": 76,
+        "3": 7
+      },
+      "proposed_distribution": {
+        "2": 91,
+        "1": 57,
+        "4": 141,
+        "3": 62,
+        "5": 49
+      }
+    },
+    "missing_context_wordfreq764": {
+      "n": 764,
+      "gpt_failed": 0,
+      "qwen_routed": 0,
+      "review_eligible": 130,
+      "review_selected": 34,
+      "gpt_baseline_gap_histogram": {
+        "0": 362,
+        "1": 272,
+        "2": 124,
+        "3": 6
+      },
+      "proposed_distribution": {
+        "4": 362,
+        "3": 151,
+        "5": 121,
+        "2": 124,
+        "1": 6
+      }
+    }
+  },
+  "protected_files_unchanged": 4456,
+  "baseline_unchanged": true,
+  "independent_policy_rank_match": true,
+  "ui_lexical_only": true,
+  "audit_sha256": "062baa5f5b4ad09b2389e0072e7cc9c30d55eef3d83ae9cc48088244c43b39e6",
+  "limitations": [
+    "No new gold labels; disagreements are not errors or calibrated confidence.",
+    "Configured GPT identity only; managed Codex wrapper remains and zero observed tools does not imply tool unavailability.",
+    "No-context and missing-frequency population differs substantially from reused pilot.",
+    "CLI internal transport retries not independently measured."
+  ]
+}

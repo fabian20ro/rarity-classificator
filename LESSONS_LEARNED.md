@@ -316,3 +316,13 @@ activity and runtime warnings, including stderr; malformed items or nonzero exit
 must not mask a later tool event. Persist raw receipts before fatal propagation.
 Keep this transport distinction explicit in model comparisons; do not synthesize
 HTTP responses or claim calibrated confidence from strict JSON success.
+
+
+**[2026-10-31]** A second judge's agreement within one level must not veto the
+initial large baseline conflict. On the150 references, târfă remains a GPT error
+although Qwen differs by only1. Freeze routing/ranking without labels, report misses
+(carter has a small baseline–GPT gap despite both being wrong), and retain operational
+versus proposed scores separately. On an unlabelled sample, disagreement counts and
+model agreement are not accuracy. Missing dictionary context requires an explicit UI
+state, not a model-invented sense or fabricated example; skipped cards do not trigger
+a replacement round beyond the fixed human-review budget.

@@ -1,0 +1,25 @@
+import csv,json,sys,hashlib
+from pathlib import Path
+out=Path(__file__).resolve().parent; code=out.parent/'risk-plan-pr'; pilot=out.parent/'gpt-judge-2026-10-31'; qwen=out.parent/'qwen-judge-curated-2026-10-30'
+sys.path.insert(0,str(code/'src'))
+from classificator.evaluation.risk_queue import export_risk_csv
+from classificator.evaluation.dataset import _write_csv
+read=lambda p:list(csv.DictReader(p.open()))
+root=out/'pilot-policy';root.mkdir(exist_ok=True)
+def project(source,target,fields,ids=None):
+ rows=[{k:r[k] for k in fields} for r in read(source) if ids is None or r['word_id'] in ids]
+ _write_csv(target,fields,rows)
+project(pilot/'inputs/baseline-oof.csv',root/'baseline.csv',['word_id','word','baseline_level','wordfreq'])
+project(pilot/'campaign/predictions.csv',root/'gpt.csv',['word_id','word','status','rarity_level'])
+evidence=pilot/'inputs/evidence.csv'
+export_risk_csv(root/'baseline.csv',evidence,root/'gpt.csv',root/'pre-qwen',review_budget=8)
+ids={r['word_id'] for r in read(root/'pre-qwen/qwen-route.csv')}
+project(qwen/'campaign/predictions.csv',root/'qwen.csv',['word_id','word','status','rarity_level'],ids)
+result=export_risk_csv(root/'baseline.csv',evidence,root/'gpt.csv',root/'final',qwen_csv=root/'qwen.csv',review_budget=8)
+expected=json.loads((out/'pilot-audit/independent-rule-metrics.json').read_text())
+actual=[r['word_id'] for r in read(root/'final/review-queue.csv')]
+assert actual==[r['word_id'] for r in expected['ranked_queue'][:8]]
+assert len(ids)==12 and result['review_eligible']==13
+report=dict(status='pass',policy=result['policy'],qwen_route=12,eligible=13,top8=expected['top8_detection'],missed_gpt=['carter'],missed_baseline=['carter','in'],independent_order_match=True,scope='Fixed exploratory policy, reused development labels. No threshold sweep or new CV claim. No label-based reranking; no production score changes.')
+(root/'verification.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps(report,indent=2))

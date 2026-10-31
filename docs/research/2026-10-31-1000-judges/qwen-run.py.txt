@@ -1,0 +1,51 @@
+"""Only Qwen inference; fixed blinded inputs, one blocking HTTP call at a time."""
+import datetime,hashlib,json,os,re,subprocess,sys,time
+from pathlib import Path
+from unittest.mock import patch
+import requests
+OUT=Path(__file__).resolve().parent;CODE=OUT.parent.parent/'risk-plan-pr';sys.path.insert(0,str(CODE/'src'))
+from classificator.evaluation.chat_judge import collect_chat_csv
+MODEL='qwen3.8-27b-splash';URL='http://127.0.0.1:1234'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+protocol=json.loads((OUT/'protocol.json').read_text());runtime=json.loads((OUT/'runtime.json').read_text())
+for name,digest in protocol['inputs'].items():assert sha(OUT/name)==digest,name
+assert sha(CODE/'src/classificator/evaluation/chat_judge.py')==protocol['judge_sha256']
+for path,digest in json.loads((OUT/'protected-inputs.json').read_text()).items():assert sha(Path(path))==digest,path
+class LoggedSession(requests.Session):
+ def post(self,url,**kwargs):
+  start=time.time();state=json.loads(kwargs['json']['messages'][1]['content'])
+  entry=dict(word_id=state['word_id'],started=start,http_status=None)
+  try:
+   result=super().post(url,**kwargs);entry['http_status']=result.status_code
+   try:entry['usage']=result.json().get('usage')
+   except ValueError:pass
+   return result
+  except requests.RequestException as exc:
+   entry['transport_error']=str(exc);raise
+  finally:
+   entry['finished']=time.time()
+   with (OUT/'transfers.jsonl').open('a') as f:f.write(json.dumps(entry)+'\n')
+http=LoggedSession()
+if os.getenv('LMSTUDIO_API_KEY'):http.headers['Authorization']='Bearer '+os.environ['LMSTUDIO_API_KEY']
+count=0
+def guard(wid):
+ global count
+ r=http.get(URL+'/api/v1/models',timeout=30);r.raise_for_status();loaded=[m for m in r.json()['models'] if m.get('loaded_instances')]
+ if loaded != [runtime['identity']]:raise RuntimeError('Loaded model identity/config changed; no request sent')
+ raw=subprocess.check_output(['vm_stat'],text=True);size=int(re.search(r'page size of (\d+)',raw)[1]);pages={k:int(v) for k,v in re.findall(r'^(Pages [^:]+):\s+(\d+)\.',raw,re.M)}
+ pressure=subprocess.check_output(['memory_pressure','-Q'],text=True);percent=int(re.search(r'free percentage: (\d+)%',pressure)[1])
+ avail=sum(pages[k] for k in ['Pages free','Pages inactive','Pages speculative'])*size
+ entry=dict(at=datetime.datetime.now(datetime.timezone.utc).isoformat(),word_id=wid,available_proxy_bytes=avail,os_free_percentage=percent)
+ with (OUT/'memory.jsonl').open('a') as f:f.write(json.dumps(entry)+'\n')
+ if avail<2*2**30 or percent<10:raise RuntimeError('RAM reserve below limit; no request sent')
+ count+=1
+ if count==1 or count%10==0:print(f'Sequential request {count}/31; RAM proxy {avail/2**30:.2f} GiB',flush=True)
+try:
+ with patch('psycopg.connect',side_effect=AssertionError('DB forbidden')):
+  path=collect_chat_csv(OUT/'inputs/vocabulary.csv',OUT/'inputs/evidence.csv',OUT/'campaign',model=MODEL,endpoint=URL+'/v1/chat/completions',http=http,options=json.loads((OUT/'options.json').read_text()),before_request=guard,runtime=dict(protocol_sha256=sha(OUT/'protocol.json'),runtime_sha256=sha(OUT/'runtime.json'),runner_sha256=sha(Path(__file__))))
+ print('COMPLETE '+str(path),flush=True)
+finally:
+ r=http.get(URL+'/api/v1/models',timeout=30);r.raise_for_status();(OUT/'post-run-models.json').write_text(json.dumps(r.json(),indent=2)+'\n')
+ # Preserve the Qwen instance that was already loaded; do not manage other sessions.
+ for filename,digest in json.loads((OUT/'protected-inputs.json').read_text()).items():assert sha(Path(filename))==digest,filename
+ print('Protected inputs unchanged; preexisting Qwen preserved.',flush=True)

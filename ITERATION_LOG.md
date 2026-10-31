@@ -1061,3 +1061,31 @@ Planupdated: GPTprimarysemanticresearchcandidate,Qwendiagnosticcomplement; basel
 operationalunchanged. Nextprepare1000evidenceCSV/freezerouting andcheckofflineonexisting
 predictions, thennewsequentialcampaign/causalaudit/max50reviews. No newpromptsearch.
 Aggregateartifacts+verificationpublished; rawlexicaltext/processreceiptsstaylocal.
+
+
+## 2026-10-31 — Frozen conflict policy, sequential1,000 GPT and31 Qwen
+
+User authorized fixed rules checked on150, GPT on frozen1,000, Qwen only important
+conflicts, maximum50 cards, plan/PR update; no DB. Worked in isolated risk-plan-pr
+checkout. TDD public CSV seams: audited sources→judge inputs; label-free predictions
+→routes/review queue. Added strict immutable evidence projection and conflict policy;
+blind review supports missing senses without fake meanings and separate storage.
+
+One policy, no threshold sweep: pilot12 Qwen routes,13 eligible; top8 captures6/11
+baseline severe and2/3 GPT severe. Misses carter/in for baseline,carter for GPT;
+no word-specific exception or Qwen veto. Inputs1,000 forms/1,146 members;130 with
+contexts,870 missing;764 missing both contexts/frequency. Same pilot prompt/schema;
+GPT-6.1-sol low configured through Codex, fresh ephemeral sessions, no reference
+scores/frequencies/other predictions in requests.1,000 native valid then31 Qwen
+native valid, zero fallback.171 initial gaps≥2;11 Qwen–GPT gaps≥2;50 fixed cards
+(20general/30stress,12with contexts/38explicitly missing). No new gold labels;
+121 eligible conflicts remain beyond budget, rest uncertain rather than certified.
+
+927tests+330subtests/Ruff PASS. Independent audit and process/network/DB-blocked
+replay PASS;1,000 unique sessions/999 nonoverlap checks and Qwen-after-GPT;
+4,456 protected files unchanged. GPT93.67min,Qwen2.51min; Qwen minimum RAM proxy
+2.85GiB/OS15%. Preexisting Qwen preserved; no D1 or DB writes. Surprises: existing
+manifest helper allowed missing implementation provenance (new adapter fails closed);
+Qwen within-one agreement is insufficient to discard initial conflict. No further
+human round silently added. Next: import this≤50 round and audit confirmed causes;
+no production promotion or whole-inventory regeneration yet.

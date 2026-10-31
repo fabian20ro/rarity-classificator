@@ -1,9 +1,9 @@
 'use strict';
 const $=id=>document.getElementById(id);
-const data=JSON.parse($('case-data').textContent),forms=data.forms,key='romanian-'+data.version;
+const data=JSON.parse($('case-data').textContent),forms=data.forms,riskMode=data.mode==='risk',key=(riskMode?'romanian-risk-':'romanian-')+data.version;
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const level=n=>Number.isInteger(n)&&n>=1&&n<=5;
-const validContext=(f,id)=>id===''||id==='other'||f.contexts.some(c=>c.context_id===id);
+const validContext=(f,id)=>id===''||id==='other'||(riskMode&&f.contexts.length===0&&id==='unavailable')||f.contexts.some(c=>c.context_id===id);
 let state={version:data.version,pack_sha256:data.pack_sha256,index:0,answers:{},events:[]};
 let blocked=false,preservedRaw=null,lastRaw=null;
 function valid(s){
@@ -16,7 +16,7 @@ function valid(s){
 try{lastRaw=localStorage.getItem(key);if(lastRaw!==null){const saved=JSON.parse(lastRaw);if(!valid(saved))throw Error('Invalid state');state=saved;}}
 catch(error){blocked=true;preservedRaw=lastRaw;}
 const item=()=>forms[state.index];
-function answer(){const f=item();return state.answers[f.word_id]??={decision:'pending',level:null,first_level:null,first_context_id:null,selected_context_id:f.contexts.length===1?f.contexts[0].context_id:'',notes:''};}
+function answer(){const f=item();return state.answers[f.word_id]??={decision:'pending',level:null,first_level:null,first_context_id:null,selected_context_id:f.contexts.length===1?f.contexts[0].context_id:riskMode&&f.contexts.length===0?'unavailable':'',notes:''};}
 function event(kind,extra={}){state.events.push({kind,word_id:item().word_id,at:new Date().toISOString(),...extra});}
 function save(){
  if(blocked){$('save-status').textContent='Progresul existent este păstrat intact. Nu îl pot suprascrie; salvează JSON pentru recuperare.';return;}
@@ -34,8 +34,10 @@ function render(){
  $('progress').max=forms.length;$('progress').value=rated;
  $('progress-text').textContent=`${rated}/${forms.length} evaluate · ${unsure} neclare`;
  $('current-status').textContent=a.decision==='rated'?`Scor ${a.level}`:a.decision==='unsure'?'Fără scor · neclar':'De evaluat';
- $('contexts').innerHTML=f.contexts.map(c=>`<section class="context"><small>${esc(c.pos)}</small><p>${esc(c.meaning)}</p><p class="example">${esc(c.example)}</p><a href="${esc(c.source)}" target="_blank" rel="noreferrer">Sursa sensului ↗</a></section>`).join('');
- $('familiar').innerHTML='<option value="">Alege sensul…</option>'+f.contexts.map(c=>`<option value="${esc(c.context_id)}">${esc(c.meaning)}</option>`).join('')+'<option value="other">Alt sens — descrie-l mai jos</option>';
+ $('contexts').innerHTML=(riskMode?`<p class="example">Părți de vorbire valide: ${f.valid_pos.map(esc).join(' · ')}</p>`:'')+
+  f.contexts.map(c=>`<section class="context"><small>${esc(c.pos)}</small><p>${esc(c.meaning)}</p>${riskMode?(c.restrictions.length?`<p class="example">${c.restrictions.map(esc).join(' · ')}</p>`:''):`<p class="example">${esc(c.example)}</p>`}<a href="${esc(c.source)}" target="_blank" rel="noreferrer">Sursa sensului ↗</a></section>`).join('')+
+  (riskMode?(f.contexts.length?'<p class="example">Sensuri documentate în sursele disponibile; lista poate fi incompletă.</p>':'<p class="context">Nu avem un sens verificat pentru această grafie. Lipsa definiției nu înseamnă raritate. Notează numai dacă recunoști forma; altfel alege „Nu pot decide”.</p>'):'');
+ $('familiar').innerHTML='<option value="">Alege sensul…</option>'+f.contexts.map(c=>`<option value="${esc(c.context_id)}">${esc(c.meaning)}</option>`).join('')+(riskMode&&f.contexts.length===0?'<option value="unavailable">Recunosc forma; sens nespecificat în surse</option>':'')+'<option value="other">Alt sens — descrie-l mai jos</option>';
  $('familiar').value=a.selected_context_id;$('notes').value=a.notes;
  $('jump').innerHTML=forms.map((f,i)=>`<option value="${i}">${i+1}. ${esc(f.word)}${state.answers[f.word_id]?.decision==='rated'?' ✓':state.answers[f.word_id]?.decision==='unsure'?' ?':''}</option>`).join('');
  $('jump').value=String(state.index);
@@ -71,11 +73,11 @@ $('next-unrated').onclick=()=>{
  $('alert').textContent='Toate fișele au fost parcurse. Poți revizui cazurile neclare sau exporta răspunsurile.';
 };
 function download(filename,mime,text){const link=document.createElement('a'),url=URL.createObjectURL(new Blob([text],{type:mime}));link.href=url;link.download=filename;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-$('export-json').onclick=()=>download('lot-independent-progres.json','application/json',JSON.stringify({...state,case_pack:data,ai_exposure:false,preserved_raw:preservedRaw,exported_at:new Date().toISOString()},null,2));
+$('export-json').onclick=()=>download(riskMode?'revizuire-risc-progres.json':'lot-independent-progres.json','application/json',JSON.stringify({...state,case_pack:data,ai_exposure:false,preserved_raw:preservedRaw,exported_at:new Date().toISOString()},null,2));
 $('export-csv').onclick=()=>{
  const fields=['version','pack_sha256','word_id','word','decision','level','selected_context_id','first_level','first_context_id','notes','ai_exposure'];
  const rows=forms.map(f=>({version:data.version,pack_sha256:data.pack_sha256,word_id:f.word_id,word:f.word,decision:'pending',...state.answers[f.word_id],ai_exposure:false}));
  const cell=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
- download('lot-independent-evaluare.csv','text/csv;charset=utf-8','\ufeff'+[fields,...rows.map(r=>fields.map(k=>r[k]))].map(r=>r.map(cell).join(',')).join('\r\n')+'\r\n');
+ download(riskMode?'revizuire-risc-evaluare.csv':'lot-independent-evaluare.csv','text/csv;charset=utf-8','\ufeff'+[fields,...rows.map(r=>fields.map(k=>r[k]))].map(r=>r.map(cell).join(',')).join('\r\n')+'\r\n');
 };
 render();

@@ -1,7 +1,7 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-10-31. Stare: etapa1 și piloții Qwen/GPT din etapa2 încheiați.
-Pregătirea intrărilor1000, cascada/rutarea și maximum50 revizuiri rămân de făcut.
+Actualizat: 2026-10-31. Stare: etapele1–3 încheiate;50 fișe pregătite în etapa4.
+Rămân răspunsurile acestei singure runde, importul și analiza cauzelor confirmate.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -68,8 +68,8 @@ sensurile/POS. Această lipsă de suport este mult mai frecventă decât în pil
 Artefactele locale existente, relative la workspace-ul original:
 `build/d1/independent-1000-2026-10-30/{forms.csv,vocabulary.csv,signals.csv,manifest.json,verification.json}`.
 `forms.csv` păstrează toate ID-urile/POS/codurile LOC; `vocabulary.csv.type` este numai
-metadată legacy. Selecția și îmbinările au fost reproduse independent. Nu există încă
-judecăți multi-model sau etichete umane noi pentru aceste 1.000 de forme.
+metadată legacy. Selecția și îmbinările au fost reproduse independent. Există acum
+1.000 judecăți GPT și31 judecăți Qwen pe ruta fixată; nicio etichetă umană nouă încă.
 
 Sursele locale: inventarul Scrabble, exportul wordfreq înghețat, cache-ul lexical și
 definițiile rebus, frecvențele/concordanțele FineWeb2 și CoRoLa deja colectate.
@@ -150,14 +150,26 @@ technical_status, risk_band, reason_flags, manifest_id. O combinație numerică 
 metodelor este permisă doar dacă regula sa a trecut aceeași evaluare fără leakage;
 în lipsa ei, scorul final rămâne baseline și judecătorii furnizează semnale de audit.
 
-**Rutare propusă după piloți, încă de verificat:** GPT pentru trecerea semantică;
-Qwen pentru conflicte de minimum2 niveluri sau contradicții între dovezi, preferabil
-numai când există contexte lexicale utilizabile. Verificăm această condiție pe
-predicțiile150 existente înainte de înghețare; nu o prezentăm drept regulă validată.
-Lipsa wordfreq ori a definițiilor rămâne flag de incertitudine și motiv de audit al
-surselor, nu declanșator pentru sute de apeluri Qwen fără contexte. Măsurăm erorile
-severe recuperate și introduse de rutare, inclusiv cazurile ratate fără dezacord≥2.
-Orice schimbare ulterioară cere protocol nou, declarat exploratoriu.
+**Rutare înghețată, `exact-form-conflicts-v1`:** GPT pentru toate formele; Qwen
+numai dacă GPT a răspuns valid, diferența GPT–baseline este ≥2 și există minimum
+un context lexical utilizabil. Qwen primește aceeași dovadă lexicală, fără scorul GPT
+sau baseline. Lipsa definițiilor/frecvenței nu declanșează singură inferență suplimentară.
+Baseline-ul operațional se exportă separat; propunerea de cercetare este GPT valid,
+altfel fallback baseline explicit. Qwen este diagnostic, fără medie/vot/suprascriere.
+
+Coada eligibilă: eșec tehnic GPT sau diferență inițială GPT–baseline ≥2. Qwen nu are
+drept de veto. Ordine lexicografică fixată înainte de cele1.000: eșec GPT; eșec Qwen;
+dezacord Qwen–GPT ≥2; amplitudinea scorurilor descrescător; diferența inițială
+descrescător; lipsă context; POS multiple; SHA256(`qwen-pilot-v1:` + ID). Maximum50,
+fără completare artificială. Fișele se publică numai după încheierea rutei Qwen.
+Contradicțiile lexicale cer verificare documentară separată; notele unui model nu
+sunt dovezi suficiente pentru schimbarea sensurilor sau a cozii.
+
+Verificare exploratorie pe150, fără căutare de praguri:12 apeluri Qwen eligibile,
+13 forme eligibile pentru revizuire. Top8 găsește6/11 erori severe baseline și2/3 GPT;
+toate8 au o eroare severă în cel puțin una dintre metode. Rămân nedetectate în coada
+completă: baseline `carter`, `in`; GPT `carter`. Nicio excepție pentru aceste cuvinte.
+Referințe de dezvoltare refolosite, fără pretenție de validare independentă.
 
 Riscul vizează `P(eroare >= 2)`, nu probabilitatea clasei favorite. Implicit folosim
 benzi ordinale și `unknown`. Fiecare bandă publică numitorul și erorile observate;
@@ -239,12 +251,18 @@ numai un export nou, niciodată scorurile originale. Nu există operații DB de 
 
 ## Următoarea acțiune concretă
 
-**Pregătirea dovezilor pentru1000 și înghețarea rutării**, verificată offline pe
-predicțiile150 existente, fără noi evaluări umane. GPT devine candidatul principal
-pentru judecata semantică; Qwen, al doilea diagnostic pe conflicte importante, preferabil
-cu sensuri utilizabile. Baseline-ul rămâne scorul operațional și controlul pentru toate.
-Regula de combinare/rutare nu este încă implementată sau validată; nu facem medie/vot
-implicit. După fixarea ei urmează rularea secvențială1000 și maximum50 fișe într-o rundă.
+**O singură rundă de50 fișe**, deja pregătită la
+[review-risk](http://127.0.0.1:8765/review-risk/). Estimările sunt absente din interfață;
+12 forme au sensuri documentate,38 au lipsa explicită și opțiunea „Nu pot decide”.
+Nu se cer explicații sau etichete pentru restul950 și nu se înlocuiesc fișele neclare.
+
+După răspunsuri: import fără suprascrierea istoricului, recalcularea formei exacte
+prin cel mai familiar sens valid și auditul erorilor confirmate ≥2. Cele50 sunt
+selectate după risc, deci nu estimează imparțial acuratețea întregului lot. Păstrăm
+baseline-ul operațional, scorurile propuse separat și starea necunoscută pentru cazurile
+nevalidate. Nicio promovare DB, medie de modele sau nouă căutare largă de prompturi.
+
+[Raportul complet al celor1.000](../research/2026-10-31-1000-judges.md).
 
 
 ## Rezultatul etapei 1 — implementat și verificat
@@ -334,7 +352,37 @@ Verificare:915teste+303subteste/Ruff, replay fără procese/rețea/DB identic, a
 independent PASS,2092fișiere protejate intacte.150sesiuni distincte/149verificări de
 neconcurență; aproximativ13minute. [Raport GPT](../research/2026-10-31-gpt-judge-pilot.md).
 
-Rămân: CSV-ul lexical1000 în schema judecătorilor, reguli de rutare/risc înghețate și
-verificate pe predicțiile existente, campania1000, comparație pe600/400 și lipsuri,
-auditul cauzelor, maximum50 fișe și decizia separată despre scorurile finale.
+La închiderea pilotului rămâneau pregătirea/rutarea/campania1000 și interfața.
+Acestea sunt încheiate în rezultatul etapei3 de mai jos; decizia despre scorurile finale
+așteaptă runda de revizuire și analiza cauzelor confirmate.
 Compatibilitatea API directă rămâne netestată; transportul Codex este cel măsurat.
+
+
+## Rezultatul etapei3 și pregătirea rundei — 2026-10-31
+
+1.000/1.000 GPT valide, apoi31/31 Qwen valide; zero fallback tehnic. Regula verificată
+pe150 și înghețată înaintea lotului nou selectează171 conflicte GPT–baseline ≥2.
+31 au contexte și au fost trimise la Qwen;11 dezacorduri Qwen–GPT ≥2. Fără combinare
+numerică: baseline operațional păstrat, propuneri GPT în CSV separat.
+
+| Segment | N | Dezacord GPT–baseline ≥2 | Apeluri Qwen | Fișe |
+|---|---:|---:|---:|---:|
+| General |600|88|18|20|
+| Stres |400|83|13|30|
+| Fără sensuri și fără wordfreq |764|130|0|34|
+
+829/1.000 predicții GPT sunt la maximum1 de baseline; **nu înseamnă829 corecte**.
+Nu avem încă gold pe lotul nou. Coada are exact50 forme, inclusiv toate11 conflictele
+mari GPT–Qwen;121 conflicte inițiale rămân în afara bugetului. Nicio cotă de completare,
+înlocuire a fișelor sau probabilitate inventată.38 fișe nu au sensuri documentate;
+această lipsă este afișată explicit. „Nu pot decide” rămâne fără scor.
+
+Verificări:927teste+330subteste/Ruff; audit independent și replay fără procese/rețea/DB
+PASS;1.000 sesiuni GPT distincte,999 verificări de neconcurență, Qwen ulterior;
+4.456 fișiere protejate intacte. Aproximativ93,67minute GPT și2,51minute Qwen.
+Baseline, răspunsurile vechi, modelele încărcate și DB nemodificate.
+
+Leftovers: răspunsurile rundei≤50, importul lor, auditul cauzelor confirmate și o decizie
+separată despre eventuale remedieri generale. Nu extrapolăm precizia celor50 asupra
+celor950 nerevizuite; lipsa dovezilor pe764 rămâne limitarea majoră. Regenerarea întregului
+inventar și orice actualizare DB rămân în afara acestui experiment.

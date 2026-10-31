@@ -1,0 +1,33 @@
+import hashlib,json,shutil,sys
+from pathlib import Path
+out=Path(__file__).resolve().parent; old=out.parent/'gpt-judge-2026-10-31'; code=out.parent/'risk-plan-pr'; gpt=out/'gpt'
+sys.path.insert(0,str(code/'src'))
+from classificator.evaluation.risk_queue import POLICY
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def write(p,value):
+ text=json.dumps(value,ensure_ascii=False,indent=2)+'\n'
+ if p.exists():assert p.read_text()==text,p
+ else:p.write_text(text)
+write(out/'policy.json',dict(POLICY,review_budget=50,pilot_budget=8,frozen_before_new_inference=True,reference_scope='Reused development150, no new cross-validation or external validation',pipeline='GPT1000 completes before routed Qwen; native failures explicit; no DB; no numeric blend; publish UI only after complete routing'))
+for name in ['prompt.txt','response-schema.json']:
+ shutil.copy2(old/name,gpt/name)
+for name in ['catalog.json','synthetic-prompt.txt','synthetic-schema.json']:
+ shutil.copy2(old/'preflight'/name,gpt/'preflight'/name)
+config=json.loads((old/'config.json').read_text())
+for key,name in [('model_instructions_file','prompt.txt'),('sqlite_home','runtime-state'),('log_dir','runtime-logs'),('model_catalog_json','preflight/catalog.json')]:config[key]=str(gpt/name)
+write(gpt/'config.json',config)
+protocol=json.loads((old/'protocol.json').read_text())
+for key in ['inputs','preflight','final_preflight_sha256','runner_sha256','primary','diagnostic','promotion']:protocol.pop(key,None)
+protocol['design']='1000 frozen new exact forms; one fresh ephemeral session each, sequential blocking. Same pilot prompt/schema. No human labels, frequencies or other predictions in requests. Routing/ranking frozen on pilot before inference.'
+protocol['sources']='Audited source-bounded exact form contexts; explicit empty senses; no new human labels. Keep all source provenance and counts.'
+protocol['policy_sha256']=sha(out/'policy.json')
+protocol['code']={k:v for k,v in protocol['code'].items() if not k.endswith('judge_comparison.py')}
+protocol['inputs']={n:sha(gpt/n) for n in ['prompt.txt','response-schema.json','config.json']}
+write(gpt/'protocol-initial.json',protocol)
+runner=(old/'run.py').read_text().replace("code=out.parent/'risk-plan-pr'", "code=out.parent.parent/'risk-plan-pr'")
+runner=runner.replace("wrc-gpt-pilot-2026-10-31", "wrc-gpt-1000-2026-10-31").replace('{count}/150','{count}/1000')
+(gpt/'run.py').write_text(runner)
+check=(old/'preflight/final_check.py').read_text().replace("protocol.json", "protocol-initial.json").replace("wrc-gpt-blind-2026-10-31", "wrc-gpt-1000-probe-2026-10-31")
+check=check.replace("cwd='/private/tmp/wrc-gpt-1000-probe-2026-10-31'", "cwd='/private/tmp/wrc-gpt-1000-probe-2026-10-31'\nPath(cwd).mkdir(exist_ok=True)\nassert not list(Path(cwd).iterdir())")
+(gpt/'preflight/final_check.py').write_text(check)
+print('Frozen policy/runtime prepared; no target calls.')

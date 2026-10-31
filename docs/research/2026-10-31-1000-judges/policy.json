@@ -1,0 +1,23 @@
+{
+  "version": "exact-form-conflicts-v1",
+  "qwen": "GPT scored AND abs(GPT-baseline)>=2 AND usable lexical context",
+  "review": "GPT failed OR initial abs(GPT-baseline)>=2; Qwen never vetoes",
+  "rank": [
+    "gpt_failed",
+    "qwen_failed",
+    "qwen_gpt_gap>=2",
+    "span_desc",
+    "initial_gap_desc",
+    "missing_context",
+    "multiple_pos",
+    "seeded_id"
+  ],
+  "seed": "qwen-pilot-v1",
+  "scores": "Operational baseline unchanged; proposed GPT with explicit failure fallback; no blend",
+  "risk": "Ordinal conflict/technical/unknown flags, not calibrated probabilities",
+  "review_budget": 50,
+  "pilot_budget": 8,
+  "frozen_before_new_inference": true,
+  "reference_scope": "Reused development150, no new cross-validation or external validation",
+  "pipeline": "GPT1000 completes before routed Qwen; native failures explicit; no DB; no numeric blend; publish UI only after complete routing"
+}

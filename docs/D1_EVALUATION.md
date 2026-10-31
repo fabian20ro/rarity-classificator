@@ -408,3 +408,20 @@ corrected Qwen scores by exact ID/spelling and identical human reference. These 
 are never supplied to the model. GPT configured identity and reasoning effort are
 reported explicitly; a provider-served model ID is not exposed by this CLI's event
 stream. [Pilot report](research/2026-10-31-gpt-judge-pilot.md).
+
+
+### Frozen1,000-form research cascade (2026-10-31)
+
+[Results and reproduction](research/2026-10-31-1000-judges.md):1,000 native GPT
+judgments then31 supported-conflict Qwen judgments, no technical fallback, no DB.
+Operational baseline and research proposal are distinct CSV columns.171 initial
+conflicts,50 blind cards; unqueried Qwen cells remain absent, not agreement/fallback.
+Use `scripts/export_audit_judge_evidence.py` for verified source projection and
+`scripts/build_risk_queue.py` for deterministic preliminary/final routing. Both
+require immutable output directories. A completed route is required before UI publish.
+
+The new public `build_risk_review` accepts explicit empty contexts plus valid POS,
+never model-generated meanings. Max50, separate storage namespace, estimates absent.
+Local interface: http://127.0.0.1:8765/review-risk/. Source/runtime scripts and
+aggregate verification receipts are linked from the result report. Human scores are
+only joined offline; the new1,000 have no validated reference labels yet.
