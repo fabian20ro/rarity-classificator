@@ -329,3 +329,17 @@ a replacement round beyond the fixed human-review budget.
 
 
 **[2026-10-31]** A risk-selected review changes denominators and score distributions — with baseline fallback4, requiring a gap≥2 selects GPT1/2 by construction.49/50 low GPT scores in that queue cannot demonstrate global collapse. Compare GPT/baseline on50, allthree only on12Qwen-observed rows, and retain150pilot separately. Completed50 reversed the pilot ordering (baseline13vsGPT19severe), especially without contexts; do not promote a post-hoc context gate. A saved note explicitly substituting otel→oțel supports an identity failure, whereas POS/sense gaps and rubric mismatch remain hypotheses without controlled evidence.
+
+
+**[2026-10-31]** Exact dictionary headwords can have valid senses absent from the
+curated tree (ceruit adjective, ozene neuter/livresc). Preserve spelling relation
+and noun gender coverage in model inputs, not only external provenance; missing
+POS is not an exhaustive blacklist. A numbered raw parser must reject inline sense
+references such as urări (2), never export the two fragments as exact meanings.
+
+**[2026-10-31]** Fresh paired arms need identical-input repeat controls. In the30-form
+lexical repair experiment, severe errors fell4→3 only because prășit changed2→3
+under identical inputs; actual evidence interventions changed no severe outcome.
+Passing a non-regression gate does not establish benefit. A post-hoc context gate
+improved overall review loss yet worsened reference4 errors0/9→2/9; retain class
+strata and separate pilot/risk-selected denominators before recommending adoption.

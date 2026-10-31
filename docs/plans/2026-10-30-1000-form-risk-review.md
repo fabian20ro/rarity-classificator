@@ -409,6 +409,53 @@ Verificare independentă și replay: PASS;4.456 fișiere protejate intacte;
 Ruff+927teste+330subteste PASS. Importul, comparația și auditul au CSV-uri locale,
 manifest și scripturi în PR. Datele individuale/CoRoLa rămân locale.
 
-Leftovers: audit/remediere generală grafie–POS–sens–restricții; apoi un experiment
-limitat cu regulă înghețată. Nicio promovare pe baza unei reguli post-hoc. Rămân
+La închiderea etapei4 urmau auditul/remedierea grafie–POS–sens–restricții și un
+experiment limitat cu regulă înghețată; realizate în etapa5 de mai jos. Nicio promovare pe baza unei reguli post-hoc. Rămân
 950 forme fără referințe; planul nu le certifică și nu cere alte etichete umane.
+
+
+## Rezultatul etapei5 — dovezi corectate, test pereche limitat, 2026-10-31
+
+Implementare TDD la limitele CSV deja aprobate: intrări MDA exacte cu POS/restricții
+și proveniență; relația grafiei cu intrarea-sursă păstrată în cerere; acoperire POS
+cu distincția genurilor și recalculare după contextele curate. Fără restaurarea
+diacriticelor sau sensuri inventate din numere de trimitere. Revizia a găsit două
+defecte; regresii red→green înaintea colectării. Commit implementare:`a196520`.
+
+Conținut lexical schimbat40/150 și4/50, fără modificarea scorurilor umane.
+ceruit recuperează adjectivul; ozene recuperează neutru livresc; otel păstrează
+explicit relația cu hotel. Pustnici rămâne fără sursă exactă; lista POS nu devine
+interdicție pentru sensurile încă nedocumentate. Afixelor nu li se atribuie automat
+sensuri ale unui cuvânt întreg.
+
+30 forme înghețate:19pilot+11runda recentă; două brațe proaspete,60 apeluri GPT
+secvențiale, prompt identic. Zece controale primesc intrări identice. Pilot:
+0/19→0/19 erori≥2; runda recentă:4/11→3/11. **Îmbunătățirea este exclusiv în
+controlul prășit**, cu aceeași cerere. În intervenția efectivă:0/14→0/14 și3/6→3/6;
+nicio dovadă de reducere a erorilor mari prin corecțiile lexicale. iț se schimbă5→4,
+față de referința5; abatere tolerată. 9/10 controale sunt identice, unul diferă cu1.
+
+Pentru4/5: pilot0/6 și0/3 severe în ambele brațe; runda recentă2/2→1/2 numai prin
+control, respectiv2/3→2/3. Neagravarea predeclarată trece; eficacitatea nu este
+arătată. Nicio promovare sau extindere automată a campaniei.
+
+Pe predicțiile istorice complete, poarta „GPT numai cu sensuri, altfel baseline”
+produce4/150 severe/cost4 și9/50/cost11, față de baseline11/150/cost14 și13/50/cost14.
+Este post-hoc și agravează referințele4 din runda recentă:0/9→2/9 severe. Nu o activăm.
+
+Verificare: Ruff+932teste+344subteste;60sesiuni/59verificări de neconcurență;
+4.468 fișiere protejate intacte; replay fără procese/rețea/DB cu138artefacte identice.
+Aproximativ5,99minute. Încercarea inițială de pornire blocată de sandbox nu a ajuns
+la model; păstrată separat. Nicio încărcare D1/Qwen, evaluare umană nouă sau scriere DB.
+[Raport și reproducere](../research/2026-10-31-evidence-repair.md).
+
+**Următorul pas recomandat:** experiment offline cu predicțiile și atestările de
+corpus existente: o poartă pentru reduceri≥2 care cere suport pentru forma exactă,
+nu doar o definiție sau consens LLM. Regulă/praguri fixate înaintea comparației;
+analiză pe familii, rezultate150/50 separate și fără agravare4/5. Fără apeluri LLM
+suplimentare și fără etichete umane noi pentru această etapă.
+
+Leftovers:19/150 și38/50 fără definiții; POS neacoperite27/150 și38/50; formate MDA
+complexe/trimiteri interne excluse; eroarea comportamentală Qwen otel→oțel neretestată.
+950 forme rămân fără referințe. Baseline operațional păstrat; nicio regenerare de
+scoruri pe inventarul complet sau modificare DB autorizată aici.

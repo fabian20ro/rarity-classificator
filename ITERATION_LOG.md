@@ -1094,3 +1094,15 @@ no production promotion or whole-inventory regeneration yet.
 ## 2026-10-31 — Completed50 imported and compared without new inference
 
 Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net score changes; pilot150 separate. Immutable local CSV artifacts/manifest at build/d1/review50-2026-10-31. Baseline13severe/excess14; GPT19/excess25 on50. Qwen only12 paired: baseline7/GPT3/Qwen3, costs8/5/5. No-context38 baseline6vsGPT16; human4/5n15 baseline1vsGPT14. Audited62 saved model notes; Qwen explicitly substitutes otel with oțel; missing POS/sense coverage and qualifier scope remain targeted hypotheses. All4456protectedfiles unchanged; independent verification and Ruff927tests+330subtests pass. No calls/models/DB writes. Recommendation: retain baseline; audit lexical evidence before one bounded, predeclared experiment; no extra human round, automatic production promotion or claim about950unreviewed. Raw evaluations and CoRoLa remain local; aggregates and reproduction scripts go to PR86.
+
+
+## 2026-10-31 — exact-form spelling/POS evidence repair and bounded paired experiment
+
+- User scope: TDD general lexical corrections; limited existing150/review50 experiment; preserve all labels; no new human round or classifier DB writes; update PR86.
+- Confirmed CSV seams reused. Added exact MDA headword extraction with source receipts, literal/inflected/variant spelling relations, gender-aware missing-definition POS, refreshed curated coverage. No per-word rarity patches.
+- RED→GREEN: missing ceruit adjective/ozene neuter; source numeric reference misparsed as clause; contradictory literal spelling. Additional negative/scope/merge regressions. Spec review caught numeric-fragment bug before inference; standards had no blocking findings.
+- Regenerated content changed40/150,4/50; seven pilot forms shed affix-only senses under common audit projection. Still19/150 and38/50 without definitions. All scores immutable.
+- Frozen30, two fresh arms,60 sequential configured GPT6.1-sol-low sessions, same prompt,10 identical repeat controls. Pilot0/19→0/19 severe; review4/11→3/11 solely from identical-input control prășit2→3. Actual interventions0/14→0/14 and3/6→3/6; no demonstrated reduction. iț5→4 remains within1.
+- Retrospective complete-cohort context gate:4/150 and9/50 severe, but reference4 review subset worsens0/9→2/9 vsbaseline. Keep operational baseline; next suggested corpus-supported gate offline on existing predictions, no fresh labels/models.
+- Sandbox prevented first Codex initialization before any thread/output. Failed receipt preserved v2; same selection/inputs collected v3 under approved escalation. No repeated model trials from initialization failure.
+- Verification: Ruff932tests+344subtests,60unique sessions59nonoverlap,4468protected files unchanged,138artifacts byte-identical replay with model/network/DB blocked. No local model loaded. Implementation a196520; report/scripts/plan in docs/research/2026-10-31-evidence-repair and docs/plans/2026-10-30-1000-form-risk-review.md.

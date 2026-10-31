@@ -1,0 +1,14 @@
+{
+  "protected_files_unchanged": 4468,
+  "unique_sessions": 60,
+  "sequential_nonoverlap_checks": 59,
+  "elapsed_minutes": 5.989881932735443,
+  "independent_metric_arithmetic": "PASS",
+  "identical_control_requests": 10,
+  "gold_read_only": true,
+  "classifier_db_writes": 0,
+  "replay": "PASS",
+  "byte_identical_artifacts": 138,
+  "models_network_db_forbidden": true,
+  "source_inputs_match_protocol": true
+}
