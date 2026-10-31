@@ -1,0 +1,11 @@
+{
+  "requests": 150,
+  "wall_seconds": 871.5219399929047,
+  "http_seconds": 870.0482246875763,
+  "median_seconds": 5.180350422859192,
+  "minimum_available_proxy_gib": 2.9353790283203125,
+  "minimum_os_free_percent": 16,
+  "prompt_tokens": 141994,
+  "completion_tokens": 14794,
+  "reasoning_tokens": 0
+}

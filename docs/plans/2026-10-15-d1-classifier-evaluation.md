@@ -1,5 +1,7 @@
 # D1 adapter and Romanian Scrabble evaluation plan
 
+> Plan curent (2026-10-30): [1.000 de forme, maximum 50 de revizuiri](2026-10-30-1000-form-risk-review.md). Prioritate: erori ≥2; documentul de mai jos păstrează istoricul și recomandări supersedate.
+
 Date: 2026-10-15. Updated: 2026-10-20. Status: offline implementation delivered; consolidated audit imported (46 contexts, 12 exact forms). Independent evaluation, live validation and replacement decision pending. Latest status and leftovers at the end.
 
 Recommendation: build an offline evaluation harness first, then a Step2 scoring adapter for D1 through LM Studio `/v1/systemone`. Evaluate D1 alone, with dictionary evidence, and alongside frequency features. Replace the existing scorer only if held-out Romanian results justify it. Expect a hybrid scorer to be a stronger candidate than D1 using word spelling alone; treat that as a hypothesis.

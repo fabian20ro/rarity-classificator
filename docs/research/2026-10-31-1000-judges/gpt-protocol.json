@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-31",
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "low",
+  "identity_scope": "Configured/requested model, not provider-served identity attestation",
+  "transport": "Codex CLI0.166.0 using existing ChatGPT authentication, no API key copied or extracted",
+  "rubric": "Same exact-form most-familiar valid sense across all POS; no restored diacritics",
+  "design": "1000 frozen new exact forms; one fresh ephemeral session each, sequential blocking. Same pilot prompt/schema. No human labels, frequencies or other predictions in requests. Routing/ranking frozen on pilot before inference.",
+  "wrapper": "Generic managed Codex tools/skills/permissions/AGENTS remain. Not byte-identical model-only prompt. No project history/gold in inspected assembled context. Tool capabilities are present, not claimed unavailable; any tool/unknown event or stderr quarantines/stops the entire campaign.",
+  "failure": "Native schema/process failures explicit; comparison uses frozen baseline fallback. No app retries or repairs; CLI internal transport retries not independently counted. Persist raw process results before parsing; resume reuses receipts.",
+  "sources": "Audited source-bounded exact form contexts; explicit empty senses; no new human labels. Keep all source provenance and counts.",
+  "code": {
+    "/Users/fabian/git/word-rarity-classifier/build/d1/risk-plan-pr/src/classificator/evaluation/codex_judge.py": "5e67bac989d57bdf479ed3c1594fcced50f012b8e28de19959821b46ba57eb4c",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/risk-plan-pr/src/classificator/evaluation/chat_judge.py": "8636699ed8524bb865be68cb3747e5e9e684e4783a7cb0990695c18b62236e26",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/risk-plan-pr/src/classificator/evaluation/campaign.py": "d233ffc8728fb152bf39d92b923070fb1952960decf6c30a10e90a1bc168b428",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/risk-plan-pr/src/classificator/evaluation/audit_judge_evidence.py": "13f69a11cc6688bc61edd6c211b4f8dc14899b1b87b62ba61e0550441416076f",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/risk-plan-pr/src/classificator/evaluation/risk_queue.py": "804df75426edc8439578e7086fb6967bc5ada3bc517db293d95458c8195f2766"
+  },
+  "cli": {
+    "path": "/opt/homebrew/Caskroom/codex/0.166.0/bin/codex",
+    "sha256": "39acf979729dd290f9a24ee38b2914e036c91b65952872e28ae2a6b88a7db7c1",
+    "catalog_sha256": "9e01cd50ec8c4ba6d782413d1154cb2dbe1da63e014d622631b0603bc19659d6"
+  },
+  "environment_allowlist": [
+    "HOME",
+    "PATH",
+    "TMPDIR",
+    "LANG",
+    "LC_ALL",
+    "USER",
+    "LOGNAME",
+    "SHELL"
+  ],
+  "policy_sha256": "c0e8805dbf8bd6378c9128a2dbb23198cfa1a6f91570e7ae9accee36685f460e",
+  "inputs": {
+    "prompt.txt": "18902572c6f770db8177db2e32f7195e844480d97521aa762f240a3e5ca840e9",
+    "response-schema.json": "dee69b3fd6da158fb0c7fb991c8e92f6bee411baa51886a6142fdfe52b44db58",
+    "config.json": "7d6427fbb428ca8489e48eaf79a46117290b2a681a7e2a983208edf24351aa80",
+    "inputs/evidence.csv": "99cf2b0f5d40929eb70eac7618d602cb2ef6e4b6c5bfb6244a3f5428a3f99b4b",
+    "inputs/vocabulary.csv": "82e08a39d2fef0048859fff02bd218bbada69054786fbcc98146e5faa3141a15"
+  },
+  "final_preflight_sha256": "e658a9a5b2f1c90e3255544cc97119cc905cbeb7c31a07a425d0fdad1ce2f62e",
+  "runner_sha256": "db1c83731a4c3f0274334134ca533d7deab576bb8fe3afa8be490268201b139f",
+  "lexical_manifest_sha256": "6b9d040a54a1a64e1f9427f5687c45b1cb86d070ad6a1926c81a92dac2777e72",
+  "pilot_verification_sha256": "d5911ff2bd7e1789fc7bfb32c87088613fd4ff52ee7764769e619aecc8724a97",
+  "protected_manifest_sha256": "6ddabf895cf31042e666518fa317d5f3c87a6aa92be7c4907e6061fe03f70898"
+}

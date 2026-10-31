@@ -1,0 +1,13 @@
+{
+  "status": "pass",
+  "replayed_records": 150,
+  "identical_requests_and_outcomes": true,
+  "byte_identical_comparison": true,
+  "process_http_network_db_blocked": true,
+  "protected_files_unchanged": 2092,
+  "artifacts": {
+    "comparison/report.json": "cc9188a3b1c965fe906708aceb7946665973b3f3c08c7865eee0a6716bd3b7b9",
+    "comparison/manifest.json": "940c4e19151dc45466896c9e3a6cfc908626301a9aaedf010bf7157a07ed4e36",
+    "comparison/comparison.csv": "26521e84fb50b48284ff75be944dd47027d8d9cee8bf8d5219cbc11123df35d9"
+  }
+}

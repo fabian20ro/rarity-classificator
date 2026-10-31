@@ -1,0 +1,38 @@
+"""Reproduce native collectors and policy exports with processes/network/DB blocked."""
+import hashlib,json,sys
+from pathlib import Path
+from unittest.mock import patch
+import requests
+out=Path(__file__).resolve().parent;sys.path.insert(0,str(out.parent/'risk-plan-pr/src'))
+from classificator.evaluation.codex_judge import collect_codex_csv
+from classificator.evaluation.chat_judge import collect_chat_csv
+from classificator.evaluation.risk_queue import export_risk_csv
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+g=out/'gpt';q=out/'qwen';gc=json.loads((g/'campaign/manifest.json').read_text())['config'];qc=json.loads((q/'campaign/manifest.json').read_text())['config']
+grecords={int(p.stem):json.loads(p.read_text()) for p in (g/'campaign/records').glob('*.json')};qrecords={int(p.stem):json.loads(p.read_text()) for p in (q/'campaign/records').glob('*.json')}
+assert len(grecords)==1000
+seen_g=[];seen_q=[];transfers={r['word_id']:r for r in [json.loads(line) for line in (q/'transfers.jsonl').read_text().splitlines()]}
+def executor(request):
+ wid=request['input']['word_id'];assert wid not in seen_g and request==grecords[wid]['request'];seen_g.append(wid)
+ return json.loads(grecords[wid]['response'])
+class Replay:
+ def post(self,url,*,json,timeout):
+  state=__import__('json').loads(json['messages'][1]['content']);wid=state['word_id'];expected=qrecords[wid]
+  assert url==qc['endpoint'] and json==expected['request'] and wid not in seen_q;seen_q.append(wid)
+  transfer=transfers[wid]
+  if transfer['http_status'] is None:raise requests.RequestException(transfer['transport_error'])
+  response=requests.Response();response.status_code=transfer['http_status'];response._content=expected['response'].encode();return response
+with patch('subprocess.run',side_effect=AssertionError('Processes forbidden')),patch('subprocess.Popen',side_effect=AssertionError('Processes forbidden')),patch('requests.adapters.HTTPAdapter.send',side_effect=AssertionError('HTTP forbidden')),patch('socket.create_connection',side_effect=AssertionError('Network forbidden')),patch('psycopg.connect',side_effect=AssertionError('DB forbidden')):
+ collect_codex_csv(g/'inputs/vocabulary.csv',g/'inputs/evidence.csv',g/'offline-replay',executor=executor,model=gc['configured_model'],runtime=gc['runtime'])
+ collect_chat_csv(q/'inputs/vocabulary.csv',q/'inputs/evidence.csv',q/'offline-replay',model=qc['model'],endpoint=qc['endpoint'],options=qc['options'],runtime=qc['runtime'],http=Replay())
+ for arm,records in [(g,grecords),(q,qrecords)]:
+  for wid,record in records.items():
+   replay=json.loads((arm/'offline-replay/records'/f'{wid}.json').read_text())
+   for key in ['word_id','word','type','rarity_level','status','error','probabilities','confidence','request','response']:assert record[key]==replay[key],(arm.name,wid,key)
+ inputs=out/'comparison-inputs'
+ export_risk_csv(inputs/'baseline.csv',g/'inputs/evidence.csv',inputs/'gpt.csv',out/'routing-replay',qwen_csv=inputs/'qwen.csv',review_budget=50)
+for p in (out/'final-routing').iterdir():assert p.read_bytes()==(out/'routing-replay'/p.name).read_bytes(),p
+protected=json.loads((q/'protected-inputs.json').read_text())
+for name,digest in protected.items():assert sha(Path(name))==digest,name
+receipt=dict(status='pass',gpt_requests=len(seen_g),qwen_requests=len(seen_q),identical_requests_and_outcomes_excluding_timestamps=True,byte_identical_routing=True,process_http_network_db_blocked=True,protected_files_unchanged=len(protected),routing_hashes={p.name:sha(p) for p in (out/'final-routing').iterdir()})
+(out/'replay-verification.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt,indent=2))

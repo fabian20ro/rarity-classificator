@@ -1,0 +1,14 @@
+{
+  "status": "pass",
+  "replayed_requests": 150,
+  "request_payloads_identical": true,
+  "all_outcomes_identical_excluding_timestamps": true,
+  "comparison_artifacts_byte_identical": true,
+  "http_network_db_blocked": true,
+  "protected_files_unchanged": 1721,
+  "artifacts": {
+    "comparison/report.json": "1185f2c4400609626d44986a10d1121da25c0b2e2aab9915bb161d35d3f7b65d",
+    "comparison/manifest.json": "4040d902bf9f7edfd9aba55f80c9de600891f0a72cd2477cfad4da3b1b7017c9",
+    "comparison/comparison.csv": "2e4a049dadb700fcc57c6a65860d6ba645868146da46fb04fa18af1a7c6a8170"
+  }
+}

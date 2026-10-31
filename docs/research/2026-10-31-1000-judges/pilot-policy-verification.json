@@ -1,0 +1,48 @@
+{
+  "status": "pass",
+  "policy": {
+    "version": "exact-form-conflicts-v1",
+    "qwen": "GPT scored AND abs(GPT-baseline)>=2 AND usable lexical context",
+    "review": "GPT failed OR initial abs(GPT-baseline)>=2; Qwen never vetoes",
+    "rank": [
+      "gpt_failed",
+      "qwen_failed",
+      "qwen_gpt_gap>=2",
+      "span_desc",
+      "initial_gap_desc",
+      "missing_context",
+      "multiple_pos",
+      "seeded_id"
+    ],
+    "seed": "qwen-pilot-v1",
+    "scores": "Operational baseline unchanged; proposed GPT with explicit failure fallback; no blend",
+    "risk": "Ordinal conflict/technical/unknown flags, not calibrated probabilities"
+  },
+  "qwen_route": 12,
+  "eligible": 13,
+  "top8": {
+    "baseline": {
+      "found": 6,
+      "total": 11,
+      "recall": 0.5454545454545454,
+      "precision": 0.75,
+      "false_alarms": 2
+    },
+    "gpt": {
+      "found": 2,
+      "total": 3,
+      "recall": 0.6666666666666666,
+      "precision": 0.25,
+      "false_alarms": 6
+    }
+  },
+  "missed_gpt": [
+    "carter"
+  ],
+  "missed_baseline": [
+    "carter",
+    "in"
+  ],
+  "independent_order_match": true,
+  "scope": "Fixed exploratory policy, reused development labels. No threshold sweep or new CV claim. No label-based reranking; no production score changes."
+}

@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-31",
+  "configured_model": "gpt-6.1-sol",
+  "reasoning_effort": "low",
+  "identity_scope": "Configured/requested model, not provider-served identity attestation",
+  "transport": "Codex CLI0.166.0 using existing ChatGPT authentication, no API key copied or extracted",
+  "wrapper": "Generic managed Codex tools/skills/permissions/AGENTS remain. Not byte-identical model-only prompt. No project history/gold in inspected assembled context. Tool capabilities are present, not claimed unavailable; any tool/unknown event or stderr quarantines/stops the entire campaign.",
+  "design": "One fresh ephemeral session per word, sequential blocking child processes. Fixed final Qwen vocabulary/evidence/rubric/schema. No human labels, Qwen/baseline predictions or frequency signals enter model state. No fewshots or tuning. Technical synthetic probes only before target collection.",
+  "primary": "Paired severe abs(error)>=2 and excess=max(abs(error)-1,0) against baseline and corrected Qwen. Same all150/clarified37/opaque113/missingwordfreq49/true4or5/with131/without19 strata; confusion all levels. Grouped bootstrap5000, fixed seed, exploratory reused development labels.",
+  "diagnostic": "Same evidence-only and judge-assisted rank, seed=qwen-pilot-v1, top8 global primary; secondary top5/fold25 explicitly16.7%. No joint scorer fitted or promoted. Report union/intersection errors as diagnostics, not oracle-achievable scores.",
+  "input_hashes": {
+    "inputs/evidence.csv": "c7756bd5d12b5fde9482d8212c6c1d350aa34744044f32e36c0329406e5de40b",
+    "inputs/vocabulary.csv": "e31dc0d484cd27394a20756e90da829a2e2415c9b6234ecc33ea4540cb39b526",
+    "inputs/reference.csv": "32f36c283df1842065f3e72d8baab1a358792fa71b7ead34a55f17666fb16aa2",
+    "inputs/baseline-oof.csv": "27d4b379165581f09d7fa586f561978143f21aee1079cfb8a7be5b478f55eb59",
+    "inputs/folds.csv": "0ea64628d44d2fdf1c6240eecd66a5474e94ce63fdde8722db41729247c62ef9",
+    "prompt.txt": "18902572c6f770db8177db2e32f7195e844480d97521aa762f240a3e5ca840e9",
+    "response-schema.json": "dee69b3fd6da158fb0c7fb991c8e92f6bee411baa51886a6142fdfe52b44db58",
+    "config.json": "b1e89c3dbb011e33b87c9a5dda20727e6e2ecc7200af3025d4c37009f7a9fbd1"
+  },
+  "code_hashes": {
+    "/Users/fabian/git/word-rarity-classifier/build/d1/risk-plan-pr/src/classificator/evaluation/codex_judge.py": "5e67bac989d57bdf479ed3c1594fcced50f012b8e28de19959821b46ba57eb4c",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/risk-plan-pr/src/classificator/evaluation/chat_judge.py": "8636699ed8524bb865be68cb3747e5e9e684e4783a7cb0990695c18b62236e26",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/risk-plan-pr/src/classificator/evaluation/campaign.py": "d233ffc8728fb152bf39d92b923070fb1952960decf6c30a10e90a1bc168b428",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/risk-plan-pr/src/classificator/evaluation/judge_comparison.py": "fa0732009eab837d03f33290174f53adaa4f96e67d4e71ad43525df096d9482d"
+  },
+  "cli": {
+    "path": "/opt/homebrew/Caskroom/codex/0.166.0/bin/codex",
+    "sha256": "39acf979729dd290f9a24ee38b2914e036c91b65952872e28ae2a6b88a7db7c1",
+    "catalog_sha256": "9e01cd50ec8c4ba6d782413d1154cb2dbe1da63e014d622631b0603bc19659d6"
+  },
+  "protocol_sha256": "89c804e5b4ba94436b7a53f129354e235c31bcafd1a9b71687004a3371b773da",
+  "runner_sha256": "a25efa199ba1ec6d39de45aa5df98516459a1e8291540c3dfd5e46e216deb204",
+  "analysis_sha256": "6568a53855abdce70c66b0119f1255604f5bc28db2edca530d851411df8e8f40",
+  "replay_sha256": "c8a920dc8657b35bc78e909ae10acbb16894cc857c43b788dd20e065e14ea62b",
+  "audit_sha256": "b5f828db94a90f570e912bcc98573a464419f29ee37933d4079505a9962f22bb",
+  "published": {
+    "preflight-verification.json": "0b714429054dbc0a27815a1a73eb0d19cf84b38e6e1925537cc0c03fcb904df6",
+    "shared-errors.json": "ec8b1577adb6534c87de29e01af2444d3f647507a36d27e86097f197bc9ef9be",
+    "report.json": "cc9188a3b1c965fe906708aceb7946665973b3f3c08c7865eee0a6716bd3b7b9",
+    "operational-summary.json": "7ffd3e01262a1f0de49b4b4b4d3b84cdcd652be13f55a007a59a1855236743a2",
+    "replay-verification.json": "66da41019030591cc1a55fdb83d67647902ff24386ffc762706e0a15a5317df2",
+    "source-snapshots.json": "8a9a085f7a73784316cb110d41f0f03ce199785378a730a7d6cbda219936fd7f",
+    "verification.json": "2cb9e7f4c20579cfe0e9d5eb56880c2630b12a593fbade5f00c074fea89f8ef2",
+    "paired-analysis.json": "36edc6c142ca7de30f0f9c69d77bf839997f07e3b36d0ac3bd9a1bf650fff3eb"
+  }
+}

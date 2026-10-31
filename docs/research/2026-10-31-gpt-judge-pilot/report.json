@@ -1,0 +1,1553 @@
+{
+  "coverage": {
+    "total": 150,
+    "native_scored": 150,
+    "native_failed": 0,
+    "fallback": 0,
+    "final_scored": 150
+  },
+  "metrics": {
+    "baseline": {
+      "all": {
+        "per_level": {
+          "1": {
+            "support": 51,
+            "predicted": 44,
+            "correct": 36,
+            "precision": 0.8181818181818182,
+            "recall": 0.7058823529411765,
+            "severe": 3
+          },
+          "2": {
+            "support": 31,
+            "predicted": 39,
+            "correct": 20,
+            "precision": 0.5128205128205128,
+            "recall": 0.6451612903225806,
+            "severe": 2
+          },
+          "3": {
+            "support": 25,
+            "predicted": 18,
+            "correct": 11,
+            "precision": 0.6111111111111112,
+            "recall": 0.44,
+            "severe": 1
+          },
+          "4": {
+            "support": 21,
+            "predicted": 49,
+            "correct": 19,
+            "precision": 0.3877551020408163,
+            "recall": 0.9047619047619048,
+            "severe": 2
+          },
+          "5": {
+            "support": 22,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": 0.0,
+            "severe": 3
+          }
+        },
+        "n": 150,
+        "exact": 86,
+        "within_one": 139,
+        "severe": 11,
+        "excess_error_total": 14,
+        "mae": 0.52,
+        "error_histogram": {
+          "0": 86,
+          "1": 53,
+          "2": 8,
+          "3": 3,
+          "4": 0
+        },
+        "confusion": [
+          [
+            36,
+            12,
+            3,
+            0,
+            0
+          ],
+          [
+            6,
+            20,
+            3,
+            2,
+            0
+          ],
+          [
+            1,
+            4,
+            11,
+            9,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            19,
+            0
+          ],
+          [
+            0,
+            2,
+            1,
+            19,
+            0
+          ]
+        ],
+        "predicted_counts": {
+          "1": 44,
+          "2": 39,
+          "3": 18,
+          "4": 49,
+          "5": 0
+        }
+      },
+      "true4_or5": {
+        "per_level": {
+          "1": {
+            "support": 0,
+            "predicted": 1,
+            "correct": 0,
+            "precision": 0.0,
+            "recall": null,
+            "severe": 0
+          },
+          "2": {
+            "support": 0,
+            "predicted": 3,
+            "correct": 0,
+            "precision": 0.0,
+            "recall": null,
+            "severe": 0
+          },
+          "3": {
+            "support": 0,
+            "predicted": 1,
+            "correct": 0,
+            "precision": 0.0,
+            "recall": null,
+            "severe": 0
+          },
+          "4": {
+            "support": 21,
+            "predicted": 38,
+            "correct": 19,
+            "precision": 0.5,
+            "recall": 0.9047619047619048,
+            "severe": 2
+          },
+          "5": {
+            "support": 22,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": 0.0,
+            "severe": 3
+          }
+        },
+        "n": 43,
+        "exact": 19,
+        "within_one": 38,
+        "severe": 5,
+        "excess_error_total": 8,
+        "mae": 0.7441860465116279,
+        "error_histogram": {
+          "0": 19,
+          "1": 19,
+          "2": 2,
+          "3": 3,
+          "4": 0
+        },
+        "confusion": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            19,
+            0
+          ],
+          [
+            0,
+            2,
+            1,
+            19,
+            0
+          ]
+        ],
+        "predicted_counts": {
+          "1": 1,
+          "2": 3,
+          "3": 1,
+          "4": 38,
+          "5": 0
+        }
+      },
+      "wordfreq_missing": {
+        "per_level": {
+          "1": {
+            "support": 0,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": null,
+            "severe": 0
+          },
+          "2": {
+            "support": 2,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": 0.0,
+            "severe": 2
+          },
+          "3": {
+            "support": 9,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": 0.0,
+            "severe": 0
+          },
+          "4": {
+            "support": 19,
+            "predicted": 49,
+            "correct": 19,
+            "precision": 0.3877551020408163,
+            "recall": 1.0,
+            "severe": 0
+          },
+          "5": {
+            "support": 19,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": 0.0,
+            "severe": 0
+          }
+        },
+        "n": 49,
+        "exact": 19,
+        "within_one": 47,
+        "severe": 2,
+        "excess_error_total": 2,
+        "mae": 0.6530612244897959,
+        "error_histogram": {
+          "0": 19,
+          "1": 28,
+          "2": 2,
+          "3": 0,
+          "4": 0
+        },
+        "confusion": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            2,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            9,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            19,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            19,
+            0
+          ]
+        ],
+        "predicted_counts": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 49,
+          "5": 0
+        }
+      },
+      "with_context": {
+        "per_level": {
+          "1": {
+            "support": 35,
+            "predicted": 29,
+            "correct": 22,
+            "precision": 0.7586206896551724,
+            "recall": 0.6285714285714286,
+            "severe": 2
+          },
+          "2": {
+            "support": 30,
+            "predicted": 38,
+            "correct": 20,
+            "precision": 0.5263157894736842,
+            "recall": 0.6666666666666666,
+            "severe": 2
+          },
+          "3": {
+            "support": 25,
+            "predicted": 17,
+            "correct": 11,
+            "precision": 0.6470588235294118,
+            "recall": 0.44,
+            "severe": 1
+          },
+          "4": {
+            "support": 21,
+            "predicted": 47,
+            "correct": 19,
+            "precision": 0.40425531914893614,
+            "recall": 0.9047619047619048,
+            "severe": 2
+          },
+          "5": {
+            "support": 20,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": 0.0,
+            "severe": 3
+          }
+        },
+        "n": 131,
+        "exact": 72,
+        "within_one": 121,
+        "severe": 10,
+        "excess_error_total": 13,
+        "mae": 0.549618320610687,
+        "error_histogram": {
+          "0": 72,
+          "1": 49,
+          "2": 7,
+          "3": 3,
+          "4": 0
+        },
+        "confusion": [
+          [
+            22,
+            11,
+            2,
+            0,
+            0
+          ],
+          [
+            5,
+            20,
+            3,
+            2,
+            0
+          ],
+          [
+            1,
+            4,
+            11,
+            9,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            19,
+            0
+          ],
+          [
+            0,
+            2,
+            1,
+            17,
+            0
+          ]
+        ],
+        "predicted_counts": {
+          "1": 29,
+          "2": 38,
+          "3": 17,
+          "4": 47,
+          "5": 0
+        }
+      },
+      "without_context": {
+        "per_level": {
+          "1": {
+            "support": 16,
+            "predicted": 15,
+            "correct": 14,
+            "precision": 0.9333333333333333,
+            "recall": 0.875,
+            "severe": 1
+          },
+          "2": {
+            "support": 1,
+            "predicted": 1,
+            "correct": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "severe": 0
+          },
+          "3": {
+            "support": 0,
+            "predicted": 1,
+            "correct": 0,
+            "precision": 0.0,
+            "recall": null,
+            "severe": 0
+          },
+          "4": {
+            "support": 0,
+            "predicted": 2,
+            "correct": 0,
+            "precision": 0.0,
+            "recall": null,
+            "severe": 0
+          },
+          "5": {
+            "support": 2,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": 0.0,
+            "severe": 0
+          }
+        },
+        "n": 19,
+        "exact": 14,
+        "within_one": 18,
+        "severe": 1,
+        "excess_error_total": 1,
+        "mae": 0.3157894736842105,
+        "error_histogram": {
+          "0": 14,
+          "1": 4,
+          "2": 1,
+          "3": 0,
+          "4": 0
+        },
+        "confusion": [
+          [
+            14,
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            2,
+            0
+          ]
+        ],
+        "predicted_counts": {
+          "1": 15,
+          "2": 1,
+          "3": 1,
+          "4": 2,
+          "5": 0
+        }
+      },
+      "clarified": {
+        "per_level": {
+          "1": {
+            "support": 17,
+            "predicted": 14,
+            "correct": 12,
+            "precision": 0.8571428571428571,
+            "recall": 0.7058823529411765,
+            "severe": 0
+          },
+          "2": {
+            "support": 6,
+            "predicted": 13,
+            "correct": 5,
+            "precision": 0.38461538461538464,
+            "recall": 0.8333333333333334,
+            "severe": 0
+          },
+          "3": {
+            "support": 6,
+            "predicted": 2,
+            "correct": 1,
+            "precision": 0.5,
+            "recall": 0.16666666666666666,
+            "severe": 1
+          },
+          "4": {
+            "support": 4,
+            "predicted": 8,
+            "correct": 3,
+            "precision": 0.375,
+            "recall": 0.75,
+            "severe": 1
+          },
+          "5": {
+            "support": 4,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": 0.0,
+            "severe": 2
+          }
+        },
+        "n": 37,
+        "exact": 21,
+        "within_one": 33,
+        "severe": 4,
+        "excess_error_total": 5,
+        "mae": 0.5675675675675675,
+        "error_histogram": {
+          "0": 21,
+          "1": 12,
+          "2": 3,
+          "3": 1,
+          "4": 0
+        },
+        "confusion": [
+          [
+            12,
+            5,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            5,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            1,
+            3,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            3,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            2,
+            0
+          ]
+        ],
+        "predicted_counts": {
+          "1": 14,
+          "2": 13,
+          "3": 2,
+          "4": 8,
+          "5": 0
+        }
+      },
+      "opaque": {
+        "per_level": {
+          "1": {
+            "support": 34,
+            "predicted": 30,
+            "correct": 24,
+            "precision": 0.8,
+            "recall": 0.7058823529411765,
+            "severe": 3
+          },
+          "2": {
+            "support": 25,
+            "predicted": 26,
+            "correct": 15,
+            "precision": 0.5769230769230769,
+            "recall": 0.6,
+            "severe": 2
+          },
+          "3": {
+            "support": 19,
+            "predicted": 16,
+            "correct": 10,
+            "precision": 0.625,
+            "recall": 0.5263157894736842,
+            "severe": 0
+          },
+          "4": {
+            "support": 17,
+            "predicted": 41,
+            "correct": 16,
+            "precision": 0.3902439024390244,
+            "recall": 0.9411764705882353,
+            "severe": 1
+          },
+          "5": {
+            "support": 18,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": 0.0,
+            "severe": 1
+          }
+        },
+        "n": 113,
+        "exact": 65,
+        "within_one": 106,
+        "severe": 7,
+        "excess_error_total": 9,
+        "mae": 0.504424778761062,
+        "error_histogram": {
+          "0": 65,
+          "1": 41,
+          "2": 5,
+          "3": 2,
+          "4": 0
+        },
+        "confusion": [
+          [
+            24,
+            7,
+            3,
+            0,
+            0
+          ],
+          [
+            5,
+            15,
+            3,
+            2,
+            0
+          ],
+          [
+            0,
+            3,
+            10,
+            6,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            16,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            17,
+            0
+          ]
+        ],
+        "predicted_counts": {
+          "1": 30,
+          "2": 26,
+          "3": 16,
+          "4": 41,
+          "5": 0
+        }
+      }
+    },
+    "judge_with_fallback": {
+      "all": {
+        "per_level": {
+          "1": {
+            "support": 51,
+            "predicted": 74,
+            "correct": 51,
+            "precision": 0.6891891891891891,
+            "recall": 1.0,
+            "severe": 0
+          },
+          "2": {
+            "support": 31,
+            "predicted": 26,
+            "correct": 9,
+            "precision": 0.34615384615384615,
+            "recall": 0.2903225806451613,
+            "severe": 0
+          },
+          "3": {
+            "support": 25,
+            "predicted": 20,
+            "correct": 6,
+            "precision": 0.3,
+            "recall": 0.24,
+            "severe": 1
+          },
+          "4": {
+            "support": 21,
+            "predicted": 26,
+            "correct": 7,
+            "precision": 0.2692307692307692,
+            "recall": 0.3333333333333333,
+            "severe": 1
+          },
+          "5": {
+            "support": 22,
+            "predicted": 4,
+            "correct": 4,
+            "precision": 1.0,
+            "recall": 0.18181818181818182,
+            "severe": 1
+          }
+        },
+        "n": 150,
+        "exact": 77,
+        "within_one": 147,
+        "severe": 3,
+        "excess_error_total": 3,
+        "mae": 0.5066666666666667,
+        "error_histogram": {
+          "0": 77,
+          "1": 70,
+          "2": 3,
+          "3": 0,
+          "4": 0
+        },
+        "confusion": [
+          [
+            51,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            22,
+            9,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            16,
+            6,
+            2,
+            0
+          ],
+          [
+            0,
+            1,
+            13,
+            7,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            17,
+            4
+          ]
+        ],
+        "predicted_counts": {
+          "1": 74,
+          "2": 26,
+          "3": 20,
+          "4": 26,
+          "5": 4
+        }
+      },
+      "true4_or5": {
+        "per_level": {
+          "1": {
+            "support": 0,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": null,
+            "severe": 0
+          },
+          "2": {
+            "support": 0,
+            "predicted": 1,
+            "correct": 0,
+            "precision": 0.0,
+            "recall": null,
+            "severe": 0
+          },
+          "3": {
+            "support": 0,
+            "predicted": 14,
+            "correct": 0,
+            "precision": 0.0,
+            "recall": null,
+            "severe": 0
+          },
+          "4": {
+            "support": 21,
+            "predicted": 24,
+            "correct": 7,
+            "precision": 0.2916666666666667,
+            "recall": 0.3333333333333333,
+            "severe": 1
+          },
+          "5": {
+            "support": 22,
+            "predicted": 4,
+            "correct": 4,
+            "precision": 1.0,
+            "recall": 0.18181818181818182,
+            "severe": 1
+          }
+        },
+        "n": 43,
+        "exact": 11,
+        "within_one": 41,
+        "severe": 2,
+        "excess_error_total": 2,
+        "mae": 0.7906976744186046,
+        "error_histogram": {
+          "0": 11,
+          "1": 30,
+          "2": 2,
+          "3": 0,
+          "4": 0
+        },
+        "confusion": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            13,
+            7,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            17,
+            4
+          ]
+        ],
+        "predicted_counts": {
+          "1": 0,
+          "2": 1,
+          "3": 14,
+          "4": 24,
+          "5": 4
+        }
+      },
+      "wordfreq_missing": {
+        "per_level": {
+          "1": {
+            "support": 0,
+            "predicted": 2,
+            "correct": 0,
+            "precision": 0.0,
+            "recall": null,
+            "severe": 0
+          },
+          "2": {
+            "support": 2,
+            "predicted": 3,
+            "correct": 1,
+            "precision": 0.3333333333333333,
+            "recall": 0.5,
+            "severe": 0
+          },
+          "3": {
+            "support": 9,
+            "predicted": 17,
+            "correct": 5,
+            "precision": 0.29411764705882354,
+            "recall": 0.5555555555555556,
+            "severe": 1
+          },
+          "4": {
+            "support": 19,
+            "predicted": 24,
+            "correct": 6,
+            "precision": 0.25,
+            "recall": 0.3157894736842105,
+            "severe": 1
+          },
+          "5": {
+            "support": 19,
+            "predicted": 3,
+            "correct": 3,
+            "precision": 1.0,
+            "recall": 0.15789473684210525,
+            "severe": 0
+          }
+        },
+        "n": 49,
+        "exact": 15,
+        "within_one": 47,
+        "severe": 2,
+        "excess_error_total": 2,
+        "mae": 0.7346938775510204,
+        "error_histogram": {
+          "0": 15,
+          "1": 32,
+          "2": 2,
+          "3": 0,
+          "4": 0
+        },
+        "confusion": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            5,
+            2,
+            0
+          ],
+          [
+            0,
+            1,
+            12,
+            6,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            16,
+            3
+          ]
+        ],
+        "predicted_counts": {
+          "1": 2,
+          "2": 3,
+          "3": 17,
+          "4": 24,
+          "5": 3
+        }
+      },
+      "with_context": {
+        "per_level": {
+          "1": {
+            "support": 35,
+            "predicted": 57,
+            "correct": 35,
+            "precision": 0.6140350877192983,
+            "recall": 1.0,
+            "severe": 0
+          },
+          "2": {
+            "support": 30,
+            "predicted": 26,
+            "correct": 9,
+            "precision": 0.34615384615384615,
+            "recall": 0.3,
+            "severe": 0
+          },
+          "3": {
+            "support": 25,
+            "predicted": 20,
+            "correct": 6,
+            "precision": 0.3,
+            "recall": 0.24,
+            "severe": 1
+          },
+          "4": {
+            "support": 21,
+            "predicted": 24,
+            "correct": 7,
+            "precision": 0.2916666666666667,
+            "recall": 0.3333333333333333,
+            "severe": 1
+          },
+          "5": {
+            "support": 20,
+            "predicted": 4,
+            "correct": 4,
+            "precision": 1.0,
+            "recall": 0.2,
+            "severe": 1
+          }
+        },
+        "n": 131,
+        "exact": 61,
+        "within_one": 128,
+        "severe": 3,
+        "excess_error_total": 3,
+        "mae": 0.5572519083969466,
+        "error_histogram": {
+          "0": 61,
+          "1": 67,
+          "2": 3,
+          "3": 0,
+          "4": 0
+        },
+        "confusion": [
+          [
+            35,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            21,
+            9,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            16,
+            6,
+            2,
+            0
+          ],
+          [
+            0,
+            1,
+            13,
+            7,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            15,
+            4
+          ]
+        ],
+        "predicted_counts": {
+          "1": 57,
+          "2": 26,
+          "3": 20,
+          "4": 24,
+          "5": 4
+        }
+      },
+      "without_context": {
+        "per_level": {
+          "1": {
+            "support": 16,
+            "predicted": 17,
+            "correct": 16,
+            "precision": 0.9411764705882353,
+            "recall": 1.0,
+            "severe": 0
+          },
+          "2": {
+            "support": 1,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": 0.0,
+            "severe": 0
+          },
+          "3": {
+            "support": 0,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": null,
+            "severe": 0
+          },
+          "4": {
+            "support": 0,
+            "predicted": 2,
+            "correct": 0,
+            "precision": 0.0,
+            "recall": null,
+            "severe": 0
+          },
+          "5": {
+            "support": 2,
+            "predicted": 0,
+            "correct": 0,
+            "precision": null,
+            "recall": 0.0,
+            "severe": 0
+          }
+        },
+        "n": 19,
+        "exact": 16,
+        "within_one": 19,
+        "severe": 0,
+        "excess_error_total": 0,
+        "mae": 0.15789473684210525,
+        "error_histogram": {
+          "0": 16,
+          "1": 3,
+          "2": 0,
+          "3": 0,
+          "4": 0
+        },
+        "confusion": [
+          [
+            16,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            2,
+            0
+          ]
+        ],
+        "predicted_counts": {
+          "1": 17,
+          "2": 0,
+          "3": 0,
+          "4": 2,
+          "5": 0
+        }
+      },
+      "clarified": {
+        "per_level": {
+          "1": {
+            "support": 17,
+            "predicted": 20,
+            "correct": 17,
+            "precision": 0.85,
+            "recall": 1.0,
+            "severe": 0
+          },
+          "2": {
+            "support": 6,
+            "predicted": 7,
+            "correct": 3,
+            "precision": 0.42857142857142855,
+            "recall": 0.5,
+            "severe": 0
+          },
+          "3": {
+            "support": 6,
+            "predicted": 2,
+            "correct": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "severe": 0
+          },
+          "4": {
+            "support": 4,
+            "predicted": 7,
+            "correct": 3,
+            "precision": 0.42857142857142855,
+            "recall": 0.75,
+            "severe": 0
+          },
+          "5": {
+            "support": 4,
+            "predicted": 1,
+            "correct": 1,
+            "precision": 1.0,
+            "recall": 0.25,
+            "severe": 1
+          }
+        },
+        "n": 37,
+        "exact": 24,
+        "within_one": 36,
+        "severe": 1,
+        "excess_error_total": 1,
+        "mae": 0.3783783783783784,
+        "error_histogram": {
+          "0": 24,
+          "1": 12,
+          "2": 1,
+          "3": 0,
+          "4": 0
+        },
+        "confusion": [
+          [
+            17,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            3,
+            3,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            4,
+            0,
+            2,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            3,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            2,
+            1
+          ]
+        ],
+        "predicted_counts": {
+          "1": 20,
+          "2": 7,
+          "3": 2,
+          "4": 7,
+          "5": 1
+        }
+      },
+      "opaque": {
+        "per_level": {
+          "1": {
+            "support": 34,
+            "predicted": 54,
+            "correct": 34,
+            "precision": 0.6296296296296297,
+            "recall": 1.0,
+            "severe": 0
+          },
+          "2": {
+            "support": 25,
+            "predicted": 19,
+            "correct": 6,
+            "precision": 0.3157894736842105,
+            "recall": 0.24,
+            "severe": 0
+          },
+          "3": {
+            "support": 19,
+            "predicted": 18,
+            "correct": 6,
+            "precision": 0.3333333333333333,
+            "recall": 0.3157894736842105,
+            "severe": 1
+          },
+          "4": {
+            "support": 17,
+            "predicted": 19,
+            "correct": 4,
+            "precision": 0.21052631578947367,
+            "recall": 0.23529411764705882,
+            "severe": 1
+          },
+          "5": {
+            "support": 18,
+            "predicted": 3,
+            "correct": 3,
+            "precision": 1.0,
+            "recall": 0.16666666666666666,
+            "severe": 0
+          }
+        },
+        "n": 113,
+        "exact": 53,
+        "within_one": 111,
+        "severe": 2,
+        "excess_error_total": 2,
+        "mae": 0.5486725663716814,
+        "error_histogram": {
+          "0": 53,
+          "1": 58,
+          "2": 2,
+          "3": 0,
+          "4": 0
+        },
+        "confusion": [
+          [
+            34,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            19,
+            6,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            12,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            12,
+            4,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            15,
+            3
+          ]
+        ],
+        "predicted_counts": {
+          "1": 54,
+          "2": 19,
+          "3": 18,
+          "4": 19,
+          "5": 3
+        }
+      }
+    }
+  },
+  "promotion": {
+    "scorer_gate_pass": true,
+    "predeclared_count_gate_pass": true,
+    "protected_excess_gate_pass": true,
+    "scope": "Exploratory reused pilot, not production authorization",
+    "diagnostic_gate_pass": true
+  },
+  "diagnostic": {
+    "primary": {
+      "evidence_only": {
+        "selected_ids": [
+          "136118",
+          "132527",
+          "101752",
+          "143224",
+          "104683",
+          "101619",
+          "151909",
+          "118165"
+        ],
+        "budget": 8,
+        "review_fraction": 0.05333333333333334,
+        "recovered_baseline_severe": 1,
+        "baseline_severe": 11,
+        "precision": 0.125,
+        "recall": 0.09090909090909091,
+        "false_alarms": 7
+      },
+      "judge_assisted": {
+        "selected_ids": [
+          "147744",
+          "154348",
+          "104683",
+          "99218",
+          "126765",
+          "78185",
+          "87696",
+          "82205"
+        ],
+        "budget": 8,
+        "review_fraction": 0.05333333333333334,
+        "recovered_baseline_severe": 6,
+        "baseline_severe": 11,
+        "precision": 0.75,
+        "recall": 0.5454545454545454,
+        "false_alarms": 2
+      }
+    },
+    "secondary_top5_per_fold": {
+      "evidence_only": {
+        "selected_ids": [
+          "151909",
+          "118165",
+          "100388",
+          "133673",
+          "85706",
+          "136118",
+          "132527",
+          "101752",
+          "152592",
+          "130353",
+          "143224",
+          "104683",
+          "99687",
+          "138669",
+          "92437",
+          "101619",
+          "101500",
+          "145053",
+          "116786",
+          "103535",
+          "150821",
+          "150097",
+          "86587",
+          "90675",
+          "116352"
+        ],
+        "budget": 25,
+        "review_fraction": 0.16666666666666666,
+        "recovered_baseline_severe": 1,
+        "baseline_severe": 11,
+        "precision": 0.04,
+        "recall": 0.09090909090909091,
+        "false_alarms": 24
+      },
+      "judge_assisted": {
+        "selected_ids": [
+          "99218",
+          "100388",
+          "118167",
+          "89337",
+          "109851",
+          "82205",
+          "82352",
+          "99292",
+          "87548",
+          "90902",
+          "147744",
+          "104683",
+          "126765",
+          "87696",
+          "103907",
+          "78185",
+          "103535",
+          "110501",
+          "119938",
+          "78134",
+          "154348",
+          "150806",
+          "147255",
+          "109394",
+          "86587"
+        ],
+        "budget": 25,
+        "review_fraction": 0.16666666666666666,
+        "recovered_baseline_severe": 10,
+        "baseline_severe": 11,
+        "precision": 0.4,
+        "recall": 0.9090909090909091,
+        "false_alarms": 15
+      }
+    },
+    "interpretation": "Deterministic exploratory triage; secondary25/150 review rate does not match deployment50/1000. No fitted weights or population confidence."
+  }
+}

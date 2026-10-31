@@ -970,3 +970,127 @@ Verified unique IDs, edge endpoints, D1Scorer query and incremental 130-unchange
 1-added-file extraction. Added reproducible scripts/graphify_local.sh, updated skill
 and docs. No D1 load, DB access, score/evaluation changes. Local CLI works despite
 hosted plugin Unknown tool; retain distinction and extractor coverage caveats.
+
+
+## 2026-10-30 — Consolidated 1,000-form / 50-review plan
+
+Published a focused successor plan: exact-form/all-POS evidence, sequential Qwen/GPT
+pilot on existing150, frozen cascade with100% score coverage, severe-error/excess-loss
+gates, causal audit and at most50 user review cards. Separated prepared candidates
+from new model/human validation; retained baseline and explicit unknown confidence.
+Added aggregate severity/sample snapshots; kept CoRoLa-derived counts local.
+Documentation-only branch stacked on#85; unrelated local code/artifacts preserved.
+Verification: cross-checked snapshots, plan links, scope and whitespace; no new model
+inference or DB writes. Implementation/testing of proposed stages remains pending.
+
+
+## 2026-10-30 — TDD exact-form evidence audit on independent 1,000
+
+Implemented public CSV audit + thin CLI, reusing lexical/form exporters. RED/GREEN
+covered full identity/POS membership, missing sources, source-scoped parent chains,
+hashes and manifest provenance/revisions. Review found empty provenance could bypass
+checks; regression added and fixed. 10 new tests/21 subtests. PR-isolated full check:
+893 tests/241 subtests + Ruff PASS; byte-identical offline replay PASS.
+
+Local run:1000forms/1146IDs;137exact-querysources,801absent,62wrongspellingexcluded.
+130forms with usable contexts (121allLOC-POS sourcebounded,9partial),7source-backed
+withoutusablecontext;515usable/418unaligned/1unknownPOS contexts. All1363protected
+files unchanged. Independent audit rejoined original frequency sources; scores intact.
+Surprise: source availability is much narrower than total frequency-signal coverage;
+870forms still lack usable lexical contexts. Next: independent150judgepilot with
+explicit missing-evidence strata; no new human review, models or DB writes this stage.
+
+
+## 2026-10-30 — Reusable sequential Qwen judge pilot (GPT deferred)
+
+Implemented CSV collection/comparison over existing campaign/Outcome seam; strict
+JSON/identity/model validation, durable native failures, explicit baseline fallback,
+no fabricated confidence. Thin CLIs, fixed provider options/runtime hashes, no DB
+integration. TDD public seams:16new tests/43subtests; full909tests/284subtests and
+Ruff PASS. Architect caught malformed-message/options mutation issues before inference.
+
+Initial Qwen150:150native,7severe/excess11 versus baseline11/14; withoutsense24 worsened
+2→5severe. Discovered older formatter omitted218existing curated contexts/95forms.
+Systematic merge, allPOS/restrictions/source provenance. Further review found five
+reviewer clauses inside meaning prose; stopped first correction at30completed records,
+retained it without quality analysis. Explicit complete218row projection removesonly
+those clauses,213meanings unchanged, source/identity/POS checked; originals preserved.
+
+Final corrective150:150native,5severe/excess9,145within±1; exact80,MAE.527. Initial7/11
+retained;12scorechangesallamong95changedinputs,55unchangedidentical. True4/5 severe5→2;
+missingwordfreq2→1. No-context19 regresses1→3severe/excess1→6. Top8 recovers4/11baseline
+severe versus1evidence-only,4falsealarms. Bothpairedbootstrapintervalsincludezero.
+Correction is label-exposed development evidence, not independent validation.
+
+Sequential Qwen-only, RAM guard beforeeachcall, preexisting instance preserved.
+Finalminmemoryproxy2.94GiB/OSfree16%,~14.5minutes;0reasoningtokens. Independent audit
+and offline replay PASS;1721protectedfiles unchanged. Rawtext/records stay local,
+aggregate reports/receipts published. No newratings,D1/GPTclassification,DBwrites.
+Plan: retain operationalwordfreq+4; Qwen diagnosticcandidate. NextcomparableGPTpilot
+uses same finalCSV/prompt; concreteprovidercompatibilityuntested. Address870/1000
+missingcontexts before blanketrollout; nocertifiedconfidence or automaticpromotion.
+
+
+## 2026-10-31 — GPT-through-Codex150 pilot and three-way comparison
+
+No APIcredentialconfigured; used existing Codex login viaofficialCLI0.166.0,
+gpt-6.1-sol/low requested. Syntheticpreflight found ignored option and persistent
+generic managedwrapper/tools; retained attempts, inspected assembledcontext and
+reportedconfiguredidentity/wrapperlimits insteadofclaimingrawmodel-onlyequivalence.
+No taskhistory/gold in context. SamefinalQwen evidence/rubric/schema; onefresh ephemeral
+session/form, minimalenvironment, readonlychild, rawreceipts beforeparsing. Modeltools
+availablebutzeroobserveduse; unknown/tool/warning eventsquarantineentirecampaign.
+
+TDDnativeCSVcollector reusescampaign/Outcome/comparator, no fabricatedHTTPresponse or
+confidence.6newtests19subtests; full915tests303subtests/RuffPASS. Reviewcaught stderr
+warningsaccepted andmalformeditemmaskinglater tool; regressionsRED/GREENfixedbefore
+anytargetclassification. All150completednatively,0fallbacks,~13minutes,149nonoverlap,
+150uniquethreads.2092protectedfilesunchanged; replaywithprocess/network/DBblocked and
+independentraw-event/metrics/bootstrap/triageauditPASS. No Qwen/D1/localmodelloading,
+newhumanratings,scoreoverwrites orprojectDBwrites.
+
+GPTsevere3/excess3/within1=147, versusQwen5/9/145 andbaseline11/14/139. AllGPTerrors
+distance2; exact77,MAE.507. Rescues10baseline/new2; rescuesall5Qwen/new3. GPTsevere:
+carter5→3,catalige4→2,târfă3→1. No severeintersectionQwen/GPT on150; notoracleensemble.
+Top8GPTfinds6/11baselinesevere with2falsealarms versusQwen4/11/evidenceonly1/11.
+True4/5severe2likeQwen,baseline5. Missingwordfreq49 GPT2tiesbaseline,Qwen1.
+No-context19 GPT0,Qwen3,baseline1—but17/19common1–2 andonly2withoutwordfreq; target
+newno-context870has764withoutwordfreq. GPT-vs-QwenCIsincludezero; noindependentgold.
+
+Planupdated: GPTprimarysemanticresearchcandidate,Qwendiagnosticcomplement; baseline
+operationalunchanged. Nextprepare1000evidenceCSV/freezerouting andcheckofflineonexisting
+predictions, thennewsequentialcampaign/causalaudit/max50reviews. No newpromptsearch.
+Aggregateartifacts+verificationpublished; rawlexicaltext/processreceiptsstaylocal.
+
+
+## 2026-10-31 — Frozen conflict policy, sequential1,000 GPT and31 Qwen
+
+User authorized fixed rules checked on150, GPT on frozen1,000, Qwen only important
+conflicts, maximum50 cards, plan/PR update; no DB. Worked in isolated risk-plan-pr
+checkout. TDD public CSV seams: audited sources→judge inputs; label-free predictions
+→routes/review queue. Added strict immutable evidence projection and conflict policy;
+blind review supports missing senses without fake meanings and separate storage.
+
+One policy, no threshold sweep: pilot12 Qwen routes,13 eligible; top8 captures6/11
+baseline severe and2/3 GPT severe. Misses carter/in for baseline,carter for GPT;
+no word-specific exception or Qwen veto. Inputs1,000 forms/1,146 members;130 with
+contexts,870 missing;764 missing both contexts/frequency. Same pilot prompt/schema;
+GPT-6.1-sol low configured through Codex, fresh ephemeral sessions, no reference
+scores/frequencies/other predictions in requests.1,000 native valid then31 Qwen
+native valid, zero fallback.171 initial gaps≥2;11 Qwen–GPT gaps≥2;50 fixed cards
+(20general/30stress,12with contexts/38explicitly missing). No new gold labels;
+121 eligible conflicts remain beyond budget, rest uncertain rather than certified.
+
+927tests+330subtests/Ruff PASS. Independent audit and process/network/DB-blocked
+replay PASS;1,000 unique sessions/999 nonoverlap checks and Qwen-after-GPT;
+4,456 protected files unchanged. GPT93.67min,Qwen2.51min; Qwen minimum RAM proxy
+2.85GiB/OS15%. Preexisting Qwen preserved; no D1 or DB writes. Surprises: existing
+manifest helper allowed missing implementation provenance (new adapter fails closed);
+Qwen within-one agreement is insufficient to discard initial conflict. No further
+human round silently added. Next: import this≤50 round and audit confirmed causes;
+no production promotion or whole-inventory regeneration yet.
+
+
+## 2026-10-31 — Completed50 imported and compared without new inference
+
+Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net score changes; pilot150 separate. Immutable local CSV artifacts/manifest at build/d1/review50-2026-10-31. Baseline13severe/excess14; GPT19/excess25 on50. Qwen only12 paired: baseline7/GPT3/Qwen3, costs8/5/5. No-context38 baseline6vsGPT16; human4/5n15 baseline1vsGPT14. Audited62 saved model notes; Qwen explicitly substitutes otel with oțel; missing POS/sense coverage and qualifier scope remain targeted hypotheses. All4456protectedfiles unchanged; independent verification and Ruff927tests+330subtests pass. No calls/models/DB writes. Recommendation: retain baseline; audit lexical evidence before one bounded, predeclared experiment; no extra human round, automatic production promotion or claim about950unreviewed. Raw evaluations and CoRoLa remain local; aggregates and reproduction scripts go to PR86.

@@ -1,0 +1,53 @@
+"""Freeze the exact Qwen route only after every GPT session has finished."""
+import csv,hashlib,json,shutil,sys,urllib.request
+from pathlib import Path
+out=Path(__file__).resolve().parent; code=out.parent/'risk-plan-pr'; sample=out.parent/'independent-1000-2026-10-30'; qwen=out/'qwen'; gpt=out/'gpt'; old=out.parent/'qwen-judge-curated-2026-10-30'
+sys.path.insert(0,str(code/'src'))
+from classificator.evaluation.risk_queue import export_risk_csv
+from classificator.evaluation.dataset import _write_csv
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+read=lambda p:list(csv.DictReader(p.open()))
+assert len(list((gpt/'campaign/records').glob('*.json')))==1000
+pred=read(gpt/'campaign/predictions.csv');assert len(pred)==1000
+inputs=out/'comparison-inputs';inputs.mkdir()
+base=[dict(word_id=r['form_id'],word=r['word'],baseline_level=r['baseline_level'],wordfreq=r['wordfreq']) for r in read(sample/'signals.csv')]
+_write_csv(inputs/'baseline.csv',['word_id','word','baseline_level','wordfreq'],base)
+fields=['word_id','word','status','rarity_level'];_write_csv(inputs/'gpt.csv',fields,[{k:r[k] for k in fields} for r in pred])
+result=export_risk_csv(inputs/'baseline.csv',gpt/'inputs/evidence.csv',inputs/'gpt.csv',out/'pre-qwen',review_budget=50)
+ids={r['word_id'] for r in read(out/'pre-qwen/qwen-route.csv')}
+(qwen/'inputs').mkdir()
+for name in ['vocabulary.csv','evidence.csv']:
+ rows=read(gpt/'inputs'/name);_write_csv(qwen/'inputs'/name,list(rows[0]),[r for r in rows if r['word_id'] in ids])
+with urllib.request.urlopen('http://127.0.0.1:1234/api/v1/models',timeout=30) as response:models=json.load(response)
+loaded=[m for m in models['models'] if m.get('loaded_instances')]
+assert len(loaded)==1 and loaded[0]['key']=='qwen3.8-27b-splash'
+assert len(loaded[0]['loaded_instances'])==1 and loaded[0]['loaded_instances'][0]['config']['parallel']==1
+(qwen/'runtime.json').write_text(json.dumps(dict(identity=loaded[0]),indent=2)+'\n')
+shutil.copy2(old/'options.json',qwen/'options.json')
+protected=json.loads((gpt/'protected-inputs.json').read_text())
+for d in [gpt/'campaign',gpt/'processes',gpt/'inputs',out/'pre-qwen',inputs]:
+ for f in d.rglob('*'):
+  if f.is_file():protected[str(f)]=sha(f)
+(qwen/'protected-inputs.json').write_text(json.dumps(protected,indent=2)+'\n')
+protocol=dict(policy_sha256=sha(out/'policy.json'),gpt_protocol_sha256=sha(gpt/'protocol.json'),route_sha256=sha(out/'pre-qwen/qwen-route.csv'),judge_sha256=sha(code/'src/classificator/evaluation/chat_judge.py'),count=len(ids),inputs={str(p.relative_to(qwen)):sha(p) for p in [*(qwen/'inputs').iterdir(),qwen/'runtime.json',qwen/'options.json']},design='Only predeclared supported conflicts; sequential after GPT1000 complete; no GPT/baseline score in Qwen request; original rubric/evidence; no label or numeric blending')
+(qwen/'protocol.json').write_text(json.dumps(protocol,indent=2)+'\n')
+runner=(old/'run.py').read_text().replace("CODE=OUT.parent/'risk-plan-pr'","CODE=OUT.parent.parent/'risk-plan-pr'").replace('{count}/150',"{count}/"+str(len(ids)))
+# Capture failed HTTP attempts too; transport faults remain explicit native failures.
+start=runner.index('class LoggedSession(');end=runner.index('http=LoggedSession()',start)
+runner=runner[:start]+"""class LoggedSession(requests.Session):
+ def post(self,url,**kwargs):
+  start=time.time();state=json.loads(kwargs['json']['messages'][1]['content'])
+  entry=dict(word_id=state['word_id'],started=start,http_status=None)
+  try:
+   result=super().post(url,**kwargs);entry['http_status']=result.status_code
+   try:entry['usage']=result.json().get('usage')
+   except ValueError:pass
+   return result
+  except requests.RequestException as exc:
+   entry['transport_error']=str(exc);raise
+  finally:
+   entry['finished']=time.time()
+   with (OUT/'transfers.jsonl').open('a') as f:f.write(json.dumps(entry)+'\\n')
+"""+runner[end:]
+(qwen/'run.py').write_text(runner)
+print(json.dumps(result,indent=2))

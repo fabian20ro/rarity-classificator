@@ -1,0 +1,29 @@
+{
+  "status": "pass",
+  "artifacts_byte_identical": {
+    "summary.json": "c27d8ae5aadd086c1e5ad6079bd5958561b5a1376e9439eed2e8ed2d8c68cff3",
+    "contexts.csv": "ab33da43bac31c2b70f0a540d4c9992919b66c86acb7abbd5ba03dff979576df",
+    "membership.csv": "4a5ef7030bffc5e14c7b6a769569103991d0ccdf4e91d532839b5f3b893a88a5",
+    "manifest.json": "3e473cd7c047775df370eb9d1587d78da449e8267d3e4eccd1cd949d8c54f447",
+    "form-evidence-audit.csv": "d73f7821e2f04ec3c21a75d50a20f0b30579560d403c06fac7e6040a436425ac"
+  },
+  "summary": {
+    "forms": 1000,
+    "inventory_rows": 1146,
+    "coverage": {
+      "no_source": 863,
+      "source_bounded_not_exhaustive": 121,
+      "no_usable_contexts": 7,
+      "partial_pos": 9
+    },
+    "forms_with_usable_contexts": 130,
+    "context_status": {
+      "usable_source_bounded": 515,
+      "unaligned": 418,
+      "empty_definition_or_pos": 1
+    },
+    "scope": "Source-bounded lexical evidence, not exhaustive senses or score validation"
+  },
+  "http_db_blocked": true,
+  "protected_files_unchanged": 1363
+}

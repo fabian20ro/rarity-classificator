@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "independent_stdlib": true,
+  "protected_files": 4456,
+  "input_hashes_verified": 11,
+  "frozen_review_ids": 50,
+  "prior_pilot_separate": 150,
+  "paired_qwen": 12,
+  "recomputed": {
+    "review50": {
+      "baseline": {
+        "n": 50,
+        "severe": 13,
+        "excess_error_total": 14,
+        "within_one": 37,
+        "exact": 10,
+        "mae": 1.08
+      },
+      "gpt": {
+        "n": 50,
+        "severe": 19,
+        "excess_error_total": 25,
+        "within_one": 31,
+        "exact": 6,
+        "mae": 1.38
+      },
+      "qwen": {
+        "n": 12,
+        "severe": 3,
+        "excess_error_total": 5,
+        "within_one": 9,
+        "exact": 1,
+        "mae": 1.3333333333333333
+      }
+    },
+    "qwen_paired12": {
+      "baseline": {
+        "n": 12,
+        "severe": 7,
+        "excess_error_total": 8,
+        "within_one": 5,
+        "exact": 2,
+        "mae": 1.5
+      },
+      "gpt": {
+        "n": 12,
+        "severe": 3,
+        "excess_error_total": 5,
+        "within_one": 9,
+        "exact": 2,
+        "mae": 1.25
+      },
+      "qwen": {
+        "n": 12,
+        "severe": 3,
+        "excess_error_total": 5,
+        "within_one": 9,
+        "exact": 1,
+        "mae": 1.3333333333333333
+      }
+    }
+  }
+}

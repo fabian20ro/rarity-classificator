@@ -1,0 +1,77 @@
+{
+  "status": "pass",
+  "audited_at": "2026-10-30T12:07:30.686726+00:00",
+  "scope": "Independent post-completion raw-receipt audit; no inference/API/network/DB calls",
+  "forms": 150,
+  "native_valid": 150,
+  "fallbacks": 0,
+  "protected_files_unchanged": 1368,
+  "frozen_source_files_verified": 168,
+  "frozen_snapshot_hashes_verified": 7,
+  "request_exact_schema_without_gold_or_other_predictions_verified": true,
+  "all_7_subsets_and_full_perclass_metrics_recomputed": true,
+  "diagnostic_top8_and_secondary25_reconstructed_without_gold_ranking": true,
+  "paired": {
+    "improved": 29,
+    "worsened": 36,
+    "tied": 85,
+    "rescued_severe": 9,
+    "introduced_severe": 5
+  },
+  "bootstrap": {
+    "severe_rate_delta": {
+      "percentile95": [
+        -0.07947019867549669,
+        0.025806451612903226
+      ],
+      "scope": "Exploratory paired group bootstrap on reused development labels; not external validation or calibrated risk."
+    },
+    "excess_mean_delta": {
+      "percentile95": [
+        -0.08783783783783784,
+        0.05228758169934641
+      ],
+      "scope": "Exploratory paired group bootstrap on reused development labels; not external validation or calibrated risk."
+    }
+  },
+  "nonoverlap_checks_passed": 149,
+  "memory_checks_verified": 150,
+  "model_identity": "qwen3.8-27b-splash",
+  "preexisting_model_preserved": true,
+  "fabricated_probabilities_or_confidence": false,
+  "baseline_all": {
+    "severe": 11,
+    "excess_error_total": 14,
+    "mae": 0.52
+  },
+  "judge_all": {
+    "severe": 7,
+    "excess_error_total": 11,
+    "mae": 0.5533333333333333
+  },
+  "with_context_severe_baseline_judge": [
+    9,
+    2
+  ],
+  "without_context_severe_baseline_judge": [
+    2,
+    5
+  ],
+  "artifact_hashes": {
+    "protocol.json": "fc2138272c9e46a44dea4124dd151ece0af4331636f6a399971a82b4ea2ba0ef",
+    "campaign/manifest.json": "65722d0e947cf4bac7c513378c2859a83a5e70664571d87821d459a62c23e36d",
+    "campaign/predictions.csv": "a0337112910d22208ad986152aafdcb8df2bd87c96bef6f49d35601d5c371a2e",
+    "comparison/report.json": "0a3cf02280c88e063a8691a2ba4025e9d0e827b1e44c993c2c2f9a1a156cfb1d",
+    "comparison/comparison.csv": "2e8db44ec222313ffcc4d7122c79a3cb77be99b8998add04c8405889fa1a83b4",
+    "paired-analysis.json": "83ba97051147bc443b342dba0cac12d98e873baa32659f66d0efde5eef0d32d3",
+    "transfers.jsonl": "43ac59be0ecbe35a39024a62b5fe4db64f5d6501a74e357d0d38b7e111bd717d",
+    "memory.jsonl": "a7ecdf970b32b3f969e9166471fcfeb7dafd46046db9b21d0a94fcd4e1ef4eb9",
+    "source-snapshots/manifest.json": "80a3e47d13faf033c6ab1a9106a868851e0a5f01f6769b5847b9ccfac5922d3f"
+  },
+  "limitations": [
+    "Reused development pilot; bootstrap intervals cross zero.",
+    "No-context forms worsen2→5 severe and3→9 excess;870/1000newforms lack usable contexts, blocking automatic generalization.",
+    "Model notes are unverified hypotheses, not demonstrated causes.",
+    "GPT compatibility and results remain untested."
+  ]
+}

@@ -151,3 +151,91 @@ Keep format-specific parsing local; no new framework, scorer coupling, frequency
 transfer or database/model path. Coverage is source-bounded, never a completeness or
 familiarity claim. Test CSV behavior, negative cases and provenance through the public
 function. Frozen scoring configuration and human labels remain outside this repair.
+
+
+## 2026-10-30: exact-form evidence audit before independent judges
+
+Keep the approved sources-to-CSV boundary. `audit_form_evidence` consumes the frozen
+form sample, full inventory, and existing lexical/exact-form exports; outputs one
+coverage row per form, all original memberships and source-scoped contexts. Reuse
+existing parsers; do not add scoring, model or DB dependencies. A thin CLI delegates
+to the same public function.
+
+Validate complete membership/POS and mandatory hashed provenance/revision before
+export. Parent joins include source, heading, POS detail, dictionary/entry/variant;
+unresolved parents never become usable context. Missing evidence stays explicit.
+LOC POS coverage is source bounded, never exhaustive semantic completeness or score
+confidence. Empty example-based form contexts are valid: do not fabricate examples
+just to adapt lexical definitions into that older schema. Atomic new directories,
+no overwrites; tests at the CSV seam. Native scores and labels remain separate.
+
+## 2026-10-30: provider-neutral sequential chat judges
+
+Reuse `run_campaign` and `Outcome` for durable per-form receipts and predictions.csv.
+The new CSV collector validates complete exact-form lexical evidence before HTTP;
+its small Chat Completions adapter returns a strict integer judgment or explicit
+failed outcome. Model loading, RAM/live-instance checks and credentials stay outside
+in the runner/session. No Step2 default or upload integration.
+
+No fabricated probabilities or confidence: use `probabilities=()`, `confidence=None`.
+The legacy run.csv projection therefore stays empty; evaluate predictions.csv. This
+prevents research-only judgments from masquerading as upload-ready scored runs.
+
+Pin endpoint, requested model, provider options, lexical/prompt implementation
+hashes and runtime metadata in the existing campaign manifest. Options are copied
+before the manifest and scorer are created. Raw failed HTTP/JSON results are retained;
+no repair, retry or implicit alternate-model route. One final assistant response,
+matching identity, stop finish reason, exact schema, no duplicate keys/refusal/tools.
+
+The same fixed evidence CSV and prompt can be reused with another compatible
+Chat Completions endpoint. Provider-specific reasoning/token options remain explicit;
+GPT availability, alias resolution and concrete parameter support require a later
+separate probe/campaign. No GPT inference is implied by this interface reuse.
+
+A separate offline CSV comparison joins human references only after inference.
+It requires full identity coverage, reports native failures separately, uses the
+frozen baseline explicitly for complete coverage, and reports severe>=2/excess loss,
+4/5 diagnostics and deterministic review queues. Ranking has no human-label input;
+selected cases are assessed afterward. No calibrated confidence or automatic promotion.
+
+Curated contract contexts are a separate evidence source and must not disappear
+when projecting parsed dictionary senses. Merge all contexts, preserving every POS
+and existing restriction. Keep source metadata and illustrative examples out of
+model state. If meaning prose contains reviewer instructions, use an explicitly
+audited complete projection CSV; validate original identity/POS/meaning, hash it,
+and retain original/projected text in provenance. No word-specific scoring rules or
+automatic lexical blacklist. Curated, label-exposed evidence remains exploratory;
+source fidelity is not the same as independence or exhaustive semantic coverage.
+
+## 2026-10-31: native Codex judgments when no API credential is configured
+
+Add a small `collect_codex_csv` adapter at the existing CSV/campaign boundary. Reuse
+the frozen chat rubric/schema/evidence validator, `Outcome`, campaign checkpoints and
+offline comparator. The executor owns a fresh sequential CLI process, environment,
+raw receipt and configuration; collection validates native JSONL directly. Do not
+fabricate an HTTP response or claim the requested model is a server-attested identity.
+
+Codex contributes a generic managed wrapper and may expose tools despite local
+feature toggles. Treat this as a separately disclosed GPT-through-Codex evaluator.
+An empty non-repository cwd, ephemeral sessions, minimal inherited environment and
+inspected context exclude project history/labels. Accepted runs require zero tool
+events. Any tool/unknown event, malformed event stream/item, runtime warning or stderr
+quarantines the campaign and stops; quarantine cannot be resumed. Native answer-schema
+failures remain explicit failed outcomes. Model output is never silently repaired.
+
+The runner saves stdout/stderr before validation. Only post-collection analysis reads
+references or other predictions. Source, CLI binary/catalog, configuration and runner
+hashes are pinned. Confidence remains unset and legacy run.csv stays empty. Existing
+HTTP collection stays available for a later directly authenticated API experiment.
+
+
+### 2026-10-31: research proposal, operational baseline and review remain separate
+
+Retain the approved CSV boundaries. Verified source audits project lexical-only judge
+inputs with separate provenance. Fixed label-free routing requires GPT–baseline gap≥2
+and a usable context for Qwen; no numeric blend or agreement-based review veto.
+`operational_level` remains baseline, `proposed_level` GPT or explicit technical
+fallback. Risk is ordinal/unknown, not inherited scalar confidence. The immutable
+review pack contains at most50 forms, real source senses or explicit missingness,
+and no model estimates; a distinct storage namespace preserves previous rounds.
+The1,000-run evidence supports orchestration/coverage, not population accuracy.

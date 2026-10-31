@@ -1,0 +1,15 @@
+{
+  "status": "pass",
+  "seconds": 12.132784843444824,
+  "events_sha256": "8f1cb0306a6769b90c5cf1c73c09d1f02f0f8578ab03df1966b78f22a48cd1b6",
+  "assembled_context_sha256": "f10d5c90bf0620f89ec5c8877930e616239fed7c161d2c24030fe911c878b266",
+  "config_sha256": "b1e89c3dbb011e33b87c9a5dda20727e6e2ecc7200af3025d4c37009f7a9fbd1",
+  "scope": "Same final execution configuration, synthetic instruction/schema substituted only for transport probe. Assembled-context debug includes generic tools; no target data or project history.",
+  "usage": {
+    "input_tokens": 5683,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 15,
+    "reasoning_output_tokens": 0
+  }
+}

@@ -1,0 +1,54 @@
+"""Only blinded GPT classification. Reference/comparison data read by separate analysis."""
+import hashlib,json,os,subprocess,sys,time
+from pathlib import Path
+from unittest.mock import patch
+out=Path(__file__).resolve().parent;code=out.parent.parent/'risk-plan-pr';sys.path.insert(0,str(code/'src'))
+from classificator.evaluation.codex_judge import collect_codex_csv
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+protocol=json.loads((out/'protocol.json').read_text());config=json.loads((out/'config.json').read_text())
+for name,digest in protocol['inputs'].items():assert sha(out/name)==digest,name
+for name,digest in protocol['code'].items():assert sha(Path(name))==digest,name
+assert sha(Path(protocol['cli']['path']))==protocol['cli']['sha256']
+assert sha(out/'preflight/catalog.json')==protocol['cli']['catalog_sha256']
+protected=json.loads((out/'protected-inputs.json').read_text())
+for name,digest in protected.items():assert sha(Path(name))==digest,name
+processes=out/'processes';processes.mkdir(exist_ok=True)
+env={k:os.environ[k] for k in protocol['environment_allowlist'] if k in os.environ}
+blind=Path('/private/tmp/wrc-gpt-1000-2026-10-31');blind.mkdir(exist_ok=True)
+config_args=[]
+for k,v in config.items():
+ encoded=('['+','.join('{path='+json.dumps(x['path'])+',enabled=false}' for x in v)+']') if isinstance(v,list) else json.dumps(v,ensure_ascii=False)
+ config_args+=['-c',k+'='+encoded]
+count=0
+
+def execute(request):
+ global count
+ assert request['instructions']==(out/'prompt.txt').read_text().rstrip('\n')
+ assert request['response_schema']==json.loads((out/'response-schema.json').read_text())
+ assert request['model']==protocol['model'] and request['reasoning_effort']==protocol['reasoning_effort']
+ wid=request['input']['word_id'];saved=processes/f'{wid}.json'
+ if saved.exists():
+  receipt=json.loads(saved.read_text());assert receipt['request']==request
+  return receipt['result']
+ cwd=blind/str(wid);cwd.mkdir(exist_ok=True);assert not list(cwd.iterdir())
+ args=[protocol['cli']['path'],'exec','--ignore-user-config','--skip-git-repo-check','--ephemeral','--json','--sandbox','read-only','--model',protocol['model'],'--cd',str(cwd),'--output-schema',str(out/'response-schema.json'),*config_args,'-']
+ start=time.time()
+ try:
+  result=subprocess.run(args,input=json.dumps(request['input'],ensure_ascii=False),capture_output=True,text=True,cwd=cwd,env=env,timeout=180)
+  native=dict(returncode=result.returncode,stdout=result.stdout,stderr=result.stderr)
+ except subprocess.TimeoutExpired as exc:
+  native=dict(returncode=124,stdout=(exc.stdout or b'').decode() if isinstance(exc.stdout,bytes) else exc.stdout or '',stderr=(exc.stderr or b'').decode() if isinstance(exc.stderr,bytes) else exc.stderr or '')
+ receipt=dict(request=request,result=native,started=start,finished=time.time(),command=args,cwd=str(cwd),environment_keys=sorted(env))
+ temp=saved.with_suffix('.tmp');temp.write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n');temp.replace(saved)
+ assert not list(cwd.iterdir()),'Unexpected model filesystem side effect'
+ count+=1
+ if count==1 or count%10==0:print(f'Completed sequential GPT session {count}/1000',flush=True)
+ return native
+
+try:
+ with patch('psycopg.connect',side_effect=AssertionError('DB forbidden')):
+  result=collect_codex_csv(out/'inputs/vocabulary.csv',out/'inputs/evidence.csv',out/'campaign',executor=execute,model=protocol['model'],runtime=dict(protocol_sha256=sha(out/'protocol.json'),runner_sha256=sha(Path(__file__))))
+ print('COMPLETE '+str(result),flush=True)
+finally:
+ for name,digest in protected.items():assert sha(Path(name))==digest,name
+ print('Protected scores, annotations and Qwen artifacts unchanged.',flush=True)

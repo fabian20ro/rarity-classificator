@@ -1,0 +1,62 @@
+{
+  "baseline_vs_gpt": {
+    "paired": {
+      "improved": 35,
+      "worsened": 40,
+      "tied": 75,
+      "rescued_severe": 10,
+      "introduced_severe": 2
+    },
+    "bootstrap": {
+      "severe_rate_delta": {
+        "percentile95": [
+          -0.1038961038961039,
+          -0.006756756756756757
+        ],
+        "scope": "Exploratory paired group bootstrap on reused development labels, not external validation or calibrated risk."
+      },
+      "excess_mean_delta": {
+        "percentile95": [
+          -0.1346153846153846,
+          -0.0196078431372549
+        ],
+        "scope": "Exploratory paired group bootstrap on reused development labels, not external validation or calibrated risk."
+      }
+    }
+  },
+  "qwen_vs_gpt": {
+    "paired": {
+      "improved": 19,
+      "worsened": 21,
+      "tied": 110,
+      "rescued_severe": 5,
+      "introduced_severe": 3
+    },
+    "bootstrap": {
+      "severe_rate_delta": {
+        "percentile95": [
+          -0.05228758169934641,
+          0.02054794520547945
+        ],
+        "scope": "Exploratory paired group bootstrap on reused development labels, not external validation or calibrated risk."
+      },
+      "excess_mean_delta": {
+        "percentile95": [
+          -0.10067114093959731,
+          0.013333333333333334
+        ],
+        "scope": "Exploratory paired group bootstrap on reused development labels, not external validation or calibrated risk."
+      }
+    }
+  },
+  "bootstrap_protocol": {
+    "seed": "qwen-eval-bootstrap-v1",
+    "iterations": 5000,
+    "groups": "sorted group keys; rows sorted integer word_id",
+    "percentile_indices": [
+      124,
+      4874
+    ]
+  },
+  "scope": "Same lexical evidence and rubric; different Codex wrapper, reasoning and transport. GPT identity is configured, not provider attested; no independently held-out references."
+}

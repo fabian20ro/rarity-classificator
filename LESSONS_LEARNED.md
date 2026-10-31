@@ -278,3 +278,54 @@ Set GRAPHIFY_BACKEND=none, use its frozen uv.lock in an isolated runtime, import
 from that checkout and preserve source/tool/hash receipts. No Homebrew, LLM key,
 model loading or broad skill/hook installer is required for this structural graph.
 EXTRACTED/INFERRED relations and zero-symbol files remain coverage caveats.
+
+
+**[2026-10-30]** Exact-query cache availability is not usable semantic coverage.
+For the new1000 sample,137 exact-query sources yielded130 forms with usable contexts;
+62 available cache files belonged to another spelling and were excluded. Preserve
+all inventory/POS IDs, report source absence separately from unresolved meanings, and
+never treat complete LOC-POS coverage as exhaustive senses or calibrated confidence.
+An audit manifest must require provenance sections/revisions; silently defaulting
+missing input hashes to an empty map can make an unverified export look verified.
+
+
+**[2026-10-30]** A label-free schema does not make meaning prose reviewer-free.
+The frozen form contract held218 curated contexts omitted by the older dictionary
+projection; five meanings also contained evaluator instructions. Merge all available
+contexts systematically, retain every POS/restriction, and use an explicit complete
+lexical projection with original-text checks and provenance for prose cleanup.
+Do not strip legitimate regional/historical qualifiers. Curated contexts may be
+label-exposed even when no numeric score enters the model; source fidelity is not
+independence. Preserve the initial arm when correcting evidence after results.
+
+**[2026-10-30]** Compare review budgets as fractions of the full population:
+top5 in each of five folds is25/150=16.7%, not50/1000=5%. Freeze matched top8/150
+before results and label the larger queue secondary. Backend-advertised reasoning
+values may differ from Chat Completions values: Qwen Splash rejected off but accepted
+none. Probe the actual transport synthetically before lexical collection; retain
+failed preflight and pin the accepted options without fabricating confidence.
+
+
+**[2026-10-31]** A Codex CLI probe is not a bare API model request. With existing
+ChatGPT authentication, fresh ephemeral sessions can reuse a frozen lexical CSV,
+but generic managed instructions/tools may remain despite local feature toggles.
+Inspect assembled context, omit project history/labels, and report requested/configured
+identity when events do not attest the served model. Zero observed tool calls does
+not prove tool unavailability. Native event parsing must quarantine unknown/tool
+activity and runtime warnings, including stderr; malformed items or nonzero exit
+must not mask a later tool event. Persist raw receipts before fatal propagation.
+Keep this transport distinction explicit in model comparisons; do not synthesize
+HTTP responses or claim calibrated confidence from strict JSON success.
+
+
+**[2026-10-31]** A second judge's agreement within one level must not veto the
+initial large baseline conflict. On the150 references, târfă remains a GPT error
+although Qwen differs by only1. Freeze routing/ranking without labels, report misses
+(carter has a small baseline–GPT gap despite both being wrong), and retain operational
+versus proposed scores separately. On an unlabelled sample, disagreement counts and
+model agreement are not accuracy. Missing dictionary context requires an explicit UI
+state, not a model-invented sense or fabricated example; skipped cards do not trigger
+a replacement round beyond the fixed human-review budget.
+
+
+**[2026-10-31]** A risk-selected review changes denominators and score distributions — with baseline fallback4, requiring a gap≥2 selects GPT1/2 by construction.49/50 low GPT scores in that queue cannot demonstrate global collapse. Compare GPT/baseline on50, allthree only on12Qwen-observed rows, and retain150pilot separately. Completed50 reversed the pilot ordering (baseline13vsGPT19severe), especially without contexts; do not promote a post-hoc context gate. A saved note explicitly substituting otel→oțel supports an identity failure, whereas POS/sense gaps and rubric mismatch remain hypotheses without controlled evidence.
