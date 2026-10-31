@@ -6,7 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from ..models import BaseWordRow
-from .chat_judge import _evidence
+from .chat_judge import _evidence, missing_definition_pos
 from .dataset import _read_csv, _sha256, _write_csv
 from .exact_form import RUBRIC_ID, load_form_contract
 from .form_evidence_audit import _check_export
@@ -87,6 +87,8 @@ def merge_judge_evidence(evidence_csv, form_contract_dir, output_dir, *, project
                     projected_sense_sha256=digest,
                 )
             )
+        if "missing_definition_pos" in value:
+            value["missing_definition_pos"] = missing_definition_pos(value)
     summary = dict(
         forms=len(items),
         forms_with_curated_contexts=changed,

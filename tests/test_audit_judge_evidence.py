@@ -105,6 +105,23 @@ class AuditJudgeEvidenceTests(unittest.TestCase):
                 ([], [], ""),
             )
 
+    def test_projection_keeps_spelling_relation_and_detailed_missing_pos(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            raw = '<div class="defWrapper"><span class="def"><b>ALTĂFORMĂ</b> <abbr data-bs-content="substantiv feminin">sf</abbr> [<abbr data-bs-content="variantă">Var.</abbr> <b>izotop</b> <abbr data-bs-content="substantiv feminin">sf</abbr>]</span><a class="ref" href="/sursa/a" title="A">A</a><a href="/definitie/alta/1">permalink</a></div>'
+            html = (
+                raw
+                + heading("altăformă", "substantiv feminin")
+                + body(meaning("10", 'Sens valid.<span class="badge-source" title="A"></span>'))
+            )
+            export_audit_judge_evidence(*self.inputs(root, html=html), root / "output")
+            value = json.loads(read(root / "output/evidence.csv")[0]["evidence_json"])
+            self.assertEqual(value["missing_definition_pos"], ["adjectiv", "substantiv neutru"])
+            self.assertEqual(
+                value["senses"][0]["form_relation"],
+                dict(exact_form="izotop", source_heading="altăformă", relation="explicit_variant"),
+            )
+
     def test_missing_senses_are_explicit_and_replay_preserves_every_artifact(self):
         from unittest.mock import patch
 

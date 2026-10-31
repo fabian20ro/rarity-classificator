@@ -6,8 +6,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from ..models import BaseWordRow
-from .chat_judge import _evidence
-from .dataset import _read_csv, _sha256, _vocabulary, _write_csv
+from .chat_judge import _evidence, missing_definition_pos
+from .dataset import _lexeme, _read_csv, _sha256, _vocabulary, _write_csv
 from .form_evidence_audit import (
     AUDIT_FIELDS,
     CONTEXT_FIELDS,
@@ -156,6 +156,15 @@ def export_audit_judge_evidence(forms_csv, vocabulary_csv, audit_dir, output_dir
             ):
                 raise ValueError("Conflicting number restrictions")
             sense = dict(
+                form_relation=dict(
+                    exact_form=form["word"],
+                    source_heading=context["heading"],
+                    relation="explicit_variant"
+                    if context["variant_id"]
+                    else "literal_heading"
+                    if _lexeme(context["heading"]) == _lexeme(form["word"])
+                    else "inflection",
+                ),
                 pos=context["pos_detail"] or context["pos"],
                 definition=context["definition"],
                 number_restriction=context["number_restriction"]
@@ -176,6 +185,7 @@ def export_audit_judge_evidence(forms_csv, vocabulary_csv, audit_dir, output_dir
             valid_pos=sorted({POS[p] for p in positions} | {s["pos"] for s in senses}),
             senses=sorted(senses, key=lambda s: json.dumps(s, ensure_ascii=False, sort_keys=True)),
         )
+        value["missing_definition_pos"] = missing_definition_pos(value)
         rows.append(
             dict(
                 word_id=wid, word=form["word"], evidence_json=json.dumps(value, ensure_ascii=False)

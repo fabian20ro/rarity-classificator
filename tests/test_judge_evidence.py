@@ -44,7 +44,8 @@ class JudgeEvidenceTests(unittest.TestCase):
                         evidence_json=json.dumps(
                             dict(
                                 coverage="source_bounded_not_exhaustive",
-                                valid_pos=["substantiv feminin"],
+                                valid_pos=["substantiv feminin", "adjectiv plural"],
+                                missing_definition_pos=["adjectiv plural"],
                                 senses=[
                                     dict(
                                         pos="substantiv feminin",
@@ -64,6 +65,7 @@ class JudgeEvidenceTests(unittest.TestCase):
             result = merge_judge_evidence(evidence, root / "contract", root / "out")
             value = json.loads(read(root / "out/evidence.csv")[0]["evidence_json"])
             self.assertEqual(value["valid_pos"], ["adjectiv plural", "substantiv feminin"])
+            self.assertEqual(value["missing_definition_pos"], [])
             self.assertEqual(
                 [r["definition"] for r in value["senses"]],
                 ["Comunicarea literelor.", "Care ține de literatură."],

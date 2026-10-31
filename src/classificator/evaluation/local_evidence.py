@@ -360,7 +360,13 @@ def _numbered_meanings(parts):
         return []
     segments = []
     for text, label, tag in parts[closing + 1 :]:
+        if not text and not label:
+            continue
         if tag == "b" and text.strip().isdigit():
+            if segments:
+                previous = "".join(t for t, _, _ in segments[-1])
+                if previous.count("(") != previous.count(")"):
+                    return []  # Inline sense references are not numbered clauses.
             if int(text.strip()) != len(segments) + 1:
                 return []
             segments.append([])
@@ -385,10 +391,120 @@ def _numbered_meanings(parts):
                 begun = True
                 definition.append(text)
         text = " ".join("".join(definition).split()).strip()
-        if not text:
+        if not text or text.count("(") != text.count(")"):
             return []
         result.append((index, text, tags))
     return result
+
+
+def _literal_mda_senses(html, target):
+    """Exact headwords only; bounded MDA header + simple meaning grammar.
+
+    No expansion of tilde forms, pronunciation, cross-references or other entries.
+    Unsupported syntax supplies no assertion; existing tree evidence stays intact.
+    """
+    short_pos = {
+        "a": "adjectiv",
+        "sn": "substantiv neutru",
+        "sf": "substantiv feminin",
+        "sm": "substantiv masculin",
+        "v": "verb",
+        "av": "adverb",
+    }
+    for entry in _Page(html).root.nodes():
+        if not entry.has("def"):
+            continue
+        ancestor, wrapper, excluded = entry.parent, None, False
+        while ancestor is not None:
+            if ancestor.has("defWrapper") and wrapper is None:
+                wrapper = ancestor
+            excluded |= ancestor.tag in {"nav", "script", "style"} or any(
+                ancestor.has(c) for c in ("type-example", "type-etymology")
+            )
+            ancestor = ancestor.parent
+        if excluded or wrapper is None:
+            continue
+        source = next(
+            (
+                n.attrs.get("title", "")
+                for n in wrapper.nodes()
+                if n.tag == "a" and n.has("ref") and n.attrs.get("href") == "/sursa/mda2"
+            ),
+            "",
+        )
+        ident = next(
+            (
+                n.attrs["href"]
+                for n in wrapper.nodes()
+                if n.tag == "a" and re.fullmatch(r"/definitie/[^/]+/\d+", n.attrs.get("href", ""))
+            ),
+            "",
+        )
+        parts = [(t, label, tag) for t, label, tag in _parts(entry) if t.strip() or label]
+        if not source or not ident or len(parts) < 3 or parts[0][2] != "b":
+            continue
+        # The comma suffix is morphology, not a second accepted spelling.
+        title = parts[0][0].strip()
+        if (
+            not re.fullmatch(r"[^\W\d_]+(?:,\s*~[^\s,]+)?", title)
+            or _lexeme(title.split(",")[0]) != target
+        ):
+            continue
+        pos_detail = parts[1][1] or (
+            short_pos.get(parts[1][0].strip(), "") if parts[1][2] == "i" else ""
+        )
+        if not _pos(pos_detail) or not parts[2][0].lstrip().startswith("["):
+            continue
+        closing = next((i for i, (t, _, _) in enumerate(parts[2:], 2) if "]" in t), None)
+        if closing is None:
+            continue
+        remainder = [(parts[closing][0].split("]", 1)[1], "", ""), *parts[closing + 1 :]]
+        # Keep lexical restrictions; omit synonym prose instead of treating it as a definition.
+        relation = next(
+            (
+                i
+                for i, (_, label, _) in enumerate(remainder)
+                if _lexeme(label).startswith("sinonim")
+            ),
+            len(remainder),
+        )
+        remainder = remainder[:relation]
+        if any(
+            _lexeme(label).startswith(("vezi", "confer", "variant", "etimolog", "exempl"))
+            for _, label, _ in remainder
+        ):
+            continue
+        numbered = any(tag == "b" and re.match(r"\d", t.strip()) for t, _, tag in remainder)
+        if not numbered:
+            remainder = [("1", "", "b"), *remainder]
+        meanings = _numbered_meanings([("]", "", ""), *remainder])
+        for index, definition, tags in meanings:
+            number = _number_restriction(tags) or ""
+            own_pos = {_pos(tag) for tag in tags if _pos(tag)}
+            reason = (
+                "conflicting_meaning_pos"
+                if own_pos and own_pos != {_pos(pos_detail)}
+                else "number_restriction"
+                if number and number != "singular"
+                else "literal_raw_headword"
+            )
+            yield dict(
+                heading=target,
+                pos=_pos(pos_detail),
+                pos_detail=pos_detail,
+                sense_id=f"{ident}#literal-{index}",
+                parent_sense_id="",
+                definition=definition,
+                tags=json.dumps(tags, ensure_ascii=False),
+                alignment="exact" if reason == "literal_raw_headword" else "unresolved",
+                alignment_reason=reason,
+                number_restriction=number,
+                source_entry_id=ident,
+                source_dictionary=source,
+                variant_id="",
+                variant_number_restriction="",
+                witness_text=f"{title} {parts[1][0]}",
+            )
 
 
 def _raw_variant_senses(variant):
@@ -622,6 +738,7 @@ def export_local_evidence(vocabulary_csv, loc_file, sources_csv, mentions_csv, o
             for v in variants
         )
         source_senses = list(_senses(html, _lexeme(source["word"]), variants))
+        source_senses.extend(_literal_mda_senses(html, _lexeme(source["word"])))
         for variant in variants:
             if not any(
                 s["variant_id"] == variant["variant_id"] and s["alignment"] == "exact"
@@ -676,7 +793,7 @@ def export_local_evidence(vocabulary_csv, loc_file, sources_csv, mentions_csv, o
         _write_csv(staged / "source-files.csv", ["word", "path", "sha256", "format"], ledger)
         manifest = dict(
             policy=POLICY,
-            extraction_revision="explicit-variants-v1",
+            extraction_revision="exact-headwords-v2",
             senses_schema=2,
             inputs={
                 str(p.resolve()): _sha256(p)

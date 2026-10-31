@@ -38,6 +38,55 @@ def response(word_id=1, word="ata", level=5, **change):
 
 
 class ChatJudgeTests(unittest.TestCase):
+    def test_rejects_inconsistent_pos_and_spelling_metadata_before_any_request(self):
+        for defect in (
+            "missing_pos",
+            "wrong_form",
+            "unknown_relation",
+            "literal_mismatch",
+            "label",
+        ):
+            with self.subTest(defect=defect), TemporaryDirectory() as temp:
+                root = Path(temp)
+                args = self.inputs(root)
+                rows = read(args[1])
+                value = json.loads(rows[0]["evidence_json"])
+                relation = dict(exact_form="ata", source_heading="atu", relation="explicit_variant")
+                value["senses"] = [
+                    dict(
+                        pos="substantiv feminin",
+                        definition="Carte de joc.",
+                        number_restriction="",
+                        grammar=[],
+                        context=[],
+                        context_incomplete=False,
+                        form_relation=relation,
+                    )
+                ]
+                value["missing_definition_pos"] = []
+                if defect == "missing_pos":
+                    value["missing_definition_pos"] = ["substantiv"]
+                elif defect == "wrong_form":
+                    relation["exact_form"] = "ață"
+                elif defect == "unknown_relation":
+                    relation["relation"] = "guessed"
+                elif defect == "literal_mismatch":
+                    relation["relation"] = "literal_heading"
+                else:
+                    relation["human_level"] = 5
+                rows[0]["evidence_json"] = json.dumps(value)
+                write_csv(args[1], rows)
+                http = Mock()
+                with self.assertRaises(ValueError):
+                    collect_chat_csv(
+                        *args,
+                        root / "out",
+                        model="test-model",
+                        endpoint="http://localhost/v1/chat/completions",
+                        http=http,
+                    )
+                http.post.assert_not_called()
+
     def inputs(self, root):
         vocabulary = write_csv(
             root / "vocabulary.csv",

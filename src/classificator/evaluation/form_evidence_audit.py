@@ -144,7 +144,8 @@ def audit_form_evidence(forms_csv, inventory_csv, lexical_dir, contract_dir, out
     contract_manifest = _check_export(contract_dir, {"forms.csv"})
     if (
         lexical_manifest.get("policy") != LEXICAL_POLICY
-        or lexical_manifest.get("extraction_revision") != "explicit-variants-v1"
+        or lexical_manifest.get("extraction_revision")
+        not in {"explicit-variants-v1", "exact-headwords-v2"}
         or lexical_manifest.get("senses_schema") != 2
         or not isinstance(lexical_manifest.get("implementation"), dict)
         or not lexical_manifest["implementation"]

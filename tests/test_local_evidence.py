@@ -34,6 +34,88 @@ def body(senses):
 
 
 class LocalEvidenceTests(unittest.TestCase):
+    def test_raw_headword_never_repairs_diacritics_expands_morphology_or_accepts_unsupported_prose(
+        self,
+    ):
+        template = '<div class="defWrapper"><span class="def"><b>{title}</b> <i>{pos}</i> [E: origine] {text}</span><a class="ref" href="/sursa/mda2" title="MDA">MDA</a><a href="/definitie/forma/1">link</a></div>'
+        cases = [
+            ("ață", "sn", "<b>1</b> Fir."),
+            ("atu, ~ata", "sn", "<b>1</b> Avantaj."),
+            ("ata", "necunoscut", "<b>1</b> Sens."),
+            ("ata", "sf", '<abbr data-bs-content="vezi">vz</abbr> atu'),
+            ("ata", "sf", "<b>1-2</b> Sensuri comprimate."),
+            (
+                "ata",
+                "sf",
+                '<b>1</b> Sens cu trimitere (<b>2</b>) în propoziție. <abbr data-bs-content="sinonim">Si:</abbr> altceva.',
+            ),
+            ("ata", "sf", '<b>1</b> Sens. <abbr data-bs-content="exemplu">Ex:</abbr> enunț'),
+        ]
+        for title, pos, text in cases:
+            with self.subTest(title=title, text=text), TemporaryDirectory() as temp:
+                root = Path(temp)
+                args = self.inputs(
+                    root,
+                    template.format(title=title, pos=pos, text=text),
+                    word="ata",
+                    loc="ata F1\n",
+                )
+                export_local_evidence(*args, root / "out")
+                self.assertEqual(read(root / "out/senses.csv"), [])
+
+    def test_raw_meaning_restrictions_stay_local_and_conflicts_remain_unresolved(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            html = '<div class="defWrapper"><span class="def"><b>forma</b> <i>sf</i> [E: origine] <b>1</b> (<abbr data-bs-content="regional">Reg</abbr>) Sens local. <b>2</b> Sens general. <b>3</b> (<abbr data-bs-content="plural">Pl</abbr>) Numai plural. <b>4</b> (<abbr data-bs-content="adjectiv">a</abbr>) Alt POS.</span><a class="ref" href="/sursa/mda2" title="MDA">MDA</a><a href="/definitie/forma/1">link</a></div>'
+            export_local_evidence(
+                *self.inputs(root, html, word="forma", loc="forma F1\n"), root / "out"
+            )
+            rows = read(root / "out/senses.csv")
+            self.assertEqual(
+                [r["alignment"] for r in rows], ["exact", "exact", "unresolved", "unresolved"]
+            )
+            self.assertEqual([json.loads(r["tags"]) for r in rows[:2]], [["regional"], []])
+
+    def test_exact_mda_headword_recovers_missing_pos_and_scoped_raw_meanings(self):
+        cases = [
+            (
+                "ceruit",
+                "ceruit, ~ă",
+                "a",
+                "<b>1</b> Dat cu ceară. <b>2</b> Lustruit<sup>1</sup>.",
+                [("A", "Dat cu ceară.", []), ("A", "Lustruit.", [])],
+            ),
+            (
+                "ozene",
+                "ozene",
+                "sn",
+                '(<abbr data-bs-content="livresc">Liv</abbr>) Nave neidentificate. <abbr data-bs-content="sinonim">Si:</abbr> <i>farfurii zburătoare.</i>',
+                [("N", "Nave neidentificate.", ["livresc"])],
+            ),
+        ]
+        for word, title, pos, definitions, expected in cases:
+            with self.subTest(word=word), TemporaryDirectory() as temp:
+                root = Path(temp)
+                html = f'<div class="defWrapper"><span class="def"><b>{title}</b> <i>{pos}</i> [<abbr data-bs-content="etimologie">E:</abbr> origine] {definitions}</span><a class="ref" href="/sursa/mda2" title="MDA 2010">MDA</a><a href="/definitie/{word}/42">permalink</a></div>'
+                args = self.inputs(root, html, word=word, loc=f"{word} A1\n{word} N1\n")
+                export_local_evidence(*args, root / "out")
+                senses = read(root / "out/senses.csv")
+                self.assertEqual(
+                    [(s["pos"], s["definition"], json.loads(s["tags"])) for s in senses], expected
+                )
+                self.assertTrue(all(s["alignment"] == "exact" for s in senses))
+                self.assertTrue(
+                    all(s["alignment_reason"] == "literal_raw_headword" for s in senses)
+                )
+                self.assertTrue(
+                    all(
+                        s["source_entry_id"] == f"/definitie/{word}/42"
+                        and s["source_dictionary"] == "MDA 2010"
+                        and s["source_sha256"]
+                        for s in senses
+                    )
+                )
+
     def inputs(self, root, html, word="izotop", loc="izotop A1\nizotop N1\n"):
         vocabulary = write_csv(root / "vocabulary.csv", [dict(word_id=1, word=word, type="N")])
         loc_file = root / "loc.txt"
