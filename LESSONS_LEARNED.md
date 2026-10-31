@@ -326,3 +326,6 @@ versus proposed scores separately. On an unlabelled sample, disagreement counts 
 model agreement are not accuracy. Missing dictionary context requires an explicit UI
 state, not a model-invented sense or fabricated example; skipped cards do not trigger
 a replacement round beyond the fixed human-review budget.
+
+
+**[2026-10-31]** A risk-selected review changes denominators and score distributions — with baseline fallback4, requiring a gap≥2 selects GPT1/2 by construction.49/50 low GPT scores in that queue cannot demonstrate global collapse. Compare GPT/baseline on50, allthree only on12Qwen-observed rows, and retain150pilot separately. Completed50 reversed the pilot ordering (baseline13vsGPT19severe), especially without contexts; do not promote a post-hoc context gate. A saved note explicitly substituting otel→oțel supports an identity failure, whereas POS/sense gaps and rubric mismatch remain hypotheses without controlled evidence.

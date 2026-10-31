@@ -1089,3 +1089,8 @@ manifest helper allowed missing implementation provenance (new adapter fails clo
 Qwen within-one agreement is insufficient to discard initial conflict. No further
 human round silently added. Next: import this≤50 round and audit confirmed causes;
 no production promotion or whole-inventory regeneration yet.
+
+
+## 2026-10-31 — Completed50 imported and compared without new inference
+
+Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net score changes; pilot150 separate. Immutable local CSV artifacts/manifest at build/d1/review50-2026-10-31. Baseline13severe/excess14; GPT19/excess25 on50. Qwen only12 paired: baseline7/GPT3/Qwen3, costs8/5/5. No-context38 baseline6vsGPT16; human4/5n15 baseline1vsGPT14. Audited62 saved model notes; Qwen explicitly substitutes otel with oțel; missing POS/sense coverage and qualifier scope remain targeted hypotheses. All4456protectedfiles unchanged; independent verification and Ruff927tests+330subtests pass. No calls/models/DB writes. Recommendation: retain baseline; audit lexical evidence before one bounded, predeclared experiment; no extra human round, automatic production promotion or claim about950unreviewed. Raw evaluations and CoRoLa remain local; aggregates and reproduction scripts go to PR86.

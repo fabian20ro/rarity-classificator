@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "byte_identical_import_outputs": 5,
+  "byte_identical_manifest": true,
+  "saved_notes_replay_rows": 62,
+  "rejected_invalid_inputs": [
+    "missing_answer",
+    "wrong_pack",
+    "invalid_level",
+    "wrong_context",
+    "history_mismatch",
+    "ai_exposure"
+  ],
+  "production_source_unchanged": true,
+  "model_calls": 0,
+  "classifier_db_writes": 0
+}

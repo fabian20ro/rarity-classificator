@@ -1,7 +1,7 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-10-31. Stare: etapele1–3 încheiate;50 fișe pregătite în etapa4.
-Rămân răspunsurile acestei singure runde, importul și analiza cauzelor confirmate.
+Actualizat: 2026-10-31. Stare: etapele1–4 încheiate;50/50 răspunsuri importate și comparate.
+Rămâne o remediere generală a dovezilor și evaluarea ei limitată, fără alte etichete umane.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -69,7 +69,7 @@ Artefactele locale existente, relative la workspace-ul original:
 `build/d1/independent-1000-2026-10-30/{forms.csv,vocabulary.csv,signals.csv,manifest.json,verification.json}`.
 `forms.csv` păstrează toate ID-urile/POS/codurile LOC; `vocabulary.csv.type` este numai
 metadată legacy. Selecția și îmbinările au fost reproduse independent. Există acum
-1.000 judecăți GPT și31 judecăți Qwen pe ruta fixată; nicio etichetă umană nouă încă.
+1.000 judecăți GPT și31 judecăți Qwen pe ruta fixată;50 referințe umane noi, selectate după risc.
 
 Sursele locale: inventarul Scrabble, exportul wordfreq înghețat, cache-ul lexical și
 definițiile rebus, frecvențele/concordanțele FineWeb2 și CoRoLa deja colectate.
@@ -251,18 +251,22 @@ numai un export nou, niciodată scorurile originale. Nu există operații DB de 
 
 ## Următoarea acțiune concretă
 
-**O singură rundă de50 fișe**, deja pregătită la
-[review-risk](http://127.0.0.1:8765/review-risk/). Estimările sunt absente din interfață;
-12 forme au sensuri documentate,38 au lipsa explicită și opțiunea „Nu pot decide”.
-Nu se cer explicații sau etichete pentru restul950 și nu se înlocuiesc fișele neclare.
+**Audit și remediere a dovezilor locale**, cu grafie exactă, lecturi/POS și sensuri
+susținute, restricții atașate sensului corect. Runda unică este completă și importată;
+nu se mai cer evaluări sau exporturi utilizatorului.
 
-După răspunsuri: import fără suprascrierea istoricului, recalcularea formei exacte
-prin cel mai familiar sens valid și auditul erorilor confirmate ≥2. Cele50 sunt
-selectate după risc, deci nu estimează imparțial acuratețea întregului lot. Păstrăm
-baseline-ul operațional, scorurile propuse separat și starea necunoscută pentru cazurile
-nevalidate. Nicio promovare DB, medie de modele sau nouă căutare largă de prompturi.
+[Comparația celor50 și auditul](../research/2026-10-31-review50.md): baseline13 erori≥2,
+GPT19, cost14vs25. Pe cele12 cu Qwen disponibil: baseline7, GPT3, Qwen3; cost8/5/5.
+Fără contexte (38): baseline6, GPT16. Pe referințe4/5 (15): baseline1, GPT14.
+Păstrăm baseline-ul operațional; propunerile modelelor rămân separate. Nu promovăm
+un hibrid ales după aceste rezultate. Următorul experiment trebuie predefinit după
+remedierea dovezilor, cu evaluare exploratorie pe familii și150/50 raportate separat.
 
-[Raportul complet al celor1.000](../research/2026-10-31-1000-judges.md).
+Cele50 nu estimează imparțial acuratețea celor1.000.950 sunt nerevizuite;121 conflicte
+inițiale rămân peste buget. Acordul modelelor nu produce gold sau probabilități de
+corectitudine. Nicio modificare DB, regenerare completă sau căutare largă de prompturi.
+
+[Raportul celor1.000](../research/2026-10-31-1000-judges.md).
 
 
 ## Rezultatul etapei 1 — implementat și verificat
@@ -372,7 +376,7 @@ numerică: baseline operațional păstrat, propuneri GPT în CSV separat.
 | Fără sensuri și fără wordfreq |764|130|0|34|
 
 829/1.000 predicții GPT sunt la maximum1 de baseline; **nu înseamnă829 corecte**.
-Nu avem încă gold pe lotul nou. Coada are exact50 forme, inclusiv toate11 conflictele
+La închiderea etapei3 nu exista încă gold pe lotul nou. Coada are exact50 forme, inclusiv toate11 conflictele
 mari GPT–Qwen;121 conflicte inițiale rămân în afara bugetului. Nicio cotă de completare,
 înlocuire a fișelor sau probabilitate inventată.38 fișe nu au sensuri documentate;
 această lipsă este afișată explicit. „Nu pot decide” rămâne fără scor.
@@ -382,7 +386,29 @@ PASS;1.000 sesiuni GPT distincte,999 verificări de neconcurență, Qwen ulterio
 4.456 fișiere protejate intacte. Aproximativ93,67minute GPT și2,51minute Qwen.
 Baseline, răspunsurile vechi, modelele încărcate și DB nemodificate.
 
-Leftovers: răspunsurile rundei≤50, importul lor, auditul cauzelor confirmate și o decizie
+La închiderea etapei3 rămâneau răspunsurile rundei≤50, importul, auditul și o decizie
 separată despre eventuale remedieri generale. Nu extrapolăm precizia celor50 asupra
 celor950 nerevizuite; lipsa dovezilor pe764 rămâne limitarea majoră. Regenerarea întregului
 inventar și orice actualizare DB rămân în afara acestui experiment.
+
+
+## Rezultatul etapei4 — 50/50 importate, 2026-10-31
+
+Exportul privat păstrează toate142 evenimentele, două observații și trei revizuiri
+nete. Niciun ID/scor invalid; cele150 anterioare sunt distincte și intacte. Întreaga
+coadă este evaluată; nicio rundă nouă. Comparația folosește numai predicții înghețate.
+
+Baseline:13/50 severe, cost14. GPT:19/50, cost25; repară13 baseline și introduce19.
+Cele12 comparabile cu Qwen:7/3/3 severe pentru baseline/GPT/Qwen, cost8/5/5; Qwen
+include o eroare4 prin substituția explicită otel→oțel.32/50 au cel puțin o eroare
+severă GPT/baseline; acesta este randamentul cozii, nu recall sau acuratețe globală.
+Lipsa definițiilor și diferențele de rubrică rămân explicații de verificat; scorul
+uman confirmă eroarea față de referință, nu mecanismul intern al modelului.
+
+Verificare independentă și replay: PASS;4.456 fișiere protejate intacte;
+Ruff+927teste+330subteste PASS. Importul, comparația și auditul au CSV-uri locale,
+manifest și scripturi în PR. Datele individuale/CoRoLa rămân locale.
+
+Leftovers: audit/remediere generală grafie–POS–sens–restricții; apoi un experiment
+limitat cu regulă înghețată. Nicio promovare pe baza unei reguli post-hoc. Rămân
+950 forme fără referințe; planul nu le certifică și nu cere alte etichete umane.
