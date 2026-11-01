@@ -351,3 +351,16 @@ through CoRoLa and added zero decisions beyond lexical coverage. Overall severe
 errors fell11→9 and13→10, yet reference4/5 strata worsened. Always retain rare-class
 checks and ablations; do not infer sense/POS-specific familiarity from exact-form
 aggregate counts or promote an aggregate gain that fails the declared criterion.
+
+
+**[2026-11-01]** Human exact-form overrides must expand across all inventory/POS
+IDs, while preserving diacritics and the original ID/spelling receipt. Here200
+references cover233rows;117numeric changes do not imply only117reviewed rows.
+A full fitted baseline export differs from historical OOF predictions; do not mix
+their conflict counts. Human concordance by construction is integrity, not accuracy.
+
+**[2026-11-01]** Compare upload quality checks with the unchanged baseline before
+attributing failure to a new overlay. Both failed L1/anchor gates against the local
+snapshot; human overrides improved them marginally. A128-word seed anchor list is
+not exhaustive, so its precision is not lexical accuracy. Keep the gate and audit
+reference/anchor semantics; never self-certify by adding candidate words to anchors.

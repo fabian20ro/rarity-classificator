@@ -1116,3 +1116,14 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
 - Surprise: corpus contributes zero decisions beyond lexical gate; CoRoLa supports57/58 proposed large reductions, so attestation does not constrain commonness. FineWeb supports37/58. No thresholds altered after results. Per-family/fold diagnostics retain group structure; no new CV claim.
 - Recommendation: retain baseline, stop this tuning cycle on reused labels. Next engineering candidate: immutable human scores as exact-form overrides in a separate offline inventory export, baseline elsewhere, explicit provenance/provisional flags; no DB upload or new user round here.
 - Verification: Ruff936tests+354subtests;4662protected files unchanged;8gate artifacts byte-identical replay; independent label/arithmetic checks; process/network/DB paths blocked. Local artifacts build/d1/reduction-gate-2026-11-01; aggregate research report and updated plan for PR86.
+
+
+## 2026-11-01 — conservative full-inventory export, human priority
+
+- User requested full CSV, human ratings first, frozen baseline elsewhere, provenance and separate conflicts; no LLM/DB; update plan/PR86. No subagents invoked.
+- TDD approved CSV seam: initial missing-module RED, GREEN exact-form/POS priority, model-only diagnostics and negative integrity/replay cases. Immutable source catalogs; no score averaging or accent restoration; conflicting human references fail closed; atomic new directory.
+- Export77,698IDs/75,147forms;200humanforms→233rows;77,465baseline rows unchanged. Numeric overrides117rows/99forms. Preserve original ratings and baseline configuration; human equality is not independent accuracy.
+- Reconciled1,331historical model observations,813conflicts across653forms:99baseline-human(23severe),714model-candidate(160severe). No model score controls output.
+- Surprise: mandatory L1 checks already failed for the original baseline. Candidate Jaccard.0323538, anchorprecision.0821918, recall.5625; baseline.0317979/.0816092/.5546875. Same existing thresholds. Local snapshot2,500L1 IDs and128seed anchors; seed precision is not population accuracy. Structurally valid candidate, not upload-ready.
+- Verification: Ruff940tests+363subtests; all77,698rows independently reconciled;10byte-identical replay artifacts;4,688protected files intact. Corrected verifier reporting counter polluted by empty defaultdict keys before publication; exported scores unaffected. No LLM/process/network/DB path used in runner/replay.
+- Local build/d1/conservative-export-2026-11-01; publish code/aggregates only. Next offline audit L1 divergence and anchor provenance/coverage, not threshold relaxation or another user review. DB remains untouched.

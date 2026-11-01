@@ -1,7 +1,7 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-10-31. Stare: etapele1–4 încheiate;50/50 răspunsuri importate și comparate.
-Rămâne o remediere generală a dovezilor și evaluarea ei limitată, fără alte etichete umane.
+Actualizat: 2026-11-01. Stare: etapele1–7 încheiate; export conservator complet verificat.
+Rămâne auditul divergenței L1/ancorelor înaintea oricărei decizii de upload; fără alte etichete umane.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -489,14 +489,49 @@ procese/rețea/DB. Revizie locală fără subagenți, respectând cererea fără
 **Decizie:** baseline păstrat, filtru nepromovat. Încheiem ciclul de reglaj pe
 aceste etichete; fallback-ul CoRoLa calibrat anterior nu trecuse nici el criteriul.
 
-**Următorul pas recomandat:** export CSV conservator pentru inventarul complet:
+**Pas recomandat la închiderea etapei6, realizat în etapa7:** export CSV conservator pentru inventarul complet:
 cele200 evaluări umane au prioritate pentru forma exactă, baseline pentru rest,
 proveniență și statut verificat/provizoriu, conflictele GPT separat. Mapare exactă
-la toate ID-urile/POS-urile, fără restaurarea diacriticelor. Acest export nu este
-executat aici; orice viitor upload cere verificările Jaccard și precizie/recall
+la toate ID-urile/POS-urile, fără restaurarea diacriticelor. Acest export nu a fost
+executat în etapa6; orice viitor upload cere verificările Jaccard și precizie/recall
 pe ancore, fără activare implicită din rezultatul experimentului.
 
 Leftovers:950forme din lotul nou fără referințe, acoperire lexicală incompletă,
 numărători corpus fără sens/POS dezambiguizat și discriminare automată4/5
 nevalidată. Nicio rundă nouă de adnotare propusă utilizatorului; nicio certificare
 artificială a scorurilor automate prin acordul modelelor.
+
+
+## Rezultatul etapei7 — export conservator complet, 2026-11-01
+
+CSV separat,77.698ID-uri/75.147forme: cele200 evaluări umane au prioritate pe233
+rânduri, inclusiv toate POS-urile aceleiași forme exacte. Cele77.465rânduri rămase
+păstrează baseline-ul înghețat; nu refacem fitting-ul și nu folosim scorurile OOF
+ca export operațional. Se schimbă numeric117rânduri/99forme. Statutul uman rămâne
+explicit și când scorul coincide cu baseline-ul; restul sunt provizorii.
+
+Proveniență CSV cu surse/hashuri, ID-uri/POS și chei de referințe.813conflicte
+separate:99baseline–uman(23≥2),714observații model–candidat(160≥2), pe653forme.
+1.331predicții istorice păstrate doar ca diagnostic; niciun vot sau override automat.
+Formele fără diacritice rămân distincte. Referințele umane contradictorii opresc
+exportul; sursele actuale sunt consistente. Scorurile originale rămân intacte.
+
+**Verificările L1 nu trec**, nici pentru baseline-ul original: candidat Jaccard3,235%,
+precizie ancore8,219%, recall56,250%, față de pragurile70%/80%/80%. Baseline:
+3,180%/8,161%/55,469%. Snapshot local2.500ID-uri L1,128ancore seed neexhaustive;
+nu este validare DB live sau acuratețe populațională. Prioritatea umană îmbunătățește
+marginal indicatorii. Export valid structural; nepregătit pentru upload.
+
+Ruff940teste+363subteste PASS; reconciliere independentă completă,10artefacte
+identice la replay,4.688fișiere protejate intacte. Zero apeluri LLM/subagenți/DB.
+[Raport, fișiere și reproducere](../research/2026-11-01-conservative-export.md).
+
+**Următorul pas:** audit offline al diferențelor L1 și al provenienței/acoperirii
+ancorelor, folosind sursele existente. Explicăm divergența înaintea oricărei decizii
+de upload; nu relaxăm pragurile, nu modificăm scorurile umane și nu ajustăm
+histograma pentru a forța un PASS. Nu propunem încă o rundă de evaluare.
+
+Leftovers:74.947forme din inventar fără referință umană, inclusiv950din lotul nou;
+discriminare automată4/5 nevalidată, dovezi lexicale incomplete, corpus fără
+sens/POS dezambiguizat. Compatibilitatea live și uploadul rămân etape separate,
+neexecutate; gating-ul și modul implicit partial se păstrează.
