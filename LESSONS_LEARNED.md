@@ -343,3 +343,11 @@ under identical inputs; actual evidence interventions changed no severe outcome.
 Passing a non-regression gate does not establish benefit. A post-hoc context gate
 improved overall review loss yet worsened reference4 errors0/9→2/9; retain class
 strata and separate pilot/risk-selected denominators before recommending adoption.
+
+
+**[2026-11-01]** Corpus attestation is not a lower-rarity certificate. A frozen
+FineWeb2(5counts/3docs/2hosts) OR CoRoLa≥5 gate supported57/58 large GPT reductions
+through CoRoLa and added zero decisions beyond lexical coverage. Overall severe
+errors fell11→9 and13→10, yet reference4/5 strata worsened. Always retain rare-class
+checks and ablations; do not infer sense/POS-specific familiarity from exact-form
+aggregate counts or promote an aggregate gain that fails the declared criterion.

@@ -449,7 +449,7 @@ Aproximativ5,99minute. Încercarea inițială de pornire blocată de sandbox nu 
 la model; păstrată separat. Nicio încărcare D1/Qwen, evaluare umană nouă sau scriere DB.
 [Raport și reproducere](../research/2026-10-31-evidence-repair.md).
 
-**Următorul pas recomandat:** experiment offline cu predicțiile și atestările de
+**Pas recomandat la închiderea etapei5, realizat în etapa6:** experiment offline cu predicțiile și atestările de
 corpus existente: o poartă pentru reduceri≥2 care cere suport pentru forma exactă,
 nu doar o definiție sau consens LLM. Regulă/praguri fixate înaintea comparației;
 analiză pe familii, rezultate150/50 separate și fără agravare4/5. Fără apeluri LLM
@@ -459,3 +459,44 @@ Leftovers:19/150 și38/50 fără definiții; POS neacoperite27/150 și38/50; for
 complexe/trimiteri interne excluse; eroarea comportamentală Qwen otel→oțel neretestată.
 950 forme rămân fără referințe. Baseline operațional păstrat; nicio regenerare de
 scoruri pe inventarul complet sau modificare DB autorizată aici.
+
+
+## Rezultatul etapei6 — filtru lexical + corpus offline, 2026-11-01
+
+Regulă înghețată înaintea comparației: acceptă numai reduceri GPT≥2 dacă există
+sensuri pentru POS-urile cunoscute și suport FineWeb2(≥5apariții,≥3documente,
+≥2gazde) SAU CoRoLa(≥5apariții). În toate celelalte cazuri păstrează baseline-ul.
+Fără antrenare, modificarea pragurilor, apeluri LLM, downloaduri sau scrieri DB.
+Toate150 și toate50 păstrate în evaluare; scorurile umane/originale intacte.
+
+| Lot | Reduceri propuse / acceptate | Severe baseline → candidat | Cost |
+|---|---:|---:|---:|
+|150|9 /8|11 → 9|14 → 12|
+|50 selectate după risc|49 /11|13 → 10|14 → 13|
+
+**Criteriul predeclarat NU trece:** pe referințele4, erorile cresc2/21→3/21 și
+0/9→2/9; pe referințele5 rămân3/22→3/22 în pilot, dar cresc1/6→2/6 în lotul recent.
+Corpusul nu schimbă nicio decizie față de filtrul numai lexical. CoRoLa trece57/58
+reduceri propuse; pragul de atestare nu este dovadă de familiaritate. Pilotul are
+142grupuri, lotul recent50; un fold pilot se agravează2→4 severe. Fără validare
+independentă sau pretenție de CV nouă.
+
+Ruff936teste+354subteste PASS;4.662fișiere protejate intacte;8artefacte de replay
+identice, verificare separată a etichetelor și aritmeticii. Runner-ul blochează
+procese/rețea/DB. Revizie locală fără subagenți, respectând cererea fără LLM.
+[Raport, ablații și reproducere](../research/2026-11-01-reduction-gate.md).
+
+**Decizie:** baseline păstrat, filtru nepromovat. Încheiem ciclul de reglaj pe
+aceste etichete; fallback-ul CoRoLa calibrat anterior nu trecuse nici el criteriul.
+
+**Următorul pas recomandat:** export CSV conservator pentru inventarul complet:
+cele200 evaluări umane au prioritate pentru forma exactă, baseline pentru rest,
+proveniență și statut verificat/provizoriu, conflictele GPT separat. Mapare exactă
+la toate ID-urile/POS-urile, fără restaurarea diacriticelor. Acest export nu este
+executat aici; orice viitor upload cere verificările Jaccard și precizie/recall
+pe ancore, fără activare implicită din rezultatul experimentului.
+
+Leftovers:950forme din lotul nou fără referințe, acoperire lexicală incompletă,
+numărători corpus fără sens/POS dezambiguizat și discriminare automată4/5
+nevalidată. Nicio rundă nouă de adnotare propusă utilizatorului; nicio certificare
+artificială a scorurilor automate prin acordul modelelor.

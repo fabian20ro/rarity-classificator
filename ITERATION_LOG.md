@@ -1106,3 +1106,13 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
 - Retrospective complete-cohort context gate:4/150 and9/50 severe, but reference4 review subset worsens0/9→2/9 vsbaseline. Keep operational baseline; next suggested corpus-supported gate offline on existing predictions, no fresh labels/models.
 - Sandbox prevented first Codex initialization before any thread/output. Failed receipt preserved v2; same selection/inputs collected v3 under approved escalation. No repeated model trials from initialization failure.
 - Verification: Ruff932tests+344subtests,60unique sessions59nonoverlap,4468protected files unchanged,138artifacts byte-identical replay with model/network/DB blocked. No local model loaded. Implementation a196520; report/scripts/plan in docs/research/2026-10-31-evidence-repair and docs/plans/2026-10-30-1000-form-risk-review.md.
+
+
+## 2026-11-01 — offline lexical/corpus gate for large reductions
+
+- User requested existing sources only, separate150/50 and rare4/5, immutable scores, zero LLM/DB. Used no subagents in deference to no-LLM scope.
+- Frozen exact-form-reduction-gate-v1 before comparison: accept only baseline−GPT≥2, known POS definition coverage, FineWeb2(5counts/3docs/2hosts) OR CoRoLa≥5. Baseline otherwise; no fitting/threshold search. TDD at approved label-free CSV seam, sources verified by existing corpus validators.
+- Full coverage150/150,50/50. Accepted8/9 and11/49. Baseline→candidate severe11→9 and13→10; excess14→12 and14→13. Failed prespecified rare-class criterion: true4 severe2/21→3/21,0/9→2/9; true5 severe3/22→3/22,1/6→2/6.
+- Surprise: corpus contributes zero decisions beyond lexical gate; CoRoLa supports57/58 proposed large reductions, so attestation does not constrain commonness. FineWeb supports37/58. No thresholds altered after results. Per-family/fold diagnostics retain group structure; no new CV claim.
+- Recommendation: retain baseline, stop this tuning cycle on reused labels. Next engineering candidate: immutable human scores as exact-form overrides in a separate offline inventory export, baseline elsewhere, explicit provenance/provisional flags; no DB upload or new user round here.
+- Verification: Ruff936tests+354subtests;4662protected files unchanged;8gate artifacts byte-identical replay; independent label/arithmetic checks; process/network/DB paths blocked. Local artifacts build/d1/reduction-gate-2026-11-01; aggregate research report and updated plan for PR86.
