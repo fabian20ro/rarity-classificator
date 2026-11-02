@@ -1171,3 +1171,19 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
 - Existing gate on full simulated inventory: Jaccard.964595PASS, seed membership.047702FAIL, recall.429688FAIL.55seed hits versus54before; original uploader/gate/thresholds unchanged, upload entrypoint not invoked.
 - TDD RED→GREEN extraction, lineage validation and stale-state checks;5new tests+10subcases; totalRuff956tests+396subtests PASS.165IDs independently reconciled,200references unchanged,16byte-identical replay files,4,754protected originals intact. Zero DBreads/writes/model calls. Uses captured2026-11-02T20:32:03.276616Z snapshot, no new freshness claim.
 - Local build/d1/human-corrections-2026-11-02; publish policy/code/tests/aggregates only. Next explicit acceptance policy for human-only corrections, separate from executor/promotion; no implicit bypass of legacy seed gates or new user ratings.
+
+
+## 2026-11-03 — Human correction acceptance policy, audit only
+
+- Implemented versioned CSV audit for the frozen165 correction package; replay original
+  plan/human sources, pin exact scope and snapshot, compare full candidate, inverse and
+  Jaccard≥.7. Legacy seed gate computed separately and unchanged; no upload authority.
+- TDD7tests/26subcases; RED→GREEN for resealed package mutations, strict schema/source
+  binding, ambiguous score fields, out-of-scope candidate diagnostics and inverse check.
+  Full Ruff+963tests/422subtests PASS. No subagents/models, DB reads/writes or uploader.
+- Actual165/233/200 pass all6criteria;77,533rows untouched, inverse restores snapshot.
+  Legacy96.459%/4.770%/42.969% still FAIL. Zero direct human–seed contradictions;
+  incompleteness/global seed placement causes failure, not a contradictory reviewed label.
+-4,778protected files intact;10byte-identical audit replay files; original200scores retained.
+- Plan stage12 and PR updated. Next: explicit operational policy promotion/integration,
+  then live transactional guards/receipt/rollback; no additional annotation or calibration.

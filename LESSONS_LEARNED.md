@@ -408,3 +408,13 @@ literal ID/spelling/POS and expected scores to catch new POS/duplicates or drift
 Rollback includes only changed IDs and requires a confirmed apply receipt; matching
 post-state alone proves neither execution nor absence of an intervening A→B→A edit.
 Offline forward/inverse equality is data integrity, not a live execution guarantee.
+
+
+**[2026-11-03]** Scoped human acceptance and operational authorization are separate
+outcomes. The165-correction package passes original-label, full-candidate, inverse
+and stability criteria with zero direct human–seed contradictions, yet the global
+seed gate still fails. Report both; never turn audit PASS into upload permission.
+Pin the original migration snapshot and complete package, not just counts; replay
+raw-source lineage to reject resealed CSV edits. Reject competing score columns:
+legacy quality audit prefers final_level over rarity_level, which could otherwise
+make the reported metric describe a different candidate than the identity check.

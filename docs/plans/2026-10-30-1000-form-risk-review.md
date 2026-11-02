@@ -1,7 +1,7 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-02. Stare: etapele1–11 încheiate; lot165corecții umane, precondiții și rollback pregătite.
-Upload blocat de gate-ul legacy; politica de acceptare și executorul rămân etape separate.
+Actualizat: 2026-11-03. Stare: etapele 1–12 încheiate; lotul de 165 de corecții trece politica de acceptare în mod audit.
+Upload blocat: gate legacy FAIL; promovarea operațională a politicii și executorul rămân separate.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -668,7 +668,7 @@ numitor; uploaderul neinvocat. Snapshotul din20:32UTCeste reutilizat, nu recitit
 TDD5teste+10subcazuri, total956teste+396subteste PASS;16artefacte replay identice,
 4.754fișiere protejate intacte. Zero DB/LLM. [Raport și fișiere](../research/2026-11-02-human-corrections.md).
 
-**Următorul pas recomandat:** politică explicită de acceptare pentru lotul uman,
+**Pas recomandat la închiderea etapei 11, realizat în etapa 12:** politică explicită de acceptare pentru lotul uman,
 cu exact setul aprobat, scoruri din referințe, rest neschimbat și precondiții complete.
 Integrarea cu uploaderul/executorul este separată; fără relaxarea implicită a
 gate-ului și fără altă rundă de evaluare. Nu aplicăm acum nici corecții, nici rollback.
@@ -676,3 +676,35 @@ gate-ului și fără altă rundă de evaluare. Nu aplicăm acum nici corecții, 
 Leftovers: prospețime live, tranzacție/concurență, recipisă de execuție și politica
 de rollback după editări ulterioare, blocajul ancorelor legacy.50.724schimbări
 baseline rămân provizorii, fără promovare sau experimente LLM noi.
+
+
+## Rezultatul etapei 12 — politica de acceptare în audit, 2026-11-03
+
+`human-corrections-acceptance-audit-v1`: toate cele șase criterii PASS pentru lotul
+fixat. Pachetul este regenerat din plan și răspunsurile originale; 165 corecții,
+233 precondiții, 200 referințe. Candidatul complet trebuie să fie exact snapshotul
+plus lotul uman, fără alte modificări. Inversa restabilește fiecare rând al snapshotului.
+Jaccard ≥0,70 rămâne obligatoriu; versiunile/modurile/pragurile suplimentare sunt
+refuzate. Auditul fixează întregul pachet prin manifest, nu doar cardinalitatea lui.
+
+Rezultat: `human_policy_satisfied=true`, dar `promotion_blocked=true` și nicio
+autorizare upload/rollback. Gate-ul legacy rămâne FAIL: Jaccard 96,459% PASS,
+apartenență seed 4,770%, recall 42,969%. Zero contradicții directe seed–uman;
+seed-ul incomplet nu este reinterpretat ca adevăr negativ despre formele absente.
+Nu schimbăm praguri, ancore, uploader sau scoruri. Snapshotul din 2026-11-02 este
+reutilizat, fără dovadă de prospețime/execuție și fără acces DB/LLM.
+
+TDD: 7 teste noi + 26 subcazuri; total **963 teste + 422 subteste PASS** și Ruff.
+4.778 fișiere protejate intacte; 10 fișiere de audit identice la replay. Delta
+reconciliată independent: 165 rânduri schimbate, 77.533 intacte. Cele 200 de evaluări
+rămân originale. [Politică, rezultate și reproducere](../research/2026-11-03-human-acceptance.md).
+
+**Următorul pas:** decizie explicită de promovare operațională a politicii pentru
+fluxul separat de corecții umane, inclusiv rolul ancorelor incomplete; apoi executor
+tranzacțional cu verificare live, concurență, recipisă și rollback condiționat de
+execuție confirmată. Politica de audit este gata; nu o redefinim și nu cerem evaluări
+noi. Gate-ul operațional nu este înlocuit implicit prin acest audit.
+
+Leftovers: acea integrare autorizată, prospețime și execuție atomică, blocajul legacy,
+precizie globală L1 necunoscută, discriminare automată 4/5 nevalidată și 50.724 de
+schimbări baseline provizorii nepromovate. Niciun upload sau SQL de modificare.
