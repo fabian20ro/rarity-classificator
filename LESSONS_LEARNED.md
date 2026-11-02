@@ -400,3 +400,11 @@ the gate: new ceiling79.319%, observed14.678%. Complete mapping is engineering
 integrity, not evidence for50,889score changes. Separate165human corrections from
 50,724provisional baseline changes;30,524historical5->baseline4transitions do not
 supply new evidence about rare-word familiarity.
+
+
+**[2026-11-02]** Human-only patches need guards beyond changed rows:165corrections
+cover233reviewed rows, including68already correct. Check complete form membership,
+literal ID/spelling/POS and expected scores to catch new POS/duplicates or drift.
+Rollback includes only changed IDs and requires a confirmed apply receipt; matching
+post-state alone proves neither execution nor absence of an intervening A→B→A edit.
+Offline forward/inverse equality is data integrity, not a live execution guarantee.

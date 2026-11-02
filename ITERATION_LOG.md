@@ -1160,3 +1160,14 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
 - Reprojected immutable scores/references into live-ID audit universe with explicit group provenance. Actual Step4+gate blocked before forbidden DB/marker boundaries: Jaccard.146784 vs.7 (ceiling now.793187), seed membership.082192/recall.5625 vs.8/.8. No SQL updates or authorization.
 - Verification: Ruff951tests+386subtests;4new tests+5subcases, each live row independently reconciled,13byte-identical replay artifacts,4,729protected files intact. Local build/d1/migration-dry-run-2026-11-02. Code/aggregate report/plan to PR86; row-level snapshot stays local.
 - Recommendation: no full migration; next prepare165human corrections with optimistic identity/current-score preconditions and rollback CSV, acceptance policy explicit before any upload. No further annotations or LLM experiments.
+
+
+## 2026-11-02 — human-only165 correction package and guarded rollback
+
+- User requested TDD preparation only, preconditions/rollback CSV, no upload/LLM/DB; update plan/PR86. Reused approved CSV seam, no agents.
+- Public prepare_human_corrections validates pinned exports, replays full migration plan and reconciles projected references with original human working_level rows. Extracts only changed human rows; fails resealed plan/reference omissions or fabricated levels. Atomic package/no overwrite.
+-165corrections/144forms,165inverse rows,233guards/200forms including68already-correct rows;61large differences. Guard verifier checks literal ID/word/POS, before/after level and full reviewed-form membership. Unreviewed rows outside guard scope; full-inventory legacy gate separate.
+- Offline application to copies changes exactly165, leaves77,533others unchanged; inverse reconstructs original snapshot bytes. Postcondition match never claims freshness/execution/rollback permission. Future rollback needs confirmed apply receipt and conflict checks; CAS values alone cannot detect ABA. No executor/SQL/update path added.
+- Existing gate on full simulated inventory: Jaccard.964595PASS, seed membership.047702FAIL, recall.429688FAIL.55seed hits versus54before; original uploader/gate/thresholds unchanged, upload entrypoint not invoked.
+- TDD RED→GREEN extraction, lineage validation and stale-state checks;5new tests+10subcases; totalRuff956tests+396subtests PASS.165IDs independently reconciled,200references unchanged,16byte-identical replay files,4,754protected originals intact. Zero DBreads/writes/model calls. Uses captured2026-11-02T20:32:03.276616Z snapshot, no new freshness claim.
+- Local build/d1/human-corrections-2026-11-02; publish policy/code/tests/aggregates only. Next explicit acceptance policy for human-only corrections, separate from executor/promotion; no implicit bypass of legacy seed gates or new user ratings.

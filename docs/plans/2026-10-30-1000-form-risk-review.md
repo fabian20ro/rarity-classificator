@@ -1,7 +1,7 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-02. Stare: etapele1–10 încheiate; dry-run pe snapshot proaspăt verificat.
-Upload blocat; migrarea integrală nerecomandată. Următoarea etapă propusă: lot separat pentru165corecții umane.
+Actualizat: 2026-11-02. Stare: etapele1–11 încheiate; lot165corecții umane, precondiții și rollback pregătite.
+Upload blocat de gate-ul legacy; politica de acceptare și executorul rămân etape separate.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -633,7 +633,7 @@ Audit în universul live: Jaccard14,678%, acum fezabil teoretic(max79,319%), dar
 TDD4teste+5subcazuri, total951teste+386subteste PASS;13artefacte replay identice,
 4.729fișiere protejate intacte. [Raport și fișiere](../research/2026-11-02-migration-dry-run.md).
 
-**Decizie:** nu promovăm migrarea integrală. **Următorul pas recomandat:** pregătirea
+**Decizie:** nu promovăm migrarea integrală. **Pas recomandat la închiderea etapei10, realizat în etapa11:** pregătirea
 unui lot separat pentru165corecții umane, cu precondiții ID/grafie/POS/scor live și
 rollback CSV. Politica de acceptare pentru lot trebuie stabilită explicit, fără
 ocolirea gate-ului, auto-referință sau reducerea artificială a numitorului. Fără
@@ -641,3 +641,38 @@ execuție DB în această etapă viitoare de pregătire; nu cerem alte evaluări
 
 Leftovers:50.724schimbări baseline provizorii, politica de promovare, verificarea
 prospețimii înainte de orice upload, precizie globală L1necunoscută și4/5nevalidat.
+
+
+## Rezultatul etapei11 —165corecții umane, precondiții și rollback, 2026-11-02
+
+Pachet `human-corrections-package-v1`, exclusiv pregătire:165corecții/144forme,
+165inverse de rollback;233rânduri protejate pentru200forme.68rânduri deja corecte
+nu intră în update/rollback. Numai referințe umane originale, verificate față de
+răspunsurile `working_level`; planul de migrare trebuie regenerat identic din
+intrările fixate. Nu sunt suficiente flag-uri sau hashes recalculabile ale unui
+CSV alterat. Niciun scor/ID nu este inventat sau selectat din baseline.
+
+Precondiții before/after: ID/grafie/POS literal, scor și mulțimea completă de
+ID-uri/POS pentru toate formele evaluate; detectează rânduri noi/dispărute și
+schimbări ale celor68rânduri deja corecte. Metadatele rămân explicit fără dovadă
+de prospețime/execuție și fără autorizare apply/rollback.
+
+Simulare numai în CSV: exact165schimbări,77.533rânduri neatinse; inversa reconstruiește
+snapshotul original byte cu byte. Rollback-ul viitor ar necesita recipisă confirmată
+de apply, verificarea stării post și protecție față de schimbări concurente; un
+scor care coincide nu demonstrează execuția și nu detectează singur A→B→A.
+
+Gate pe întreg inventarul simulat: Jaccard96,459%PASS, apartenență seed4,770%FAIL,
+recall42,969%FAIL.55/128ancore L1față de54inițial. Nicio modificare de prag/seed sau
+numitor; uploaderul neinvocat. Snapshotul din20:32UTCeste reutilizat, nu recitit.
+TDD5teste+10subcazuri, total956teste+396subteste PASS;16artefacte replay identice,
+4.754fișiere protejate intacte. Zero DB/LLM. [Raport și fișiere](../research/2026-11-02-human-corrections.md).
+
+**Următorul pas recomandat:** politică explicită de acceptare pentru lotul uman,
+cu exact setul aprobat, scoruri din referințe, rest neschimbat și precondiții complete.
+Integrarea cu uploaderul/executorul este separată; fără relaxarea implicită a
+gate-ului și fără altă rundă de evaluare. Nu aplicăm acum nici corecții, nici rollback.
+
+Leftovers: prospețime live, tranzacție/concurență, recipisă de execuție și politica
+de rollback după editări ulterioare, blocajul ancorelor legacy.50.724schimbări
+baseline rămân provizorii, fără promovare sau experimente LLM noi.
