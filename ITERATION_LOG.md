@@ -1127,3 +1127,14 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
 - Surprise: mandatory L1 checks already failed for the original baseline. Candidate Jaccard.0323538, anchorprecision.0821918, recall.5625; baseline.0317979/.0816092/.5546875. Same existing thresholds. Local snapshot2,500L1 IDs and128seed anchors; seed precision is not population accuracy. Structurally valid candidate, not upload-ready.
 - Verification: Ruff940tests+363subtests; all77,698rows independently reconciled;10byte-identical replay artifacts;4,688protected files intact. Corrected verifier reporting counter polluted by empty defaultdict keys before publication; exported scores unaffected. No LLM/process/network/DB path used in runner/replay.
 - Local build/d1/conservative-export-2026-11-01; publish code/aggregates only. Next offline audit L1 divergence and anchor provenance/coverage, not threshold relaxation or another user review. DB remains untouched.
+
+
+## 2026-11-02 — offline L1 divergence and incomplete-anchor audit
+
+- User scope: explain why original baseline also fails; preserve scores, no LLM/subagents/DB; update plan/PR86. Research script only, no operational changes.
+- All77,698 local IDs/spellings/POS align. Jaccard upper bound972/2500=.3888 (<.7); anchor precision upper bound128/870=.147126 (<.8). Even400anchors only allow.45977. Unlisted positive-seed words are not validated negatives.
+- All128unique anchors in inventory (130lines, lună/mare duplicates already deduped). Baseline71L1,54L2,1L3(stilou),2L4(prună/ședea missing frequency). Candidate adds human ou to L1. Most seed misses are only1level, unlike primary >=2 objective.
+- Historical snapshot fails its own anchor gate:19/128recall, .007612precision. Journal dates capture before Feb15 uploads; later saved rebalance differs53,763scores. Feb20 remap+77,698 verified across whole inventory with saved uploaded receipts; no inference about live DB IDs/state.
+- Snapshot1,783form-level inconsistencies; deduplicating POS barely changes Jaccard(.031798→.032832). Against existing150: snapshot76severe/excess139, minimum-over-POS74/131, fitted baseline10/13; review50:13/18,12/17,13/14. Fitted vsOOF distinction retained. Human candidate agrees by construction, not validation.
+- Recommendation: versioned validation manifest/report in audit mode, typed historical/positive-only/human sources, impossible-threshold preflight and separate drift/seed recall/label severity. Do not relax existing gate, use candidate as reference or expand anchors circularly. No more human rounds; independent population precision remains unknown.
+- Verification: prior gate exactly reproduced, independent arithmetic,6byte-identical replay files,4,707protected files intact, process/network/DB forbidden. Ruff940tests+363subtests. Source CSVs local; publish aggregates/script. Code behavior/scores/anchors/thresholds unchanged.

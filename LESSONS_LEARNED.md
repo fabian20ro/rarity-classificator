@@ -364,3 +364,17 @@ attributing failure to a new overlay. Both failed L1/anchor gates against the lo
 snapshot; human overrides improved them marginally. A128-word seed anchor list is
 not exhaustive, so its precision is not lexical accuracy. Keep the gate and audit
 reference/anchor semantics; never self-certify by adding candidate words to anchors.
+
+
+**[2026-11-02]** Check gate feasibility before semantic diagnosis. Jaccard cannot
+exceed min(C,R)/max(C,R); with972versus2500L1 IDs, .7 is impossible. A128-positive
+seed divided by870predicted forms cannot reach .8 precision, even if every seed
+matches. Nonmembers are unlabelled, not semantic false positives.400anchors still
+cannot reach .8 here. Distinguish drift, seed recall and precision on labelled
+examples; never manufacture matching anchors or relax thresholds to force PASS.
+
+**[2026-11-02]** A filename containing current is not provenance. The February
+snapshot predates saved later uploads, itself fails seed recall (19/128), and has
+76severe disagreements on150existing labels versus10for the fitted baseline.
+Check journal/receipts, all ID/spelling/POS identities, and form-level consistency.
+Historical ID shifts must not be applied to a future live DB by assumption.

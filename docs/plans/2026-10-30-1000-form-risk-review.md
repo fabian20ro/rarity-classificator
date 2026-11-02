@@ -1,7 +1,7 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-01. Stare: etapele1–7 încheiate; export conservator complet verificat.
-Rămâne auditul divergenței L1/ancorelor înaintea oricărei decizii de upload; fără alte etichete umane.
+Actualizat: 2026-11-02. Stare: etapele1–8 încheiate; export conservator și audit L1 verificate.
+Rămâne contractul versionat de validare, întâi în mod audit; fără alte etichete umane sau upload.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -526,7 +526,7 @@ Ruff940teste+363subteste PASS; reconciliere independentă completă,10artefacte
 identice la replay,4.688fișiere protejate intacte. Zero apeluri LLM/subagenți/DB.
 [Raport, fișiere și reproducere](../research/2026-11-01-conservative-export.md).
 
-**Următorul pas:** audit offline al diferențelor L1 și al provenienței/acoperirii
+**Pas recomandat la închiderea etapei7, realizat în etapa8:** audit offline al diferențelor L1 și al provenienței/acoperirii
 ancorelor, folosind sursele existente. Explicăm divergența înaintea oricărei decizii
 de upload; nu relaxăm pragurile, nu modificăm scorurile umane și nu ajustăm
 histograma pentru a forța un PASS. Nu propunem încă o rundă de evaluare.
@@ -535,3 +535,41 @@ Leftovers:74.947forme din inventar fără referință umană, inclusiv950din lot
 discriminare automată4/5 nevalidată, dovezi lexicale incomplete, corpus fără
 sens/POS dezambiguizat. Compatibilitatea live și uploadul rămân etape separate,
 neexecutate; gating-ul și modul implicit partial se păstrează.
+
+
+## Rezultatul etapei8 — audit L1/ancore offline, 2026-11-02
+
+**Cauze confirmate:** praguri imposibile la cardinalitățile actuale, seed pozitiv
+tratabil doar ca listă incompletă, snapshot istoric slab aliniat evaluărilor umane,
+plus limita reală a baseline-ului frecvență/fallback. Zero probleme de identitate
+între77.698ID-uri locale; normalizarea nu schimbă mulțimile L1.
+
+- Jaccard baseline maxim38,88% (972/2.500), sub prag70% chiar cu suprapunere
+  perfectă. Efectiv3,180%; candidatul3,235%, maxim39,12%. Pe forme:3,283%/3,340%,
+  deci agregarea POS nu rezolvă divergența. Snapshot:1.783forme cu niveluri diferite.
+- Precizie seed baseline maxim14,713% (128/870), sub80%. Chiar400ancore ar permite
+  cel mult45,98%. Cuvintele neincluse în seed nu sunt negative validate.
+- Toate128ancore există în inventar; baseline71la1,54la2,1la3,2la4. Majoritatea
+  ratărilor sunt abateri de1, tolerate de obiectiv. `stilou`3, `prună`/`ședea`4;
+  ultimele două fără frecvență. Candidatul are72ancore L1 prin evaluarea umană `ou`.
+- Snapshotul din15februarie precedă run-uri/uploaduri locale ulterioare. El însuși
+  trece numai19/128ancore în L1 și produce76/150erori≥2, față de10/150baseline
+  fitted; pe50:13vs13, cost18vs14. Nu confunda10fitted cu11OOF istoric.
+- Restaurarea istorică a deplasat ID-urile cu+77.698; verificat pe toate rândurile.
+  Nu aplicăm deplasarea și nu presupunem starea DB actuală fără snapshot nou.
+
+Scoruri/export/ancore/praguri intacte. 4.707fișiere protejate;6artefacte replay
+identice; gate-ul reprodus cu aritmetică independentă; Ruff940teste+363subteste.
+Zero LLM/subagenți/DB. [Raport și reproducere](../research/2026-11-02-l1-audit.md).
+
+**Următorul pas recomandat:** TDD pentru manifestul și raportul de validare v2,
+în mod audit separat: rol/data/universul fiecărei referințe, preflight pentru
+cardinalități imposibile/identități incompatibile, Jaccard ca măsură a schimbării,
+recall pentru seed pozitiv, erori≥2 și4/5 pe etichetele existente cu numitor și
+acoperire explicite. Formele neetichetate rămân necunoscute; fără auto-ancorare,
+fără scoruri noi sau altă rundă de evaluare. Gate-ul operațional rămâne nemodificat;
+contractul trebuie stabilit înaintea oricărei integrări în upload.
+
+Leftovers: referință live/ID-uri actuale neverificate, lipsă dovadă independentă de
+precizie globală,74.947forme fără etichete umane, diferența4/5 automată nevalidată.
+Un snapshot nou ar clarifica starea DB, nu ar valida semantic scorurile istorice.
