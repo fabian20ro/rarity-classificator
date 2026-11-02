@@ -1,7 +1,7 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-02. Stare: etapele1–8 încheiate; export conservator și audit L1 verificate.
-Rămâne contractul versionat de validare, întâi în mod audit; fără alte etichete umane sau upload.
+Actualizat: 2026-11-02. Stare: etapele1–9 încheiate; contract versionat audit-only verificat.
+Upload blocat; următoarea etapă propusă: dry-run de migrare cu snapshot actualizat doar prin citire.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -562,7 +562,7 @@ Scoruri/export/ancore/praguri intacte. 4.707fișiere protejate;6artefacte replay
 identice; gate-ul reprodus cu aritmetică independentă; Ruff940teste+363subteste.
 Zero LLM/subagenți/DB. [Raport și reproducere](../research/2026-11-02-l1-audit.md).
 
-**Următorul pas recomandat:** TDD pentru manifestul și raportul de validare v2,
+**Pas recomandat la închiderea etapei8, realizat în etapa9:** TDD pentru manifestul și raportul de validare nou,
 în mod audit separat: rol/data/universul fiecărei referințe, preflight pentru
 cardinalități imposibile/identități incompatibile, Jaccard ca măsură a schimbării,
 recall pentru seed pozitiv, erori≥2 și4/5 pe etichetele existente cu numitor și
@@ -573,3 +573,38 @@ contractul trebuie stabilit înaintea oricărei integrări în upload.
 Leftovers: referință live/ID-uri actuale neverificate, lipsă dovadă independentă de
 precizie globală,74.947forme fără etichete umane, diferența4/5 automată nevalidată.
 Un snapshot nou ar clarifica starea DB, nu ar valida semantic scorurile istorice.
+
+
+## Rezultatul etapei9 — contract versionat audit-only, 2026-11-02
+
+Prima schemă explicită `rarity-validation-audit-v1`. Manifest cu rol/unitate/datǎ/
+proveniență/hash/univers; versiuni necunoscute și modul upload respinse. Surse
+historical_snapshot/positive_seed/human_labels, candidat complet și utilizarea
+etichetelor declarată. Erori structurale opresc exportul; publicare atomică,
+fără suprascriere sau remapări implicite. Interfață reutilizabilă CSV→rapoarte.
+
+Jaccard istoric, recall seed, erori umane separate150/50 și4/5. Numitori/acoperire
+explicite; seed neexhaustiv nu produce precizie semantică. fit/override nu sunt
+validare independentă; numitor zero→null. `upload_authorized=false` inclusiv cu
+metrici perfecte; nicio integrare/înlocuire a gate-ului operațional.
+
+Rezultate reproduse: baseline fitted10/150și13/50severe, override0prin construcție;
+125/128ancore la±1,3abateri≥2. Precizia baseline pe L1etichetat38/45=84,44%, dar
+acoperă numai45/870=5,17%L1și este fitting. Conservator51/51prin override, acoperire
+51/876=5,82%. 825forme L1fără referință în ambele cazuri; lotul50nu are L1.
+
+Verificare: TDD7teste noi+18subcazuri; total947teste+381subteste, Ruff PASS;
+400comparații umane reconciliate,7artefacte replay identice,4.718fișiere intacte.
+Apelat entrypoint-ul real Step4 cu efecte externe interzise: baseline și conservator
+blocate de gate înainte de DB/markere. Scorurile/ancorele/pragurile originale intacte;
+zero apeluri LLM/subagenți/DB. [Contract și raport](../research/2026-11-02-validation-contract.md).
+
+**Următorul pas recomandat:** dry-run de migrare pe snapshot actualizat doar prin
+citire, cu proveniență, verificarea ID/grafie/POS și plan CSV de diferențe/conflicte.
+Fără update, fără vechiul offset de ID aplicat automat, fără gate bypass. Nu este
+executat în această etapă. Nu cerem alte evaluări și nu reglăm din nou pragurile.
+
+Leftovers: politica explicită de acceptare înaintea oricărei integrări în upload;
+precizie globală L1necunoscută(825L1neetichetate),74.947forme fără referință umană,
+4/5nevalidat automat. Un snapshot nou rezolvă prospețimea/identitatea, nu adevărul
+semantic. Gate-ul existent rămâne obligatoriu și FAIL; contractul nou este audit-only.

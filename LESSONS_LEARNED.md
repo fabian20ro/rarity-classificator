@@ -378,3 +378,11 @@ snapshot predates saved later uploads, itself fails seed recall (19/128), and ha
 76severe disagreements on150existing labels versus10for the fitted baseline.
 Check journal/receipts, all ID/spelling/POS identities, and form-level consistency.
 Historical ID shifts must not be applied to a future live DB by assumption.
+
+
+**[2026-11-02]** Validation reports need label-use metadata, not only metrics:
+fit describes training performance; override agreement is integrity by construction.
+A positive-only seed cannot supply semantic precision. Denominators and coverage
+must accompany labelled precision:38/45baseline L1 is only45/870coverage, and a
+risk-selected50may have no L1 at all (undefined, not0or100%). Both current exports
+leave825L1forms unlabelled. Even perfect audit metrics must not grant upload authority.
