@@ -386,3 +386,17 @@ A positive-only seed cannot supply semantic precision. Denominators and coverage
 must accompany labelled precision:38/45baseline L1 is only45/870coverage, and a
 risk-selected50may have no L1 at all (undefined, not0or100%). Both current exports
 leave825L1forms unlabelled. Even perfect audit metrics must not grant upload authority.
+
+
+**[2026-11-02]** Historical ID shifts are not migration rules: the fresh words table
+uses233095..310792, an observed+155396from the frozen export, not the old+77698.
+Join exact form/POS, verify multiplicities and scores. Duplicate row identity may
+remain unknowable while the proposed score is unambiguous for every group member;
+record the full equivalence group, never fabricate one-to-one provenance. Changed
+multiplicity must quarantine the group, not silently pair sorted IDs.
+
+**[2026-11-02]** A refreshed snapshot can fix Jaccard feasibility without passing
+the gate: new ceiling79.319%, observed14.678%. Complete mapping is engineering
+integrity, not evidence for50,889score changes. Separate165human corrections from
+50,724provisional baseline changes;30,524historical5->baseline4transitions do not
+supply new evidence about rare-word familiarity.

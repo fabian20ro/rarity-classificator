@@ -1,7 +1,7 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-02. Stare: etapele1–9 încheiate; contract versionat audit-only verificat.
-Upload blocat; următoarea etapă propusă: dry-run de migrare cu snapshot actualizat doar prin citire.
+Actualizat: 2026-11-02. Stare: etapele1–10 încheiate; dry-run pe snapshot proaspăt verificat.
+Upload blocat; migrarea integrală nerecomandată. Următoarea etapă propusă: lot separat pentru165corecții umane.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -599,7 +599,7 @@ Apelat entrypoint-ul real Step4 cu efecte externe interzise: baseline și conser
 blocate de gate înainte de DB/markere. Scorurile/ancorele/pragurile originale intacte;
 zero apeluri LLM/subagenți/DB. [Contract și raport](../research/2026-11-02-validation-contract.md).
 
-**Următorul pas recomandat:** dry-run de migrare pe snapshot actualizat doar prin
+**Pas recomandat la închiderea etapei9, realizat în etapa10:** dry-run de migrare pe snapshot actualizat doar prin
 citire, cu proveniență, verificarea ID/grafie/POS și plan CSV de diferențe/conflicte.
 Fără update, fără vechiul offset de ID aplicat automat, fără gate bypass. Nu este
 executat în această etapă. Nu cerem alte evaluări și nu reglăm din nou pragurile.
@@ -608,3 +608,36 @@ Leftovers: politica explicită de acceptare înaintea oricărei integrări în u
 precizie globală L1necunoscută(825L1neetichetate),74.947forme fără referință umană,
 4/5nevalidat automat. Un snapshot nou rezolvă prospețimea/identitatea, nu adevărul
 semantic. Gate-ul existent rămâne obligatoriu și FAIL; contractul nou este audit-only.
+
+
+## Rezultatul etapei10 — dry-run pe snapshot proaspăt, 2026-11-02
+
+Captură prin pluginul Supabase, două SELECT-uri (preflight+snapshot), zero scrieri:
+2026-11-02T20:32:03.276616Z,77.698rânduri,ID233.095–310.792. Snapshot complet într-o
+singură instrucțiune, fără paginare. Nu presupunem setarea read-only a sesiunii;
+SQL-ul trimis este exclusiv SELECT. Restul runner-ului interzice rețea/procese/DB.
+
+Mapare exactă formă/POS:73.308rânduri unice +4.390rânduri în2.165grupuri duplicate
+cu scor propus echivalent. Toate75.473perechi regăsite, cardinalități egale; zero
+identități lipsă. Nu se ghicește corespondența individuală în duplicate. Offsetul
+observat+155.396este numai diagnostic; vechiul+77.698nu a fost aplicat.
+
+Propunerea completă ar schimba50.889rânduri, păstrând26.809;6.664diferențe≥2.
+30.540tranziții5→4provin în mare parte din fallback, nu din dovezi noi. Dintre233
+rânduri umane,165ar necesita corecție(144forme),61diferă≥2(54forme).200evaluări și
+exportul inițial intacte;6.603diferențe mari apar pe rânduri baseline provizorii.
+
+Audit în universul live: Jaccard14,678%, acum fezabil teoretic(max79,319%), dar sub
+70%; seed8,219%/recall56,250%, sub80%/80%. Entry-point-ul real Step4 rămâne blocat
+înainte de DB/markere. Nu s-a generat SQL de modificare sau autorizare de upload.
+TDD4teste+5subcazuri, total951teste+386subteste PASS;13artefacte replay identice,
+4.729fișiere protejate intacte. [Raport și fișiere](../research/2026-11-02-migration-dry-run.md).
+
+**Decizie:** nu promovăm migrarea integrală. **Următorul pas recomandat:** pregătirea
+unui lot separat pentru165corecții umane, cu precondiții ID/grafie/POS/scor live și
+rollback CSV. Politica de acceptare pentru lot trebuie stabilită explicit, fără
+ocolirea gate-ului, auto-referință sau reducerea artificială a numitorului. Fără
+execuție DB în această etapă viitoare de pregătire; nu cerem alte evaluări umane.
+
+Leftovers:50.724schimbări baseline provizorii, politica de promovare, verificarea
+prospețimii înainte de orice upload, precizie globală L1necunoscută și4/5nevalidat.

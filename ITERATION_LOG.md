@@ -1149,3 +1149,14 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
 - Actual Step4+actual gate blocked both baseline and candidate before forbidden WordStore/marker boundaries; no external side effects. Existing thresholds and every original score unchanged.
 - Validation: Ruff947tests+381subtests PASS;400human comparisons independently reconciled,7byte-identical artifacts,4,718protected inputs intact. Local build/d1/validation-contract-2026-11-02; publish code/tests/contract/aggregates only.
 - Next suggested step: read-only fresh snapshot and migration dry-run plan for identity/differences, never automatic ID shifting, upload or quality certification. Explicit future acceptance policy still needed; no new user annotations or silent relaxation of gates.
+
+
+## 2026-11-02 — fresh snapshot and conservative migration dry-run
+
+- User accepted read-only snapshot/dry-run. Used Supabase skill/plugin: project discovery, count/ID SELECT, then full single-SELECT aggregate captured2026-11-02T20:32:03.276616Z.77,698rows, IDs233095..310792; no DML/DDL or DB writes. Do not claim plugin session read_only setting. No LLM/subagents.
+- Initial parsing of the MCP untrusted-data wrapper matched its explanatory inline tag; fixed delimiter parsing before persistence, no repeated SQL. Original complete snapshot JSON2,084,739bytes/count verified and kept local; no credentials in artifacts.
+- TDD exact-form/POS migration mapper: ignore old/reused IDs; unique73,308rows and4,390score-equivalent duplicates across2,165groups. Equal cardinalities required; missing/POS/count conflicts quarantined. All77,698mapped, zero issues. Observed+155,396on unique pairs is diagnostic only, not automatic offset.
+- Full candidate would change50,889rows, preserve26,809;6,664gaps>=2.30,540transitions5->4; no evidence that historical disagreement means error. Human priority233rows,165changes/144forms,61large differences/54forms; original200references intact. Other50,724changes provisional baseline.
+- Reprojected immutable scores/references into live-ID audit universe with explicit group provenance. Actual Step4+gate blocked before forbidden DB/marker boundaries: Jaccard.146784 vs.7 (ceiling now.793187), seed membership.082192/recall.5625 vs.8/.8. No SQL updates or authorization.
+- Verification: Ruff951tests+386subtests;4new tests+5subcases, each live row independently reconciled,13byte-identical replay artifacts,4,729protected files intact. Local build/d1/migration-dry-run-2026-11-02. Code/aggregate report/plan to PR86; row-level snapshot stays local.
+- Recommendation: no full migration; next prepare165human corrections with optimistic identity/current-score preconditions and rollback CSV, acceptance policy explicit before any upload. No further annotations or LLM experiments.
