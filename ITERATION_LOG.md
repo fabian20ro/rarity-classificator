@@ -1206,3 +1206,24 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
   then separately authorized deployment/application; policy approval already given.
 - Validated design lesson: a lost commit acknowledgement cannot be classified as
   rollback. Persist receipt in the same transaction; recover before repeating DML.
+
+
+## 2026-11-03 — Disposable PostgreSQL integration and receipt-trigger fix
+
+- Approved next step: real PostgreSQL17.9 in an owned Docker container/temporary
+  volume, loopback only,512MiB, exact image digest. No project DSN/model calls.
+- TDD integration exposed two ledger-trigger failures: unexpected words mutation
+  and receipt rewrite after first post-check. RED observed on real PostgreSQL;
+  final inventory/receipt checks and immediate constraints make both GREEN.
+  Rollback covered too; added offline regression3subcases.
+-17integration cases PASS: real locks/concurrency/one-time duplicate apply, schema,
+  RLS/privileges, deferred/receipt failures, backend termination, restart, real xmin
+  ABA detection, recovery after injected post-commit lost ACK, full165package.
+- Full77,698-row snapshot in test DB: exact165changes,77,533untouched, retry does not
+  reapply; rollback restores all original values.4,885protected files unchanged.
+- Normal Ruff+977tests/452subtests PASS;17server tests skipped by default and run
+  separately. New reusable opt-in script; container+volume cleaned,104MiB image cache.
+- Harness surprise: Docker's automatically published port did not survive restart
+  access as expected; reserve an explicit loopback port for the owned lifecycle.
+- Next: production read-only preflight, then separately instructed ledger deployment
+  and apply. No production schema/data touched; no power-loss durability claim.

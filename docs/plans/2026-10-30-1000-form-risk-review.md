@@ -1,7 +1,7 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-03. Stare: etapele 1–13 încheiate; politica umană aprobată, flux separat implementat și testat offline.
-Nicio aplicare DB. Rămân integrarea pe PostgreSQL izolat și instalarea/executarea autorizată; Step4 automat neschimbat.
+Actualizat: 2026-11-03. Stare: etapele 1–14 încheiate; flux uman verificat offline și pe PostgreSQL17.9 izolat.
+Nicio aplicare în DB-ul proiectului. Rămân verificarea mediului real și instalarea/executarea autorizată; Step4 neschimbat.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -734,7 +734,37 @@ seed4,770%/recall42,969% raportate fără veto în fluxul uman. Zero DB/LLM/DDL.
 blocările, rolurile, schema/triggerele, xmin sau commit-ul. Recipisele simulate nu
 sunt recipise DB. [Implementare, rezultate și utilizare](../research/2026-11-03-human-flow.md).
 
-**Următorul pas recomandat:** integrare pe un PostgreSQL izolat, inclusiv concurență
+**Pas recomandat la închiderea etapei13, realizat în etapa14:** integrare pe un PostgreSQL izolat, inclusiv concurență
 și recuperare. După acea verificare, instalare ledger și aplicare reală numai cu
 autorizare; politica nu mai necesită reaprobare. Snapshotul live va fi reverificat
 în tranzacție. Nu promovăm50.724 schimbări baseline și nu solicităm evaluări noi.
+
+
+## Rezultatul etapei14 — integrare PostgreSQL17.9 izolată, 2026-11-03
+
+Aprobarea „ok. do it” a acoperit testele pe un server local separat. Harness Docker
+cu imagine fixată prin digest, port numai127.0.0.1, volum nou și nume unic, maximum
+512MiB RAM. Fără DSN arbitrar sau credentiale ale aplicației. Containerul și volumul
+au fost eliminate; imaginea de aproximativ104MiB rămâne cache reutilizabil.
+
+**17 teste reale PASS**, inclusiv concurență între conexiuni, aplicare simultană a
+aceluiași pachet o singură dată, restart, RLS/roluri, triggere/deferred constraints,
+deconectare înainte de commit, recuperare după commit confirmat dar ACK simulat
+pierdut, rollback și ABA prin xmin. Lotul165 pe copia întregului inventar77.698:
+candidat exact,77.533rânduri neatinse, retry fără reaplicare, rollback corect.
+
+**Defect găsit și reparat cu TDD:** un trigger pe ledger putea modifica words sau
+rescrie recipisa după verificarea inițială. Fluxul forțează acum constrângerile și
+reverifică inventarul +recipisa după scrierea ledger-ului, înainte de commit; aplicare
+și rollback protejate. Regresie în suita offline și pe server. Gate-ul automat intact.
+
+Ruff PASS; suita normală **977 teste +452 subteste PASS**,17 integrări skip implicit,
+rulate separat toate cu succes.4.885 fișiere originale protejate intacte; fără LLM.
+Schema ledger instalată numai în container, niciun acces la DB-ul proiectului.
+[Raport, reproducere și limite](../research/2026-11-03-postgres-integration.md).
+
+**Următorul pas:** preflight read-only al configurației reale (roluri/RLS/triggere,
+identitatea și starea lotului), apoi instalarea ledger-ului și aplicarea lotului numai
+la instrucțiune explicită. Nu mai este nevoie de reaprobarea politicii sau de o nouă
+rundă de etichetare. Integrarea nu certifică mediul de producție și nu testează căderi
+fizice de disc/mașină.50.724 modificări baseline rămân excluse.

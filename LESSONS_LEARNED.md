@@ -427,3 +427,11 @@ DML. Local files alone cannot certify DB execution. Rollback needs post-write ro
 versions, not only matching scores; bound32-bit xmin reuse with64-bit transaction
 age and fail closed on ambiguity. These guarantees are tested with transaction
 and driver doubles here; server concurrency and deployment still need integration.
+
+
+**[2026-11-03]** Final verification must follow the LAST database write, including
+receipt persistence. Real PostgreSQL tests found ledger triggers could mutate words
+or rewrite the receipt after the initial inventory post-check. Force constraints,
+then re-read inventory and receipt before commit, for both apply and rollback.
+Keep this regression in the default offline suite as well as opt-in server tests.
+A valid isolated-server run does not certify production triggers/RLS or power loss.

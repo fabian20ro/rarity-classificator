@@ -86,5 +86,6 @@ package. Jaccard remains mandatory; anchor metrics remain visible but do not vet
 this flow. Default offline preview; transactional execution, durable receipt and
 version-guarded rollback are separate from Step4. No general gate-bypass option.
 See [accepted decision](adr/2026-11-03-human-correction-flow.md) and
-[runbook](research/2026-11-03-human-flow.md). Implementation tested offline only;
-no schema deployment or real application performed.
+[runbook](research/2026-11-03-human-flow.md). Implementation verified offline and on disposable PostgreSQL17.9;
+no schema deployment or application in the project database.
+[Integration evidence](research/2026-11-03-postgres-integration.md).

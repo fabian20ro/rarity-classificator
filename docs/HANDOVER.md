@@ -87,6 +87,7 @@ Don’t:
 User-approved separate flow: original human labels, exact pinned package, complete
 live guards, Jaccard mandatory, anchors measured without veto. Default dry-run;
 no change to Step4 behavior. Transactional receipt/recovery and guarded rollback
-implemented; PostgreSQL server integration and schema deployment remain unperformed.
+implemented and verified on disposable PostgreSQL17.9. Project DB schema deployment
+and application remain unperformed. [Integration results](research/2026-11-03-postgres-integration.md).
 [Decision](adr/2026-11-03-human-correction-flow.md) ·
 [Runbook/results](research/2026-11-03-human-flow.md).

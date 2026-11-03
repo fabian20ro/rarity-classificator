@@ -83,3 +83,4 @@ class _Transaction:
             )
         if cursor.rowcount != 1:
             raise ValueError("Durable receipt affected-row mismatch")
+        self.conn.execute("SET CONSTRAINTS ALL IMMEDIATE")

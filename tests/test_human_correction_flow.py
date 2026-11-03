@@ -470,3 +470,44 @@ class HumanFlowTests(unittest.TestCase):
             self.assertEqual(
                 json.loads((root / "preview/result.json").read_text())["status"], "dry_run"
             )
+
+    def test_receipt_side_effects_are_checked_before_commit_for_apply_and_rollback(self):
+        from classificator.human_correction_flow import run_human_corrections
+
+        for fault in ("word_after_apply", "receipt_rewrite", "word_after_rollback"):
+            with self.subTest(fault=fault), TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                approval, policy, package, store = self.inputs(root)
+                action = "apply"
+                if fault == "word_after_rollback":
+                    run_human_corrections(
+                        approval,
+                        policy,
+                        root / "apply",
+                        action="apply",
+                        store=store,
+                        confirm_package=package,
+                    )
+                    action = "rollback"
+                before = copy.deepcopy((store.rows, store.receipts))
+                save = store.save_receipt
+
+                def receipt_trigger(package_id, receipt, *, replace=False):
+                    save(package_id, receipt, replace=replace)
+                    if fault == "receipt_rewrite":
+                        store.receipts[package_id]["state"] = "rolled_back"
+                    else:
+                        store.rows["104"]["rarity_level"] = "2"
+
+                store.save_receipt = receipt_trigger
+                with self.assertRaises(ValueError):
+                    run_human_corrections(
+                        approval,
+                        policy,
+                        root / "failed",
+                        action=action,
+                        store=store,
+                        confirm_package=package,
+                    )
+                self.assertEqual((store.rows, store.receipts), before)
+                self.assertFalse((root / "failed/receipt.json").exists())

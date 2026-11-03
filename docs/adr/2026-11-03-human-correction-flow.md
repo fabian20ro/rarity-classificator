@@ -1,7 +1,8 @@
 # Decision: separate approved human correction flow
 
-Status: **accepted by the user, 2026-11-03**, for implementation and offline tests.
-The approval does not authorize schema deployment or application to a database.
+Status: **accepted by the user, 2026-11-03**. Initial scope: implementation/offline tests;
+subsequent approval covers disposable PostgreSQL integration. No production schema
+deployment or application authorized or performed.
 
 ## Context
 
@@ -32,7 +33,9 @@ reported without vetoing this scoped flow. Automatic Step4 remains unchanged.
   [PostgreSQL locking](https://www.postgresql.org/docs/17/explicit-locking.html).
 - Compare-and-set each update using ID, literal spelling/POS, expected score and
   `xmin`. Enforce affected IDs/count, force deferred constraints before post-check,
-  then compare the entire post-state, including untouched row versions. Unexpected
+  then compare the entire post-state, including untouched row versions. Recheck both
+  inventory and stored receipt again after saving the ledger row; ledger triggers
+  can introduce effects after the first check. Unexpected
   word-table trigger effects abort. Other tables/remote trigger effects are not
   covered by this inventory check and require deployment inspection.
 - Write the durable receipt in a private schema in the **same transaction**;
@@ -67,7 +70,7 @@ Table locks briefly block writers:5s lock timeout,30s statement timeout. A dedic
 privileged backend role must see every word and own/access the private ledger;
 `row_security=off` prevents silently accepting an RLS-filtered inventory. No schema
 creation or role grants occur automatically. The SQL prerequisite is separate and
-has **not been executed**. Existing schema conflicts deliberately fail.
+has been executed only on a disposable test server, **not in the project DB**. Existing schema conflicts deliberately fail.
 
 CSV-first artifacts include preview, original approval/audit, locked before,
 projected candidate, guard/quality reports, after-state and receipt. Inputs are
@@ -75,7 +78,12 @@ hash-checked before DML and before transaction exit. Local publication can fail 
 commit; the DB ledger remains the recovery authority. Local CSVs/receipts cannot
 prove a live transaction happened.
 
-Tests use a memory transaction double and mocked psycopg boundary. They validate
-orchestration, rollback/recovery and SQL parameter/transaction contracts, **not**
-server lock scheduling, actual trigger/RLS configuration, SQL deployment or durable
-storage behavior. Next: isolated PostgreSQL integration before production deployment.
+Initial tests used a memory transaction double and mocked psycopg boundary. The
+subsequent approved integration ran17 tests on an owned Docker PostgreSQL17.9 server,
+including real locks, concurrent writers, duplicate applies, role/RLS boundaries,
+triggers, deferred failures, disconnect, restart and the full165-row package.
+This exposed and fixed ledger-trigger effects after the first post-check. All tests
+pass; container and volume are removed. Lost acknowledgement after a real commit
+is injected at the transport boundary; this is not a physical power-loss test.
+Production roles/triggers/schema and server environment are still unverified.
+[Integration report](../research/2026-11-03-postgres-integration.md).

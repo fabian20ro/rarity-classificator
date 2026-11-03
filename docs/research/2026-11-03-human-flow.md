@@ -1,5 +1,8 @@
 # Flux separat pentru corecții umane — 2026-11-03
 
+Actualizare ulterioară: [integrarea PostgreSQL izolată a trecut](2026-11-03-postgres-integration.md).
+Rezultatele de mai jos descriu etapa inițială offline. Nu s-a aplicat lotul în DB-ul proiectului.
+
 **Implementat conform politicii aprobate; niciun scor aplicat în DB.**
 `human-corrections-flow-v1` păstrează Jaccard obligatoriu, cu ancore raportate fără
 blocare exclusiv pentru pachetul uman verificat. Step4 automat rămâne neschimbat;

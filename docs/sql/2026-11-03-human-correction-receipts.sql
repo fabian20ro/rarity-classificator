@@ -1,4 +1,5 @@
--- FUTURE deployment prerequisite only. Not executed by the CLI, tests, or this task.
+-- Production deployment prerequisite; CLI never installs it automatically.
+-- Validated only in the disposable PostgreSQL integration server; not installed in the project DB.
 -- Run only after explicit schema-deployment authorization, as the intended owner.
 -- Use a dedicated privileged backend role. Never expose this schema via the web API.
 BEGIN;

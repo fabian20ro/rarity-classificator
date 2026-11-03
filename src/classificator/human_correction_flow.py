@@ -168,6 +168,7 @@ def _apply(package, approval, policy, policy_path, report, out, store, protected
                 post_versions={i: after[i]["version"] for i in ids},
             )
             tx.save_receipt(package_id, receipt)
+            _verify_final(tx, package_id, receipt, after, out)
             status = "applied"
         _unchanged(protected)
     _json(out / "receipt.json", receipt)
@@ -259,6 +260,7 @@ def _rollback(package, approval, policy, policy_path, report, out, store, protec
                 receipt, state="rolled_back", rollback_txid=tx.txid, rollback_quality=quality
             )
             tx.save_receipt(package_id, receipt, replace=True)
+            _verify_final(tx, package_id, receipt, after, out)
             status = "rolled_back"
         else:
             raise ValueError("Invalid durable receipt state")
@@ -271,6 +273,14 @@ def _rollback(package, approval, policy, policy_path, report, out, store, protec
         human_policy_satisfied=True,
         legacy_gate=report["legacy_gate"],
     )
+
+
+def _verify_final(tx, package_id, receipt, after, out):
+    # Ledger triggers can affect words or rewrite the receipt after the first post-check.
+    if _snapshot(tx, out / "live-final.csv") != after:
+        raise ValueError("Receipt write changed the verified inventory")
+    if tx.receipt(package_id) != receipt:
+        raise ValueError("Durable receipt differs from confirmed operation")
 
 
 def _validate_receipt(receipt, approval, changes):
