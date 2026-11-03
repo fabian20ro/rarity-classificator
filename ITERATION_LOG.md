@@ -1187,3 +1187,22 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
 -4,778protected files intact;10byte-identical audit replay files; original200scores retained.
 - Plan stage12 and PR updated. Next: explicit operational policy promotion/integration,
   then live transactional guards/receipt/rollback; no additional annotation or calibration.
+
+
+## 2026-11-03 — Approved human flow implementation, no DB/LLM
+
+- User explicitly approved scoped human policy; separate default-offline CLI +
+  transaction adapter. Jaccard original/current mandatory; anchors diagnostic;
+  Step4/WordStore/Step5 unchanged. Approval pins policy/package, execution needs
+  additional explicit package confirmation and dedicated DSN.
+- TDD13tests/27subcases: approval, full live guards, partial failure/receipt/commit,
+  trigger side effects, lost acknowledgement/recovery, inverse/ABA/xid age, source
+  mutation and psycopg parameter/transaction contract.976tests+449subtests/Ruff PASS.
+- Actual165-package preview/rehearsal with memory store only: exact candidate,
+  233guards/200references,77,533untouched, retry without reapply, rollback restores
+  values.4,791files intact,14byte-identical preview files. Zero DB/DDL/models.
+- Durable ledger schema prepared, NOT installed. Server concurrency/RLS/trigger/
+  xmin/durability semantics not integration-tested. Next isolated PostgreSQL tests,
+  then separately authorized deployment/application; policy approval already given.
+- Validated design lesson: a lost commit acknowledgement cannot be classified as
+  rollback. Persist receipt in the same transaction; recover before repeating DML.

@@ -1,7 +1,7 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-03. Stare: etapele 1–12 încheiate; lotul de 165 de corecții trece politica de acceptare în mod audit.
-Upload blocat: gate legacy FAIL; promovarea operațională a politicii și executorul rămân separate.
+Actualizat: 2026-11-03. Stare: etapele 1–13 încheiate; politica umană aprobată, flux separat implementat și testat offline.
+Nicio aplicare DB. Rămân integrarea pe PostgreSQL izolat și instalarea/executarea autorizată; Step4 automat neschimbat.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -699,7 +699,7 @@ TDD: 7 teste noi + 26 subcazuri; total **963 teste + 422 subteste PASS** și Ruf
 reconciliată independent: 165 rânduri schimbate, 77.533 intacte. Cele 200 de evaluări
 rămân originale. [Politică, rezultate și reproducere](../research/2026-11-03-human-acceptance.md).
 
-**Următorul pas:** decizie explicită de promovare operațională a politicii pentru
+**Pas recomandat la închiderea etapei12, aprobat și implementat în etapa13:** promovare operațională a politicii pentru
 fluxul separat de corecții umane, inclusiv rolul ancorelor incomplete; apoi executor
 tranzacțional cu verificare live, concurență, recipisă și rollback condiționat de
 execuție confirmată. Politica de audit este gata; nu o redefinim și nu cerem evaluări
@@ -708,3 +708,33 @@ noi. Gate-ul operațional nu este înlocuit implicit prin acest audit.
 Leftovers: acea integrare autorizată, prospețime și execuție atomică, blocajul legacy,
 precizie globală L1 necunoscută, discriminare automată 4/5 nevalidată și 50.724 de
 schimbări baseline provizorii nepromovate. Niciun upload sau SQL de modificare.
+
+
+## Rezultatul etapei13 — flux uman aprobat, implementat fără DB, 2026-11-03
+
+Utilizatorul a aprobat explicit politica: Jaccard obligatoriu, seed diagnostic pentru
+corecții umane, fără schimbarea gate-ului automat. Flux separat CSV-first și adaptor
+PostgreSQL; dry-run implicit, apply/rollback numai explicit cu package_id confirmat
+și DSN dedicat. Auditul/proveniența originale sunt refolosite fără modificare.
+
+Tranzacție: lock înainte de snapshot, toate233 precondițiile și apartenențele, candidat
+integral cu165 corecții, Jaccard≥.7 față de referința fixată și starea curentă, update
+condiționat de valori/versiuni, verificare post-state și recipisă în același commit.
+Reluarea recuperează recipisa fără reaplicare. Rollback numai cu dovadă și versiuni
+valide; detectează ABA, păstrează editările fără legătură și se poate recupera după
+commit incert. Schema ledger-ului privat este pregătită, dar neexecutată.
+
+Verificare:13 teste noi +27 subcazuri; **976 teste +449 subteste PASS**, Ruff PASS.
+Lot real în preview și store simulat:165 schimbări exacte,77.533 rânduri neatinse,
+233 guards,200 referințe păstrate; inversă corectă și retry fără reaplicare.
+4.791 fișiere protejate intacte;14 fișiere preview identice la replay. Jaccard96,459%,
+seed4,770%/recall42,969% raportate fără veto în fluxul uman. Zero DB/LLM/DDL.
+
+**Limită:** transport substituit și store în memorie; nu s-au verificat pe server
+blocările, rolurile, schema/triggerele, xmin sau commit-ul. Recipisele simulate nu
+sunt recipise DB. [Implementare, rezultate și utilizare](../research/2026-11-03-human-flow.md).
+
+**Următorul pas recomandat:** integrare pe un PostgreSQL izolat, inclusiv concurență
+și recuperare. După acea verificare, instalare ledger și aplicare reală numai cu
+autorizare; politica nu mai necesită reaprobare. Snapshotul live va fi reverificat
+în tranzacție. Nu promovăm50.724 schimbări baseline și nu solicităm evaluări noi.

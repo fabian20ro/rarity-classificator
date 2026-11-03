@@ -418,3 +418,12 @@ Pin the original migration snapshot and complete package, not just counts; repla
 raw-source lineage to reject resealed CSV edits. Reject competing score columns:
 legacy quality audit prefers final_level over rarity_level, which could otherwise
 make the reported metric describe a different candidate than the identity check.
+
+
+**[2026-11-03]** Lost commit acknowledgement is not proof of rollback. Human-flow
+fault tests cover both rolled-back and committed-but-unacknowledged transactions.
+Keep a package-keyed receipt in the same transaction; retries recover it before
+DML. Local files alone cannot certify DB execution. Rollback needs post-write row
+versions, not only matching scores; bound32-bit xmin reuse with64-bit transaction
+age and fail closed on ambiguity. These guarantees are tested with transaction
+and driver doubles here; server concurrency and deployment still need integration.

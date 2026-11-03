@@ -50,7 +50,7 @@ This repository is the source of truth for offline rarity classification.
 
 ## Quality Gate Contract
 
-Before upload, candidate CSV must pass:
+Before automatic Step4 upload, candidate CSV must pass:
 
 - L1 Jaccard against trusted reference run (`word_id` set overlap stability),
 - L1 anchor precision/recall from curated Romanian base vocabulary anchors.
@@ -77,3 +77,14 @@ This protects against superficially correct histograms with semantically poor L1
 - Step2 and Step5 are single-process orchestrations (not distributed workers).
 - Quality anchors start as seed set; precision improves with larger curated anchors.
 - Local LM behavior varies by model; strict parser/schema catches drift but may increase retries.
+
+
+## Approved human correction flow (2026-11-03)
+
+A separate CSV-first flow accepts only an explicitly approved, source-verified human
+package. Jaccard remains mandatory; anchor metrics remain visible but do not veto
+this flow. Default offline preview; transactional execution, durable receipt and
+version-guarded rollback are separate from Step4. No general gate-bypass option.
+See [accepted decision](adr/2026-11-03-human-correction-flow.md) and
+[runbook](research/2026-11-03-human-flow.md). Implementation tested offline only;
+no schema deployment or real application performed.

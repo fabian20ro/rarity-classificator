@@ -10,7 +10,7 @@ This Python project replaces only the rarity/classification tooling. Backend API
 
 - Output rarity levels stay in `1..5` with lower level = more common word.
 - Step5 rebalance selections use only batch-local ids (`1..N`), no duplicates, no `0`, exact count.
-- Upload must stay gated by both:
+- Automatic Step4 upload must stay gated by both:
   - L1 set stability (Jaccard vs reference),
   - L1 anchor precision/recall.
 - Upload mode default is `partial`; `full-fallback` is explicit exception mode.
@@ -80,3 +80,13 @@ Don’t:
 - Confirm quality thresholds used for this campaign.
 - Confirm upload mode is `partial` unless approved otherwise.
 - Archive run command lines and generated artifacts paths.
+
+
+## Approved human-only exception (2026-11-03)
+
+User-approved separate flow: original human labels, exact pinned package, complete
+live guards, Jaccard mandatory, anchors measured without veto. Default dry-run;
+no change to Step4 behavior. Transactional receipt/recovery and guarded rollback
+implemented; PostgreSQL server integration and schema deployment remain unperformed.
+[Decision](adr/2026-11-03-human-correction-flow.md) ·
+[Runbook/results](research/2026-11-03-human-flow.md).
