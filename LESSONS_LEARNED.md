@@ -457,3 +457,9 @@ The local LoadDictionary tool uses explicit columns but TRUNCATE/reload restores
 scores by word/type/gender, not pinned IDs. Audit column compatibility separately
 from identity/history compatibility; reconcile correction packages and receipts
 after reload/restore. Source inspection is not proof of all deployed writers.
+
+**[2026-11-04]** Reproduce event-trigger ownership history in isolated fixtures.
+PostgreSQL17 rejects assigning an event trigger to a non-superuser, although a
+captured existing trigger can have an owner later stripped of SUPERUSER. Bootstrap
+ownership with privileges, then remove them before testing the actual non-superuser
+installer; do not weaken production role checks to make the fixture pass.

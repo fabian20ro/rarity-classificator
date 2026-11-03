@@ -23,7 +23,14 @@ def main():
         action="store_true",
         help="Also use the existing local 165-correction package",
     )
+    parser.add_argument(
+        "--installation-bundle",
+        action="store_true",
+        help="Rehearse the complete installation SQL on owned OrioleDB",
+    )
     args = parser.parse_args()
+    if args.installation_bundle and args.engine != "orioledb":
+        parser.error("--installation-bundle requires --engine orioledb")
     root = Path(__file__).resolve().parents[1]
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -38,13 +45,18 @@ def main():
         )
         protected = json.loads((previous / "protected-inputs.json").read_text())
         protected.update({str(p): digest(p) for p in previous.rglob("*") if p.is_file()})
+        if args.installation_bundle:
+            bundle = previous.parent / "human-installation-2026-11-03/verified"
+            protected.update({str(p): digest(p) for p in bundle.rglob("*") if p.is_file()})
         for path, expected in protected.items():
             assert digest(Path(path)) == expected, path
     command = [
         sys.executable,
         "-m",
         "pytest",
-        "tests/integration/test_human_flow_postgres.py",
+        "tests/integration/test_human_installation_postgres.py"
+        if args.installation_bundle
+        else "tests/integration/test_human_flow_postgres.py",
         "-q",
         "--tb=short",
         "--junitxml",
@@ -55,6 +67,7 @@ def main():
     env = dict(
         os.environ,
         RUN_HUMAN_POSTGRES_INTEGRATION="1",
+        RUN_HUMAN_INSTALLATION_INTEGRATION="1" if args.installation_bundle else "0",
         RUN_HUMAN_POSTGRES_FULL_INVENTORY="1" if args.full_inventory else "0",
         HUMAN_PG_REPORT_PATH=str(out / "server.json"),
         HUMAN_PG_ENGINE=args.engine,
@@ -80,6 +93,7 @@ def main():
         passed=len(cases) - failed - skipped,
         exit_code=result.returncode,
         full_inventory=args.full_inventory,
+        installation_bundle=args.installation_bundle,
         protected_files_unchanged=len(protected),
         project_database_accessed=False,
         model_calls=0,
@@ -96,6 +110,13 @@ def main():
         "docs/sql/2026-11-03-human-correction-receipts.sql",
         "docs/sql/2026-11-03-human-row-revisions.sql",
     ]
+    if args.installation_bundle:
+        files.extend(
+            [
+                "tests/integration/test_human_installation_postgres.py",
+                "src/classificator/human_installation.py",
+            ]
+        )
     manifest = dict(
         implementation={str(root / f): digest(root / f) for f in files},
         artifacts={str(p.relative_to(out)): digest(p) for p in out.rglob("*") if p.is_file()},

@@ -1,8 +1,8 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-03. Stare: etapele 1–17 încheiate; pachetul de instalare pregătit
-și verificat offline. Lotul165 valid la ultima captură; schema/rolul reale încă
-neinstalate. Urmează repetiția întregului pachet pe OrioleDB izolat. Step4 neschimbat.
+Actualizat: 2026-11-04. Stare: etapele 1–18 încheiate; pachetul complet verificat
+pe OrioleDB izolat,12/12 teste PASS. Schema/rolul reale încă neinstalate. Urmează
+preflight actualizat și instalare numai explicit autorizată. Step4 neschimbat.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -858,8 +858,35 @@ poate schimba ID-urile și cere reconcilierea lotului. Nu reprezintă inventarul
 scriitorilor deployați. Recitirea configurației reale și verificarea DSN-ului rămân
 necesare înaintea oricărei instalări autorizate.
 
-**Următorul pas:** repetiție completă pe OrioleDB izolat: creator non-superuser,
+**Pas recomandat la închiderea etapei17, realizat în etapa18:** repetiție completă pe OrioleDB izolat: creator non-superuser,
 rol/granturi, hook-uri DDL reprezentative, inventar complet, timeout/eșec/recuperare,
 pre/postchecks. Ulterior: instalare explicit autorizată, activare controlată a
 executorului, apoi apply165 separat autorizat și revalidat în tranzacție.
 Politica deja aprobată; fără etichete noi;50.724schimbări baseline rămân excluse.
+
+
+## Rezultatul etapei18 — repetiție integrală OrioleDB, 2026-11-04
+
+**12/12 teste reale PASS**. Arhiva originală nemodificată executată ca proprietar
+non-superuser, cu77.698rânduri și cele9hook-uri DDL capturate:17/17 prechecks,
+16/16 postchecks; restart corect. Fixture separat pentru excepții DDL, modificări
+ale coloanelor fără scor, backend terminat, drift, timeout la lock și ACK pierdut.
+Eșecurile sunt atomice și permit retry; succesul incert se identifică prin recipisă,
+nu prin reinstalare. Postflight detectează granturi/trigger/date alterate ulterior.
+
+Granturile executorului generate sunt suficiente: apply165 +retry +rollback în
+copia izolată;77.533rânduri cu scor păstrat, rollback identic proiecției inițiale.
+Niciun defect de runtime găsit; pachetul/SQL-ul original păstrate. Corectat numai
+setup-ul fixture-ului pentru ownerul event trigger-ului; instalarea fără SUPERUSER.
+[Raport și reproducere](../research/2026-11-04-installation-rehearsal.md).
+
+Ruff +986teste +456subteste PASS;40integrări skip implicit, cele12noi rulate separat.
+6.175fișiere protejate intacte. Container/volum eliminate; imagine deja în cache,
+fără download. Zero acces DB real și apeluri LLM. Fixture-ul nu clonează toate
+coloanele/serviciile găzduite; ACK simulat după commit real, nu pană fizică.
+
+**Următorul pas:** preflight read-only actualizat pe conexiunea efectivă; apoi,
+numai explicit autorizată, instalarea structurală în fereastra de lock, cu checks
+înainte/după. Executorul rămâne NOLOGIN. Activarea și apply165 separate, cu revalidare
+live. Nu cere reaprobarea politicii sau etichete noi. Orice drift oprește execuția;
+50.724schimbări baseline rămân excluse, gate-urile automate intacte.

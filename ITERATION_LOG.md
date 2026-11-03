@@ -1298,3 +1298,28 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
 - Assembled SQL NOT parsed/executed on PostgreSQL this turn. Earlier28Oriole/17heap
   component tests are not new full-bundle runtime evidence. Next: isolated complete
   package rehearsal, then separately instructed production installation/application.
+
+
+## 2026-11-04 — complete installation rehearsal on owned OrioleDB
+
+- User authorized isolated installation/fault recovery, not production writes.
+  Reused TDD skill and agreed package/SQL/transaction seams; no model/subagents.
+- Added12 opt-in integration cases and --installation-bundle to existing harness.
+  Original immutable bundle ran unmodified with all9 captured hooks and77,698rows;
+ 17/17 prechecks and16/16 postchecks PASS, including after restart.
+- Faults: DDL rejection, non-score column mutation, terminated backend, inventory
+  drift, exclusive-lock timeout; all atomic/retryable. Post-commit ACK simulated,
+  receipt retained, duplicate installation refused. Postflight rejects later grants,
+  disabled revision trigger and non-score edits despite unchanged score projection.
+- Complete fixture install grants allow165 apply/retry/rollback:77,533scores preserved,
+  rollback original projection exact. Full unrelated-column fixture data preserved.
+- Surprise/RED: captured event-trigger owner cannot be assigned to non-superuser.
+  Corrected fixture bootstrap with temporary SUPERUSER, removed before installation.
+  Runtime/SQL passed; no product fix needed, no invented RED→GREEN claim.
+-12/12 server tests PASS24.23s;986offline +456subtests PASS,40server cases skip by
+  default. Ruff PASS.6,175protected files unchanged, original bundle/hash preserved.
+  Container/volume removed; cached image, no pull. Production DB not accessed.
+- Fixture contains real4-column projection plus synthetic extra column, not full
+  production backup. Captured hook bodies run locally; hosted service behavior not
+  certified. Next fresh real read-only preflight + separately instructed installation;
+  NOLOGIN default, activation/apply remain separate. Policy/labels/gates untouched.

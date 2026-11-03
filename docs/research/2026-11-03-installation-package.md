@@ -1,5 +1,7 @@
 # Pachet de instalare pregătit offline — 2026-11-03
 
+Actualizare2026-11-04: pachetul original a trecut repetiția izolată; [12 teste și limite](2026-11-04-installation-rehearsal.md). Textul de mai jos păstrează starea istorică a pregătirii offline.
+
 **Pregătit; neinstalat.** Generatorul fixează reviziile, ledger-ul, executorul și
 verificările într-un singur pachet. Niciun apel DB/LLM, nicio instalare sau modificare
 scoruri în această etapă. Politica umană aprobată rămâne intactă; pregătirea nu

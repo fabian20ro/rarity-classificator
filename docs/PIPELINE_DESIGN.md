@@ -110,3 +110,14 @@ components only. Next: complete-package rehearsal on isolated OrioleDB, before a
 separately authorized production installation/activation/apply. Local dictionary
 TRUNCATE/reload requires package/receipt reconciliation.
 [Bundle, writer audit and reproduction](research/2026-11-03-installation-package.md).
+
+
+## Complete installation rehearsal (2026-11-04)
+
+12/12 owned-OrioleDB tests pass, including the unchanged original bundle, captured
+nine DDL hooks, full inventory, non-superuser installer, faults/recovery, and an
+executor apply/retry/rollback. No installer correction needed. Production untouched.
+The fixture's event-trigger ownership setup needed temporary superuser privileges;
+removed before installer execution. Local data/SQL remain unchanged. Next: fresh
+read-only real preflight, then separately authorized structural installation and
+activation/apply. [Results and limitations](research/2026-11-04-installation-rehearsal.md).
