@@ -1,8 +1,8 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-03. Stare: etapele 1–16 încheiate; revizii explicite implementate
-și verificate pe OrioleDB1.8 izolat. Lotul165 valid; DB-ul real nu are încă schema și
-rolul necesare. Urmează pregătirea instalării, fără aplicare implicită. Step4 neschimbat.
+Actualizat: 2026-11-03. Stare: etapele 1–17 încheiate; pachetul de instalare pregătit
+și verificat offline. Lotul165 valid la ultima captură; schema/rolul reale încă
+neinstalate. Urmează repetiția întregului pachet pe OrioleDB izolat. Step4 neschimbat.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -823,7 +823,7 @@ skip. Ruff și **980teste +456subteste PASS** offline.6.151fișiere protejate in
 container/volum eliminate. Zero acces la DB-ul real sau apeluri LLM.
 [Implementare, reproducere și limite](../research/2026-11-03-orioledb-integration.md).
 
-**Următorul pas:** pregătirea pachetului de instalare pentru producție, separat de
+**Pas recomandat la închiderea etapei16, realizat în etapa17:** pregătirea pachetului de instalare pentru producție, separat de
 apply165: ledger, revizii, executor/granturi, pre/postchecks și compatibilitatea
 scriitorilor existenți. Inițializarea reviziilor atinge toate77.698 de rânduri fără
 schimbarea scorurilor și cere o fereastră pentru lock exclusiv. Instalarea nu este
@@ -833,3 +833,33 @@ cu DSN-ul efectiv, apoi apply numai la instrucțiune explicită și cu revalidar
 Leftovers: schema/rolurile reale încă absente; administratori/restore de încredere,
 fără resetarea istoricului de revizii; infrastructura găzduită nu este certificată
 prin fixture. Fără evaluări noi; politica deja aprobată; baseline50.724 nepromovat.
+
+
+## Rezultatul etapei17 — pachet de instalare offline, 2026-11-03
+
+Interfață CSV/captură fixată → director nou cu SQL, audit, manifest și CSV-urile
+originale.17 prechecks read-only; o tranzacție ledger/revizii/rol/granturi;
+16 postchecks read-only. Inventarul și configurația reală capturate sunt precondiții,
+reverificate sub lock exclusiv. Hash-ul tuturor coloanelor existente și recipisa
+instalării verifică păstrarea datelor inclusiv după ultima scriere internă.
+
+Executor NOLOGIN, fără credentiale; BYPASSRLS cu granturi limitate, fără secvență/DDL
+sau scrierea contractului. Nicio instalare/aplicare implicită. Refolosește componentele
+SQL existente; refuză schema/rolul deja prezente. Runbook pentru verificare, client
+fail-fast și recuperarea unei confirmări pierdute; fără uninstall automat.
+
+**6 teste noi PASS; Ruff +986teste +456subteste PASS**,28 integrări skip.9artefacte
+principale reproduse identic;6.151fișiere originale intacte. Zero conexiuni DB,
+instalări sau apeluri LLM. Wrapper-ul SQL complet **neexecutat**; probele server din
+etapa16 nu certifică această nouă compoziție. [Raport și reproducere](../research/2026-11-03-installation-package.md).
+
+Audit local: loader-ul dicționarului folosește coloane explicite, dar TRUNCATE/reload
+poate schimba ID-urile și cere reconcilierea lotului. Nu reprezintă inventarul tuturor
+scriitorilor deployați. Recitirea configurației reale și verificarea DSN-ului rămân
+necesare înaintea oricărei instalări autorizate.
+
+**Următorul pas:** repetiție completă pe OrioleDB izolat: creator non-superuser,
+rol/granturi, hook-uri DDL reprezentative, inventar complet, timeout/eșec/recuperare,
+pre/postchecks. Ulterior: instalare explicit autorizată, activare controlată a
+executorului, apoi apply165 separat autorizat și revalidat în tranzacție.
+Politica deja aprobată; fără etichete noi;50.724schimbări baseline rămân excluse.

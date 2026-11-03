@@ -123,3 +123,16 @@ receipt portability. A new column also requires checking external positional INS
 TDD and28 real tests pass on PostgreSQL17.9/OrioleDB1.8;17 heap regression tests pass.
 Production installation/application remain unperformed and separately authorized.
 [Results and deployment leftovers](../research/2026-11-03-orioledb-integration.md).
+
+
+## Offline installation bundle (2026-11-03)
+
+`classificator.human_installation` prepares pinned CSVs/captures → SQL/checks/manifest;
+no DB connection or execution. One atomic ledger/revision/NOLOGIN executor proposal,
+17 prechecks and16 postchecks, full existing-column digest and installation receipt.
+Runtime never auto-installs. Source/label files preserved; automatic gates unchanged.
+The assembled SQL has not run on a server; previous integration tests cover its
+components only. Next: complete-package rehearsal on isolated OrioleDB, before any
+separately authorized production installation/activation/apply. Local dictionary
+TRUNCATE/reload requires package/receipt reconciliation.
+[Bundle, writer audit and reproduction](../research/2026-11-03-installation-package.md).

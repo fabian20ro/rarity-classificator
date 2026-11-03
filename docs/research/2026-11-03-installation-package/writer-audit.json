@@ -1,0 +1,24 @@
+{
+  "scope": "Local source audit only; not deployed jobs or all external writers",
+  "repositories": [
+    {
+      "path": "/Users/fabian/git/propozitii-nostime",
+      "head": "3995cdf76f4f199a48939d450546861fe38e9f30"
+    },
+    {
+      "path": "/Users/fabian/git/generator-rebus",
+      "head": "a37fded780ab4b23a55e0cebbb8fe7c333ff2589"
+    },
+    {
+      "path": "/Users/fabian/git/shared-api-host",
+      "head": "b33671d5f139c0538f9cfc635c0451ee6d7750f4"
+    }
+  ],
+  "loader": {
+    "path": "/Users/fabian/git/propozitii-nostime/src/main/kotlin/scrabble/phrases/tools/LoadDictionary.kt",
+    "sha256": "36936a0e2e30f99bde050aca7ca2bacfc0b3a75cf2fac798105a87a9d20be2f1",
+    "insert_columns_explicit": true,
+    "truncates_and_reloads": true,
+    "requires_package_reconciliation": true
+  }
+}

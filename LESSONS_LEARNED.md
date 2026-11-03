@@ -451,3 +451,9 @@ writes; an epoch-changing ledger trigger otherwise allowed an invalid commit.
 Do not grant UPDATE on the contract just to obtain a stronger lock: ACCESS SHARE
 works with SELECT-only rights. Trusted administrators must preserve sequence/epoch
 history; no claim of protection against owner resets or divergent restores.
+
+**[2026-11-03]** Dictionary reload is a package boundary, even with named INSERTs.
+The local LoadDictionary tool uses explicit columns but TRUNCATE/reload restores
+scores by word/type/gender, not pinned IDs. Audit column compatibility separately
+from identity/history compatibility; reconcile correction packages and receipts
+after reload/restore. Source inspection is not proof of all deployed writers.

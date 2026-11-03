@@ -1277,3 +1277,24 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
   Dedicated role/grants and production writer compatibility still need preparation.
   No DB installation/application or LLM calls; no claim against owner tampering,
   divergent restore or physical power failure. Policy and original labels unchanged.
+
+
+## 2026-11-03 — TDD offline production installation bundle
+
+- Prepared only; no DB/network model calls, installation, container execution or score
+  changes. Reused approved CSV/package seam, TDD/codebase-design guidance.
+- RED→GREEN: missing generator, unlisted SQL accepted, incomplete check contract,
+  final data check absent after installation-receipt write.6 public-interface tests.
+- Hash-bound preflight capture and original snapshot; one atomic ledger/revisions/
+  NOLOGIN role/grants proposal;17 prechecks/16 postchecks, full existing-column hash,
+  installation receipt, unchanged CSVs, integrity manifest and operational runbook.
+- PostgreSQL17 creator ADMIN membership accounted for; no inherited/SET membership,
+  credentials or login activation. NOLOGIN is preparation, not apply authorization.
+- Surprise: local LoadDictionary.kt uses named INSERT columns but TRUNCATE/reload;
+  IDs/membership may change despite restored scores. Requires reconciliation; local
+  source audit cannot certify all deployed writers. Writer source/hash recorded.
+-986tests +456subtests PASS, Ruff PASS;28server integrations skipped.9 main bundle
+  files replay identically;6,151original files unchanged. ZIP/hash retained locally.
+- Assembled SQL NOT parsed/executed on PostgreSQL this turn. Earlier28Oriole/17heap
+  component tests are not new full-bundle runtime evidence. Next: isolated complete
+  package rehearsal, then separately instructed production installation/application.

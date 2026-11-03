@@ -97,3 +97,16 @@ ordinary external writers.28 OrioleDB tests and17 heap regressions pass. The165 
 and233 guards remain valid; production still needs separately authorized revision,
 ledger and role installation. [Preflight](research/2026-11-03-production-preflight.md) ·
 [Implementation/results](research/2026-11-03-orioledb-integration.md).
+
+
+## Offline installation bundle (2026-11-03)
+
+`classificator.human_installation` prepares pinned CSVs/captures → SQL/checks/manifest;
+no DB connection or execution. One atomic ledger/revision/NOLOGIN executor proposal,
+17 prechecks and16 postchecks, full existing-column digest and installation receipt.
+Runtime never auto-installs. Source/label files preserved; automatic gates unchanged.
+The assembled SQL has not run on a server; previous integration tests cover its
+components only. Next: complete-package rehearsal on isolated OrioleDB, before any
+separately authorized production installation/activation/apply. Local dictionary
+TRUNCATE/reload requires package/receipt reconciliation.
+[Bundle, writer audit and reproduction](research/2026-11-03-installation-package.md).

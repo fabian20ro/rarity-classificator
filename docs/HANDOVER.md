@@ -98,3 +98,16 @@ from apply, including external-writer compatibility and all-row token bootstrap.
 [OrioleDB implementation/results](research/2026-11-03-orioledb-integration.md).
 [Decision](adr/2026-11-03-human-correction-flow.md) ·
 [Runbook/results](research/2026-11-03-human-flow.md).
+
+
+## Offline installation bundle (2026-11-03)
+
+`classificator.human_installation` prepares pinned CSVs/captures → SQL/checks/manifest;
+no DB connection or execution. One atomic ledger/revision/NOLOGIN executor proposal,
+17 prechecks and16 postchecks, full existing-column digest and installation receipt.
+Runtime never auto-installs. Source/label files preserved; automatic gates unchanged.
+The assembled SQL has not run on a server; previous integration tests cover its
+components only. Next: complete-package rehearsal on isolated OrioleDB, before any
+separately authorized production installation/activation/apply. Local dictionary
+TRUNCATE/reload requires package/receipt reconciliation.
+[Bundle, writer audit and reproduction](research/2026-11-03-installation-package.md).
