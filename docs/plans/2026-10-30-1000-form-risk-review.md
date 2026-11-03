@@ -1,7 +1,8 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-03. Stare: etapele 1–14 încheiate; flux uman verificat offline și pe PostgreSQL17.9 izolat.
-Nicio aplicare în DB-ul proiectului. Rămân verificarea mediului real și instalarea/executarea autorizată; Step4 neschimbat.
+Actualizat: 2026-11-03. Stare: etapele 1–15 încheiate; preflight real read-only finalizat.
+Lotul165 valid, execuția blocată: OrioleDB nu furnizează xmin. Urmează compatibilitate
+și teste OrioleDB izolate, înaintea oricărei instalări/aplicări. Step4 neschimbat.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -763,8 +764,40 @@ rulate separat toate cu succes.4.885 fișiere originale protejate intacte; făr�
 Schema ledger instalată numai în container, niciun acces la DB-ul proiectului.
 [Raport, reproducere și limite](../research/2026-11-03-postgres-integration.md).
 
-**Următorul pas:** preflight read-only al configurației reale (roluri/RLS/triggere,
+**Pas recomandat la închiderea etapei14, realizat în etapa15:** preflight read-only al configurației reale (roluri/RLS/triggere,
 identitatea și starea lotului), apoi instalarea ledger-ului și aplicarea lotului numai
 la instrucțiune explicită. Nu mai este nevoie de reaprobarea politicii sau de o nouă
 rundă de etichetare. Integrarea nu certifică mediul de producție și nu testează căderi
 fizice de disc/mașină.50.724 modificări baseline rămân excluse.
+
+
+## Rezultatul etapei15 — preflight real read-only, 2026-11-03
+
+**Lot valid; mediu incompatibil cu executorul actual.** Proiectul folosește
+PostgreSQL17.9 +OrioleDB1.8; words și access method implicit sunt `orioledb`.
+SELECT-ul `xmin` eșuează cu XX000. Cele17 integrări anterioare au verificat heap,
+nu acest motor. Nu eliminăm protecția la editări A→B→A pentru a permite execuția.
+
+Inventarul77.698 are aceeași amprentă SHA-256 pe ID/grafie/POS/scor ca snapshotul
+aprobat. Cele233 de precondiții trec:165 corecții încă necesare,68 deja corecte;
+200 referințe originale păstrate. Preview/proveniență PASS, Jaccard96,459%; seed
+diagnostic4,770%/42,969%. Restul77.533 de rânduri rămân neschimbate în proiecție.
+
+RLS activ, o politică SELECT; sesiunea postgres are BYPASSRLS. Zero triggere/rules
+pe words;9 event triggers DDL inspectate separat. Ledger-ul privat lipsește;
+executor dedicat și DSN efectiv neverificate. Nu există autorizare de instalare
+sau aplicare.5 încercări SQL read-only:4 reușite,1 eroare de capabilitate xmin.
+Zero modificări DB/LLM;6.117 fișiere protejate intacte.26 teste +66 subteste PASS.
+[Raport, roluri, artefacte și limite](../research/2026-11-03-production-preflight.md).
+
+**Următorul pas:** TDD pentru compatibilitate OrioleDB într-un mediu izolat:
+reproducerea defectului, refuz timpuriu al capabilităților incompatibile, versiune
+explicită a rândului și rollback care detectează ABA inclusiv delete/reinsert.
+Recomandare de investigat: token unic emis de DB pentru fiecare INSERT/UPDATE,
+prin secvență/trigger, acoperind toți scriitorii. Nu hash/scor/timestamp ca substitut.
+Necesită proiectare și probe pe OrioleDB înainte de pregătirea unei migrări reale.
+
+Leftovers: suportul motorului real; schema ledger/rol/granturi private; conexiune
+directă verificată; instalare și apply numai la instrucțiune explicită, cu verificări
+live în tranzacție. Politica umană deja aprobată. Blocajul legacy, precizia globală
+L1 necunoscută și50.724 de schimbări baseline provizorii rămân în afara acestui lot.

@@ -1227,3 +1227,26 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
   access as expected; reserve an explicit loopback port for the owned lifecycle.
 - Next: production read-only preflight, then separately instructed ledger deployment
   and apply. No production schema/data touched; no power-loss durability claim.
+
+
+## 2026-11-03 — Real read-only preflight: OrioleDB compatibility blocker
+
+- Authorized metadata/data reads only, plan/PR update. Supabase skill consulted;
+  five SQL attempts inside BEGIN READ ONLY, four successful and one xmin failure.
+  No DDL/DML, table locks, installation, model/subagent calls, or apply/rollback.
+- Surprise: project engine17-oriole, extensionOrioleDB1.8, words/default access
+  methodorioledb. PostgreSQL17.9 matches the isolated server but xmin SELECT raises
+  XX000. Current heap adapter cannot run here; removing version checks is unsafe.
+- Inspected roles/memberships/grants, RLS/policies, columns/constraints/indexes,
+  DML triggers/rules, DDL event triggers and default ACLs. Words RLS on, postgres
+  BYPASSRLS; no words triggers/rules. Private ledger absent; no dedicated executor.
+- Full77,698-row canonical ID/word/POS/score SHA-256 equals pinned original.
+  Direct233-row capture matches all guards:165pending corrections,68already correct,
+  200references. Offline provenance/preview PASS; projected Jaccard96.459%; unchanged
+  legacy seed diagnostic4.770%/42.969%. No claim about other columns or prior ABA.
+-26focused tests +66subtests PASS.7replay outputs byte-identical after JSON key-order
+  normalization;6,117protected files intact;33local artifact hashes verified.
+  Raw233-row data stays local; aggregate report and read-only catalog queries in PR.
+- Next revised: TDD capability guard and explicit row revision on isolated OrioleDB,
+  covering all writers, ABA/delete-reinsert, receipt and rollback. Only then prepare
+  separately authorized schema/role deployment/application. Policy remains approved.

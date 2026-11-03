@@ -435,3 +435,10 @@ or rewrite the receipt after the initial inventory post-check. Force constraints
 then re-read inventory and receipt before commit, for both apply and rollback.
 Keep this regression in the default offline suite as well as opt-in server tests.
 A valid isolated-server run does not certify production triggers/RLS or power loss.
+
+**[2026-11-03]** Match the table access method, not just PostgreSQL version.
+Production17.9 uses OrioleDB1.8; SELECT xmin fails although heap17.9 integration
+passes. Inspect pg_class.relam, pg_am and default_table_access_method during
+preflight. A heap-only version/CAS/ABA contract cannot be promoted to OrioleDB by
+removing xmin or replacing it with a score hash. Explicit revision support must
+cover every writer and delete/reinsert, with real engine tests before deployment.

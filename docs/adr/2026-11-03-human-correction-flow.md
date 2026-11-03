@@ -85,5 +85,15 @@ triggers, deferred failures, disconnect, restart and the full165-row package.
 This exposed and fixed ledger-trigger effects after the first post-check. All tests
 pass; container and volume are removed. Lost acknowledgement after a real commit
 is injected at the transport boundary; this is not a physical power-loss test.
-Production roles/triggers/schema and server environment are still unverified.
+Production roles/triggers/schema were unverified at that stage.
 [Integration report](../research/2026-11-03-postgres-integration.md).
+
+## Production preflight follow-up (2026-11-03)
+
+Read-only inspection found PostgreSQL17.9 with OrioleDB1.8 and words stored using
+OrioleDB. Its xmin SELECT fails; the current adapter is **not deployable here**.
+All233 data guards pass;165 changes remain pending. No production schema or score
+changes. The accepted policy is unchanged; its xmin implementation needs an
+engine-compatible revision mechanism, validated on isolated OrioleDB with ABA,
+delete/reinsert, other writers and rollback. A future migration requires separate
+authorization. [Preflight](../research/2026-11-03-production-preflight.md).

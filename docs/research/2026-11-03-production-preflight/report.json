@@ -1,0 +1,77 @@
+{
+  "status": "BLOCKED",
+  "project": "pdliedweugywbiczajxn",
+  "captured_at": "2026-11-03T04:27:49.596801+00:00",
+  "server_version": "17.9",
+  "access_method": "orioledb",
+  "orioledb_version": "1.8",
+  "default_table_access_method": "orioledb",
+  "package_id": "600ee91fc220c2f0ec88f821916da535d7f4388e2de922395b6ee61ccf2f6fa1",
+  "inventory_rows": 77698,
+  "canonical_projection_sha256": "0d69e5c92a45c52e85afe6fd903388009d408ebda54bb97c1d9818c0672f6fc0",
+  "full_projection_matches_original": true,
+  "projection_columns": [
+    "word_id",
+    "word",
+    "type",
+    "rarity_level"
+  ],
+  "guard_rows": 233,
+  "reviewed_forms": 200,
+  "pending_corrections": 165,
+  "already_correct_guards": 68,
+  "guard_issues": 0,
+  "human_policy_satisfied": true,
+  "quality": {
+    "distribution": {
+      "1": 1264,
+      "2": 6617,
+      "3": 12533,
+      "4": 24482,
+      "5": 32802
+    },
+    "total_rows": 77698,
+    "level_column": "rarity_level",
+    "l1_jaccard": 0.964594807238395,
+    "l1_intersection": 1226,
+    "l1_candidate_size": 1264,
+    "l1_word_count": 1153,
+    "l1_reference_size": 1233,
+    "anchor_precision": 0.047701647875108416,
+    "anchor_recall": 0.4296875,
+    "passed": false,
+    "failures": [
+      "anchor_l1_precision 0.0477 < min 0.8000",
+      "anchor_l1_recall 0.4297 < min 0.8000"
+    ]
+  },
+  "rls_enabled": true,
+  "rls_forced": false,
+  "session_role": "postgres",
+  "session_rls_active": false,
+  "words_triggers": 0,
+  "words_rewrite_rules": 0,
+  "ddl_event_triggers": 9,
+  "ledger_installed": false,
+  "runtime_compatible": false,
+  "execution_role_verified": false,
+  "blockers": [
+    "OrioleDB words rejects xmin required by apply and guarded rollback",
+    "Private ledger schema/table absent",
+    "Dedicated executor role/DSN not provisioned or verified"
+  ],
+  "execution_authorized": false,
+  "db_writes": 0,
+  "model_calls": 0,
+  "sql_attempts": 5,
+  "successful_read_only_queries": 4,
+  "capability_probe_failures": 1,
+  "protected_files_unchanged": 6117,
+  "limitations": [
+    "Point-in-time observations, not a locked execution snapshot",
+    "Equality covers id, word, type, rarity_level; not other columns or history",
+    "No xmin/version evidence; matching values cannot rule out ABA",
+    "Catalog grants only; no login/lock/write test with a dedicated DSN",
+    "No claim of full project security audit or infrastructure durability"
+  ]
+}

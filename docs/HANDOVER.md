@@ -89,5 +89,10 @@ live guards, Jaccard mandatory, anchors measured without veto. Default dry-run;
 no change to Step4 behavior. Transactional receipt/recovery and guarded rollback
 implemented and verified on disposable PostgreSQL17.9. Project DB schema deployment
 and application remain unperformed. [Integration results](research/2026-11-03-postgres-integration.md).
+**Real read-only preflight now complete: BLOCKED.** Production words uses OrioleDB1.8
+and rejects xmin; heap integration does not establish compatibility. All233 guards
+still match,165 corrections pending. Next: TDD for engine-compatible row versions
+and ABA-safe rollback on isolated OrioleDB, before any production installation.
+[Preflight evidence](research/2026-11-03-production-preflight.md).
 [Decision](adr/2026-11-03-human-correction-flow.md) ·
 [Runbook/results](research/2026-11-03-human-flow.md).

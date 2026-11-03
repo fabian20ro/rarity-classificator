@@ -4,6 +4,10 @@
 corecții și rollback-ul lor pe copia completă a inventarului. **DB-ul proiectului
 nu a fost accesat.** Nicio evaluare originală modificată și niciun apel LLM.
 
+**Constatare ulterioară:** [preflight-ul real read-only](2026-11-03-production-preflight.md)
+a identificat OrioleDB1.8, fără xmin pe words. Aceste teste validează PostgreSQL
+heap, nu motorul real; instalarea/aplicarea rămân blocate până la adaptare.
+
 ## Mediu controlat și reproducere
 
 Harness-ul pornește singur un server Docker nou, cu volum nou, identități aleatoare,

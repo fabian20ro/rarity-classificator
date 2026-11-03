@@ -89,3 +89,9 @@ See [accepted decision](adr/2026-11-03-human-correction-flow.md) and
 [runbook](research/2026-11-03-human-flow.md). Implementation verified offline and on disposable PostgreSQL17.9;
 no schema deployment or application in the project database.
 [Integration evidence](research/2026-11-03-postgres-integration.md).
+
+**Production preflight (read-only): blocked.** Actual words/default access method is
+OrioleDB1.8; SELECT xmin fails. Existing adapter requires xmin for snapshot/CAS and
+rollback. The165 corrections and all233 guards remain valid, but deployment must
+wait for tested OrioleDB-compatible versioning. Do not drop ABA guards or assume
+the heap integration covers this engine. [Evidence and next step](research/2026-11-03-production-preflight.md).
