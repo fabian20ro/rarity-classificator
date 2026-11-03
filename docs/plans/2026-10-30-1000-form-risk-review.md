@@ -1,8 +1,8 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-04. Stare: etapele 1–18 încheiate; pachetul complet verificat
-pe OrioleDB izolat,12/12 teste PASS. Schema/rolul reale încă neinstalate. Urmează
-preflight actualizat și instalare numai explicit autorizată. Step4 neschimbat.
+Actualizat: 2026-11-04. Stare: etapele 1–19 încheiate; preflight real17/17 PASS,
+lot233/233 valid,165corecții încă necesare. Pachetul testat12/12 pe OrioleDB izolat.
+Urmează numai instalarea structurală explicit autorizată; nimic instalat în DB real. Step4 neschimbat.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -885,8 +885,32 @@ Ruff +986teste +456subteste PASS;40integrări skip implicit, cele12noi rulate se
 fără download. Zero acces DB real și apeluri LLM. Fixture-ul nu clonează toate
 coloanele/serviciile găzduite; ACK simulat după commit real, nu pană fizică.
 
-**Următorul pas:** preflight read-only actualizat pe conexiunea efectivă; apoi,
+**Pas recomandat la închiderea etapei18, preflight realizat în etapa19:** preflight read-only actualizat pe conexiunea efectivă; apoi,
 numai explicit autorizată, instalarea structurală în fereastra de lock, cu checks
 înainte/după. Executorul rămâne NOLOGIN. Activarea și apply165 separate, cu revalidare
 live. Nu cere reaprobarea politicii sau etichete noi. Orice drift oprește execuția;
 50.724schimbări baseline rămân excluse, gate-urile automate intacte.
+
+
+## Rezultatul etapei19 — preflight real actualizat, 2026-11-04
+
+**17/17 precondiții originale PASS** pe conexiunea Supabase MCP reală, ca postgres.
+Proiect ACTIVE_HEALTHY; PostgreSQL17.9/OrioleDB1.8, RLS/granturi/hook-uri neschimbate.
+Schema privată și rolul încă absente. Snapshot77.698 are aceeași amprentă pe
+ID/grafie/POS/scor;233/233 rânduri protejate citite individual și comparate:
+165corecții necesare,68deja corecte. Politica/proveniența reconfirmate offline.
+[Raport și limite](../research/2026-11-04-production-preflight.md).
+
+Două tranzacții READ ONLY,00:49:33 și00:50:38 Europe/Bucharest. Fără DDL/DML/lock
+explicit/apeluri LLM. Zero alte lock-uri words la captura secundară; nicio rezervare
+viitoare. Conexiunea MCP verificată; DSN dedicat neconfigurat și netestat. Setarea
+schemelor API nu este vizibilă în sesiune; postflight-ul rămâne necesar.
+
+35teste +70subteste PASS;6artefacte de replay identice;7.124fișiere protejate intacte.
+Nicio schimbare runtime/SQL/pachet sau evaluare. Nu s-a reluat repetiția server12/12.
+
+**Următorul pas:** instalarea structurală numai la instrucțiune explicită, cu
+preflight repetat și lock exclusiv, apoi verificările16după. Nu există blocaj tehnic
+observat în precondițiile curente. Instalarea lasă executorul NOLOGIN; activarea,
+conexiunea lui și apply165 sunt separate. Fără reaprobarea politicii/etichete noi;
+50.724schimbări baseline rămân excluse. Orice drift real oprește execuția.

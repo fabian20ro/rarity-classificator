@@ -1323,3 +1323,25 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
   production backup. Captured hook bodies run locally; hosted service behavior not
   certified. Next fresh real read-only preflight + separately instructed installation;
   NOLOGIN default, activation/apply remain separate. Policy/labels/gates untouched.
+
+
+## 2026-11-04 — refreshed real installation preflight, read-only
+
+- Supabase skill; verified project pdliedweugywbiczajxn ACTIVE_HEALTHY. Exactly2 SQL
+  transactions BEGIN READ ONLY/ROLLBACK, session/current_user postgres. No DDL/DML,
+  explicit table locks, sequence advancement, model calls, secret reads or direct DSN.
+- Original17 installation predicates all PASS at00:49:33 Europe/Bucharest; second
+  capture00:50:38 confirms77,698 projection hash and233 individual guards.165pending,
+ 68already correct. RLS/grants/9DDL hooks unchanged; private schema/executor absent.
+- No other words locks visible at second capture; no future lock reservation. MCP
+  connection verified only; HUMAN_CORRECTIONS_DSN absent. PostgREST exposed-schema
+  setting not visible, so no claim about all hosted API settings.
+- Replayed provenance/policy offline with psycopg connect prohibited.35focused tests
+  +70subtests PASS;6replay outputs byte-identical;7,124protected files unchanged.
+  Raw rows/SQL/captures local, aggregates published. No runtime/pinned SQL changes.
+- Local evidence parsing initially matched the tool warning envelope; fixed to the
+  newline-delimited data block without repeating SQL. Replay comparison corrected
+  expected filename report.json to actual result.json; both were local tooling only.
+- Result: installation prerequisites satisfied now; next separately instructed
+  structural installation with repeated checks/lock, NOLOGIN/postflight. Activation
+  and apply165 remain separate. Existing approval/labels and automatic gates intact.

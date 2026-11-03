@@ -121,3 +121,13 @@ The fixture's event-trigger ownership setup needed temporary superuser privilege
 removed before installer execution. Local data/SQL remain unchanged. Next: fresh
 read-only real preflight, then separately authorized structural installation and
 activation/apply. [Results and limitations](research/2026-11-04-installation-rehearsal.md).
+
+
+## Refreshed real preflight (2026-11-04)
+
+17/17 original installer checks PASS on the real Supabase MCP connection;233/233
+human guards match,165pending. Inventory/configuration unchanged, schema/role absent.
+Two READ ONLY transactions; no installation or LLM calls. Dedicated DSN not configured
+or tested. Next: separately instructed structural installation, then postchecks;
+executor stays NOLOGIN and score application is separate. Recheck under the install
+lock; this observation reserves nothing. [Current result](research/2026-11-04-production-preflight.md).
