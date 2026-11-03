@@ -14,6 +14,7 @@ class Connection:
         self.result = []
         self.rowcount = 1
         self.empty_update = False
+        self.access_method = "heap"
 
     def __enter__(self):
         return self
@@ -32,7 +33,11 @@ class Connection:
 
     def execute(self, sql, params=None):
         self.calls.append((sql, params))
-        if "pg_current_xact_id()" in sql:
+        if "am.amname" in sql:
+            self.result = [(self.access_method,)]
+        elif "to_regclass" in sql:
+            self.result = [(None,)]
+        elif "pg_current_xact_id()" in sql:
             self.result = [("4294967317",)]
         elif "SELECT id::text" in sql:
             self.result = [("100", "a'ta", "N", "4", "10")]
@@ -52,6 +57,20 @@ class Connection:
 
 
 class PostgresHumanStoreTests(unittest.TestCase):
+    def test_unsupported_storage_fails_before_any_write_or_snapshot(self):
+        from classificator.human_correction_postgres import PostgresHumanStore
+
+        conn = Connection()
+        conn.access_method = "orioledb"
+        with patch("psycopg.connect", return_value=conn):
+            with self.assertRaisesRegex(ValueError, "revision contract"):
+                with PostgresHumanStore("isolated").transaction():
+                    self.fail("Unsupported engine reached the caller")
+        self.assertTrue(conn.aborted)
+        self.assertFalse(
+            any(s.startswith(("UPDATE", "INSERT", "SELECT id::text")) for s, _ in conn.calls)
+        )
+
     def test_full_lock_before_snapshot_parameterized_cas_and_receipt_share_one_transaction(self):
         from classificator.human_correction_postgres import PostgresHumanStore
 

@@ -17,6 +17,7 @@ def digest(path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--engine", choices=("heap", "orioledb"), default="heap")
     parser.add_argument(
         "--full-inventory",
         action="store_true",
@@ -32,7 +33,8 @@ def main():
             (root / "docs/research/2026-11-03-human-acceptance/policy.json").read_text()
         )
         previous = (
-            Path(policy["sources"]["candidate"]["path"]).parent.parent / "human-flow-2026-11-03"
+            Path(policy["sources"]["candidate"]["path"]).parent.parent
+            / "human-production-preflight-2026-11-03"
         )
         protected = json.loads((previous / "protected-inputs.json").read_text())
         protected.update({str(p): digest(p) for p in previous.rglob("*") if p.is_file()})
@@ -55,6 +57,7 @@ def main():
         RUN_HUMAN_POSTGRES_INTEGRATION="1",
         RUN_HUMAN_POSTGRES_FULL_INVENTORY="1" if args.full_inventory else "0",
         HUMAN_PG_REPORT_PATH=str(out / "server.json"),
+        HUMAN_PG_ENGINE=args.engine,
     )
     result = subprocess.run(command, cwd=root, env=env, text=True, capture_output=True)
     (out / "test-output.txt").write_text(result.stdout + result.stderr)
@@ -80,7 +83,7 @@ def main():
         protected_files_unchanged=len(protected),
         project_database_accessed=False,
         model_calls=0,
-        caveat="Real PostgreSQL in a disposable Docker volume. Not the project database; no production RLS/trigger configuration verified. Lost post-commit acknowledgement is injected after real commit; pre-commit disconnect and restart are real server operations.",
+        caveat="Owned disposable database only. Fixture roles/triggers, not deployment certification. Post-commit ACK loss is injected after real commit; disconnect/restart are real. Trusted schema/backup administrators must preserve revision epochs and sequence history.",
     )
     (out / "report.json").write_text(json.dumps(report, indent=2) + "\n")
     (out / "protected-inputs.json").write_text(json.dumps(protected, indent=2) + "\n")
@@ -91,6 +94,7 @@ def main():
         "src/classificator/human_correction_flow.py",
         "src/classificator/human_correction_postgres.py",
         "docs/sql/2026-11-03-human-correction-receipts.sql",
+        "docs/sql/2026-11-03-human-row-revisions.sql",
     ]
     manifest = dict(
         implementation={str(root / f): digest(root / f) for f in files},

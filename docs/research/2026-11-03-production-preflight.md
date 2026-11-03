@@ -4,6 +4,10 @@
 Cele165 de corecții sunt încă necesare. Toate233 de precondiții corespund, inclusiv
 cele68 de rânduri deja corecte. Nu s-a instalat sau aplicat nimic. Zero apeluri LLM.
 
+Actualizare ulterioară: [revizii explicite implementate și testate pe OrioleDB izolat](2026-11-03-orioledb-integration.md).
+Constatările de mai jos descriu preflight-ul anterior adaptării. Mediul real încă
+necesită instalare separat autorizată; nu s-a aplicat lotul.
+
 ## Constatarea care schimbă următorul pas
 
 Proiectul `propozitii-nostime` (`pdliedweugywbiczajxn`) este ACTIVE_HEALTHY,

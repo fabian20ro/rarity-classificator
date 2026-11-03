@@ -1250,3 +1250,30 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
 - Next revised: TDD capability guard and explicit row revision on isolated OrioleDB,
   covering all writers, ABA/delete-reinsert, receipt and rollback. Only then prepare
   separately authorized schema/role deployment/application. Policy remains approved.
+
+
+## 2026-11-03 — TDD explicit row revisions on isolated OrioleDB
+
+- User approved the proposed OrioleDB adaptation/tests. Reused confirmed CSV flow
+  and transactional adapter seams; TDD/codebase-design skills, no model/subagents.
+- Owned Supabase17.9.0.029-orioledb image pinned by digest, extension1.8 asserted,
+ 512MiB/1CPU/loopback/new volume. Reproduced actual xmin failure. Initial libc locale
+  failed Oriole table creation; minimal fixture uses C/UTF-8. No production access.
+- RED→GREEN: unsupported capability, apply/rollback on Oriole, cross-installation
+  receipt, broken/competing revision triggers, ledger-trigger epoch change.
+  Added DB-issued sequence token on every INSERT/UPDATE, installation UUID and
+  early/repeated catalog verification. Heap keeps xmin; no public interface growth.
+- Non-owner external writers cannot reuse supplied tokens/reset sequence/disable
+  trigger. Same-score, ABA, delete/reinsert, concurrency, restart, role/RLS, deferred
+  failures, receipts, disconnect/recovery and rollback exercised on real OrioleDB.
+- Surprise: SHARE lock on contract required extra write rights; changed to ACCESS
+  SHARE and kept executor SELECT-only. Recheck epoch at final snapshot before commit.
+-28/28 Oriole tests PASS with full165 package/77,698 rows;17 heap tests PASS,11Oriole
+  cases skip.980offline tests +456subtests and Ruff PASS;28integrations opt-in.
+  Apply candidate exact;77,533scores unchanged; retry/rollback correct.6,151protected
+  files unchanged per full run. Both container/volume inventories empty afterward.
+- Deployment SQL is prepared/tested locally only. Bootstrap assigns tokens to all
+  rows without changing scores; separate structural installation, not apply165.
+  Dedicated role/grants and production writer compatibility still need preparation.
+  No DB installation/application or LLM calls; no claim against owner tampering,
+  divergent restore or physical power failure. Policy and original labels unchanged.

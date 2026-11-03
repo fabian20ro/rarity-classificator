@@ -119,6 +119,7 @@ def _apply(package, approval, policy, policy_path, report, out, store, protected
         receipt = tx.receipt(package_id)
         if receipt is not None:
             _validate_receipt(receipt, approval, changes)
+            _check_version_contract(tx, receipt)
             if (
                 receipt["policy_sha256"] != approval["policy_sha256"]
                 or receipt["state"] != "applied"
@@ -166,6 +167,7 @@ def _apply(package, approval, policy, policy_path, report, out, store, protected
                 changes=updates,
                 quality=quality,
                 post_versions={i: after[i]["version"] for i in ids},
+                row_version_contract=getattr(tx, "version_contract", {"kind": "xmin-v1"}),
             )
             tx.save_receipt(package_id, receipt)
             _verify_final(tx, package_id, receipt, after, out)
@@ -217,10 +219,13 @@ def _rollback(package, approval, policy, policy_path, report, out, store, protec
         if receipt is None:
             raise ValueError("Rollback requires this package confirmed apply receipt")
         _validate_receipt(receipt, approval, inverse)
+        _check_version_contract(tx, receipt)
         if receipt["state"] == "rolled_back":
             status = "already_rolled_back"
         elif receipt["state"] == "applied":
-            if type(tx.txid) is not int or not 0 < tx.txid - receipt["apply_txid"] < 2**31:
+            if receipt.get("row_version_contract", {"kind": "xmin-v1"})["kind"] == "xmin-v1" and (
+                type(tx.txid) is not int or not 0 < tx.txid - receipt["apply_txid"] < 2**31
+            ):
                 raise ValueError("Transaction age cannot safely identify post-apply row versions")
             before = _snapshot(tx, out / "live-before.csv")
             guards = verify_correction_snapshot(
@@ -281,6 +286,14 @@ def _verify_final(tx, package_id, receipt, after, out):
         raise ValueError("Receipt write changed the verified inventory")
     if tx.receipt(package_id) != receipt:
         raise ValueError("Durable receipt differs from confirmed operation")
+
+
+def _check_version_contract(tx, receipt):
+    # Legacy receipts are heap/xmin only. Never reinterpret their integers as revisions.
+    if receipt.get("row_version_contract", {"kind": "xmin-v1"}) != getattr(
+        tx, "version_contract", {"kind": "xmin-v1"}
+    ):
+        raise ValueError("Receipt row version contract differs from this installation")
 
 
 def _validate_receipt(receipt, approval, changes):

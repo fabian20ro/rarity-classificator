@@ -1,8 +1,8 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-03. Stare: etapele 1–15 încheiate; preflight real read-only finalizat.
-Lotul165 valid, execuția blocată: OrioleDB nu furnizează xmin. Urmează compatibilitate
-și teste OrioleDB izolate, înaintea oricărei instalări/aplicări. Step4 neschimbat.
+Actualizat: 2026-11-03. Stare: etapele 1–16 încheiate; revizii explicite implementate
+și verificate pe OrioleDB1.8 izolat. Lotul165 valid; DB-ul real nu are încă schema și
+rolul necesare. Urmează pregătirea instalării, fără aplicare implicită. Step4 neschimbat.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -790,7 +790,7 @@ sau aplicare.5 încercări SQL read-only:4 reușite,1 eroare de capabilitate xmi
 Zero modificări DB/LLM;6.117 fișiere protejate intacte.26 teste +66 subteste PASS.
 [Raport, roluri, artefacte și limite](../research/2026-11-03-production-preflight.md).
 
-**Următorul pas:** TDD pentru compatibilitate OrioleDB într-un mediu izolat:
+**Pas recomandat la închiderea etapei15, realizat în etapa16:** TDD pentru compatibilitate OrioleDB într-un mediu izolat:
 reproducerea defectului, refuz timpuriu al capabilităților incompatibile, versiune
 explicită a rândului și rollback care detectează ABA inclusiv delete/reinsert.
 Recomandare de investigat: token unic emis de DB pentru fiecare INSERT/UPDATE,
@@ -801,3 +801,35 @@ Leftovers: suportul motorului real; schema ledger/rol/granturi private; conexiun
 directă verificată; instalare și apply numai la instrucțiune explicită, cu verificări
 live în tranzacție. Politica umană deja aprobată. Blocajul legacy, precizia globală
 L1 necunoscută și50.724 de schimbări baseline provizorii rămân în afara acestui lot.
+
+
+## Rezultatul etapei16 — revizii OrioleDB cu TDD, 2026-11-03
+
+Adaptorul păstrează xmin pentru heap și folosește revizii explicite pentru OrioleDB.
+Motorul nesuportat/contractul absent este refuzat anticipat. Un trigger privat,
+ENABLE ALWAYS, emite token bigint nou prin secvență la fiecare INSERT/UPDATE;
+ignoră tokenurile furnizate de apelant. Recipisa fixează tipul și UUID-ul instalării.
+Retry/rollback refuză alt contract; ABA și delete/reinsert nu reutilizează tokenuri.
+
+Contractul coloanei/funcției/triggerului/secvenței este verificat înaintea execuției
+și la snapshoturi, inclusiv după scrierea ledger-ului. Triggere BEFORE suplimentare
+sunt refuzate; scriitorii obișnuiți nu pot reseta secvența sau dezactiva triggerul.
+Interfețele CSV/tranzacționale, politica, scorurile și Step4/Step5 rămân neschimbate.
+
+**28/28 teste OrioleDB1.8 PASS**, PostgreSQL17.9, imagine Supabase fixată prin digest.
+Lot complet:165 scoruri schimbate,77.533 păstrate; candidat exact, retry fără
+reaplicare, restart și rollback corecte. Regresie heap:17PASS,11cazuri numai OrioleDB
+skip. Ruff și **980teste +456subteste PASS** offline.6.151fișiere protejate intacte;
+container/volum eliminate. Zero acces la DB-ul real sau apeluri LLM.
+[Implementare, reproducere și limite](../research/2026-11-03-orioledb-integration.md).
+
+**Următorul pas:** pregătirea pachetului de instalare pentru producție, separat de
+apply165: ledger, revizii, executor/granturi, pre/postchecks și compatibilitatea
+scriitorilor existenți. Inițializarea reviziilor atinge toate77.698 de rânduri fără
+schimbarea scorurilor și cere o fereastră pentru lock exclusiv. Instalarea nu este
+autorizată de testele izolate. După instrucțiunea explicită de instalare: preflight
+cu DSN-ul efectiv, apoi apply numai la instrucțiune explicită și cu revalidare live.
+
+Leftovers: schema/rolurile reale încă absente; administratori/restore de încredere,
+fără resetarea istoricului de revizii; infrastructura găzduită nu este certificată
+prin fixture. Fără evaluări noi; politica deja aprobată; baseline50.724 nepromovat.

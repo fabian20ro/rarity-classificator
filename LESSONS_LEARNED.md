@@ -442,3 +442,12 @@ passes. Inspect pg_class.relam, pg_am and default_table_access_method during
 preflight. A heap-only version/CAS/ABA contract cannot be promoted to OrioleDB by
 removing xmin or replacing it with a score hash. Explicit revision support must
 cover every writer and delete/reinsert, with real engine tests before deployment.
+
+**[2026-11-03]** Explicit row revisions must bind both token and installation.
+On OrioleDB1.8, an ALWAYS INSERT/UPDATE trigger plus private noncycling sequence
+detects same-score writes and delete/reinsert from ordinary external writers.
+Bind receipts to the installation UUID and recheck the contract after ledger
+writes; an epoch-changing ledger trigger otherwise allowed an invalid commit.
+Do not grant UPDATE on the contract just to obtain a stronger lock: ACCESS SHARE
+works with SELECT-only rights. Trusted administrators must preserve sequence/epoch
+history; no claim of protection against owner resets or divergent restores.

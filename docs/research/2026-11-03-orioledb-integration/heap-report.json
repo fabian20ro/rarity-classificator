@@ -1,0 +1,25 @@
+{
+  "server": {
+    "image": "postgres@sha256:c7526c0f6c3f30260a563d7bcf8ad778effac59a44f8ffa86678c35418338609",
+    "engine": "heap",
+    "extension_version": null,
+    "server_version": "17.9",
+    "container": "codex-human-pg-5a941d46d613",
+    "volume": "codex-human-pg-5a941d46d613-data",
+    "host": "127.0.0.1",
+    "host_port": 54714,
+    "memory_limit_mib": 512,
+    "container_removed": true,
+    "volume_removed": true
+  },
+  "tests": 28,
+  "failed": 0,
+  "skipped": 11,
+  "passed": 17,
+  "exit_code": 0,
+  "full_inventory": true,
+  "protected_files_unchanged": 6151,
+  "project_database_accessed": false,
+  "model_calls": 0,
+  "caveat": "Owned disposable database only. Fixture roles/triggers, not deployment certification. Post-commit ACK loss is injected after real commit; disconnect/restart are real. Trusted schema/backup administrators must preserve revision epochs and sequence history."
+}

@@ -44,6 +44,21 @@ def snapshot(store):
         return {r["word_id"]: r for r in tx.snapshot()}
 
 
+def test_orioledb_without_revision_contract_is_rejected(cluster, tmp_path):
+    import psycopg
+
+    if cluster.engine != "orioledb":
+        pytest.skip("OrioleDB capability probe")
+    _, _, _, memory = fixtures.HumanFlowTests().inputs(tmp_path)
+    dsn = cluster.database()
+    cluster.seed(dsn, list(memory.rows.values()), revisions=False)
+    with psycopg.connect(dsn, autocommit=True) as conn:
+        with pytest.raises(psycopg.Error, match="system attribute: xmin"):
+            conn.execute("SELECT xmin FROM public.words LIMIT 1")
+    with pytest.raises(ValueError, match="revision contract"):
+        snapshot(PostgresHumanStore(dsn))
+
+
 def test_real_schema_apply_retry_restart_and_rollback(cluster, scenario, tmp_path):
     store = scenario[3]
     before = snapshot(store)
@@ -126,7 +141,7 @@ def test_real_trigger_failures_roll_back_words_and_receipt(scenario, tmp_path, f
 @pytest.mark.parametrize(
     "statement",
     [
-        "INSERT INTO public.words VALUES (105,'ata','A',5)",
+        "INSERT INTO public.words (id,word,type,rarity_level) VALUES (105,'ata','A',5)",
         "UPDATE public.words SET rarity_level=2 WHERE id=101",
     ],
 )
@@ -222,8 +237,126 @@ def test_receipt_trigger_side_effect_on_rollback_is_atomic(scenario, tmp_path):
         assert tx.receipt(scenario[2])["state"] == "applied"
 
 
+@pytest.mark.parametrize("operation", ["same_value", "delete_reinsert", "supplied_old_token"])
+def test_oriole_external_writer_cannot_reuse_a_revision(cluster, scenario, tmp_path, operation):
+    import psycopg
+    from psycopg import sql
+    from psycopg.conninfo import make_conninfo
+    from uuid import uuid4
+
+    if cluster.engine != "orioledb":
+        pytest.skip("Explicit revision deployment")
+    run(scenario, tmp_path / "apply", "apply")
+    old = snapshot(scenario[3])["100"]["version"]
+    role = "writer_" + uuid4().hex[:10]
+    with psycopg.connect(scenario[4]) as conn:
+        conn.execute(
+            sql.SQL("CREATE ROLE {} LOGIN PASSWORD 'isolated_writer'").format(sql.Identifier(role))
+        )
+        conn.execute(sql.SQL("GRANT USAGE ON SCHEMA public TO {}").format(sql.Identifier(role)))
+        conn.execute(
+            sql.SQL("GRANT SELECT,INSERT,UPDATE,DELETE ON public.words TO {}").format(
+                sql.Identifier(role)
+            )
+        )
+    writer_dsn = make_conninfo(scenario[4], user=role, password="isolated_writer")
+    with psycopg.connect(writer_dsn, autocommit=True) as conn:
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            conn.execute("SELECT setval('classificator_private.words_revision_seq',1)")
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            conn.execute("ALTER TABLE public.words DISABLE TRIGGER classificator_word_revision")
+    with psycopg.connect(writer_dsn) as conn:
+        if operation == "delete_reinsert":
+            conn.execute("DELETE FROM public.words WHERE id=100")
+            conn.execute(
+                "INSERT INTO public.words (id,word,type,rarity_level,classificator_revision) VALUES (100,'ata','N',5,%s)",
+                (int(old),),
+            )
+        elif operation == "supplied_old_token":
+            conn.execute(
+                "UPDATE public.words SET rarity_level=5, classificator_revision=%s WHERE id=100",
+                (int(old),),
+            )
+        else:
+            conn.execute("UPDATE public.words SET rarity_level=5 WHERE id=100")
+    after = snapshot(scenario[3])
+    assert after["100"]["version"] != old
+    assert after["100"]["rarity_level"] == "5"
+    with pytest.raises(ValueError, match="Concurrent row change"):
+        run(scenario, tmp_path / "rollback", "rollback")
+    assert snapshot(scenario[3]) == after
+
+
+def test_receipt_cannot_cross_revision_installations(cluster, scenario, tmp_path):
+    import psycopg
+
+    if cluster.engine != "orioledb":
+        pytest.skip("Explicit revision deployment")
+    run(scenario, tmp_path / "apply", "apply")
+    before = snapshot(scenario[3])
+    with psycopg.connect(scenario[4]) as conn:
+        conn.execute(
+            "UPDATE classificator_private.words_revision_contract SET epoch=gen_random_uuid()"
+        )
+    with pytest.raises(ValueError, match="version contract"):
+        run(scenario, tmp_path / "rollback", "rollback")
+    assert snapshot(scenario[3]) == before
+
+
+@pytest.mark.parametrize(
+    "damage", ["disabled", "replica_only", "wrong_body", "sequence_cycle", "later_before_trigger"]
+)
+def test_damaged_revision_contract_fails_before_execution(cluster, scenario, tmp_path, damage):
+    import psycopg
+
+    if cluster.engine != "orioledb":
+        pytest.skip("Explicit revision deployment")
+    with psycopg.connect(scenario[4]) as conn:
+        if damage == "disabled":
+            conn.execute("ALTER TABLE public.words DISABLE TRIGGER classificator_word_revision")
+        elif damage == "replica_only":
+            conn.execute(
+                "ALTER TABLE public.words ENABLE REPLICA TRIGGER classificator_word_revision"
+            )
+        elif damage == "sequence_cycle":
+            conn.execute("ALTER SEQUENCE classificator_private.words_revision_seq CYCLE")
+        elif damage == "later_before_trigger":
+            conn.execute(
+                "CREATE FUNCTION reuse_version() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN NEW.classificator_revision=OLD.classificator_revision; RETURN NEW; END $$"
+            )
+            conn.execute(
+                "CREATE TRIGGER zz_reuse_version BEFORE UPDATE ON public.words FOR EACH ROW EXECUTE FUNCTION reuse_version()"
+            )
+        else:
+            conn.execute(
+                "CREATE OR REPLACE FUNCTION classificator_private.assign_word_revision() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog AS $$ BEGIN RETURN NEW; END $$"
+            )
+    with pytest.raises(ValueError, match="revision contract"):
+        run(scenario, tmp_path / "blocked", "apply")
+    assert not (tmp_path / "blocked/receipt.json").exists()
+
+
+def test_ledger_trigger_cannot_change_revision_contract_at_commit(cluster, scenario, tmp_path):
+    import psycopg
+
+    if cluster.engine != "orioledb":
+        pytest.skip("Explicit revision deployment")
+    before = snapshot(scenario[3])
+    with psycopg.connect(scenario[4]) as conn:
+        conn.execute("""CREATE FUNCTION change_epoch() RETURNS trigger LANGUAGE plpgsql AS $$
+        BEGIN UPDATE classificator_private.words_revision_contract SET epoch=gen_random_uuid(); RETURN NEW; END $$""")
+        conn.execute(
+            "CREATE TRIGGER change_epoch AFTER INSERT ON classificator_private.human_correction_receipts FOR EACH ROW EXECUTE FUNCTION change_epoch()"
+        )
+    with pytest.raises(ValueError, match="revision contract"):
+        run(scenario, tmp_path / "changed-contract", "apply")
+    assert snapshot(scenario[3]) == before
+    with scenario[3].transaction() as tx:
+        assert tx.receipt(scenario[2]) is None
+
+
 @pytest.mark.parametrize("access", ["rls_filtered", "ledger_denied", "bypassrls_executor"])
-def test_real_role_and_rls_boundaries(scenario, tmp_path, access):
+def test_real_role_and_rls_boundaries(cluster, scenario, tmp_path, access):
     import psycopg
     from psycopg import sql
     from psycopg.conninfo import make_conninfo
@@ -250,6 +383,12 @@ def test_real_role_and_rls_boundaries(scenario, tmp_path, access):
             conn.execute(
                 sql.SQL(
                     "GRANT SELECT, INSERT, UPDATE ON classificator_private.human_correction_receipts TO {}"
+                ).format(sql.Identifier(role))
+            )
+        if cluster.engine == "orioledb" and access != "ledger_denied":
+            conn.execute(
+                sql.SQL(
+                    "GRANT SELECT ON classificator_private.words_revision_contract TO {}"
                 ).format(sql.Identifier(role))
             )
         conn.execute("ALTER TABLE public.words ENABLE ROW LEVEL SECURITY")

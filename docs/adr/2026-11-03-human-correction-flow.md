@@ -1,7 +1,7 @@
 # Decision: separate approved human correction flow
 
 Status: **accepted by the user, 2026-11-03**. Initial scope: implementation/offline tests;
-subsequent approval covers disposable PostgreSQL integration. No production schema
+subsequent approvals cover disposable heap and OrioleDB integration. No production schema
 deployment or application authorized or performed.
 
 ## Context
@@ -32,7 +32,7 @@ reported without vetoing this scoped flow. Automatic Step4 remains unchanged.
   changes and serializes this small administrative batch. Normal reads continue.
   [PostgreSQL locking](https://www.postgresql.org/docs/17/explicit-locking.html).
 - Compare-and-set each update using ID, literal spelling/POS, expected score and
-  `xmin`. Enforce affected IDs/count, force deferred constraints before post-check,
+  row version (heap xmin or the installed OrioleDB revision). Enforce affected IDs/count, force deferred constraints before post-check,
   then compare the entire post-state, including untouched row versions. Recheck both
   inventory and stored receipt again after saving the ledger row; ledger triggers
   can introduce effects after the first check. Unexpected
@@ -51,10 +51,10 @@ reported without vetoing this scoped flow. Automatic Step4 remains unchanged.
 
 Rollback requires the ledger receipt for the exact package/policy, exact changed
 IDs and original values. Check all reviewed postconditions and membership; compare
-changed-row `xmin` with the saved post-apply version. A same-score later write is a
+changed-row version with the saved post-apply version. A same-score later write is a
 conflict, so simple A→B→A edits do not pass. Preserve unrelated later edits.
 
-`xmin` is a32-bit row version, not an eternal revision. Save the64-bit apply
+For heap, `xmin` is a32-bit row version, not an eternal revision. Save the64-bit apply
 transaction ID and fail closed if current transaction is earlier or ≥2^31
 transactions later. No claim of portability across DB restore/replacement or
 indefinite receipt validity. [PostgreSQL system columns](https://www.postgresql.org/docs/17/ddl-system-columns.html),
@@ -91,9 +91,35 @@ Production roles/triggers/schema were unverified at that stage.
 ## Production preflight follow-up (2026-11-03)
 
 Read-only inspection found PostgreSQL17.9 with OrioleDB1.8 and words stored using
-OrioleDB. Its xmin SELECT fails; the current adapter is **not deployable here**.
+OrioleDB. Its xmin SELECT fails; the original heap-only adapter was **not deployable here**.
 All233 data guards pass;165 changes remain pending. No production schema or score
 changes. The accepted policy is unchanged; its xmin implementation needs an
 engine-compatible revision mechanism, validated on isolated OrioleDB with ABA,
 delete/reinsert, other writers and rollback. A future migration requires separate
 authorization. [Preflight](../research/2026-11-03-production-preflight.md).
+
+## OrioleDB revision implementation (2026-11-03)
+
+The same adapter now detects the access method. Heap retains xmin and its age
+guard. OrioleDB requires an explicitly installed private revision contract:
+bigint column, NO CYCLE sequence, ALWAYS BEFORE INSERT/UPDATE trigger, and an
+installation UUID. The trigger replaces any supplied token; delete/reinsert and
+same-score writes get new tokens, including writes outside this application.
+
+Receipts bind `{kind: sequence-v1, epoch: UUID}`; absent fields mean legacy xmin,
+never an inferred revision. Compare-and-set and rollback use the saved token;
+no32-bit age limit on the nonrecycled sequence. Capability verification checks
+column, trigger, function body/owner/search_path and sequence, rejecting additional
+BEFORE row triggers. Every snapshot rechecks the contract, including after receipt
+persistence. SQL identifiers are fixed internally; update values stay parameterized.
+
+Revision SQL is a separate manual prerequisite, never auto-installed. Bootstrap
+touches all rows to assign tokens while preserving scores. Executor has SELECT on
+the contract and no sequence/DDL/contract-write rights; ACCESS SHARE protects that
+table from DDL without granting write privileges. Schema/backup administrators
+remain trusted and must preserve the sequence/epoch history. Restore is not automatic
+receipt portability. A new column also requires checking external positional INSERTs.
+
+TDD and28 real tests pass on PostgreSQL17.9/OrioleDB1.8;17 heap regression tests pass.
+Production installation/application remain unperformed and separately authorized.
+[Results and deployment leftovers](../research/2026-11-03-orioledb-integration.md).

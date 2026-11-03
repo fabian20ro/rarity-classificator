@@ -70,6 +70,63 @@ class MemoryStore:
 
 
 class HumanFlowTests(unittest.TestCase):
+    def test_revision_receipts_cannot_be_reinterpreted_after_contract_change(self):
+        from classificator.human_correction_flow import run_human_corrections
+
+        for action in ("apply", "rollback"):
+            for changed in ({"kind": "xmin-v1"}, {"kind": "sequence-v1", "epoch": "other"}):
+                with self.subTest(action=action, contract=changed), TemporaryDirectory() as tmp:
+                    root = Path(tmp)
+                    approval, policy, package, store = self.inputs(root)
+                    store.version_contract = {"kind": "sequence-v1", "epoch": "original"}
+                    run_human_corrections(
+                        approval,
+                        policy,
+                        root / "apply",
+                        action="apply",
+                        store=store,
+                        confirm_package=package,
+                    )
+                    after = store.snapshot()
+                    store.version_contract = changed
+                    with self.assertRaisesRegex(ValueError, "version contract"):
+                        run_human_corrections(
+                            approval,
+                            policy,
+                            root / "retry",
+                            action=action,
+                            store=store,
+                            confirm_package=package,
+                        )
+                    self.assertEqual(store.snapshot(), after)
+                    self.assertEqual(store.receipts[package]["state"], "applied")
+
+    def test_explicit_revision_rollback_does_not_depend_on_32_bit_xmin_age(self):
+        from classificator.human_correction_flow import run_human_corrections
+
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            approval, policy, package, store = self.inputs(root)
+            store.version_contract = {"kind": "sequence-v1", "epoch": "original"}
+            run_human_corrections(
+                approval,
+                policy,
+                root / "apply",
+                action="apply",
+                store=store,
+                confirm_package=package,
+            )
+            store.txid += 2**32
+            result = run_human_corrections(
+                approval,
+                policy,
+                root / "rollback",
+                action="rollback",
+                store=store,
+                confirm_package=package,
+            )
+            self.assertEqual(result["status"], "rolled_back")
+
     def inputs(self, root):
         policy = fixtures.HumanAcceptanceTests().inputs(root)
         config = json.loads(policy.read_text())
