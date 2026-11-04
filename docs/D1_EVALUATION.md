@@ -291,3 +291,137 @@ artifacts. Reproduce with the campaign's `run.py NEW_OUTPUT_NAME`, then
 `compare_evidence.py NEW_OUTPUT_NAME` and `verify.py OUTPUT_PATH`, using the project
 Python environment for export. Existing outputs are never overwritten. Scores and
 ratings remain frozen; no model, database or network needed.
+
+## Sequential chat judges (Qwen now; compatible GPT endpoint later)
+
+Use `collect_chat_csv` for a fixed, blinded prompt over the existing evidence CSV;
+use `compare_judge_csv` only after inference to join human references and baseline.
+Both public boundaries are CSV-first, tested independently and provider-neutral.
+The chat collector reuses campaign receipts/checkpoints; it does not manage local
+model loading or databases. For the measured Qwen pilot, use the saved local runner
+under `build/d1/qwen-judge-2026-10-30/run.py`: it checks RAM and exact live model
+configuration before each sequential request. The generic CLI below delegates
+transport only; local lifecycle/RAM checks remain the caller's responsibility.
+
+```sh
+PYTHONPATH=src python scripts/run_chat_judge.py \
+  --vocabulary /path/to/vocabulary.csv \
+  --evidence /path/to/evidence.csv \
+  --output-dir /path/to/new-campaign \
+  --model EXACT_SERVED_MODEL_ID \
+  --endpoint http://127.0.0.1:1234/v1/chat/completions \
+  --options-json /path/to/provider-options.json \
+  --runtime-json /path/to/runtime-provenance.json
+
+PYTHONPATH=src python scripts/compare_chat_judge.py \
+  --predictions /path/to/new-campaign/predictions.csv \
+  --reference /path/to/reference.csv \
+  --baseline /path/to/baseline-oof.csv \
+  --evidence /path/to/evidence.csv \
+  --folds /path/to/folds.csv \
+  --output-dir /path/to/new-comparison --review-budget 8
+```
+
+For a later compatible hosted model, keep the lexical CSV and rubric; change the
+endpoint, pinned model ID and explicit provider options. `--api-key-env ENV_NAME`
+reads credentials into the HTTP session only. The provider's concrete model/parameter
+support must be probed separately; this is not a claim that GPT has been run or that
+Chat Completions and Responses are interchangeable. Served model identity must match
+the requested ID; alias behavior requires separate verification.
+
+Labels, human estimates, baseline scores and other judges' predictions have no field
+in the inference evidence schema. No examples or target labels enter the fixed prompt.
+No regex repair or silent retries: invalid responses are persisted as native failures;
+the offline comparison uses the frozen baseline as an explicit fallback. All input
+IDs must still appear. Missing definitions are explicit, never an automatic level5.
+
+Chat judgments have no invented probabilities or confidence. `predictions.csv` is
+the research artifact; legacy `run.csv` intentionally has no scored rows because its
+confidence requirement is unmet. Nothing is uploaded from this pilot.
+
+Changed model/options/evidence/code reject resume. Use a fresh campaign; preserve
+source snapshots and raw receipts for old runs. Complete existing records are reused
+without another model call. Comparison reports >=2 errors, error2/3/4, excess loss,
+4/5 confusion, evidence/reference strata and matched-budget diagnostic recall/precision.
+
+To include all previously curated exact-form contexts in either provider's evidence:
+
+```sh
+PYTHONPATH=src python scripts/merge_judge_evidence.py \
+  --evidence /path/to/evidence.csv \
+  --form-contract-dir /path/to/verified-form-export \
+  --projection /path/to/audited-projection.csv \
+  --output-dir /path/to/new-merged-export
+```
+
+This preserves existing senses and adds every curated POS/meaning, retaining detailed
+POS/restriction text. It verifies the source export hashes and complete identities.
+Provenance is a separate CSV; illustrative examples are not corpus attestations and
+are excluded from model state. Curated pilot contexts may be label-exposed: reuse
+is transparent but does not establish independent validation. Existing outputs are
+never overwritten. [Measured Qwen pilot](research/2026-10-30-qwen-judge-pilot.md).
+
+When curated meaning fields contain reviewer prose, supply an explicit audited
+projection. Columns: word_id,word,context_id,pos,original_meaning,definition. It must
+cover every original context exactly once and preserve identity, POS and original
+text. Only definition replaces model-bound prose; the original/projected pair stays
+in provenance. There is no automatic blacklist or lexical rewriting. The argument
+is optional for already lexical-only input, but **required to reproduce this pilot's
+corrected arm**. Its218-row projection changes exactly five review clauses;213
+meanings remain identical. The separate interrupted30-record arm is not a result.
+
+## GPT through Codex — 2026-10-31
+
+When only an existing Codex login is available, the public boundary
+`evaluation.codex_judge.collect_codex_csv(vocabulary_csv, evidence_csv, output_dir,
+executor=..., model=..., runtime=...)` consumes the same lexical CSV as the HTTP
+collector. The executor receives a label-free request with the fixed rubric, JSON
+schema, configured model/effort and one exact form. It returns the native process
+receipt `{returncode, stdout, stderr}`. No simulated HTTP response or served-model
+identity is added.
+
+The measured local campaign is `build/d1/gpt-judge-2026-10-31/`. `prepare.py` freezes
+inputs; `preflight/final_check.py` verifies a synthetic transport probe and captures
+assembled context; `run.py` starts one fresh ephemeral Codex process per form with
+minimal environment and a separate empty cwd. Its native process receipts precede
+campaign parsing/checkpointing. Re-running the unchanged runner resumes persisted
+records without asking the model again. A model/config/source change requires a new
+campaign. Preserve raw files; do not edit manifests to force compatibility.
+
+Run the saved runner using the project Python environment. Its `protocol.json` pins
+the source checkout/binary/catalog paths; inspect these instead of assuming any clone
+or newer installed CLI is equivalent. API credentials are not extracted or copied.
+The runner requires the existing CLI authentication and permission to initialize its
+local runtime; child model commands retain the declared read-only mode.
+
+Codex has a generic managed instruction/tool wrapper, so this is not an identical
+provider prompt to Qwen. Tools are not claimed unavailable: every accepted run must
+have no observed tool events. Unknown/tool events, configuration warnings or stderr
+save a quarantine receipt and stop collection; a quarantined directory cannot resume.
+Review that failure and start a separately documented campaign if needed. Invalid
+final JSON/levels/identities produce explicit native failures; the offline comparator
+uses the original frozen baseline fallback, never a fabricated model score.
+
+After all150 records: `evaluate.py`, `replay.py`, then the separate `audit.py`.
+Comparison uses the existing `compare_judge_csv`; pairwise analysis additionally joins
+corrected Qwen scores by exact ID/spelling and identical human reference. These files
+are never supplied to the model. GPT configured identity and reasoning effort are
+reported explicitly; a provider-served model ID is not exposed by this CLI's event
+stream. [Pilot report](research/2026-10-31-gpt-judge-pilot.md).
+
+
+### Frozen1,000-form research cascade (2026-10-31)
+
+[Results and reproduction](research/2026-10-31-1000-judges.md):1,000 native GPT
+judgments then31 supported-conflict Qwen judgments, no technical fallback, no DB.
+Operational baseline and research proposal are distinct CSV columns.171 initial
+conflicts,50 blind cards; unqueried Qwen cells remain absent, not agreement/fallback.
+Use `scripts/export_audit_judge_evidence.py` for verified source projection and
+`scripts/build_risk_queue.py` for deterministic preliminary/final routing. Both
+require immutable output directories. A completed route is required before UI publish.
+
+The new public `build_risk_review` accepts explicit empty contexts plus valid POS,
+never model-generated meanings. Max50, separate storage namespace, estimates absent.
+Local interface: http://127.0.0.1:8765/review-risk/. Source/runtime scripts and
+aggregate verification receipts are linked from the result report. Human scores are
+only joined offline; the new1,000 have no validated reference labels yet.

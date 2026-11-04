@@ -970,3 +970,458 @@ Verified unique IDs, edge endpoints, D1Scorer query and incremental 130-unchange
 1-added-file extraction. Added reproducible scripts/graphify_local.sh, updated skill
 and docs. No D1 load, DB access, score/evaluation changes. Local CLI works despite
 hosted plugin Unknown tool; retain distinction and extractor coverage caveats.
+
+
+## 2026-10-30 — Consolidated 1,000-form / 50-review plan
+
+Published a focused successor plan: exact-form/all-POS evidence, sequential Qwen/GPT
+pilot on existing150, frozen cascade with100% score coverage, severe-error/excess-loss
+gates, causal audit and at most50 user review cards. Separated prepared candidates
+from new model/human validation; retained baseline and explicit unknown confidence.
+Added aggregate severity/sample snapshots; kept CoRoLa-derived counts local.
+Documentation-only branch stacked on#85; unrelated local code/artifacts preserved.
+Verification: cross-checked snapshots, plan links, scope and whitespace; no new model
+inference or DB writes. Implementation/testing of proposed stages remains pending.
+
+
+## 2026-10-30 — TDD exact-form evidence audit on independent 1,000
+
+Implemented public CSV audit + thin CLI, reusing lexical/form exporters. RED/GREEN
+covered full identity/POS membership, missing sources, source-scoped parent chains,
+hashes and manifest provenance/revisions. Review found empty provenance could bypass
+checks; regression added and fixed. 10 new tests/21 subtests. PR-isolated full check:
+893 tests/241 subtests + Ruff PASS; byte-identical offline replay PASS.
+
+Local run:1000forms/1146IDs;137exact-querysources,801absent,62wrongspellingexcluded.
+130forms with usable contexts (121allLOC-POS sourcebounded,9partial),7source-backed
+withoutusablecontext;515usable/418unaligned/1unknownPOS contexts. All1363protected
+files unchanged. Independent audit rejoined original frequency sources; scores intact.
+Surprise: source availability is much narrower than total frequency-signal coverage;
+870forms still lack usable lexical contexts. Next: independent150judgepilot with
+explicit missing-evidence strata; no new human review, models or DB writes this stage.
+
+
+## 2026-10-30 — Reusable sequential Qwen judge pilot (GPT deferred)
+
+Implemented CSV collection/comparison over existing campaign/Outcome seam; strict
+JSON/identity/model validation, durable native failures, explicit baseline fallback,
+no fabricated confidence. Thin CLIs, fixed provider options/runtime hashes, no DB
+integration. TDD public seams:16new tests/43subtests; full909tests/284subtests and
+Ruff PASS. Architect caught malformed-message/options mutation issues before inference.
+
+Initial Qwen150:150native,7severe/excess11 versus baseline11/14; withoutsense24 worsened
+2→5severe. Discovered older formatter omitted218existing curated contexts/95forms.
+Systematic merge, allPOS/restrictions/source provenance. Further review found five
+reviewer clauses inside meaning prose; stopped first correction at30completed records,
+retained it without quality analysis. Explicit complete218row projection removesonly
+those clauses,213meanings unchanged, source/identity/POS checked; originals preserved.
+
+Final corrective150:150native,5severe/excess9,145within±1; exact80,MAE.527. Initial7/11
+retained;12scorechangesallamong95changedinputs,55unchangedidentical. True4/5 severe5→2;
+missingwordfreq2→1. No-context19 regresses1→3severe/excess1→6. Top8 recovers4/11baseline
+severe versus1evidence-only,4falsealarms. Bothpairedbootstrapintervalsincludezero.
+Correction is label-exposed development evidence, not independent validation.
+
+Sequential Qwen-only, RAM guard beforeeachcall, preexisting instance preserved.
+Finalminmemoryproxy2.94GiB/OSfree16%,~14.5minutes;0reasoningtokens. Independent audit
+and offline replay PASS;1721protectedfiles unchanged. Rawtext/records stay local,
+aggregate reports/receipts published. No newratings,D1/GPTclassification,DBwrites.
+Plan: retain operationalwordfreq+4; Qwen diagnosticcandidate. NextcomparableGPTpilot
+uses same finalCSV/prompt; concreteprovidercompatibilityuntested. Address870/1000
+missingcontexts before blanketrollout; nocertifiedconfidence or automaticpromotion.
+
+
+## 2026-10-31 — GPT-through-Codex150 pilot and three-way comparison
+
+No APIcredentialconfigured; used existing Codex login viaofficialCLI0.166.0,
+gpt-6.1-sol/low requested. Syntheticpreflight found ignored option and persistent
+generic managedwrapper/tools; retained attempts, inspected assembledcontext and
+reportedconfiguredidentity/wrapperlimits insteadofclaimingrawmodel-onlyequivalence.
+No taskhistory/gold in context. SamefinalQwen evidence/rubric/schema; onefresh ephemeral
+session/form, minimalenvironment, readonlychild, rawreceipts beforeparsing. Modeltools
+availablebutzeroobserveduse; unknown/tool/warning eventsquarantineentirecampaign.
+
+TDDnativeCSVcollector reusescampaign/Outcome/comparator, no fabricatedHTTPresponse or
+confidence.6newtests19subtests; full915tests303subtests/RuffPASS. Reviewcaught stderr
+warningsaccepted andmalformeditemmaskinglater tool; regressionsRED/GREENfixedbefore
+anytargetclassification. All150completednatively,0fallbacks,~13minutes,149nonoverlap,
+150uniquethreads.2092protectedfilesunchanged; replaywithprocess/network/DBblocked and
+independentraw-event/metrics/bootstrap/triageauditPASS. No Qwen/D1/localmodelloading,
+newhumanratings,scoreoverwrites orprojectDBwrites.
+
+GPTsevere3/excess3/within1=147, versusQwen5/9/145 andbaseline11/14/139. AllGPTerrors
+distance2; exact77,MAE.507. Rescues10baseline/new2; rescuesall5Qwen/new3. GPTsevere:
+carter5→3,catalige4→2,târfă3→1. No severeintersectionQwen/GPT on150; notoracleensemble.
+Top8GPTfinds6/11baselinesevere with2falsealarms versusQwen4/11/evidenceonly1/11.
+True4/5severe2likeQwen,baseline5. Missingwordfreq49 GPT2tiesbaseline,Qwen1.
+No-context19 GPT0,Qwen3,baseline1—but17/19common1–2 andonly2withoutwordfreq; target
+newno-context870has764withoutwordfreq. GPT-vs-QwenCIsincludezero; noindependentgold.
+
+Planupdated: GPTprimarysemanticresearchcandidate,Qwendiagnosticcomplement; baseline
+operationalunchanged. Nextprepare1000evidenceCSV/freezerouting andcheckofflineonexisting
+predictions, thennewsequentialcampaign/causalaudit/max50reviews. No newpromptsearch.
+Aggregateartifacts+verificationpublished; rawlexicaltext/processreceiptsstaylocal.
+
+
+## 2026-10-31 — Frozen conflict policy, sequential1,000 GPT and31 Qwen
+
+User authorized fixed rules checked on150, GPT on frozen1,000, Qwen only important
+conflicts, maximum50 cards, plan/PR update; no DB. Worked in isolated risk-plan-pr
+checkout. TDD public CSV seams: audited sources→judge inputs; label-free predictions
+→routes/review queue. Added strict immutable evidence projection and conflict policy;
+blind review supports missing senses without fake meanings and separate storage.
+
+One policy, no threshold sweep: pilot12 Qwen routes,13 eligible; top8 captures6/11
+baseline severe and2/3 GPT severe. Misses carter/in for baseline,carter for GPT;
+no word-specific exception or Qwen veto. Inputs1,000 forms/1,146 members;130 with
+contexts,870 missing;764 missing both contexts/frequency. Same pilot prompt/schema;
+GPT-6.1-sol low configured through Codex, fresh ephemeral sessions, no reference
+scores/frequencies/other predictions in requests.1,000 native valid then31 Qwen
+native valid, zero fallback.171 initial gaps≥2;11 Qwen–GPT gaps≥2;50 fixed cards
+(20general/30stress,12with contexts/38explicitly missing). No new gold labels;
+121 eligible conflicts remain beyond budget, rest uncertain rather than certified.
+
+927tests+330subtests/Ruff PASS. Independent audit and process/network/DB-blocked
+replay PASS;1,000 unique sessions/999 nonoverlap checks and Qwen-after-GPT;
+4,456 protected files unchanged. GPT93.67min,Qwen2.51min; Qwen minimum RAM proxy
+2.85GiB/OS15%. Preexisting Qwen preserved; no D1 or DB writes. Surprises: existing
+manifest helper allowed missing implementation provenance (new adapter fails closed);
+Qwen within-one agreement is insufficient to discard initial conflict. No further
+human round silently added. Next: import this≤50 round and audit confirmed causes;
+no production promotion or whole-inventory regeneration yet.
+
+
+## 2026-10-31 — Completed50 imported and compared without new inference
+
+Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net score changes; pilot150 separate. Immutable local CSV artifacts/manifest at build/d1/review50-2026-10-31. Baseline13severe/excess14; GPT19/excess25 on50. Qwen only12 paired: baseline7/GPT3/Qwen3, costs8/5/5. No-context38 baseline6vsGPT16; human4/5n15 baseline1vsGPT14. Audited62 saved model notes; Qwen explicitly substitutes otel with oțel; missing POS/sense coverage and qualifier scope remain targeted hypotheses. All4456protectedfiles unchanged; independent verification and Ruff927tests+330subtests pass. No calls/models/DB writes. Recommendation: retain baseline; audit lexical evidence before one bounded, predeclared experiment; no extra human round, automatic production promotion or claim about950unreviewed. Raw evaluations and CoRoLa remain local; aggregates and reproduction scripts go to PR86.
+
+
+## 2026-10-31 — exact-form spelling/POS evidence repair and bounded paired experiment
+
+- User scope: TDD general lexical corrections; limited existing150/review50 experiment; preserve all labels; no new human round or classifier DB writes; update PR86.
+- Confirmed CSV seams reused. Added exact MDA headword extraction with source receipts, literal/inflected/variant spelling relations, gender-aware missing-definition POS, refreshed curated coverage. No per-word rarity patches.
+- RED→GREEN: missing ceruit adjective/ozene neuter; source numeric reference misparsed as clause; contradictory literal spelling. Additional negative/scope/merge regressions. Spec review caught numeric-fragment bug before inference; standards had no blocking findings.
+- Regenerated content changed40/150,4/50; seven pilot forms shed affix-only senses under common audit projection. Still19/150 and38/50 without definitions. All scores immutable.
+- Frozen30, two fresh arms,60 sequential configured GPT6.1-sol-low sessions, same prompt,10 identical repeat controls. Pilot0/19→0/19 severe; review4/11→3/11 solely from identical-input control prășit2→3. Actual interventions0/14→0/14 and3/6→3/6; no demonstrated reduction. iț5→4 remains within1.
+- Retrospective complete-cohort context gate:4/150 and9/50 severe, but reference4 review subset worsens0/9→2/9 vsbaseline. Keep operational baseline; next suggested corpus-supported gate offline on existing predictions, no fresh labels/models.
+- Sandbox prevented first Codex initialization before any thread/output. Failed receipt preserved v2; same selection/inputs collected v3 under approved escalation. No repeated model trials from initialization failure.
+- Verification: Ruff932tests+344subtests,60unique sessions59nonoverlap,4468protected files unchanged,138artifacts byte-identical replay with model/network/DB blocked. No local model loaded. Implementation a196520; report/scripts/plan in docs/research/2026-10-31-evidence-repair and docs/plans/2026-10-30-1000-form-risk-review.md.
+
+
+## 2026-11-01 — offline lexical/corpus gate for large reductions
+
+- User requested existing sources only, separate150/50 and rare4/5, immutable scores, zero LLM/DB. Used no subagents in deference to no-LLM scope.
+- Frozen exact-form-reduction-gate-v1 before comparison: accept only baseline−GPT≥2, known POS definition coverage, FineWeb2(5counts/3docs/2hosts) OR CoRoLa≥5. Baseline otherwise; no fitting/threshold search. TDD at approved label-free CSV seam, sources verified by existing corpus validators.
+- Full coverage150/150,50/50. Accepted8/9 and11/49. Baseline→candidate severe11→9 and13→10; excess14→12 and14→13. Failed prespecified rare-class criterion: true4 severe2/21→3/21,0/9→2/9; true5 severe3/22→3/22,1/6→2/6.
+- Surprise: corpus contributes zero decisions beyond lexical gate; CoRoLa supports57/58 proposed large reductions, so attestation does not constrain commonness. FineWeb supports37/58. No thresholds altered after results. Per-family/fold diagnostics retain group structure; no new CV claim.
+- Recommendation: retain baseline, stop this tuning cycle on reused labels. Next engineering candidate: immutable human scores as exact-form overrides in a separate offline inventory export, baseline elsewhere, explicit provenance/provisional flags; no DB upload or new user round here.
+- Verification: Ruff936tests+354subtests;4662protected files unchanged;8gate artifacts byte-identical replay; independent label/arithmetic checks; process/network/DB paths blocked. Local artifacts build/d1/reduction-gate-2026-11-01; aggregate research report and updated plan for PR86.
+
+
+## 2026-11-01 — conservative full-inventory export, human priority
+
+- User requested full CSV, human ratings first, frozen baseline elsewhere, provenance and separate conflicts; no LLM/DB; update plan/PR86. No subagents invoked.
+- TDD approved CSV seam: initial missing-module RED, GREEN exact-form/POS priority, model-only diagnostics and negative integrity/replay cases. Immutable source catalogs; no score averaging or accent restoration; conflicting human references fail closed; atomic new directory.
+- Export77,698IDs/75,147forms;200humanforms→233rows;77,465baseline rows unchanged. Numeric overrides117rows/99forms. Preserve original ratings and baseline configuration; human equality is not independent accuracy.
+- Reconciled1,331historical model observations,813conflicts across653forms:99baseline-human(23severe),714model-candidate(160severe). No model score controls output.
+- Surprise: mandatory L1 checks already failed for the original baseline. Candidate Jaccard.0323538, anchorprecision.0821918, recall.5625; baseline.0317979/.0816092/.5546875. Same existing thresholds. Local snapshot2,500L1 IDs and128seed anchors; seed precision is not population accuracy. Structurally valid candidate, not upload-ready.
+- Verification: Ruff940tests+363subtests; all77,698rows independently reconciled;10byte-identical replay artifacts;4,688protected files intact. Corrected verifier reporting counter polluted by empty defaultdict keys before publication; exported scores unaffected. No LLM/process/network/DB path used in runner/replay.
+- Local build/d1/conservative-export-2026-11-01; publish code/aggregates only. Next offline audit L1 divergence and anchor provenance/coverage, not threshold relaxation or another user review. DB remains untouched.
+
+
+## 2026-11-02 — offline L1 divergence and incomplete-anchor audit
+
+- User scope: explain why original baseline also fails; preserve scores, no LLM/subagents/DB; update plan/PR86. Research script only, no operational changes.
+- All77,698 local IDs/spellings/POS align. Jaccard upper bound972/2500=.3888 (<.7); anchor precision upper bound128/870=.147126 (<.8). Even400anchors only allow.45977. Unlisted positive-seed words are not validated negatives.
+- All128unique anchors in inventory (130lines, lună/mare duplicates already deduped). Baseline71L1,54L2,1L3(stilou),2L4(prună/ședea missing frequency). Candidate adds human ou to L1. Most seed misses are only1level, unlike primary >=2 objective.
+- Historical snapshot fails its own anchor gate:19/128recall, .007612precision. Journal dates capture before Feb15 uploads; later saved rebalance differs53,763scores. Feb20 remap+77,698 verified across whole inventory with saved uploaded receipts; no inference about live DB IDs/state.
+- Snapshot1,783form-level inconsistencies; deduplicating POS barely changes Jaccard(.031798→.032832). Against existing150: snapshot76severe/excess139, minimum-over-POS74/131, fitted baseline10/13; review50:13/18,12/17,13/14. Fitted vsOOF distinction retained. Human candidate agrees by construction, not validation.
+- Recommendation: versioned validation manifest/report in audit mode, typed historical/positive-only/human sources, impossible-threshold preflight and separate drift/seed recall/label severity. Do not relax existing gate, use candidate as reference or expand anchors circularly. No more human rounds; independent population precision remains unknown.
+- Verification: prior gate exactly reproduced, independent arithmetic,6byte-identical replay files,4,707protected files intact, process/network/DB forbidden. Ruff940tests+363subtests. Source CSVs local; publish aggregates/script. Code behavior/scores/anchors/thresholds unchanged.
+
+
+## 2026-11-02 — versioned validation contract, audit-only
+
+- User scope: TDD implementation, existing data, preserve human scores and upload block, zero LLM/DB, update plan/PR86. Reused approved CSV seams; no agents/models.
+- Added rarity-validation-audit-v1 public manifest→CSV/JSON audit. Strict role/unit/date/hash/universe metadata; exact ID/POS mapping, complete consistent candidates, contradictory human labels fail closed. Atomic output/no overwrite; historical drift, positive-only seed recall and human150/50 metrics separated. Declared fit/override/none/unknown interpretation; no global PASS or upload authority, including perfect metrics.
+- RED→GREEN7tests and18negative subcases: missing module, human metrics, incompatible manifest, identity/POS/references, provenance/reuse warnings, empty L1 and CSV/replay. Preserve existing gate code; no framework/transport/upload integration.
+- Full inventory77,698IDs/75,147forms,200human/74,947unknown. Reproduced baseline fitted10/150 and13/50severe; conservative0through override only. Baseline L1precision38/45=.8444 on labelled development subset, coverage45/870=.05172; conservative51/51with51/876coverage. Both leave825L1forms without human reference. Review50has no L1; undefined metrics null.
+- Actual Step4+actual gate blocked both baseline and candidate before forbidden WordStore/marker boundaries; no external side effects. Existing thresholds and every original score unchanged.
+- Validation: Ruff947tests+381subtests PASS;400human comparisons independently reconciled,7byte-identical artifacts,4,718protected inputs intact. Local build/d1/validation-contract-2026-11-02; publish code/tests/contract/aggregates only.
+- Next suggested step: read-only fresh snapshot and migration dry-run plan for identity/differences, never automatic ID shifting, upload or quality certification. Explicit future acceptance policy still needed; no new user annotations or silent relaxation of gates.
+
+
+## 2026-11-02 — fresh snapshot and conservative migration dry-run
+
+- User accepted read-only snapshot/dry-run. Used Supabase skill/plugin: project discovery, count/ID SELECT, then full single-SELECT aggregate captured2026-11-02T20:32:03.276616Z.77,698rows, IDs233095..310792; no DML/DDL or DB writes. Do not claim plugin session read_only setting. No LLM/subagents.
+- Initial parsing of the MCP untrusted-data wrapper matched its explanatory inline tag; fixed delimiter parsing before persistence, no repeated SQL. Original complete snapshot JSON2,084,739bytes/count verified and kept local; no credentials in artifacts.
+- TDD exact-form/POS migration mapper: ignore old/reused IDs; unique73,308rows and4,390score-equivalent duplicates across2,165groups. Equal cardinalities required; missing/POS/count conflicts quarantined. All77,698mapped, zero issues. Observed+155,396on unique pairs is diagnostic only, not automatic offset.
+- Full candidate would change50,889rows, preserve26,809;6,664gaps>=2.30,540transitions5->4; no evidence that historical disagreement means error. Human priority233rows,165changes/144forms,61large differences/54forms; original200references intact. Other50,724changes provisional baseline.
+- Reprojected immutable scores/references into live-ID audit universe with explicit group provenance. Actual Step4+gate blocked before forbidden DB/marker boundaries: Jaccard.146784 vs.7 (ceiling now.793187), seed membership.082192/recall.5625 vs.8/.8. No SQL updates or authorization.
+- Verification: Ruff951tests+386subtests;4new tests+5subcases, each live row independently reconciled,13byte-identical replay artifacts,4,729protected files intact. Local build/d1/migration-dry-run-2026-11-02. Code/aggregate report/plan to PR86; row-level snapshot stays local.
+- Recommendation: no full migration; next prepare165human corrections with optimistic identity/current-score preconditions and rollback CSV, acceptance policy explicit before any upload. No further annotations or LLM experiments.
+
+
+## 2026-11-02 — human-only165 correction package and guarded rollback
+
+- User requested TDD preparation only, preconditions/rollback CSV, no upload/LLM/DB; update plan/PR86. Reused approved CSV seam, no agents.
+- Public prepare_human_corrections validates pinned exports, replays full migration plan and reconciles projected references with original human working_level rows. Extracts only changed human rows; fails resealed plan/reference omissions or fabricated levels. Atomic package/no overwrite.
+-165corrections/144forms,165inverse rows,233guards/200forms including68already-correct rows;61large differences. Guard verifier checks literal ID/word/POS, before/after level and full reviewed-form membership. Unreviewed rows outside guard scope; full-inventory legacy gate separate.
+- Offline application to copies changes exactly165, leaves77,533others unchanged; inverse reconstructs original snapshot bytes. Postcondition match never claims freshness/execution/rollback permission. Future rollback needs confirmed apply receipt and conflict checks; CAS values alone cannot detect ABA. No executor/SQL/update path added.
+- Existing gate on full simulated inventory: Jaccard.964595PASS, seed membership.047702FAIL, recall.429688FAIL.55seed hits versus54before; original uploader/gate/thresholds unchanged, upload entrypoint not invoked.
+- TDD RED→GREEN extraction, lineage validation and stale-state checks;5new tests+10subcases; totalRuff956tests+396subtests PASS.165IDs independently reconciled,200references unchanged,16byte-identical replay files,4,754protected originals intact. Zero DBreads/writes/model calls. Uses captured2026-11-02T20:32:03.276616Z snapshot, no new freshness claim.
+- Local build/d1/human-corrections-2026-11-02; publish policy/code/tests/aggregates only. Next explicit acceptance policy for human-only corrections, separate from executor/promotion; no implicit bypass of legacy seed gates or new user ratings.
+
+
+## 2026-11-03 — Human correction acceptance policy, audit only
+
+- Implemented versioned CSV audit for the frozen165 correction package; replay original
+  plan/human sources, pin exact scope and snapshot, compare full candidate, inverse and
+  Jaccard≥.7. Legacy seed gate computed separately and unchanged; no upload authority.
+- TDD7tests/26subcases; RED→GREEN for resealed package mutations, strict schema/source
+  binding, ambiguous score fields, out-of-scope candidate diagnostics and inverse check.
+  Full Ruff+963tests/422subtests PASS. No subagents/models, DB reads/writes or uploader.
+- Actual165/233/200 pass all6criteria;77,533rows untouched, inverse restores snapshot.
+  Legacy96.459%/4.770%/42.969% still FAIL. Zero direct human–seed contradictions;
+  incompleteness/global seed placement causes failure, not a contradictory reviewed label.
+-4,778protected files intact;10byte-identical audit replay files; original200scores retained.
+- Plan stage12 and PR updated. Next: explicit operational policy promotion/integration,
+  then live transactional guards/receipt/rollback; no additional annotation or calibration.
+
+
+## 2026-11-03 — Approved human flow implementation, no DB/LLM
+
+- User explicitly approved scoped human policy; separate default-offline CLI +
+  transaction adapter. Jaccard original/current mandatory; anchors diagnostic;
+  Step4/WordStore/Step5 unchanged. Approval pins policy/package, execution needs
+  additional explicit package confirmation and dedicated DSN.
+- TDD13tests/27subcases: approval, full live guards, partial failure/receipt/commit,
+  trigger side effects, lost acknowledgement/recovery, inverse/ABA/xid age, source
+  mutation and psycopg parameter/transaction contract.976tests+449subtests/Ruff PASS.
+- Actual165-package preview/rehearsal with memory store only: exact candidate,
+  233guards/200references,77,533untouched, retry without reapply, rollback restores
+  values.4,791files intact,14byte-identical preview files. Zero DB/DDL/models.
+- Durable ledger schema prepared, NOT installed. Server concurrency/RLS/trigger/
+  xmin/durability semantics not integration-tested. Next isolated PostgreSQL tests,
+  then separately authorized deployment/application; policy approval already given.
+- Validated design lesson: a lost commit acknowledgement cannot be classified as
+  rollback. Persist receipt in the same transaction; recover before repeating DML.
+
+
+## 2026-11-03 — Disposable PostgreSQL integration and receipt-trigger fix
+
+- Approved next step: real PostgreSQL17.9 in an owned Docker container/temporary
+  volume, loopback only,512MiB, exact image digest. No project DSN/model calls.
+- TDD integration exposed two ledger-trigger failures: unexpected words mutation
+  and receipt rewrite after first post-check. RED observed on real PostgreSQL;
+  final inventory/receipt checks and immediate constraints make both GREEN.
+  Rollback covered too; added offline regression3subcases.
+-17integration cases PASS: real locks/concurrency/one-time duplicate apply, schema,
+  RLS/privileges, deferred/receipt failures, backend termination, restart, real xmin
+  ABA detection, recovery after injected post-commit lost ACK, full165package.
+- Full77,698-row snapshot in test DB: exact165changes,77,533untouched, retry does not
+  reapply; rollback restores all original values.4,885protected files unchanged.
+- Normal Ruff+977tests/452subtests PASS;17server tests skipped by default and run
+  separately. New reusable opt-in script; container+volume cleaned,104MiB image cache.
+- Harness surprise: Docker's automatically published port did not survive restart
+  access as expected; reserve an explicit loopback port for the owned lifecycle.
+- Next: production read-only preflight, then separately instructed ledger deployment
+  and apply. No production schema/data touched; no power-loss durability claim.
+
+
+## 2026-11-03 — Real read-only preflight: OrioleDB compatibility blocker
+
+- Authorized metadata/data reads only, plan/PR update. Supabase skill consulted;
+  five SQL attempts inside BEGIN READ ONLY, four successful and one xmin failure.
+  No DDL/DML, table locks, installation, model/subagent calls, or apply/rollback.
+- Surprise: project engine17-oriole, extensionOrioleDB1.8, words/default access
+  methodorioledb. PostgreSQL17.9 matches the isolated server but xmin SELECT raises
+  XX000. Current heap adapter cannot run here; removing version checks is unsafe.
+- Inspected roles/memberships/grants, RLS/policies, columns/constraints/indexes,
+  DML triggers/rules, DDL event triggers and default ACLs. Words RLS on, postgres
+  BYPASSRLS; no words triggers/rules. Private ledger absent; no dedicated executor.
+- Full77,698-row canonical ID/word/POS/score SHA-256 equals pinned original.
+  Direct233-row capture matches all guards:165pending corrections,68already correct,
+  200references. Offline provenance/preview PASS; projected Jaccard96.459%; unchanged
+  legacy seed diagnostic4.770%/42.969%. No claim about other columns or prior ABA.
+-26focused tests +66subtests PASS.7replay outputs byte-identical after JSON key-order
+  normalization;6,117protected files intact;33local artifact hashes verified.
+  Raw233-row data stays local; aggregate report and read-only catalog queries in PR.
+- Next revised: TDD capability guard and explicit row revision on isolated OrioleDB,
+  covering all writers, ABA/delete-reinsert, receipt and rollback. Only then prepare
+  separately authorized schema/role deployment/application. Policy remains approved.
+
+
+## 2026-11-03 — TDD explicit row revisions on isolated OrioleDB
+
+- User approved the proposed OrioleDB adaptation/tests. Reused confirmed CSV flow
+  and transactional adapter seams; TDD/codebase-design skills, no model/subagents.
+- Owned Supabase17.9.0.029-orioledb image pinned by digest, extension1.8 asserted,
+ 512MiB/1CPU/loopback/new volume. Reproduced actual xmin failure. Initial libc locale
+  failed Oriole table creation; minimal fixture uses C/UTF-8. No production access.
+- RED→GREEN: unsupported capability, apply/rollback on Oriole, cross-installation
+  receipt, broken/competing revision triggers, ledger-trigger epoch change.
+  Added DB-issued sequence token on every INSERT/UPDATE, installation UUID and
+  early/repeated catalog verification. Heap keeps xmin; no public interface growth.
+- Non-owner external writers cannot reuse supplied tokens/reset sequence/disable
+  trigger. Same-score, ABA, delete/reinsert, concurrency, restart, role/RLS, deferred
+  failures, receipts, disconnect/recovery and rollback exercised on real OrioleDB.
+- Surprise: SHARE lock on contract required extra write rights; changed to ACCESS
+  SHARE and kept executor SELECT-only. Recheck epoch at final snapshot before commit.
+-28/28 Oriole tests PASS with full165 package/77,698 rows;17 heap tests PASS,11Oriole
+  cases skip.980offline tests +456subtests and Ruff PASS;28integrations opt-in.
+  Apply candidate exact;77,533scores unchanged; retry/rollback correct.6,151protected
+  files unchanged per full run. Both container/volume inventories empty afterward.
+- Deployment SQL is prepared/tested locally only. Bootstrap assigns tokens to all
+  rows without changing scores; separate structural installation, not apply165.
+  Dedicated role/grants and production writer compatibility still need preparation.
+  No DB installation/application or LLM calls; no claim against owner tampering,
+  divergent restore or physical power failure. Policy and original labels unchanged.
+
+
+## 2026-11-03 — TDD offline production installation bundle
+
+- Prepared only; no DB/network model calls, installation, container execution or score
+  changes. Reused approved CSV/package seam, TDD/codebase-design guidance.
+- RED→GREEN: missing generator, unlisted SQL accepted, incomplete check contract,
+  final data check absent after installation-receipt write.6 public-interface tests.
+- Hash-bound preflight capture and original snapshot; one atomic ledger/revisions/
+  NOLOGIN role/grants proposal;17 prechecks/16 postchecks, full existing-column hash,
+  installation receipt, unchanged CSVs, integrity manifest and operational runbook.
+- PostgreSQL17 creator ADMIN membership accounted for; no inherited/SET membership,
+  credentials or login activation. NOLOGIN is preparation, not apply authorization.
+- Surprise: local LoadDictionary.kt uses named INSERT columns but TRUNCATE/reload;
+  IDs/membership may change despite restored scores. Requires reconciliation; local
+  source audit cannot certify all deployed writers. Writer source/hash recorded.
+-986tests +456subtests PASS, Ruff PASS;28server integrations skipped.9 main bundle
+  files replay identically;6,151original files unchanged. ZIP/hash retained locally.
+- Assembled SQL NOT parsed/executed on PostgreSQL this turn. Earlier28Oriole/17heap
+  component tests are not new full-bundle runtime evidence. Next: isolated complete
+  package rehearsal, then separately instructed production installation/application.
+
+
+## 2026-11-04 — complete installation rehearsal on owned OrioleDB
+
+- User authorized isolated installation/fault recovery, not production writes.
+  Reused TDD skill and agreed package/SQL/transaction seams; no model/subagents.
+- Added12 opt-in integration cases and --installation-bundle to existing harness.
+  Original immutable bundle ran unmodified with all9 captured hooks and77,698rows;
+ 17/17 prechecks and16/16 postchecks PASS, including after restart.
+- Faults: DDL rejection, non-score column mutation, terminated backend, inventory
+  drift, exclusive-lock timeout; all atomic/retryable. Post-commit ACK simulated,
+  receipt retained, duplicate installation refused. Postflight rejects later grants,
+  disabled revision trigger and non-score edits despite unchanged score projection.
+- Complete fixture install grants allow165 apply/retry/rollback:77,533scores preserved,
+  rollback original projection exact. Full unrelated-column fixture data preserved.
+- Surprise/RED: captured event-trigger owner cannot be assigned to non-superuser.
+  Corrected fixture bootstrap with temporary SUPERUSER, removed before installation.
+  Runtime/SQL passed; no product fix needed, no invented RED→GREEN claim.
+-12/12 server tests PASS24.23s;986offline +456subtests PASS,40server cases skip by
+  default. Ruff PASS.6,175protected files unchanged, original bundle/hash preserved.
+  Container/volume removed; cached image, no pull. Production DB not accessed.
+- Fixture contains real4-column projection plus synthetic extra column, not full
+  production backup. Captured hook bodies run locally; hosted service behavior not
+  certified. Next fresh real read-only preflight + separately instructed installation;
+  NOLOGIN default, activation/apply remain separate. Policy/labels/gates untouched.
+
+
+## 2026-11-04 — refreshed real installation preflight, read-only
+
+- Supabase skill; verified project pdliedweugywbiczajxn ACTIVE_HEALTHY. Exactly2 SQL
+  transactions BEGIN READ ONLY/ROLLBACK, session/current_user postgres. No DDL/DML,
+  explicit table locks, sequence advancement, model calls, secret reads or direct DSN.
+- Original17 installation predicates all PASS at00:49:33 Europe/Bucharest; second
+  capture00:50:38 confirms77,698 projection hash and233 individual guards.165pending,
+ 68already correct. RLS/grants/9DDL hooks unchanged; private schema/executor absent.
+- No other words locks visible at second capture; no future lock reservation. MCP
+  connection verified only; HUMAN_CORRECTIONS_DSN absent. PostgREST exposed-schema
+  setting not visible, so no claim about all hosted API settings.
+- Replayed provenance/policy offline with psycopg connect prohibited.35focused tests
+  +70subtests PASS;6replay outputs byte-identical;7,124protected files unchanged.
+  Raw rows/SQL/captures local, aggregates published. No runtime/pinned SQL changes.
+- Local evidence parsing initially matched the tool warning envelope; fixed to the
+  newline-delimited data block without repeating SQL. Replay comparison corrected
+  expected filename report.json to actual result.json; both were local tooling only.
+- Result: installation prerequisites satisfied now; next separately instructed
+  structural installation with repeated checks/lock, NOLOGIN/postflight. Activation
+  and apply165 remain separate. Existing approval/labels and automatic gates intact.
+
+
+## 2026-11-04 — authorized production structural installation
+
+- User “do it” follows recommendation for structural installation; scope announced:
+  ledger/revisions/NOLOGIN role only, no apply165 or executor activation. No new
+  permission question, no LLM/subagents. Exact immutable bundle hash verified.
+- Real project ACTIVE_HEALTHY; repeated original17prechecks PASS. Executed original
+ 02-install.sql once via Supabase MCP, one transaction with exclusive lock, repeated
+  checks and full existing-column preservation hash. No SQL patch/retry needed.
+-16/16 postchecks PASS in separate read-only transaction. Durable receipt read in
+  another: timestamp07:10:27UTC (09:10:27local), epoch f7256150-4123-4170-88b0-41c8a5e5b387.
+ 77,698unique revisions1..77,698; before/after full-column hash6d1052a2...90f8a3 equal.
+- Executor NOLOGIN, no password provisioned; only postgres ADMIN membership with
+  INHERIT/SET false. API-role private USAGE false; correction ledger0. No scores
+  changed;165pending. Original policy, labels, gates and runtime/SQL unchanged.
+- Advisor0private findings;5existing public objects visible to anon GraphQL,
+  documented with remediation link; no out-of-scope ACL changes.7,155original files
+  unchanged. One write transaction plus3read-only; raw receipt/captures/manifest local.
+- Tests not rerun without code change; actual postflight/receipt verifies deployment.
+  Next dedicated-connection configuration/controlled activation, initially read-only;
+  separately instructed apply165 remains outstanding. No automatic reinstall/uninstall.
+
+
+## 2026-11-04 — dedicated connection setup and read-only verification
+
+- User approved connection setup/controlled activation. No human corrections, new
+  grants or LLM calls. Read installed contract and local config without exposing secrets.
+- Direct endpoint DNS unavailable. Existing config used JDBC URL and separate user/
+  password; corrected local parser without executing the env file or installing dotenv.
+  Public CA bundle rejected the service chain. Located CA URL in official Supabase
+  Studio source; downloaded scoped CA and retained TLS verify-full.
+- Surprise: pooler startup options did not enforce read-only; initial SELECT probe
+  observed off. All validation transactions explicitly BEGIN READ ONLY and verify on.
+- Existing libpq generated SCRAM verifier from locally random secret. Protected
+  service/passfile written first, ignored by root checkout; role password/LOGIN changed
+  in one transaction. No passwords/verifiers in model output, process arguments,
+  evidence or repository. Directory0700/files0600; original admin config untouched.
+- Dedicated authentication, role flags/grants, runtime revision contract and whole
+  snapshot verified.233guards PASS;165pending/68correct; ledger0; original projection
+  unchanged. Original installer NOLOGIN check false by design, other15PASS.
+- Local reusable read-only verifier/runbook; standard service/env interface.7,172
+  protected files unchanged. No runtime/SQL changes or redundant suite rerun.
+- Published aggregate results only; private endpoints/credentials omitted. Next
+  separately instructed apply165 with transactional revalidation and receipt.
+
+
+## 2026-11-04 — approved human corrections applied in production
+
+- User confirmed the proposed apply step. Reused existing dedicated connection and
+  immutable policy/package; no new permissions, schema changes or LLM calls.
+- Fresh read-only preflight233/233 and offline provenance/acceptance preview PASS.
+  Captured full inventory and hash of every other column before execution.
+- Existing CLI applied165 sequential CAS updates in one transaction, with live
+  guards/quality checks and durable receipt. Commit acknowledged; no retries.
+- Separate READ ONLY connection recaptured all77,698rows:165score/revision changes,
+ 77,533fully unchanged;233postconditions pass. Other-column digest unchanged;
+  receipt and post-versions match the committed local evidence.7,187protected
+  files unchanged. No rollback performed, original rollback CSV retained.
+- Jaccard96.459% against original/live reference. Automatic legacy anchor gate
+  remains FAIL; scoped approved human policy passes. No baseline-only uploads.
+- Runtime unchanged; no redundant suite rerun. Published aggregate outcome only,
+  detailed receipt/snapshots/connection remain local. Updated plan/handover/ADR.
+- Next review/merge stacked PR85/86. Human deployment complete; broader automatic
+  promotion remains a separate semantic-validation decision, no new user ratings.
+
+
+## 2026-11-04 — PR85/86 offline review and merge preparation
+
+- Surprise: GitHub85 was already merged on October30 into82's branch, although
+  earlier handovers recommended merging85/86.81/82 still open; do not infer main
+  integration from merged=true. Parent tree equals85 head;86 delta unchanged.
+- Reviewed standards/spec separately without subagents/model calls. No remaining
+  code blockers found; corrected stale initial deployment status in ADR/report.
+- Ran official offline checks on both exact heads with DB/network/process guards:
+ 85:883tests+220subtests;86:986tests+456subtests,40DB integration skips; Ruff PASS.
+  CI green on original heads; no review threads/negative reviews. No DB access,
+  score changes, LLM calls or dependency installation.
+- Recommended86 retarget to85's merged parent;81/82 outside current merge scope
+  unless user explicitly expands it. Review report records limits and exact refs.

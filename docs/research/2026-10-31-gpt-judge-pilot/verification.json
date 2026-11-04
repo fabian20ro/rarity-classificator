@@ -1,0 +1,353 @@
+{
+  "status": "pass",
+  "audited_at": "2026-10-30T23:26:35.540146+00:00",
+  "scope": "Independent native process/event/request/metric audit; no model, API or database calls",
+  "forms": 150,
+  "native_scored": 150,
+  "fallbacks": 0,
+  "unique_threads": 150,
+  "nonoverlap_checks": 149,
+  "protected_files_unchanged": 2092,
+  "tools_observed": 0,
+  "unknown_events_observed": 0,
+  "stderr_records": 0,
+  "event_counts": {
+    "thread.started": 150,
+    "turn.started": 150,
+    "item.completed": 150,
+    "turn.completed": 150
+  },
+  "input_evidence_byte_identical_to_corrected_qwen": true,
+  "with_context": 131,
+  "without_context": 19,
+  "metrics_subsets_verified": 7,
+  "diagnostic_top8_secondary25_verified": true,
+  "paired": {
+    "baseline_vs_gpt": {
+      "paired": {
+        "improved": 35,
+        "worsened": 40,
+        "tied": 75,
+        "rescued_severe": 10,
+        "introduced_severe": 2
+      },
+      "bootstrap": {
+        "severe_rate_delta": {
+          "percentile95": [
+            -0.1038961038961039,
+            -0.006756756756756757
+          ],
+          "scope": "Exploratory paired group bootstrap on reused development labels, not external validation or calibrated risk."
+        },
+        "excess_mean_delta": {
+          "percentile95": [
+            -0.1346153846153846,
+            -0.0196078431372549
+          ],
+          "scope": "Exploratory paired group bootstrap on reused development labels, not external validation or calibrated risk."
+        }
+      }
+    },
+    "qwen_vs_gpt": {
+      "paired": {
+        "improved": 19,
+        "worsened": 21,
+        "tied": 110,
+        "rescued_severe": 5,
+        "introduced_severe": 3
+      },
+      "bootstrap": {
+        "severe_rate_delta": {
+          "percentile95": [
+            -0.05228758169934641,
+            0.02054794520547945
+          ],
+          "scope": "Exploratory paired group bootstrap on reused development labels, not external validation or calibrated risk."
+        },
+        "excess_mean_delta": {
+          "percentile95": [
+            -0.10067114093959731,
+            0.013333333333333334
+          ],
+          "scope": "Exploratory paired group bootstrap on reused development labels, not external validation or calibrated risk."
+        }
+      }
+    },
+    "bootstrap_protocol": {
+      "seed": "qwen-eval-bootstrap-v1",
+      "iterations": 5000,
+      "groups": "sorted group keys; rows sorted integer word_id",
+      "percentile_indices": [
+        124,
+        4874
+      ]
+    },
+    "scope": "Same lexical evidence and rubric; different Codex wrapper, reasoning and transport. GPT identity is configured, not provider attested; no independently held-out references."
+  },
+  "shared_errors": {
+    "exclusive_patterns": {
+      "baseline": 8,
+      "baseline+gpt": 1,
+      "baseline+qwen": 2,
+      "gpt": 2,
+      "none": 134,
+      "qwen": 3
+    },
+    "severe_counts": {
+      "baseline": 11,
+      "qwen": 5,
+      "gpt": 3
+    },
+    "all_three": 0,
+    "qwen_and_gpt": 0,
+    "any_method": 16,
+    "scope": "Observed error overlap only, not an achievable oracle ensemble or proof of model independence."
+  },
+  "promotion": {
+    "scorer_gate_pass": true,
+    "predeclared_count_gate_pass": true,
+    "protected_excess_gate_pass": true,
+    "scope": "Exploratory reused pilot, not production authorization",
+    "diagnostic_gate_pass": true
+  },
+  "baseline_all": {
+    "per_level": {
+      "1": {
+        "support": 51,
+        "predicted": 44,
+        "correct": 36,
+        "precision": 0.8181818181818182,
+        "recall": 0.7058823529411765,
+        "severe": 3
+      },
+      "2": {
+        "support": 31,
+        "predicted": 39,
+        "correct": 20,
+        "precision": 0.5128205128205128,
+        "recall": 0.6451612903225806,
+        "severe": 2
+      },
+      "3": {
+        "support": 25,
+        "predicted": 18,
+        "correct": 11,
+        "precision": 0.6111111111111112,
+        "recall": 0.44,
+        "severe": 1
+      },
+      "4": {
+        "support": 21,
+        "predicted": 49,
+        "correct": 19,
+        "precision": 0.3877551020408163,
+        "recall": 0.9047619047619048,
+        "severe": 2
+      },
+      "5": {
+        "support": 22,
+        "predicted": 0,
+        "correct": 0,
+        "precision": null,
+        "recall": 0.0,
+        "severe": 3
+      }
+    },
+    "n": 150,
+    "exact": 86,
+    "within_one": 139,
+    "severe": 11,
+    "excess_error_total": 14,
+    "mae": 0.52,
+    "error_histogram": {
+      "0": 86,
+      "1": 53,
+      "2": 8,
+      "3": 3,
+      "4": 0
+    },
+    "confusion": [
+      [
+        36,
+        12,
+        3,
+        0,
+        0
+      ],
+      [
+        6,
+        20,
+        3,
+        2,
+        0
+      ],
+      [
+        1,
+        4,
+        11,
+        9,
+        0
+      ],
+      [
+        1,
+        1,
+        0,
+        19,
+        0
+      ],
+      [
+        0,
+        2,
+        1,
+        19,
+        0
+      ]
+    ],
+    "predicted_counts": {
+      "1": 44,
+      "2": 39,
+      "3": 18,
+      "4": 49,
+      "5": 0
+    }
+  },
+  "judge_all": {
+    "per_level": {
+      "1": {
+        "support": 51,
+        "predicted": 74,
+        "correct": 51,
+        "precision": 0.6891891891891891,
+        "recall": 1.0,
+        "severe": 0
+      },
+      "2": {
+        "support": 31,
+        "predicted": 26,
+        "correct": 9,
+        "precision": 0.34615384615384615,
+        "recall": 0.2903225806451613,
+        "severe": 0
+      },
+      "3": {
+        "support": 25,
+        "predicted": 20,
+        "correct": 6,
+        "precision": 0.3,
+        "recall": 0.24,
+        "severe": 1
+      },
+      "4": {
+        "support": 21,
+        "predicted": 26,
+        "correct": 7,
+        "precision": 0.2692307692307692,
+        "recall": 0.3333333333333333,
+        "severe": 1
+      },
+      "5": {
+        "support": 22,
+        "predicted": 4,
+        "correct": 4,
+        "precision": 1.0,
+        "recall": 0.18181818181818182,
+        "severe": 1
+      }
+    },
+    "n": 150,
+    "exact": 77,
+    "within_one": 147,
+    "severe": 3,
+    "excess_error_total": 3,
+    "mae": 0.5066666666666667,
+    "error_histogram": {
+      "0": 77,
+      "1": 70,
+      "2": 3,
+      "3": 0,
+      "4": 0
+    },
+    "confusion": [
+      [
+        51,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        22,
+        9,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        16,
+        6,
+        2,
+        0
+      ],
+      [
+        0,
+        1,
+        13,
+        7,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        17,
+        4
+      ]
+    ],
+    "predicted_counts": {
+      "1": 74,
+      "2": 26,
+      "3": 20,
+      "4": 26,
+      "5": 4
+    }
+  },
+  "audit_script_sha256": "b5f828db94a90f570e912bcc98573a464419f29ee37933d4079505a9962f22bb",
+  "artifact_hashes": {
+    "protocol.json": "89c804e5b4ba94436b7a53f129354e235c31bcafd1a9b71687004a3371b773da",
+    "config.json": "b1e89c3dbb011e33b87c9a5dda20727e6e2ecc7200af3025d4c37009f7a9fbd1",
+    "run.py": "a25efa199ba1ec6d39de45aa5df98516459a1e8291540c3dfd5e46e216deb204",
+    "evaluate.py": "6568a53855abdce70c66b0119f1255604f5bc28db2edca530d851411df8e8f40",
+    "analysis-plan.json": "8b678b6c0ce87ed3711a6be4962812da4de4cf372cc0e96997b536503c494827",
+    "inputs/evidence.csv": "c7756bd5d12b5fde9482d8212c6c1d350aa34744044f32e36c0329406e5de40b",
+    "campaign/manifest.json": "f95e710a90bf13cdf5057dbbbbbc2427873e5604a6a42373049be4a4902de20b",
+    "comparison/report.json": "cc9188a3b1c965fe906708aceb7946665973b3f3c08c7865eee0a6716bd3b7b9",
+    "comparison/comparison.csv": "26521e84fb50b48284ff75be944dd47027d8d9cee8bf8d5219cbc11123df35d9",
+    "paired-analysis.json": "36edc6c142ca7de30f0f9c69d77bf839997f07e3b36d0ac3bd9a1bf650fff3eb",
+    "shared-errors.json": "ec8b1577adb6534c87de29e01af2444d3f647507a36d27e86097f197bc9ef9be"
+  },
+  "limitations": [
+    "Configured/requested model only; no provider-served identity attestation.",
+    "Generic managed Codex wrapper and tool capabilities remain; zero observed native tool events, not proof that tools were unavailable.",
+    "Synthetic assembled-context inspection plus exact invocation/payload checks; actual provider prompt not separately captured per lexical call.",
+    "Reused development labels and historically label-exposed curated contexts; no independent generalization or probability calibration claim.",
+    "870/1000 new forms lack usable contexts; pilot transfer remains unverified.",
+    "CLI internal transport retries not independently counted; one application invocation/session per word."
+  ],
+  "transfer_diagnostic": {
+    "pilot_without_context": 19,
+    "pilot_without_context_wordfreq_missing": 2,
+    "pilot_without_context_gold_distribution": {
+      "1": 16,
+      "2": 1,
+      "5": 2
+    },
+    "new1000_without_context": 870,
+    "new1000_without_context_wordfreq_missing": 764,
+    "interpretation": "Pilot no-context result is dominated by familiar forms; 0/19 severe is not evidence of equivalent performance on new mostly missing-frequency forms. No new labels inferred.",
+    "source_hashes": {
+      "/Users/fabian/git/word-rarity-classifier/build/d1/independent-evidence-2026-10-30/run-final/audit/form-evidence-audit.csv": "d73f7821e2f04ec3c21a75d50a20f0b30579560d403c06fac7e6040a436425ac",
+      "/Users/fabian/git/word-rarity-classifier/build/d1/independent-1000-2026-10-30/signals.csv": "36ccb7ac4b6734d3a649d3f90ca7686dc772fab0c9718207e469272961fa28a3"
+    }
+  }
+}

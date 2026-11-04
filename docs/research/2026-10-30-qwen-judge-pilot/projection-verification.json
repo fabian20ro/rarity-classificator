@@ -1,0 +1,26 @@
+{
+  "status": "pass",
+  "audited_at": "2026-10-30T12:25:31.384378+00:00",
+  "scope": "Pre-result frozen projection audit only; no raw model responses inspected",
+  "contexts": 218,
+  "forms_with_curated_contexts": 95,
+  "unchanged_contexts": 213,
+  "reviewer_clauses_removed": 5,
+  "all_target_identities_POS_and_original_meanings_retained": true,
+  "merged_evidence_independently_reconstructed": true,
+  "all_initial_dictionary_senses_preserved": true,
+  "forms": 150,
+  "forms_with_senses": 131,
+  "forms_without_senses": 19,
+  "no_examples_source_metadata_or_label_fields_in_projected_senses": true,
+  "prompt_options_rubric_reference_baseline_unchanged": true,
+  "projection_sha256": "c20db64fe8e3e014852ddf2e1a34105c157a7a4e296a68b3b3021f04c1100492",
+  "protocol_sha256": "cef12f00a3c6d4eaf0212298e3406db382a39fff13e4d2e3ef8089d294731d71",
+  "evidence_sha256": "c7756bd5d12b5fde9482d8212c6c1d350aa34744044f32e36c0329406e5de40b",
+  "merge_manifest_sha256": "bff0b848299a8027a35e499cdefd58d866a87024b1d1d4c68ff6bc528ae2abd4",
+  "limitations": [
+    "Previously curated label-exposed pilot evidence; corrective development arm, not independent validation.",
+    "Only literal reviewer-directed clauses removed; regional and historical lexical restrictions remain."
+  ],
+  "full_local_receipt_sha256": "569fd8d1af9f7f307f61c71be40f18c7b66b707e145009940ba8268593226a13"
+}

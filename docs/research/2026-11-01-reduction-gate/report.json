@@ -1,0 +1,1240 @@
+{
+  "policy": {
+    "version": "exact-form-reduction-gate-v1",
+    "reduction": "baseline minus scored GPT >= 2; all other rows retain baseline",
+    "lexical": "at least one usable sense and no known POS without a definition; source bounded, not exhaustive",
+    "corpus": "FineWeb2 support OR CoRoLa count>=5; exact spelling, no lemma/accent folding",
+    "fineweb_support": {
+      "count": 5,
+      "documents": 3,
+      "hosts": 2
+    },
+    "corola_count": 5,
+    "scope": "Offline noncommercial research. Attestation is not familiarity or a POS/sense-disambiguated count. No fitted thresholds, labels, models or DB."
+  },
+  "protocol_sha256": "ea9d0fef5fd9b0f373220a4bd932ed8d9263f1be8be3ece015e34bf2c0746ca7",
+  "cohorts": {
+    "pilot150": {
+      "gate": {
+        "forms": 150,
+        "large_reductions": 9,
+        "accepted": 8,
+        "gpt_failed": 0,
+        "fineweb_balanced_sample": true
+      },
+      "reasons": {
+        "not_large_reduction": 141,
+        "accepted": 8,
+        "missing_lexical_support": 1
+      },
+      "strata": {
+        "all": {
+          "baseline_level": {
+            "n": 150,
+            "severe": 11,
+            "excess_error_total": 14,
+            "within_one": 139,
+            "mae": 0.52,
+            "exact": 86,
+            "error_histogram": {
+              "0": 86,
+              "1": 53,
+              "2": 8,
+              "3": 3,
+              "4": 0
+            }
+          },
+          "gpt_full_level": {
+            "n": 150,
+            "severe": 3,
+            "excess_error_total": 3,
+            "within_one": 147,
+            "mae": 0.5066666666666667,
+            "exact": 77,
+            "error_histogram": {
+              "0": 77,
+              "1": 70,
+              "2": 3,
+              "3": 0,
+              "4": 0
+            }
+          },
+          "ungated_reduction_level": {
+            "n": 150,
+            "severe": 8,
+            "excess_error_total": 11,
+            "within_one": 142,
+            "mae": 0.48,
+            "exact": 89,
+            "error_histogram": {
+              "0": 89,
+              "1": 53,
+              "2": 5,
+              "3": 3,
+              "4": 0
+            }
+          },
+          "lexical_only_level": {
+            "n": 150,
+            "severe": 9,
+            "excess_error_total": 12,
+            "within_one": 141,
+            "mae": 0.49333333333333335,
+            "exact": 88,
+            "error_histogram": {
+              "0": 88,
+              "1": 53,
+              "2": 6,
+              "3": 3,
+              "4": 0
+            }
+          },
+          "corpus_only_level": {
+            "n": 150,
+            "severe": 8,
+            "excess_error_total": 11,
+            "within_one": 142,
+            "mae": 0.48,
+            "exact": 89,
+            "error_histogram": {
+              "0": 89,
+              "1": 53,
+              "2": 5,
+              "3": 3,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 150,
+            "severe": 9,
+            "excess_error_total": 12,
+            "within_one": 141,
+            "mae": 0.49333333333333335,
+            "exact": 88,
+            "error_histogram": {
+              "0": 88,
+              "1": 53,
+              "2": 6,
+              "3": 3,
+              "4": 0
+            }
+          }
+        },
+        "true4": {
+          "baseline_level": {
+            "n": 21,
+            "severe": 2,
+            "excess_error_total": 3,
+            "within_one": 19,
+            "mae": 0.23809523809523808,
+            "exact": 19,
+            "error_histogram": {
+              "0": 19,
+              "1": 0,
+              "2": 1,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "gpt_full_level": {
+            "n": 21,
+            "severe": 1,
+            "excess_error_total": 1,
+            "within_one": 20,
+            "mae": 0.7142857142857143,
+            "exact": 7,
+            "error_histogram": {
+              "0": 7,
+              "1": 13,
+              "2": 1,
+              "3": 0,
+              "4": 0
+            }
+          },
+          "ungated_reduction_level": {
+            "n": 21,
+            "severe": 3,
+            "excess_error_total": 4,
+            "within_one": 18,
+            "mae": 0.3333333333333333,
+            "exact": 18,
+            "error_histogram": {
+              "0": 18,
+              "1": 0,
+              "2": 2,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "lexical_only_level": {
+            "n": 21,
+            "severe": 3,
+            "excess_error_total": 4,
+            "within_one": 18,
+            "mae": 0.3333333333333333,
+            "exact": 18,
+            "error_histogram": {
+              "0": 18,
+              "1": 0,
+              "2": 2,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "corpus_only_level": {
+            "n": 21,
+            "severe": 3,
+            "excess_error_total": 4,
+            "within_one": 18,
+            "mae": 0.3333333333333333,
+            "exact": 18,
+            "error_histogram": {
+              "0": 18,
+              "1": 0,
+              "2": 2,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 21,
+            "severe": 3,
+            "excess_error_total": 4,
+            "within_one": 18,
+            "mae": 0.3333333333333333,
+            "exact": 18,
+            "error_histogram": {
+              "0": 18,
+              "1": 0,
+              "2": 2,
+              "3": 1,
+              "4": 0
+            }
+          }
+        },
+        "true5": {
+          "baseline_level": {
+            "n": 22,
+            "severe": 3,
+            "excess_error_total": 5,
+            "within_one": 19,
+            "mae": 1.2272727272727273,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 19,
+              "2": 1,
+              "3": 2,
+              "4": 0
+            }
+          },
+          "gpt_full_level": {
+            "n": 22,
+            "severe": 1,
+            "excess_error_total": 1,
+            "within_one": 21,
+            "mae": 0.8636363636363636,
+            "exact": 4,
+            "error_histogram": {
+              "0": 4,
+              "1": 17,
+              "2": 1,
+              "3": 0,
+              "4": 0
+            }
+          },
+          "ungated_reduction_level": {
+            "n": 22,
+            "severe": 3,
+            "excess_error_total": 5,
+            "within_one": 19,
+            "mae": 1.2272727272727273,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 19,
+              "2": 1,
+              "3": 2,
+              "4": 0
+            }
+          },
+          "lexical_only_level": {
+            "n": 22,
+            "severe": 3,
+            "excess_error_total": 5,
+            "within_one": 19,
+            "mae": 1.2272727272727273,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 19,
+              "2": 1,
+              "3": 2,
+              "4": 0
+            }
+          },
+          "corpus_only_level": {
+            "n": 22,
+            "severe": 3,
+            "excess_error_total": 5,
+            "within_one": 19,
+            "mae": 1.2272727272727273,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 19,
+              "2": 1,
+              "3": 2,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 22,
+            "severe": 3,
+            "excess_error_total": 5,
+            "within_one": 19,
+            "mae": 1.2272727272727273,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 19,
+              "2": 1,
+              "3": 2,
+              "4": 0
+            }
+          }
+        },
+        "true45": {
+          "baseline_level": {
+            "n": 43,
+            "severe": 5,
+            "excess_error_total": 8,
+            "within_one": 38,
+            "mae": 0.7441860465116279,
+            "exact": 19,
+            "error_histogram": {
+              "0": 19,
+              "1": 19,
+              "2": 2,
+              "3": 3,
+              "4": 0
+            }
+          },
+          "gpt_full_level": {
+            "n": 43,
+            "severe": 2,
+            "excess_error_total": 2,
+            "within_one": 41,
+            "mae": 0.7906976744186046,
+            "exact": 11,
+            "error_histogram": {
+              "0": 11,
+              "1": 30,
+              "2": 2,
+              "3": 0,
+              "4": 0
+            }
+          },
+          "ungated_reduction_level": {
+            "n": 43,
+            "severe": 6,
+            "excess_error_total": 9,
+            "within_one": 37,
+            "mae": 0.7906976744186046,
+            "exact": 18,
+            "error_histogram": {
+              "0": 18,
+              "1": 19,
+              "2": 3,
+              "3": 3,
+              "4": 0
+            }
+          },
+          "lexical_only_level": {
+            "n": 43,
+            "severe": 6,
+            "excess_error_total": 9,
+            "within_one": 37,
+            "mae": 0.7906976744186046,
+            "exact": 18,
+            "error_histogram": {
+              "0": 18,
+              "1": 19,
+              "2": 3,
+              "3": 3,
+              "4": 0
+            }
+          },
+          "corpus_only_level": {
+            "n": 43,
+            "severe": 6,
+            "excess_error_total": 9,
+            "within_one": 37,
+            "mae": 0.7906976744186046,
+            "exact": 18,
+            "error_histogram": {
+              "0": 18,
+              "1": 19,
+              "2": 3,
+              "3": 3,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 43,
+            "severe": 6,
+            "excess_error_total": 9,
+            "within_one": 37,
+            "mae": 0.7906976744186046,
+            "exact": 18,
+            "error_histogram": {
+              "0": 18,
+              "1": 19,
+              "2": 3,
+              "3": 3,
+              "4": 0
+            }
+          }
+        },
+        "large_reductions": {
+          "baseline_level": {
+            "n": 9,
+            "severe": 5,
+            "excess_error_total": 5,
+            "within_one": 4,
+            "mae": 1.4444444444444444,
+            "exact": 1,
+            "error_histogram": {
+              "0": 1,
+              "1": 3,
+              "2": 5,
+              "3": 0,
+              "4": 0
+            }
+          },
+          "gpt_full_level": {
+            "n": 9,
+            "severe": 2,
+            "excess_error_total": 2,
+            "within_one": 7,
+            "mae": 0.7777777777777778,
+            "exact": 4,
+            "error_histogram": {
+              "0": 4,
+              "1": 3,
+              "2": 2,
+              "3": 0,
+              "4": 0
+            }
+          },
+          "ungated_reduction_level": {
+            "n": 9,
+            "severe": 2,
+            "excess_error_total": 2,
+            "within_one": 7,
+            "mae": 0.7777777777777778,
+            "exact": 4,
+            "error_histogram": {
+              "0": 4,
+              "1": 3,
+              "2": 2,
+              "3": 0,
+              "4": 0
+            }
+          },
+          "lexical_only_level": {
+            "n": 9,
+            "severe": 3,
+            "excess_error_total": 3,
+            "within_one": 6,
+            "mae": 1.0,
+            "exact": 3,
+            "error_histogram": {
+              "0": 3,
+              "1": 3,
+              "2": 3,
+              "3": 0,
+              "4": 0
+            }
+          },
+          "corpus_only_level": {
+            "n": 9,
+            "severe": 2,
+            "excess_error_total": 2,
+            "within_one": 7,
+            "mae": 0.7777777777777778,
+            "exact": 4,
+            "error_histogram": {
+              "0": 4,
+              "1": 3,
+              "2": 2,
+              "3": 0,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 9,
+            "severe": 3,
+            "excess_error_total": 3,
+            "within_one": 6,
+            "mae": 1.0,
+            "exact": 3,
+            "error_histogram": {
+              "0": 3,
+              "1": 3,
+              "2": 3,
+              "3": 0,
+              "4": 0
+            }
+          }
+        }
+      },
+      "transitions": {
+        "rescued": 4,
+        "introduced": 2,
+        "blocked_beneficial": 1,
+        "blocked_harmful": 0
+      },
+      "families": {
+        "count": 142,
+        "largest": 2,
+        "methods": {
+          "baseline_level": {
+            "families_with_severe": 10,
+            "macro_severe_rate": 0.06690140845070422
+          },
+          "gpt_full_level": {
+            "families_with_severe": 3,
+            "macro_severe_rate": 0.02112676056338028
+          },
+          "ungated_reduction_level": {
+            "families_with_severe": 8,
+            "macro_severe_rate": 0.04929577464788732
+          },
+          "lexical_only_level": {
+            "families_with_severe": 9,
+            "macro_severe_rate": 0.056338028169014086
+          },
+          "corpus_only_level": {
+            "families_with_severe": 8,
+            "macro_severe_rate": 0.04929577464788732
+          },
+          "candidate_level": {
+            "families_with_severe": 9,
+            "macro_severe_rate": 0.056338028169014086
+          }
+        }
+      },
+      "existing_fold_diagnostics": {
+        "0": {
+          "baseline_level": {
+            "n": 30,
+            "severe": 1,
+            "excess_error_total": 2,
+            "within_one": 29,
+            "mae": 0.5,
+            "exact": 17,
+            "error_histogram": {
+              "0": 17,
+              "1": 12,
+              "2": 0,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 30,
+            "severe": 1,
+            "excess_error_total": 2,
+            "within_one": 29,
+            "mae": 0.5,
+            "exact": 17,
+            "error_histogram": {
+              "0": 17,
+              "1": 12,
+              "2": 0,
+              "3": 1,
+              "4": 0
+            }
+          }
+        },
+        "1": {
+          "baseline_level": {
+            "n": 31,
+            "severe": 4,
+            "excess_error_total": 5,
+            "within_one": 27,
+            "mae": 0.6774193548387096,
+            "exact": 15,
+            "error_histogram": {
+              "0": 15,
+              "1": 12,
+              "2": 3,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 31,
+            "severe": 2,
+            "excess_error_total": 3,
+            "within_one": 29,
+            "mae": 0.5483870967741935,
+            "exact": 17,
+            "error_histogram": {
+              "0": 17,
+              "1": 12,
+              "2": 1,
+              "3": 1,
+              "4": 0
+            }
+          }
+        },
+        "2": {
+          "baseline_level": {
+            "n": 29,
+            "severe": 2,
+            "excess_error_total": 2,
+            "within_one": 27,
+            "mae": 0.5862068965517241,
+            "exact": 14,
+            "error_histogram": {
+              "0": 14,
+              "1": 13,
+              "2": 2,
+              "3": 0,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 29,
+            "severe": 4,
+            "excess_error_total": 4,
+            "within_one": 25,
+            "mae": 0.6896551724137931,
+            "exact": 13,
+            "error_histogram": {
+              "0": 13,
+              "1": 12,
+              "2": 4,
+              "3": 0,
+              "4": 0
+            }
+          }
+        },
+        "3": {
+          "baseline_level": {
+            "n": 30,
+            "severe": 2,
+            "excess_error_total": 2,
+            "within_one": 28,
+            "mae": 0.3333333333333333,
+            "exact": 22,
+            "error_histogram": {
+              "0": 22,
+              "1": 6,
+              "2": 2,
+              "3": 0,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 30,
+            "severe": 1,
+            "excess_error_total": 1,
+            "within_one": 29,
+            "mae": 0.26666666666666666,
+            "exact": 23,
+            "error_histogram": {
+              "0": 23,
+              "1": 6,
+              "2": 1,
+              "3": 0,
+              "4": 0
+            }
+          }
+        },
+        "4": {
+          "baseline_level": {
+            "n": 30,
+            "severe": 2,
+            "excess_error_total": 3,
+            "within_one": 28,
+            "mae": 0.5,
+            "exact": 18,
+            "error_histogram": {
+              "0": 18,
+              "1": 10,
+              "2": 1,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 30,
+            "severe": 1,
+            "excess_error_total": 2,
+            "within_one": 29,
+            "mae": 0.4666666666666667,
+            "exact": 18,
+            "error_histogram": {
+              "0": 18,
+              "1": 11,
+              "2": 0,
+              "3": 1,
+              "4": 0
+            }
+          }
+        }
+      },
+      "predeclared_checks": {
+        "severe_decreased": true,
+        "excess_not_increased": true,
+        "true4_not_worse": false,
+        "true5_not_worse": true
+      }
+    },
+    "review50": {
+      "gate": {
+        "forms": 50,
+        "large_reductions": 49,
+        "accepted": 11,
+        "gpt_failed": 0,
+        "fineweb_balanced_sample": true
+      },
+      "reasons": {
+        "missing_lexical_support": 37,
+        "accepted": 11,
+        "missing_lexical_and_corpus_support": 1,
+        "not_large_reduction": 1
+      },
+      "strata": {
+        "all": {
+          "baseline_level": {
+            "n": 50,
+            "severe": 13,
+            "excess_error_total": 14,
+            "within_one": 37,
+            "mae": 1.08,
+            "exact": 10,
+            "error_histogram": {
+              "0": 10,
+              "1": 27,
+              "2": 12,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "gpt_full_level": {
+            "n": 50,
+            "severe": 19,
+            "excess_error_total": 25,
+            "within_one": 31,
+            "mae": 1.38,
+            "exact": 6,
+            "error_histogram": {
+              "0": 6,
+              "1": 25,
+              "2": 13,
+              "3": 6,
+              "4": 0
+            }
+          },
+          "ungated_reduction_level": {
+            "n": 50,
+            "severe": 20,
+            "excess_error_total": 27,
+            "within_one": 30,
+            "mae": 1.42,
+            "exact": 6,
+            "error_histogram": {
+              "0": 6,
+              "1": 24,
+              "2": 13,
+              "3": 7,
+              "4": 0
+            }
+          },
+          "lexical_only_level": {
+            "n": 50,
+            "severe": 10,
+            "excess_error_total": 13,
+            "within_one": 40,
+            "mae": 1.06,
+            "exact": 10,
+            "error_histogram": {
+              "0": 10,
+              "1": 30,
+              "2": 7,
+              "3": 3,
+              "4": 0
+            }
+          },
+          "corpus_only_level": {
+            "n": 50,
+            "severe": 20,
+            "excess_error_total": 27,
+            "within_one": 30,
+            "mae": 1.42,
+            "exact": 6,
+            "error_histogram": {
+              "0": 6,
+              "1": 24,
+              "2": 13,
+              "3": 7,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 50,
+            "severe": 10,
+            "excess_error_total": 13,
+            "within_one": 40,
+            "mae": 1.06,
+            "exact": 10,
+            "error_histogram": {
+              "0": 10,
+              "1": 30,
+              "2": 7,
+              "3": 3,
+              "4": 0
+            }
+          }
+        },
+        "true4": {
+          "baseline_level": {
+            "n": 9,
+            "severe": 0,
+            "excess_error_total": 0,
+            "within_one": 9,
+            "mae": 0.0,
+            "exact": 9,
+            "error_histogram": {
+              "0": 9,
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0
+            }
+          },
+          "gpt_full_level": {
+            "n": 9,
+            "severe": 9,
+            "excess_error_total": 10,
+            "within_one": 0,
+            "mae": 2.111111111111111,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 0,
+              "2": 8,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "ungated_reduction_level": {
+            "n": 9,
+            "severe": 9,
+            "excess_error_total": 10,
+            "within_one": 0,
+            "mae": 2.111111111111111,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 0,
+              "2": 8,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "lexical_only_level": {
+            "n": 9,
+            "severe": 2,
+            "excess_error_total": 3,
+            "within_one": 7,
+            "mae": 0.5555555555555556,
+            "exact": 7,
+            "error_histogram": {
+              "0": 7,
+              "1": 0,
+              "2": 1,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "corpus_only_level": {
+            "n": 9,
+            "severe": 9,
+            "excess_error_total": 10,
+            "within_one": 0,
+            "mae": 2.111111111111111,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 0,
+              "2": 8,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 9,
+            "severe": 2,
+            "excess_error_total": 3,
+            "within_one": 7,
+            "mae": 0.5555555555555556,
+            "exact": 7,
+            "error_histogram": {
+              "0": 7,
+              "1": 0,
+              "2": 1,
+              "3": 1,
+              "4": 0
+            }
+          }
+        },
+        "true5": {
+          "baseline_level": {
+            "n": 6,
+            "severe": 1,
+            "excess_error_total": 2,
+            "within_one": 5,
+            "mae": 1.3333333333333333,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 5,
+              "2": 0,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "gpt_full_level": {
+            "n": 6,
+            "severe": 5,
+            "excess_error_total": 10,
+            "within_one": 1,
+            "mae": 2.6666666666666665,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 1,
+              "2": 0,
+              "3": 5,
+              "4": 0
+            }
+          },
+          "ungated_reduction_level": {
+            "n": 6,
+            "severe": 6,
+            "excess_error_total": 12,
+            "within_one": 0,
+            "mae": 3.0,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 0,
+              "2": 0,
+              "3": 6,
+              "4": 0
+            }
+          },
+          "lexical_only_level": {
+            "n": 6,
+            "severe": 2,
+            "excess_error_total": 4,
+            "within_one": 4,
+            "mae": 1.6666666666666667,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 4,
+              "2": 0,
+              "3": 2,
+              "4": 0
+            }
+          },
+          "corpus_only_level": {
+            "n": 6,
+            "severe": 6,
+            "excess_error_total": 12,
+            "within_one": 0,
+            "mae": 3.0,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 0,
+              "2": 0,
+              "3": 6,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 6,
+            "severe": 2,
+            "excess_error_total": 4,
+            "within_one": 4,
+            "mae": 1.6666666666666667,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 4,
+              "2": 0,
+              "3": 2,
+              "4": 0
+            }
+          }
+        },
+        "true45": {
+          "baseline_level": {
+            "n": 15,
+            "severe": 1,
+            "excess_error_total": 2,
+            "within_one": 14,
+            "mae": 0.5333333333333333,
+            "exact": 9,
+            "error_histogram": {
+              "0": 9,
+              "1": 5,
+              "2": 0,
+              "3": 1,
+              "4": 0
+            }
+          },
+          "gpt_full_level": {
+            "n": 15,
+            "severe": 14,
+            "excess_error_total": 20,
+            "within_one": 1,
+            "mae": 2.3333333333333335,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 1,
+              "2": 8,
+              "3": 6,
+              "4": 0
+            }
+          },
+          "ungated_reduction_level": {
+            "n": 15,
+            "severe": 15,
+            "excess_error_total": 22,
+            "within_one": 0,
+            "mae": 2.466666666666667,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 0,
+              "2": 8,
+              "3": 7,
+              "4": 0
+            }
+          },
+          "lexical_only_level": {
+            "n": 15,
+            "severe": 4,
+            "excess_error_total": 7,
+            "within_one": 11,
+            "mae": 1.0,
+            "exact": 7,
+            "error_histogram": {
+              "0": 7,
+              "1": 4,
+              "2": 1,
+              "3": 3,
+              "4": 0
+            }
+          },
+          "corpus_only_level": {
+            "n": 15,
+            "severe": 15,
+            "excess_error_total": 22,
+            "within_one": 0,
+            "mae": 2.466666666666667,
+            "exact": 0,
+            "error_histogram": {
+              "0": 0,
+              "1": 0,
+              "2": 8,
+              "3": 7,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 15,
+            "severe": 4,
+            "excess_error_total": 7,
+            "within_one": 11,
+            "mae": 1.0,
+            "exact": 7,
+            "error_histogram": {
+              "0": 7,
+              "1": 4,
+              "2": 1,
+              "3": 3,
+              "4": 0
+            }
+          }
+        },
+        "large_reductions": {
+          "baseline_level": {
+            "n": 49,
+            "severe": 12,
+            "excess_error_total": 12,
+            "within_one": 37,
+            "mae": 1.0408163265306123,
+            "exact": 10,
+            "error_histogram": {
+              "0": 10,
+              "1": 27,
+              "2": 12,
+              "3": 0,
+              "4": 0
+            }
+          },
+          "gpt_full_level": {
+            "n": 49,
+            "severe": 19,
+            "excess_error_total": 25,
+            "within_one": 30,
+            "mae": 1.3877551020408163,
+            "exact": 6,
+            "error_histogram": {
+              "0": 6,
+              "1": 24,
+              "2": 13,
+              "3": 6,
+              "4": 0
+            }
+          },
+          "ungated_reduction_level": {
+            "n": 49,
+            "severe": 19,
+            "excess_error_total": 25,
+            "within_one": 30,
+            "mae": 1.3877551020408163,
+            "exact": 6,
+            "error_histogram": {
+              "0": 6,
+              "1": 24,
+              "2": 13,
+              "3": 6,
+              "4": 0
+            }
+          },
+          "lexical_only_level": {
+            "n": 49,
+            "severe": 9,
+            "excess_error_total": 11,
+            "within_one": 40,
+            "mae": 1.0204081632653061,
+            "exact": 10,
+            "error_histogram": {
+              "0": 10,
+              "1": 30,
+              "2": 7,
+              "3": 2,
+              "4": 0
+            }
+          },
+          "corpus_only_level": {
+            "n": 49,
+            "severe": 19,
+            "excess_error_total": 25,
+            "within_one": 30,
+            "mae": 1.3877551020408163,
+            "exact": 6,
+            "error_histogram": {
+              "0": 6,
+              "1": 24,
+              "2": 13,
+              "3": 6,
+              "4": 0
+            }
+          },
+          "candidate_level": {
+            "n": 49,
+            "severe": 9,
+            "excess_error_total": 11,
+            "within_one": 40,
+            "mae": 1.0204081632653061,
+            "exact": 10,
+            "error_histogram": {
+              "0": 10,
+              "1": 30,
+              "2": 7,
+              "3": 2,
+              "4": 0
+            }
+          }
+        }
+      },
+      "transitions": {
+        "rescued": 6,
+        "introduced": 3,
+        "blocked_beneficial": 6,
+        "blocked_harmful": 16
+      },
+      "families": {
+        "count": 50,
+        "largest": 1,
+        "methods": {
+          "baseline_level": {
+            "families_with_severe": 13,
+            "macro_severe_rate": 0.26
+          },
+          "gpt_full_level": {
+            "families_with_severe": 19,
+            "macro_severe_rate": 0.38
+          },
+          "ungated_reduction_level": {
+            "families_with_severe": 20,
+            "macro_severe_rate": 0.4
+          },
+          "lexical_only_level": {
+            "families_with_severe": 10,
+            "macro_severe_rate": 0.2
+          },
+          "corpus_only_level": {
+            "families_with_severe": 20,
+            "macro_severe_rate": 0.4
+          },
+          "candidate_level": {
+            "families_with_severe": 10,
+            "macro_severe_rate": 0.2
+          }
+        }
+      },
+      "predeclared_checks": {
+        "severe_decreased": true,
+        "excess_not_increased": true,
+        "true4_not_worse": false,
+        "true5_not_worse": false
+      }
+    }
+  },
+  "scope": "Reused development150 and risk-selected50 separately. No fitting/CV or population accuracy claim. Corpus attestation is not familiarity.",
+  "cohort_overlap": {
+    "exact_words": 0,
+    "group_ids": 0
+  },
+  "candidate_passes_predeclared_criteria": false,
+  "reference_sha256": {
+    "/Users/fabian/git/word-rarity-classifier/build/d1/gpt-judge-2026-10-31/inputs/reference.csv": "32f36c283df1842065f3e72d8baab1a358792fa71b7ead34a55f17666fb16aa2",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/review50-2026-10-31/review-responses.csv": "4a5296c9387f18e99e9462bf78135eac8c7e476d355eff98c17903e7ce09a4f5"
+  },
+  "verification": {
+    "protected_files_unchanged": 4662,
+    "model_calls": 0,
+    "classifier_db_writes": 0,
+    "new_downloads": 0,
+    "full_coverage": {
+      "pilot150": 150,
+      "review50": 50
+    },
+    "metric_arithmetic": "independently checked",
+    "fitting": "none",
+    "source_inputs_verified": true
+  }
+}

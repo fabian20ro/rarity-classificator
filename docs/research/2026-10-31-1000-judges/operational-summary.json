@@ -1,0 +1,17 @@
+{
+  "gpt_sessions": 1000,
+  "gpt_wall_seconds": 5620.113244056702,
+  "gpt_median_seconds": 5.340111136436462,
+  "gpt_native_usage": {
+    "input_tokens": 6155407,
+    "cached_input_tokens": 5271552,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 83555,
+    "reasoning_output_tokens": 20679
+  },
+  "qwen_calls": 31,
+  "qwen_wall_seconds": 150.695876121521,
+  "qwen_min_memory_proxy_gib": 2.84735107421875,
+  "qwen_min_os_free_percent": 15,
+  "scope": "Observed application execution; native usage is not a billed API receipt. No local model loaded or unloaded."
+}

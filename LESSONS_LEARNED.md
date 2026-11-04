@@ -278,3 +278,199 @@ Set GRAPHIFY_BACKEND=none, use its frozen uv.lock in an isolated runtime, import
 from that checkout and preserve source/tool/hash receipts. No Homebrew, LLM key,
 model loading or broad skill/hook installer is required for this structural graph.
 EXTRACTED/INFERRED relations and zero-symbol files remain coverage caveats.
+
+
+**[2026-10-30]** Exact-query cache availability is not usable semantic coverage.
+For the new1000 sample,137 exact-query sources yielded130 forms with usable contexts;
+62 available cache files belonged to another spelling and were excluded. Preserve
+all inventory/POS IDs, report source absence separately from unresolved meanings, and
+never treat complete LOC-POS coverage as exhaustive senses or calibrated confidence.
+An audit manifest must require provenance sections/revisions; silently defaulting
+missing input hashes to an empty map can make an unverified export look verified.
+
+
+**[2026-10-30]** A label-free schema does not make meaning prose reviewer-free.
+The frozen form contract held218 curated contexts omitted by the older dictionary
+projection; five meanings also contained evaluator instructions. Merge all available
+contexts systematically, retain every POS/restriction, and use an explicit complete
+lexical projection with original-text checks and provenance for prose cleanup.
+Do not strip legitimate regional/historical qualifiers. Curated contexts may be
+label-exposed even when no numeric score enters the model; source fidelity is not
+independence. Preserve the initial arm when correcting evidence after results.
+
+**[2026-10-30]** Compare review budgets as fractions of the full population:
+top5 in each of five folds is25/150=16.7%, not50/1000=5%. Freeze matched top8/150
+before results and label the larger queue secondary. Backend-advertised reasoning
+values may differ from Chat Completions values: Qwen Splash rejected off but accepted
+none. Probe the actual transport synthetically before lexical collection; retain
+failed preflight and pin the accepted options without fabricating confidence.
+
+
+**[2026-10-31]** A Codex CLI probe is not a bare API model request. With existing
+ChatGPT authentication, fresh ephemeral sessions can reuse a frozen lexical CSV,
+but generic managed instructions/tools may remain despite local feature toggles.
+Inspect assembled context, omit project history/labels, and report requested/configured
+identity when events do not attest the served model. Zero observed tool calls does
+not prove tool unavailability. Native event parsing must quarantine unknown/tool
+activity and runtime warnings, including stderr; malformed items or nonzero exit
+must not mask a later tool event. Persist raw receipts before fatal propagation.
+Keep this transport distinction explicit in model comparisons; do not synthesize
+HTTP responses or claim calibrated confidence from strict JSON success.
+
+
+**[2026-10-31]** A second judge's agreement within one level must not veto the
+initial large baseline conflict. On the150 references, târfă remains a GPT error
+although Qwen differs by only1. Freeze routing/ranking without labels, report misses
+(carter has a small baseline–GPT gap despite both being wrong), and retain operational
+versus proposed scores separately. On an unlabelled sample, disagreement counts and
+model agreement are not accuracy. Missing dictionary context requires an explicit UI
+state, not a model-invented sense or fabricated example; skipped cards do not trigger
+a replacement round beyond the fixed human-review budget.
+
+
+**[2026-10-31]** A risk-selected review changes denominators and score distributions — with baseline fallback4, requiring a gap≥2 selects GPT1/2 by construction.49/50 low GPT scores in that queue cannot demonstrate global collapse. Compare GPT/baseline on50, allthree only on12Qwen-observed rows, and retain150pilot separately. Completed50 reversed the pilot ordering (baseline13vsGPT19severe), especially without contexts; do not promote a post-hoc context gate. A saved note explicitly substituting otel→oțel supports an identity failure, whereas POS/sense gaps and rubric mismatch remain hypotheses without controlled evidence.
+
+
+**[2026-10-31]** Exact dictionary headwords can have valid senses absent from the
+curated tree (ceruit adjective, ozene neuter/livresc). Preserve spelling relation
+and noun gender coverage in model inputs, not only external provenance; missing
+POS is not an exhaustive blacklist. A numbered raw parser must reject inline sense
+references such as urări (2), never export the two fragments as exact meanings.
+
+**[2026-10-31]** Fresh paired arms need identical-input repeat controls. In the30-form
+lexical repair experiment, severe errors fell4→3 only because prășit changed2→3
+under identical inputs; actual evidence interventions changed no severe outcome.
+Passing a non-regression gate does not establish benefit. A post-hoc context gate
+improved overall review loss yet worsened reference4 errors0/9→2/9; retain class
+strata and separate pilot/risk-selected denominators before recommending adoption.
+
+
+**[2026-11-01]** Corpus attestation is not a lower-rarity certificate. A frozen
+FineWeb2(5counts/3docs/2hosts) OR CoRoLa≥5 gate supported57/58 large GPT reductions
+through CoRoLa and added zero decisions beyond lexical coverage. Overall severe
+errors fell11→9 and13→10, yet reference4/5 strata worsened. Always retain rare-class
+checks and ablations; do not infer sense/POS-specific familiarity from exact-form
+aggregate counts or promote an aggregate gain that fails the declared criterion.
+
+
+**[2026-11-01]** Human exact-form overrides must expand across all inventory/POS
+IDs, while preserving diacritics and the original ID/spelling receipt. Here200
+references cover233rows;117numeric changes do not imply only117reviewed rows.
+A full fitted baseline export differs from historical OOF predictions; do not mix
+their conflict counts. Human concordance by construction is integrity, not accuracy.
+
+**[2026-11-01]** Compare upload quality checks with the unchanged baseline before
+attributing failure to a new overlay. Both failed L1/anchor gates against the local
+snapshot; human overrides improved them marginally. A128-word seed anchor list is
+not exhaustive, so its precision is not lexical accuracy. Keep the gate and audit
+reference/anchor semantics; never self-certify by adding candidate words to anchors.
+
+
+**[2026-11-02]** Check gate feasibility before semantic diagnosis. Jaccard cannot
+exceed min(C,R)/max(C,R); with972versus2500L1 IDs, .7 is impossible. A128-positive
+seed divided by870predicted forms cannot reach .8 precision, even if every seed
+matches. Nonmembers are unlabelled, not semantic false positives.400anchors still
+cannot reach .8 here. Distinguish drift, seed recall and precision on labelled
+examples; never manufacture matching anchors or relax thresholds to force PASS.
+
+**[2026-11-02]** A filename containing current is not provenance. The February
+snapshot predates saved later uploads, itself fails seed recall (19/128), and has
+76severe disagreements on150existing labels versus10for the fitted baseline.
+Check journal/receipts, all ID/spelling/POS identities, and form-level consistency.
+Historical ID shifts must not be applied to a future live DB by assumption.
+
+
+**[2026-11-02]** Validation reports need label-use metadata, not only metrics:
+fit describes training performance; override agreement is integrity by construction.
+A positive-only seed cannot supply semantic precision. Denominators and coverage
+must accompany labelled precision:38/45baseline L1 is only45/870coverage, and a
+risk-selected50may have no L1 at all (undefined, not0or100%). Both current exports
+leave825L1forms unlabelled. Even perfect audit metrics must not grant upload authority.
+
+
+**[2026-11-02]** Historical ID shifts are not migration rules: the fresh words table
+uses233095..310792, an observed+155396from the frozen export, not the old+77698.
+Join exact form/POS, verify multiplicities and scores. Duplicate row identity may
+remain unknowable while the proposed score is unambiguous for every group member;
+record the full equivalence group, never fabricate one-to-one provenance. Changed
+multiplicity must quarantine the group, not silently pair sorted IDs.
+
+**[2026-11-02]** A refreshed snapshot can fix Jaccard feasibility without passing
+the gate: new ceiling79.319%, observed14.678%. Complete mapping is engineering
+integrity, not evidence for50,889score changes. Separate165human corrections from
+50,724provisional baseline changes;30,524historical5->baseline4transitions do not
+supply new evidence about rare-word familiarity.
+
+
+**[2026-11-02]** Human-only patches need guards beyond changed rows:165corrections
+cover233reviewed rows, including68already correct. Check complete form membership,
+literal ID/spelling/POS and expected scores to catch new POS/duplicates or drift.
+Rollback includes only changed IDs and requires a confirmed apply receipt; matching
+post-state alone proves neither execution nor absence of an intervening A→B→A edit.
+Offline forward/inverse equality is data integrity, not a live execution guarantee.
+
+
+**[2026-11-03]** Scoped human acceptance and operational authorization are separate
+outcomes. The165-correction package passes original-label, full-candidate, inverse
+and stability criteria with zero direct human–seed contradictions, yet the global
+seed gate still fails. Report both; never turn audit PASS into upload permission.
+Pin the original migration snapshot and complete package, not just counts; replay
+raw-source lineage to reject resealed CSV edits. Reject competing score columns:
+legacy quality audit prefers final_level over rarity_level, which could otherwise
+make the reported metric describe a different candidate than the identity check.
+
+
+**[2026-11-03]** Lost commit acknowledgement is not proof of rollback. Human-flow
+fault tests cover both rolled-back and committed-but-unacknowledged transactions.
+Keep a package-keyed receipt in the same transaction; retries recover it before
+DML. Local files alone cannot certify DB execution. Rollback needs post-write row
+versions, not only matching scores; bound32-bit xmin reuse with64-bit transaction
+age and fail closed on ambiguity. These guarantees are tested with transaction
+and driver doubles here; server concurrency and deployment still need integration.
+
+
+**[2026-11-03]** Final verification must follow the LAST database write, including
+receipt persistence. Real PostgreSQL tests found ledger triggers could mutate words
+or rewrite the receipt after the initial inventory post-check. Force constraints,
+then re-read inventory and receipt before commit, for both apply and rollback.
+Keep this regression in the default offline suite as well as opt-in server tests.
+A valid isolated-server run does not certify production triggers/RLS or power loss.
+
+**[2026-11-03]** Match the table access method, not just PostgreSQL version.
+Production17.9 uses OrioleDB1.8; SELECT xmin fails although heap17.9 integration
+passes. Inspect pg_class.relam, pg_am and default_table_access_method during
+preflight. A heap-only version/CAS/ABA contract cannot be promoted to OrioleDB by
+removing xmin or replacing it with a score hash. Explicit revision support must
+cover every writer and delete/reinsert, with real engine tests before deployment.
+
+**[2026-11-03]** Explicit row revisions must bind both token and installation.
+On OrioleDB1.8, an ALWAYS INSERT/UPDATE trigger plus private noncycling sequence
+detects same-score writes and delete/reinsert from ordinary external writers.
+Bind receipts to the installation UUID and recheck the contract after ledger
+writes; an epoch-changing ledger trigger otherwise allowed an invalid commit.
+Do not grant UPDATE on the contract just to obtain a stronger lock: ACCESS SHARE
+works with SELECT-only rights. Trusted administrators must preserve sequence/epoch
+history; no claim of protection against owner resets or divergent restores.
+
+**[2026-11-03]** Dictionary reload is a package boundary, even with named INSERTs.
+The local LoadDictionary tool uses explicit columns but TRUNCATE/reload restores
+scores by word/type/gender, not pinned IDs. Audit column compatibility separately
+from identity/history compatibility; reconcile correction packages and receipts
+after reload/restore. Source inspection is not proof of all deployed writers.
+
+**[2026-11-04]** Reproduce event-trigger ownership history in isolated fixtures.
+PostgreSQL17 rejects assigning an event trigger to a non-superuser, although a
+captured existing trigger can have an owner later stripped of SUPERUSER. Bootstrap
+ownership with privileges, then remove them before testing the actual non-superuser
+installer; do not weaken production role checks to make the fixture pass.
+
+**[2026-11-04]** Verify read-only mode inside the actual pooler transaction.
+The observed session pooler did not apply startup `options=-c default_transaction_read_only=on`:
+an initial SELECT saw transaction_read_only=off. Use explicit BEGIN READ ONLY and
+assert the setting in the same transaction; a DSN option is not a security boundary.
+
+
+**[2026-11-04]** Verify the destination of a merged stacked PR. PR85 was already
+merged into82's feature branch while81/82 remained open; merged=true did not mean
+main contained it. Refresh metadata/ancestry, retarget children to the surviving
+parent, compare trees, and pin the reviewed head SHA before merging.

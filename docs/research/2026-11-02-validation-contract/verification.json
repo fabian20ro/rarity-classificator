@@ -1,0 +1,17 @@
+{
+  "protected_files_unchanged": 4718,
+  "replay_byte_identical_artifacts": 7,
+  "prior_independent_metrics": "PASS",
+  "human_comparisons_reconciled": 400,
+  "human_overrides_preserved": 200,
+  "upload_entrypoint_blocked": {
+    "baseline": "Quality audit failed: l1_jaccard 0.0318 < min 0.7000, anchor_l1_precision 0.0816 < min 0.8000, anchor_l1_recall 0.5547 < min 0.8000",
+    "conservative": "Quality audit failed: l1_jaccard 0.0324 < min 0.7000, anchor_l1_precision 0.0822 < min 0.8000, anchor_l1_recall 0.5625 < min 0.8000"
+  },
+  "external_effect_boundaries_reached": false,
+  "model_calls": 0,
+  "database_writes": 0,
+  "implementation_sha256": "61d94c23ab8fd2d235fb5b755bb136eaff29df6b34590b854d71c201f3150106",
+  "runner_sha256": "9450a8384373f7e28819d8949f5a5f83c17ec513b7c2213cff50bc77965f1d76",
+  "contract_sha256": "07794d987e3455aad45a123482ea69e15a7e2bcfe922f204357f4cc0dbe116be"
+}

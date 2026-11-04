@@ -1,0 +1,14 @@
+{
+  "policy_sha256": "c0e8805dbf8bd6378c9128a2dbb23198cfa1a6f91570e7ae9accee36685f460e",
+  "gpt_protocol_sha256": "c4d3f2129fd10d275e0de5be7087cb7047a965ac316b65e9af16aa3cf9b5e5f0",
+  "route_sha256": "48816b0be20eaba251c3559abad5cbaf68707beda5fb644ea49c9db67b13f5e7",
+  "judge_sha256": "8636699ed8524bb865be68cb3747e5e9e684e4783a7cb0990695c18b62236e26",
+  "count": 31,
+  "inputs": {
+    "inputs/evidence.csv": "51bb9daa11216932dd4faf37ec5bc5f7872d03465b62453b30a5d677c8f719c6",
+    "inputs/vocabulary.csv": "c3d01844d301f851b5bbe2d31486744b36324400d5e5410b84bcaf3930123649",
+    "runtime.json": "7e8ae877a3efc78f6c89dd122e2aced27d8c195b79a35b45a23cdbed0eb8cd38",
+    "options.json": "eba91281ffc2a1d2da80b19d9e8e6921bfc13fcf58f00e38c89883a84f08efb5"
+  },
+  "design": "Only predeclared supported conflicts; sequential after GPT1000 complete; no GPT/baseline score in Qwen request; original rubric/evidence; no label or numeric blending"
+}

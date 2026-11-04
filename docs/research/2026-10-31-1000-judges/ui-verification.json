@@ -1,0 +1,13 @@
+{
+  "status": "pass",
+  "scope": "Isolated Playwright QA profile; user browser and prior annotations untouched",
+  "real_pack_count": 50,
+  "estimates_absent": true,
+  "documented_context_rendered": true,
+  "missing_context_and_pos_rendered": true,
+  "rating_survives_reload": true,
+  "synthetic_answer_deleted": true,
+  "final_rated_count": 0,
+  "screenshot_sha256": "6a2241fb2e86a0e312a36e2201acbf98250cb2154d331f862215fbea2e70a4f8",
+  "fixture_verification_sha256": "a92cfa56e15174ccb3fa4e6163f48775d28ca415864651a174072315131d2833"
+}

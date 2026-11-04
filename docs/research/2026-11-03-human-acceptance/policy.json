@@ -1,0 +1,36 @@
+{
+  "version": "human-corrections-acceptance-audit-v1",
+  "mode": "audit",
+  "as_of": "2026-11-03",
+  "sources": {
+    "package_manifest": {
+      "path": "/Users/fabian/git/word-rarity-classifier/build/d1/human-corrections-2026-11-02/package/manifest.json",
+      "sha256": "b16a3b48d24988e4612ac63fc4b17255fc3b09219f76b6d0d9f2a4446a9fa7fd"
+    },
+    "plan_manifest": {
+      "path": "/Users/fabian/git/word-rarity-classifier/build/d1/migration-dry-run-2026-11-02/analysis/plan/manifest.json",
+      "sha256": "b8c91e6ce1d3c76ae9c2b219a656c2f1f1128e367c051e878825726f6372e587"
+    },
+    "human_export_manifest": {
+      "path": "/Users/fabian/git/word-rarity-classifier/build/d1/conservative-export-2026-11-01/export/manifest.json",
+      "sha256": "32ebc09c97816bc24f74eb3216379f7cbbf03659ab681e3e3a393c694cf3d3de"
+    },
+    "snapshot": {
+      "path": "/Users/fabian/git/word-rarity-classifier/build/d1/migration-dry-run-2026-11-02/analysis/live-snapshot.csv",
+      "sha256": "d52b8cdbfc0cfdd5d8184f68bf34d8660dcfbd49e20eebf6a1cdd2bb4b64d10d"
+    },
+    "candidate": {
+      "path": "/Users/fabian/git/word-rarity-classifier/build/d1/human-corrections-2026-11-02/simulation-after.csv",
+      "sha256": "d53efcf75a64949e5c351f6f963e55475c201f63247fffc27b059e2cd8997172"
+    },
+    "anchors": {
+      "path": "/Users/fabian/git/word-rarity-classifier/build/d1/risk-plan-pr/docs/rarity-anchor-l1-ro.txt",
+      "sha256": "f8f4bfb586ca403524e0185f3ccaec85ec6af15fbabd7c0dfa7593c2d113afc4"
+    }
+  },
+  "scope": {
+    "correction_rows": 165,
+    "guard_rows": 233,
+    "human_references": 200
+  }
+}

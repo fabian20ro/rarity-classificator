@@ -1,0 +1,23 @@
+{
+  "server": {
+    "image": "postgres@sha256:c7526c0f6c3f30260a563d7bcf8ad778effac59a44f8ffa86678c35418338609",
+    "server_version": "17.9",
+    "container": "codex-human-pg-a367ce88ae3d",
+    "volume": "codex-human-pg-a367ce88ae3d-data",
+    "host": "127.0.0.1",
+    "host_port": 64799,
+    "memory_limit_mib": 512,
+    "container_removed": true,
+    "volume_removed": true
+  },
+  "tests": 17,
+  "failed": 0,
+  "skipped": 0,
+  "passed": 17,
+  "exit_code": 0,
+  "full_inventory": true,
+  "protected_files_unchanged": 4885,
+  "project_database_accessed": false,
+  "model_calls": 0,
+  "caveat": "Real PostgreSQL in a disposable Docker volume. Not the project database; no production RLS/trigger configuration verified. Lost post-commit acknowledgement is injected after real commit; pre-commit disconnect and restart are real server operations."
+}

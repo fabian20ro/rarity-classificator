@@ -1,0 +1,12 @@
+{
+  "version": "human-corrections-package-v1",
+  "mode": "prepared_only",
+  "upload_authorized": false,
+  "rollback_authorized": false,
+  "requires_fresh_snapshot_before_apply": true,
+  "requires_existing_upload_gate": true,
+  "execution_contract": "Recheck complete reviewed-form membership, literal ID/word/POS and all guarded levels under one transaction; all corrections or none; exact affected-row count and durable apply receipt required.",
+  "rollback_requires_confirmed_apply_receipt": true,
+  "rollback_contract": "Only IDs confirmed changed by this package may be restored; verify post-apply identity and levels, refuse conflicts. Expected values alone cannot detect ABA or prove this package ran. No rollback before confirmed apply.",
+  "package_id": "600ee91fc220c2f0ec88f821916da535d7f4388e2de922395b6ee61ccf2f6fa1"
+}

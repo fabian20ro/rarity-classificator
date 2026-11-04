@@ -1,0 +1,17 @@
+{
+  "forms": 1000,
+  "inventory_rows": 1146,
+  "coverage": {
+    "no_source": 863,
+    "source_bounded_not_exhaustive": 121,
+    "no_usable_contexts": 7,
+    "partial_pos": 9
+  },
+  "forms_with_usable_contexts": 130,
+  "context_status": {
+    "usable_source_bounded": 515,
+    "unaligned": 418,
+    "empty_definition_or_pos": 1
+  },
+  "scope": "Source-bounded lexical evidence, not exhaustive senses or score validation"
+}

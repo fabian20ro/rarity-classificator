@@ -1,0 +1,8 @@
+{
+  "src/classificator/evaluation/codex_judge.py": "5e67bac989d57bdf479ed3c1594fcced50f012b8e28de19959821b46ba57eb4c",
+  "src/classificator/evaluation/chat_judge.py": "8636699ed8524bb865be68cb3747e5e9e684e4783a7cb0990695c18b62236e26",
+  "src/classificator/evaluation/campaign.py": "d233ffc8728fb152bf39d92b923070fb1952960decf6c30a10e90a1bc168b428",
+  "src/classificator/evaluation/dataset.py": "c6fd9f04362a9ce3811579e9a4aed71a1c5ae9d1e55de376020fe06e4726439d",
+  "src/classificator/evaluation/judge_comparison.py": "fa0732009eab837d03f33290174f53adaa4f96e67d4e71ad43525df096d9482d",
+  "tests/test_codex_judge.py": "a2bee7ace60da8871aaf7dc185806f8539cc1e3e13ddfd59468e7414652a1208"
+}
