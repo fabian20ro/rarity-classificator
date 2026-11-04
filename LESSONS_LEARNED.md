@@ -468,3 +468,9 @@ installer; do not weaken production role checks to make the fixture pass.
 The observed session pooler did not apply startup `options=-c default_transaction_read_only=on`:
 an initial SELECT saw transaction_read_only=off. Use explicit BEGIN READ ONLY and
 assert the setting in the same transaction; a DSN option is not a security boundary.
+
+
+**[2026-11-04]** Verify the destination of a merged stacked PR. PR85 was already
+merged into82's feature branch while81/82 remained open; merged=true did not mean
+main contained it. Refresh metadata/ancestry, retarget children to the surviving
+parent, compare trees, and pin the reviewed head SHA before merging.

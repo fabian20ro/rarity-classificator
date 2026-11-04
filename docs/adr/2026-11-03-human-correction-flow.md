@@ -1,8 +1,10 @@
 # Decision: separate approved human correction flow
 
-Status: **accepted by the user, 2026-11-03**. Initial scope: implementation/offline tests;
-subsequent approvals cover disposable heap and OrioleDB integration. No production schema
-deployment or application authorized or performed.
+Status: **accepted by the user, 2026-11-03; deployed and applied, 2026-11-04**.
+The initial scope was implementation/offline tests; later instructions authorized
+isolated integration, installation, connection setup and the165-row human apply.
+[Current verified state](../research/2026-11-04-human-application.md). Dated sections
+below preserve the decisions and limits at each earlier stage.
 
 ## Context
 
@@ -69,8 +71,9 @@ rollback acknowledgement is recovered identically, without repeated reversal.
 Table locks briefly block writers:5s lock timeout,30s statement timeout. A dedicated
 privileged backend role must see every word and own/access the private ledger;
 `row_security=off` prevents silently accepting an RLS-filtered inventory. No schema
-creation or role grants occur automatically. The SQL prerequisite is separate and
-has been executed only on a disposable test server, **not in the project DB**. Existing schema conflicts deliberately fail.
+creation or role grants occur automatically. The SQL prerequisite is separate; at the initial integration stage it had run
+only on a disposable test server. Production deployment is recorded in the dated
+follow-ups below. Existing schema conflicts deliberately fail.
 
 CSV-first artifacts include preview, original approval/audit, locked before,
 projected candidate, guard/quality reports, after-state and receipt. Inputs are

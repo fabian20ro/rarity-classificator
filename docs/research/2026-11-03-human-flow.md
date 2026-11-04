@@ -1,9 +1,12 @@
 # Flux separat pentru corecții umane — 2026-11-03
 
+Stare curentă: [adaptarea OrioleDB, instalarea și aplicarea umană sunt încheiate](2026-11-04-human-application.md).
+Restul raportului descrie etapa inițială offline și blocajele ei istorice.
+
 Actualizare ulterioară: [integrarea PostgreSQL izolată a trecut](2026-11-03-postgres-integration.md).
 Rezultatele de mai jos descriu etapa inițială offline. Nu s-a aplicat lotul în DB-ul proiectului.
 Preflight-ul real a găsit ulterior un [blocaj OrioleDB/xmin](2026-11-03-production-preflight.md).
-Adaptorul actual nu poate fi aplicat acelui motor fără adaptare și teste specifice.
+Adaptorul de la acea dată nu putea fi aplicat acelui motor fără adaptare și teste specifice.
 
 **Implementat conform politicii aprobate; niciun scor aplicat în DB.**
 `human-corrections-flow-v1` păstrează Jaccard obligatoriu, cu ancore raportate fără

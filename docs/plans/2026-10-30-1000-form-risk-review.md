@@ -2,7 +2,8 @@
 
 Actualizat: 2026-11-04. Stare: etapele 1–22 încheiate;165corecții umane aplicate
 și confirmate prin citire separată.77.533rânduri neschimbate;233postcondiții valide.
-Lot uman închis. Urmează review/merge PR85/86; Step4 și blocarea automată neschimbate.
+Lot uman închis. Review85/86 încheiat;85 era deja merged în82.
+Integrarea86 urmărește același părinte;81/82 rămân înainte de main. Step4 neschimbat.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -986,3 +987,16 @@ istoric cu ledger gol ca test al stării actuale; păstrează dovada post-apply.
 necesită în continuare o decizie distinctă despre contractul semantic L1/ancore și
 validarea erorilor≥2 pe referințele existente; succesul lotului uman nu autorizează
 acel upload. Nu transforma consensul modelelor sau potrivirea histogramei în gold.
+
+
+## Review și integrare PR85/86 — 2026-11-04
+
+Review offline pe puncte fixe: fără probleme blocante rămase; antetele documentelor
+istorice clarificate. PR85:883teste+220subteste; PR86:986teste+456subteste,40teste DB
+omise. Ruff și CI verde pe head-urile revizuite. Zero acces DB/apeluri LLM.
+[Raport și limite](../research/2026-11-04-pr85-pr86-review.md).
+
+Corecție față de recomandarea anterioară:85 era deja merged din30octombrie în
+branch-ul lui82.86 trebuie integrat în acel părinte; simpla închidere a stivei85/86
+nu înseamnă integrare în main. PR81/82 sunt încă deschise; extinderea review/merge-ului
+la acestea este o etapă separată. Lotul uman și gate-urile automate nu se schimbă.

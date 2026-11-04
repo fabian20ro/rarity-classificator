@@ -1410,3 +1410,18 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
   detailed receipt/snapshots/connection remain local. Updated plan/handover/ADR.
 - Next review/merge stacked PR85/86. Human deployment complete; broader automatic
   promotion remains a separate semantic-validation decision, no new user ratings.
+
+
+## 2026-11-04 — PR85/86 offline review and merge preparation
+
+- Surprise: GitHub85 was already merged on October30 into82's branch, although
+  earlier handovers recommended merging85/86.81/82 still open; do not infer main
+  integration from merged=true. Parent tree equals85 head;86 delta unchanged.
+- Reviewed standards/spec separately without subagents/model calls. No remaining
+  code blockers found; corrected stale initial deployment status in ADR/report.
+- Ran official offline checks on both exact heads with DB/network/process guards:
+ 85:883tests+220subtests;86:986tests+456subtests,40DB integration skips; Ruff PASS.
+  CI green on original heads; no review threads/negative reviews. No DB access,
+  score changes, LLM calls or dependency installation.
+- Recommended86 retarget to85's merged parent;81/82 outside current merge scope
+  unless user explicitly expands it. Review report records limits and exact refs.
