@@ -1,0 +1,443 @@
+{
+  "status": "complete",
+  "routing": {
+    "total": 1000,
+    "qwen_routed": 31,
+    "review_eligible": 171,
+    "review_selected": 50,
+    "review_budget": 50,
+    "qwen_complete": true,
+    "policy": {
+      "version": "exact-form-conflicts-v1",
+      "qwen": "GPT scored AND abs(GPT-baseline)>=2 AND usable lexical context",
+      "review": "GPT failed OR initial abs(GPT-baseline)>=2; Qwen never vetoes",
+      "rank": [
+        "gpt_failed",
+        "qwen_failed",
+        "qwen_gpt_gap>=2",
+        "span_desc",
+        "initial_gap_desc",
+        "missing_context",
+        "multiple_pos",
+        "seeded_id"
+      ],
+      "seed": "qwen-pilot-v1",
+      "scores": "Operational baseline unchanged; proposed GPT with explicit failure fallback; no blend",
+      "risk": "Ordinal conflict/technical/unknown flags, not calibrated probabilities"
+    }
+  },
+  "strata": {
+    "all": {
+      "n": 1000,
+      "gpt_native": 1000,
+      "gpt_failed": 0,
+      "qwen_routed": 31,
+      "qwen_native": 31,
+      "qwen_failed": 0,
+      "gpt_baseline_gap_ge2": 171,
+      "qwen_gpt_gap_ge2": 11,
+      "gpt_baseline_gap_counts": {
+        "0": 453,
+        "1": 376,
+        "2": 160,
+        "3": 11
+      },
+      "baseline_distribution": {
+        "1": 21,
+        "2": 92,
+        "3": 36,
+        "4": 851
+      },
+      "proposed_distribution": {
+        "1": 94,
+        "2": 206,
+        "3": 169,
+        "4": 400,
+        "5": 131
+      },
+      "qwen_distribution": {
+        "1": 2,
+        "2": 9,
+        "3": 13,
+        "4": 7
+      },
+      "review_selected": 50
+    },
+    "general600": {
+      "n": 600,
+      "gpt_native": 600,
+      "gpt_failed": 0,
+      "qwen_routed": 18,
+      "qwen_native": 18,
+      "qwen_failed": 0,
+      "gpt_baseline_gap_ge2": 88,
+      "qwen_gpt_gap_ge2": 4,
+      "gpt_baseline_gap_counts": {
+        "0": 283,
+        "1": 229,
+        "2": 84,
+        "3": 4
+      },
+      "baseline_distribution": {
+        "1": 8,
+        "2": 42,
+        "3": 23,
+        "4": 527
+      },
+      "proposed_distribution": {
+        "1": 37,
+        "2": 115,
+        "3": 107,
+        "4": 259,
+        "5": 82
+      },
+      "qwen_distribution": {
+        "2": 6,
+        "3": 8,
+        "4": 4
+      },
+      "review_selected": 20
+    },
+    "stress400": {
+      "n": 400,
+      "gpt_native": 400,
+      "gpt_failed": 0,
+      "qwen_routed": 13,
+      "qwen_native": 13,
+      "qwen_failed": 0,
+      "gpt_baseline_gap_ge2": 83,
+      "qwen_gpt_gap_ge2": 7,
+      "gpt_baseline_gap_counts": {
+        "0": 170,
+        "1": 147,
+        "2": 76,
+        "3": 7
+      },
+      "baseline_distribution": {
+        "1": 13,
+        "2": 50,
+        "3": 13,
+        "4": 324
+      },
+      "proposed_distribution": {
+        "1": 57,
+        "2": 91,
+        "3": 62,
+        "4": 141,
+        "5": 49
+      },
+      "qwen_distribution": {
+        "1": 2,
+        "2": 3,
+        "3": 5,
+        "4": 3
+      },
+      "review_selected": 30
+    },
+    "with_context": {
+      "n": 130,
+      "gpt_native": 130,
+      "gpt_failed": 0,
+      "qwen_routed": 31,
+      "qwen_native": 31,
+      "qwen_failed": 0,
+      "gpt_baseline_gap_ge2": 31,
+      "qwen_gpt_gap_ge2": 11,
+      "gpt_baseline_gap_counts": {
+        "0": 52,
+        "1": 47,
+        "2": 26,
+        "3": 5
+      },
+      "baseline_distribution": {
+        "1": 7,
+        "2": 30,
+        "3": 6,
+        "4": 87
+      },
+      "proposed_distribution": {
+        "1": 28,
+        "2": 38,
+        "3": 17,
+        "4": 37,
+        "5": 10
+      },
+      "qwen_distribution": {
+        "1": 2,
+        "2": 9,
+        "3": 13,
+        "4": 7
+      },
+      "review_selected": 12
+    },
+    "without_context": {
+      "n": 870,
+      "gpt_native": 870,
+      "gpt_failed": 0,
+      "qwen_routed": 0,
+      "qwen_native": 0,
+      "qwen_failed": 0,
+      "gpt_baseline_gap_ge2": 140,
+      "qwen_gpt_gap_ge2": 0,
+      "gpt_baseline_gap_counts": {
+        "0": 401,
+        "1": 329,
+        "2": 134,
+        "3": 6
+      },
+      "baseline_distribution": {
+        "1": 14,
+        "2": 62,
+        "3": 30,
+        "4": 764
+      },
+      "proposed_distribution": {
+        "1": 66,
+        "2": 168,
+        "3": 152,
+        "4": 363,
+        "5": 121
+      },
+      "qwen_distribution": {},
+      "review_selected": 38
+    },
+    "wordfreq_missing": {
+      "n": 851,
+      "gpt_native": 851,
+      "gpt_failed": 0,
+      "qwen_routed": 27,
+      "qwen_native": 27,
+      "qwen_failed": 0,
+      "gpt_baseline_gap_ge2": 157,
+      "qwen_gpt_gap_ge2": 10,
+      "gpt_baseline_gap_counts": {
+        "0": 396,
+        "1": 298,
+        "2": 146,
+        "3": 11
+      },
+      "baseline_distribution": {
+        "4": 851
+      },
+      "proposed_distribution": {
+        "1": 11,
+        "2": 146,
+        "3": 167,
+        "4": 396,
+        "5": 131
+      },
+      "qwen_distribution": {
+        "1": 1,
+        "2": 8,
+        "3": 12,
+        "4": 6
+      },
+      "review_selected": 45
+    },
+    "without_context_and_wordfreq": {
+      "n": 764,
+      "gpt_native": 764,
+      "gpt_failed": 0,
+      "qwen_routed": 0,
+      "qwen_native": 0,
+      "qwen_failed": 0,
+      "gpt_baseline_gap_ge2": 130,
+      "qwen_gpt_gap_ge2": 0,
+      "gpt_baseline_gap_counts": {
+        "0": 362,
+        "1": 272,
+        "2": 124,
+        "3": 6
+      },
+      "baseline_distribution": {
+        "4": 764
+      },
+      "proposed_distribution": {
+        "1": 6,
+        "2": 124,
+        "3": 151,
+        "4": 362,
+        "5": 121
+      },
+      "qwen_distribution": {},
+      "review_selected": 34
+    },
+    "slice_corpus100": {
+      "n": 100,
+      "gpt_native": 100,
+      "gpt_failed": 0,
+      "qwen_routed": 2,
+      "qwen_native": 2,
+      "qwen_failed": 0,
+      "gpt_baseline_gap_ge2": 33,
+      "qwen_gpt_gap_ge2": 2,
+      "gpt_baseline_gap_counts": {
+        "0": 36,
+        "1": 31,
+        "2": 32,
+        "3": 1
+      },
+      "baseline_distribution": {
+        "4": 100
+      },
+      "proposed_distribution": {
+        "1": 1,
+        "2": 32,
+        "3": 28,
+        "4": 36,
+        "5": 3
+      },
+      "qwen_distribution": {
+        "3": 1,
+        "4": 1
+      },
+      "review_selected": 4
+    },
+    "slice_general600": {
+      "n": 600,
+      "gpt_native": 600,
+      "gpt_failed": 0,
+      "qwen_routed": 18,
+      "qwen_native": 18,
+      "qwen_failed": 0,
+      "gpt_baseline_gap_ge2": 88,
+      "qwen_gpt_gap_ge2": 4,
+      "gpt_baseline_gap_counts": {
+        "0": 283,
+        "1": 229,
+        "2": 84,
+        "3": 4
+      },
+      "baseline_distribution": {
+        "1": 8,
+        "2": 42,
+        "3": 23,
+        "4": 527
+      },
+      "proposed_distribution": {
+        "1": 37,
+        "2": 115,
+        "3": 107,
+        "4": 259,
+        "5": 82
+      },
+      "qwen_distribution": {
+        "2": 6,
+        "3": 8,
+        "4": 4
+      },
+      "review_selected": 20
+    },
+    "slice_orthography100": {
+      "n": 100,
+      "gpt_native": 100,
+      "gpt_failed": 0,
+      "qwen_routed": 6,
+      "qwen_native": 6,
+      "qwen_failed": 0,
+      "gpt_baseline_gap_ge2": 27,
+      "qwen_gpt_gap_ge2": 2,
+      "gpt_baseline_gap_counts": {
+        "0": 32,
+        "1": 41,
+        "2": 26,
+        "3": 1
+      },
+      "baseline_distribution": {
+        "2": 25,
+        "3": 7,
+        "4": 68
+      },
+      "proposed_distribution": {
+        "1": 20,
+        "2": 31,
+        "3": 13,
+        "4": 26,
+        "5": 10
+      },
+      "qwen_distribution": {
+        "1": 2,
+        "2": 2,
+        "3": 2
+      },
+      "review_selected": 6
+    },
+    "slice_pos100": {
+      "n": 100,
+      "gpt_native": 100,
+      "gpt_failed": 0,
+      "qwen_routed": 5,
+      "qwen_native": 5,
+      "qwen_failed": 0,
+      "gpt_baseline_gap_ge2": 22,
+      "qwen_gpt_gap_ge2": 3,
+      "gpt_baseline_gap_counts": {
+        "0": 47,
+        "1": 31,
+        "2": 17,
+        "3": 5
+      },
+      "baseline_distribution": {
+        "1": 13,
+        "2": 25,
+        "3": 6,
+        "4": 56
+      },
+      "proposed_distribution": {
+        "1": 36,
+        "2": 27,
+        "3": 11,
+        "4": 24,
+        "5": 2
+      },
+      "qwen_distribution": {
+        "2": 1,
+        "3": 2,
+        "4": 2
+      },
+      "review_selected": 20
+    },
+    "slice_weak100": {
+      "n": 100,
+      "gpt_native": 100,
+      "gpt_failed": 0,
+      "qwen_routed": 0,
+      "qwen_native": 0,
+      "qwen_failed": 0,
+      "gpt_baseline_gap_ge2": 1,
+      "qwen_gpt_gap_ge2": 0,
+      "gpt_baseline_gap_counts": {
+        "0": 55,
+        "1": 44,
+        "2": 1
+      },
+      "baseline_distribution": {
+        "4": 100
+      },
+      "proposed_distribution": {
+        "2": 1,
+        "3": 10,
+        "4": 55,
+        "5": 34
+      },
+      "qwen_distribution": {},
+      "review_selected": 0
+    }
+  },
+  "cause_counts": {
+    "multiple_pos": 104,
+    "missing_lexical_context": 870,
+    "missing_wordfreq": 851,
+    "orthographic_ambiguity": 121,
+    "gpt_baseline_disagreement": 171,
+    "model_disagreement": 11
+  },
+  "limits": [
+    "New1000 unlabelled; disagreements are not measured errors.",
+    "GPT configured/requested identity through Codex, not provider-attested model.",
+    "No model agreement certified as gold; no calibrated probability.",
+    "Operational baseline unchanged, proposed GPT only in offline CSV.",
+    "Qwen only on supported conflicts; no predictions for unqueried words.",
+    "No DB writes or new pilot ratings."
+  ]
+}

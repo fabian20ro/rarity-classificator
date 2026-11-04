@@ -1,0 +1,35 @@
+{
+  "scope": "Aggregates, hashes and runtime scripts only. Raw lexical text, model receipts, review cards and per-form corpus signals remain local.",
+  "files": {
+    "prepare_qwen.py.txt": "7b8562dfaea6098acd23b2598a3f0172a780fb5b84a6c94b91a8cf7f67d82658",
+    "policy.json": "c0e8805dbf8bd6378c9128a2dbb23198cfa1a6f91570e7ae9accee36685f460e",
+    "qwen-protocol.json": "57ac1dfbf69163a59e3150e046a8e305a69516665d865659fac4c33047661176",
+    "audit-inputs.json": "1ab73c40a184038b3f2317d308fb1ee63fe9ff03f5990c4167cb83704af06ba0",
+    "report.json": "a16ffddd177563fb82964993479c2ebc7b2da9ca9e3f6ad592775cffe6754528",
+    "freeze.py.txt": "9e16900824e0b421abc2bee3b3f55bfe508edfb8901a5be03d0a0291e3d97f2c",
+    "evidence-verification.json": "43182290e06985c455c0a89a05de83a23d02f25b381ca5edcc0d99fd9b32aa55",
+    "gpt-protocol.json": "c4d3f2129fd10d275e0de5be7087cb7047a965ac316b65e9af16aa3cf9b5e5f0",
+    "replay.py.txt": "e0f4c47714eacca31f414703ef174ff861f873775446213e9ba1b25bb5fdcd74",
+    "audit.py.txt": "062baa5f5b4ad09b2389e0072e7cc9c30d55eef3d83ae9cc48088244c43b39e6",
+    "pilot-rule-metrics.json": "9401ee80a99442fd1d671aa01dcb893ac4728efa06578c4d79c9b397966b25d3",
+    "verify_policy.py.txt": "313d64bcf075813384059946301936aa7fd62ff6aee2f90d637cdaa7a32c4da8",
+    "ui-verification.json": "ac99d6d0f3e5a98d7a579a9c5069bd782120ecbb8c4a4b03398d4b6c88de8a37",
+    "qwen-run.py.txt": "01dc5c8b5a119ba353453a61507f937f33f96ce0764492229c98e18f088d4c53",
+    "gpt-preflight-final_check.py.txt": "4f2cbb4267bc91431561f45de8c7b2c230fa8c7e19e4b239e26f23284d6c9949",
+    "gpt-run.py.txt": "db1c83731a4c3f0274334134ca533d7deab576bb8fe3afa8be490268201b139f",
+    "operational-summary.json": "957bcc966facf02621dcc3d3c8242fc9bf892636f67227386ef4dce798aec4f9",
+    "replay-verification.json": "117d125a84f99ed487aa6038f2b98fe2c92b1fc6e6a4de060883ed6369b37f56",
+    "review-summary.json": "b42a0de8bfca0223f1423fa0f7830a36a1e870dd94d6d3967066e9f521a36835",
+    "verification.json": "f7480a51c3657b02f6a3f4c7b1198513997d67d79a80bdf824990561b30fd3b4",
+    "prepare_runtime.py.txt": "997b53eafa640d1182f033f83d248e8f391510578c87c669bd06f0fdb0ab91c9",
+    "pilot-policy-verification.json": "d5911ff2bd7e1789fc7bfb32c87088613fd4ff52ee7764769e619aecc8724a97",
+    "finish.py.txt": "4cbf106856f07646d5a0199a659fddacbf0fbfbecf83258bb1cb4a90d0d0b54f"
+  },
+  "source_root": "/Users/fabian/git/word-rarity-classifier/build/d1/1000-judges-2026-10-31",
+  "code_files": {
+    "src/classificator/evaluation/audit_judge_evidence.py": "13f69a11cc6688bc61edd6c211b4f8dc14899b1b87b62ba61e0550441416076f",
+    "src/classificator/evaluation/risk_queue.py": "804df75426edc8439578e7086fb6967bc5ada3bc517db293d95458c8195f2766",
+    "src/classificator/evaluation/blind_review.py": "c326c63fd31d45ee9076a4fe75114f64e109dc6b9ea9d02735859a6807c8a694",
+    "src/classificator/evaluation/assets/blind.js": "003250ca4eb93b8eb2c6b99994a9eb64361b6bcca39e7a3612620aedffdc026c"
+  }
+}

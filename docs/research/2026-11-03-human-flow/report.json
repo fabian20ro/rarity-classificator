@@ -1,0 +1,48 @@
+{
+  "version": "human-corrections-flow-v1",
+  "policy_approved_on": "2026-11-03",
+  "actual_run": "offline_preview",
+  "transaction_test": "memory_double_only",
+  "correction_rows": 165,
+  "guard_rows": 233,
+  "human_references_preserved": 200,
+  "untouched_rows": 77533,
+  "simulated_apply_matches_frozen_candidate": true,
+  "simulated_retry_did_not_reapply": true,
+  "simulated_rollback_restores_original_values": true,
+  "legacy_gate": {
+    "distribution": {
+      "1": 1264,
+      "2": 6617,
+      "3": 12533,
+      "4": 24482,
+      "5": 32802
+    },
+    "total_rows": 77698,
+    "level_column": "rarity_level",
+    "l1_jaccard": 0.964594807238395,
+    "l1_intersection": 1226,
+    "l1_candidate_size": 1264,
+    "l1_word_count": 1153,
+    "l1_reference_size": 1233,
+    "anchor_precision": 0.047701647875108416,
+    "anchor_recall": 0.4296875,
+    "passed": false,
+    "failures": [
+      "anchor_l1_precision 0.0477 < min 0.8000",
+      "anchor_l1_recall 0.4297 < min 0.8000"
+    ]
+  },
+  "anchors_block_human_flow": false,
+  "min_l1_jaccard": 0.7,
+  "real_applied": false,
+  "real_receipt_exists": false,
+  "database_reads": 0,
+  "database_writes": 0,
+  "model_calls": 0,
+  "schema_sql_executed": false,
+  "protected_files_unchanged": 4791,
+  "byte_identical_preview_files": 14,
+  "postgres_server_integration_tested": false,
+  "caveat": "Transaction double and mocked psycopg boundary only. No live locks, permissions, schema, commit or xmin behavior verified against a server."
+}

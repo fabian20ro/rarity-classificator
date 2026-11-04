@@ -1,0 +1,19 @@
+{
+  "status": "HUMAN_CORRECTIONS_APPLIED_AND_VERIFIED",
+  "verified_at": "2026-11-04T19:44:36.842269+00:00",
+  "inventory_rows": 77698,
+  "human_forms": 200,
+  "human_guard_rows": 233,
+  "changed_score_rows": 165,
+  "unchanged_rows": 77533,
+  "all_human_postconditions_satisfied": true,
+  "other_columns_unchanged": true,
+  "receipt_confirmed_from_separate_connection": true,
+  "jaccard_l1_original_and_live": 0.964594807238395,
+  "automatic_upload_gate_passed": false,
+  "automatic_gate_changed": false,
+  "baseline_only_changes_applied": 0,
+  "model_calls": 0,
+  "runtime_changes": false,
+  "protected_files_unchanged": 7187
+}

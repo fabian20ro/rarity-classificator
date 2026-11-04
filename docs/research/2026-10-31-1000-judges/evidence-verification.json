@@ -1,0 +1,27 @@
+{
+  "status": "pass",
+  "summary": {
+    "forms": 1000,
+    "inventory_rows": 1146,
+    "with_senses": 130,
+    "without_senses": 870,
+    "source_contexts": 934,
+    "projected_contexts": 515,
+    "excluded_contexts": 419
+  },
+  "exact_identity": true,
+  "all_members_preserved": true,
+  "raw_source_hashes_verified": true,
+  "all_usable_contexts_projected": true,
+  "all_projections_preserve_definitions_contexts_tags_restrictions": true,
+  "network_and_db_blocked": true,
+  "replay_all_artifacts_byte_identical": true,
+  "earlier_export_evidence_identical": true,
+  "files": {
+    "summary.json": "9b9059cfc348bb7468300759227314df98fe1317445a28e9e5e687e5f3012c36",
+    "provenance.csv": "3a48664db586b7174e09520e6428a6c413441669d8475bec38136d6a602758aa",
+    "evidence.csv": "99cf2b0f5d40929eb70eac7618d602cb2ef6e4b6c5bfb6244a3f5428a3f99b4b",
+    "manifest.json": "6b9d040a54a1a64e1f9427f5687c45b1cb86d070ad6a1926c81a92dac2777e72"
+  },
+  "tests": "5 tests,12 subcases; Ruff PASS"
+}

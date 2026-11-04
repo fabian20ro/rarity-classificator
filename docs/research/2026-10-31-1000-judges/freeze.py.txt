@@ -1,0 +1,24 @@
+import csv,hashlib,json,shutil
+from pathlib import Path
+out=Path(__file__).resolve().parent; gpt=out/'gpt'; prior=out.parent/'gpt-judge-2026-10-31'; code=out.parent/'risk-plan-pr'; sample=out.parent/'independent-1000-2026-10-30';audit=out.parent/'independent-evidence-2026-10-30/run-final'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert not (gpt/'protocol.json').exists()
+assert json.loads((out/'evidence-verification.json').read_text())['status']=='pass'
+(gpt/'inputs').mkdir()
+shutil.copy2(sample/'vocabulary.csv',gpt/'inputs/vocabulary.csv');shutil.copy2(out/'inputs-final/evidence.csv',gpt/'inputs/evidence.csv')
+assert len(list(csv.DictReader((gpt/'inputs/vocabulary.csv').open())))==1000
+p=json.loads((gpt/'protocol-initial.json').read_text())
+p['inputs'].update({str(f.relative_to(gpt)):sha(f) for f in (gpt/'inputs').iterdir()})
+p['code'].update({str(code/f):sha(code/f) for f in ['src/classificator/evaluation/audit_judge_evidence.py','src/classificator/evaluation/risk_queue.py']})
+p['lexical_manifest_sha256']=sha(out/'inputs-final/manifest.json')
+p['pilot_verification_sha256']=sha(out/'pilot-policy/verification.json')
+p['runner_sha256']=sha(gpt/'run.py')
+protected=json.loads((prior/'protected-inputs.json').read_text())
+for d in [prior/'inputs',prior/'campaign',prior/'processes',prior/'comparison',sample,audit,out/'inputs-final',out/'pilot-policy']:
+ for f in d.rglob('*'):
+  if f.is_file():protected[str(f)]=sha(f)
+for name,digest in protected.items():assert sha(Path(name))==digest,name
+(gpt/'protected-inputs.json').write_text(json.dumps(protected,indent=2)+'\n')
+p['protected_manifest_sha256']=sha(gpt/'protected-inputs.json')
+(gpt/'protocol.json').write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n')
+print('Frozen1000 inputs; protected',len(protected),'files. protocol',sha(gpt/'protocol.json'))

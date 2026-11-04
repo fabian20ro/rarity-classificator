@@ -1,0 +1,436 @@
+{
+  "snapshot": {
+    "project_id": "pdliedweugywbiczajxn",
+    "query": "SELECT statement_timestamp() AS captured_at, current_database() AS database_name, current_setting('server_version') AS server_version, count(*) AS row_count, json_agg(json_build_array(id,word,type,rarity_level) ORDER BY id) AS rows FROM public.words",
+    "capture_method": "single SELECT aggregate; one statement snapshot; no pagination",
+    "database_writes": 0,
+    "captured_at": "2026-11-02 20:32:03.276616+00",
+    "database_name": "postgres",
+    "server_version": "17.9",
+    "row_count": 77698,
+    "raw_sha256": "942065bbbb832e3334f919cd9f262d2032dd8869de4ea55043f9bd40cea65bca",
+    "csv_sha256": "d52b8cdbfc0cfdd5d8184f68bf34d8660dcfbd49e20eebf6a1cdd2bb4b64d10d",
+    "scope": "public.words four columns, single SELECT; transaction read-only setting not asserted; no DML/DDL"
+  },
+  "summary": {
+    "policy": "exact-form-pos-migration-dry-run-v1",
+    "mode": "dry_run",
+    "upload_authorized": false,
+    "source_rows": 77698,
+    "live_rows": 77698,
+    "mapped_rows": 77698,
+    "changed_rows": 50889,
+    "unchanged_rows": 26809,
+    "large_difference_rows": 6664,
+    "mapping_kinds": {
+      "unique_exact_form_pos": 73308,
+      "equivalent_duplicate_group": 4390
+    },
+    "identity_issues": 0,
+    "unmapped_source_rows": 0,
+    "unmapped_live_rows": 0,
+    "mapping_complete": true,
+    "current_levels": {
+      "1": 1233,
+      "2": 6608,
+      "3": 12522,
+      "4": 24496,
+      "5": 32839
+    },
+    "proposed_levels": {
+      "1": 978,
+      "2": 6291,
+      "3": 4389,
+      "4": 66009,
+      "5": 31
+    },
+    "transitions": {
+      "1->1": 283,
+      "1->2": 474,
+      "1->3": 107,
+      "1->4": 369,
+      "2->1": 457,
+      "2->2": 2334,
+      "2->3": 834,
+      "2->4": 2982,
+      "2->5": 1,
+      "3->1": 104,
+      "3->2": 1709,
+      "3->3": 1381,
+      "3->4": 9322,
+      "3->5": 6,
+      "4->1": 54,
+      "4->2": 757,
+      "4->3": 880,
+      "4->4": 22796,
+      "4->5": 9,
+      "5->1": 80,
+      "5->2": 1017,
+      "5->3": 1187,
+      "5->4": 30540,
+      "5->5": 15
+    },
+    "human_rows": 233
+  },
+  "observed_unique_pair_id_deltas": {
+    "155396": 73308
+  },
+  "duplicate_groups": 2165,
+  "human_rows": 233,
+  "human_changed_rows": 165,
+  "human_large_difference_rows": 61,
+  "validation": {
+    "schema": "rarity-validation-audit-v1",
+    "status": "audit_only",
+    "upload_authorized": false,
+    "population_accuracy": null,
+    "inventory_rows": 77698,
+    "exact_forms": 75147,
+    "human_forms": 200,
+    "unknown_forms": 74947,
+    "candidates": {
+      "conservative": {
+        "historical": {
+          "history": {
+            "l1_ids": 978,
+            "reference_l1_ids": 1233,
+            "intersection": 283,
+            "jaccard": 0.14678423236514523,
+            "maximum_jaccard": 0.7931873479318735
+          }
+        },
+        "seeds": {
+          "seed": {
+            "n": 128,
+            "hits": 72,
+            "recall": 0.5625,
+            "within_one": 125,
+            "severe": 3,
+            "semantic_precision": null,
+            "membership_ratio": 0.0821917808219178,
+            "maximum_membership_ratio": 0.1461187214611872
+          }
+        },
+        "humans": {
+          "human_pilot150": {
+            "interpretation": "integrity_only_not_accuracy",
+            "override_preserved": true,
+            "metrics": {
+              "per_level": {
+                "1": {
+                  "support": 51,
+                  "predicted": 51,
+                  "correct": 51,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "severe": 0
+                },
+                "2": {
+                  "support": 31,
+                  "predicted": 31,
+                  "correct": 31,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "severe": 0
+                },
+                "3": {
+                  "support": 25,
+                  "predicted": 25,
+                  "correct": 25,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "severe": 0
+                },
+                "4": {
+                  "support": 21,
+                  "predicted": 21,
+                  "correct": 21,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "severe": 0
+                },
+                "5": {
+                  "support": 22,
+                  "predicted": 22,
+                  "correct": 22,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "severe": 0
+                }
+              },
+              "n": 150,
+              "exact": 150,
+              "within_one": 150,
+              "severe": 0,
+              "excess_error_total": 0,
+              "mae": 0.0,
+              "error_histogram": {
+                "0": 150,
+                "1": 0,
+                "2": 0,
+                "3": 0,
+                "4": 0
+              },
+              "confusion": [
+                [
+                  51,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  31,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  25,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  21,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  22
+                ]
+              ],
+              "predicted_counts": {
+                "1": 51,
+                "2": 31,
+                "3": 25,
+                "4": 21,
+                "5": 22
+              }
+            },
+            "l1_precision_on_labelled_forms": 1.0,
+            "l1_recall_on_labelled_forms": 1.0,
+            "labelled_predicted_l1": 51,
+            "labelled_true_l1": 51,
+            "predicted_l1_total": 876,
+            "predicted_l1_label_coverage": 0.05821917808219178,
+            "unknown_forms": 74997,
+            "labelled_form_coverage": 0.001996087668170386,
+            "selection": "development",
+            "declared_label_use": "override",
+            "population_precision": null
+          },
+          "human_review50": {
+            "interpretation": "integrity_only_not_accuracy",
+            "override_preserved": true,
+            "metrics": {
+              "per_level": {
+                "1": {
+                  "support": 0,
+                  "predicted": 0,
+                  "correct": 0,
+                  "precision": null,
+                  "recall": null,
+                  "severe": 0
+                },
+                "2": {
+                  "support": 15,
+                  "predicted": 15,
+                  "correct": 15,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "severe": 0
+                },
+                "3": {
+                  "support": 20,
+                  "predicted": 20,
+                  "correct": 20,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "severe": 0
+                },
+                "4": {
+                  "support": 9,
+                  "predicted": 9,
+                  "correct": 9,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "severe": 0
+                },
+                "5": {
+                  "support": 6,
+                  "predicted": 6,
+                  "correct": 6,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "severe": 0
+                }
+              },
+              "n": 50,
+              "exact": 50,
+              "within_one": 50,
+              "severe": 0,
+              "excess_error_total": 0,
+              "mae": 0.0,
+              "error_histogram": {
+                "0": 50,
+                "1": 0,
+                "2": 0,
+                "3": 0,
+                "4": 0
+              },
+              "confusion": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  15,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  20,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  9,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  6
+                ]
+              ],
+              "predicted_counts": {
+                "1": 0,
+                "2": 15,
+                "3": 20,
+                "4": 9,
+                "5": 6
+              }
+            },
+            "l1_precision_on_labelled_forms": null,
+            "l1_recall_on_labelled_forms": null,
+            "labelled_predicted_l1": 0,
+            "labelled_true_l1": 0,
+            "predicted_l1_total": 876,
+            "predicted_l1_label_coverage": 0.0,
+            "unknown_forms": 75097,
+            "labelled_form_coverage": 0.0006653625560567953,
+            "selection": "risk_selected",
+            "declared_label_use": "override",
+            "population_precision": null
+          }
+        }
+      }
+    },
+    "findings": [
+      {
+        "code": "SOURCE_DATE_UNKNOWN",
+        "source": "seed",
+        "candidate": "",
+        "detail": {}
+      },
+      {
+        "code": "HISTORICAL_REFERENCE_NOT_TRUTH",
+        "source": "history",
+        "candidate": "",
+        "detail": {}
+      },
+      {
+        "code": "HISTORICAL_FORM_LEVEL_CONFLICT",
+        "source": "history",
+        "candidate": "",
+        "detail": {
+          "forms": 296
+        }
+      },
+      {
+        "code": "POSITIVE_SEED_NOT_PRECISION_DENOMINATOR",
+        "source": "seed",
+        "candidate": "",
+        "detail": {}
+      },
+      {
+        "code": "SEED_RECALL_BELOW_LEGACY_THRESHOLD",
+        "source": "seed",
+        "candidate": "conservative",
+        "detail": {
+          "recall": 0.5625,
+          "threshold": 0.8
+        }
+      },
+      {
+        "code": "ANCHOR_MEMBERSHIP_THRESHOLD_INFEASIBLE",
+        "source": "seed",
+        "candidate": "conservative",
+        "detail": {
+          "ceiling": 0.1461187214611872
+        }
+      },
+      {
+        "code": "HUMAN_OVERRIDE_PRESERVED",
+        "source": "human_pilot150",
+        "candidate": "conservative",
+        "detail": {}
+      },
+      {
+        "code": "SELECTED_LABELS_NOT_POPULATION_VALIDATION",
+        "source": "human_pilot150",
+        "candidate": "conservative",
+        "detail": {
+          "selection": "development"
+        }
+      },
+      {
+        "code": "HUMAN_OVERRIDE_PRESERVED",
+        "source": "human_review50",
+        "candidate": "conservative",
+        "detail": {}
+      },
+      {
+        "code": "SELECTED_LABELS_NOT_POPULATION_VALIDATION",
+        "source": "human_review50",
+        "candidate": "conservative",
+        "detail": {
+          "selection": "risk_selected"
+        }
+      }
+    ]
+  },
+  "upload_blocked": "Quality audit failed: l1_jaccard 0.1468 < min 0.7000, anchor_l1_precision 0.0822 < min 0.8000, anchor_l1_recall 0.5625 < min 0.8000",
+  "protected_files_unchanged": 4729,
+  "replay_byte_identical_artifacts": 13,
+  "original_human_references_preserved": 200,
+  "model_calls": 0,
+  "database_writes": 0,
+  "caveats": [
+    "Snapshot is operational state, not ground truth; differences are not automatically errors",
+    "Duplicate groups have equivalent proposed scores, not proven per-row identity",
+    "Observed ID delta is diagnostic only, never a mapping rule",
+    "No executable update script or upload authorization"
+  ]
+}

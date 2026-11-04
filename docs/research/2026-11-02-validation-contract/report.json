@@ -1,0 +1,654 @@
+{
+  "schema": "rarity-validation-audit-v1",
+  "status": "audit_only",
+  "upload_authorized": false,
+  "population_accuracy": null,
+  "inventory_rows": 77698,
+  "exact_forms": 75147,
+  "human_forms": 200,
+  "unknown_forms": 74947,
+  "candidates": {
+    "baseline": {
+      "historical": {
+        "history": {
+          "l1_ids": 972,
+          "reference_l1_ids": 2500,
+          "intersection": 107,
+          "jaccard": 0.03179791976225854,
+          "maximum_jaccard": 0.3888
+        }
+      },
+      "seeds": {
+        "seed": {
+          "n": 128,
+          "hits": 71,
+          "recall": 0.5546875,
+          "within_one": 125,
+          "severe": 3,
+          "semantic_precision": null,
+          "membership_ratio": 0.08160919540229886,
+          "maximum_membership_ratio": 0.1471264367816092
+        }
+      },
+      "humans": {
+        "human_pilot150": {
+          "interpretation": "training_fit_not_validation",
+          "override_preserved": null,
+          "metrics": {
+            "per_level": {
+              "1": {
+                "support": 51,
+                "predicted": 45,
+                "correct": 38,
+                "precision": 0.8444444444444444,
+                "recall": 0.7450980392156863,
+                "severe": 2
+              },
+              "2": {
+                "support": 31,
+                "predicted": 41,
+                "correct": 23,
+                "precision": 0.5609756097560976,
+                "recall": 0.7419354838709677,
+                "severe": 2
+              },
+              "3": {
+                "support": 25,
+                "predicted": 15,
+                "correct": 11,
+                "precision": 0.7333333333333333,
+                "recall": 0.44,
+                "severe": 1
+              },
+              "4": {
+                "support": 21,
+                "predicted": 49,
+                "correct": 19,
+                "precision": 0.3877551020408163,
+                "recall": 0.9047619047619048,
+                "severe": 2
+              },
+              "5": {
+                "support": 22,
+                "predicted": 0,
+                "correct": 0,
+                "precision": null,
+                "recall": 0.0,
+                "severe": 3
+              }
+            },
+            "n": 150,
+            "exact": 91,
+            "within_one": 140,
+            "severe": 10,
+            "excess_error_total": 13,
+            "mae": 0.48,
+            "error_histogram": {
+              "0": 91,
+              "1": 49,
+              "2": 7,
+              "3": 3,
+              "4": 0
+            },
+            "confusion": [
+              [
+                38,
+                11,
+                2,
+                0,
+                0
+              ],
+              [
+                5,
+                23,
+                1,
+                2,
+                0
+              ],
+              [
+                1,
+                4,
+                11,
+                9,
+                0
+              ],
+              [
+                1,
+                1,
+                0,
+                19,
+                0
+              ],
+              [
+                0,
+                2,
+                1,
+                19,
+                0
+              ]
+            ],
+            "predicted_counts": {
+              "1": 45,
+              "2": 41,
+              "3": 15,
+              "4": 49,
+              "5": 0
+            }
+          },
+          "l1_precision_on_labelled_forms": 0.8444444444444444,
+          "l1_recall_on_labelled_forms": 0.7450980392156863,
+          "labelled_predicted_l1": 45,
+          "labelled_true_l1": 51,
+          "predicted_l1_total": 870,
+          "predicted_l1_label_coverage": 0.05172413793103448,
+          "unknown_forms": 74997,
+          "labelled_form_coverage": 0.001996087668170386,
+          "selection": "development",
+          "declared_label_use": "fit",
+          "population_precision": null
+        },
+        "human_review50": {
+          "interpretation": "selected_cohort_not_population",
+          "override_preserved": null,
+          "metrics": {
+            "per_level": {
+              "1": {
+                "support": 0,
+                "predicted": 0,
+                "correct": 0,
+                "precision": null,
+                "recall": null,
+                "severe": 0
+              },
+              "2": {
+                "support": 15,
+                "predicted": 1,
+                "correct": 0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "severe": 12
+              },
+              "3": {
+                "support": 20,
+                "predicted": 4,
+                "correct": 1,
+                "precision": 0.25,
+                "recall": 0.05,
+                "severe": 0
+              },
+              "4": {
+                "support": 9,
+                "predicted": 45,
+                "correct": 9,
+                "precision": 0.2,
+                "recall": 1.0,
+                "severe": 0
+              },
+              "5": {
+                "support": 6,
+                "predicted": 0,
+                "correct": 0,
+                "precision": null,
+                "recall": 0.0,
+                "severe": 1
+              }
+            },
+            "n": 50,
+            "exact": 10,
+            "within_one": 37,
+            "severe": 13,
+            "excess_error_total": 14,
+            "mae": 1.08,
+            "error_histogram": {
+              "0": 10,
+              "1": 27,
+              "2": 12,
+              "3": 1,
+              "4": 0
+            },
+            "confusion": [
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                3,
+                12,
+                0
+              ],
+              [
+                0,
+                0,
+                1,
+                19,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                9,
+                0
+              ],
+              [
+                0,
+                1,
+                0,
+                5,
+                0
+              ]
+            ],
+            "predicted_counts": {
+              "1": 0,
+              "2": 1,
+              "3": 4,
+              "4": 45,
+              "5": 0
+            }
+          },
+          "l1_precision_on_labelled_forms": null,
+          "l1_recall_on_labelled_forms": null,
+          "labelled_predicted_l1": 0,
+          "labelled_true_l1": 0,
+          "predicted_l1_total": 870,
+          "predicted_l1_label_coverage": 0.0,
+          "unknown_forms": 75097,
+          "labelled_form_coverage": 0.0006653625560567953,
+          "selection": "risk_selected",
+          "declared_label_use": "none",
+          "population_precision": null
+        }
+      }
+    },
+    "conservative": {
+      "historical": {
+        "history": {
+          "l1_ids": 978,
+          "reference_l1_ids": 2500,
+          "intersection": 109,
+          "jaccard": 0.032353814188186406,
+          "maximum_jaccard": 0.3912
+        }
+      },
+      "seeds": {
+        "seed": {
+          "n": 128,
+          "hits": 72,
+          "recall": 0.5625,
+          "within_one": 125,
+          "severe": 3,
+          "semantic_precision": null,
+          "membership_ratio": 0.0821917808219178,
+          "maximum_membership_ratio": 0.1461187214611872
+        }
+      },
+      "humans": {
+        "human_pilot150": {
+          "interpretation": "integrity_only_not_accuracy",
+          "override_preserved": true,
+          "metrics": {
+            "per_level": {
+              "1": {
+                "support": 51,
+                "predicted": 51,
+                "correct": 51,
+                "precision": 1.0,
+                "recall": 1.0,
+                "severe": 0
+              },
+              "2": {
+                "support": 31,
+                "predicted": 31,
+                "correct": 31,
+                "precision": 1.0,
+                "recall": 1.0,
+                "severe": 0
+              },
+              "3": {
+                "support": 25,
+                "predicted": 25,
+                "correct": 25,
+                "precision": 1.0,
+                "recall": 1.0,
+                "severe": 0
+              },
+              "4": {
+                "support": 21,
+                "predicted": 21,
+                "correct": 21,
+                "precision": 1.0,
+                "recall": 1.0,
+                "severe": 0
+              },
+              "5": {
+                "support": 22,
+                "predicted": 22,
+                "correct": 22,
+                "precision": 1.0,
+                "recall": 1.0,
+                "severe": 0
+              }
+            },
+            "n": 150,
+            "exact": 150,
+            "within_one": 150,
+            "severe": 0,
+            "excess_error_total": 0,
+            "mae": 0.0,
+            "error_histogram": {
+              "0": 150,
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0
+            },
+            "confusion": [
+              [
+                51,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                31,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                25,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                21,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                22
+              ]
+            ],
+            "predicted_counts": {
+              "1": 51,
+              "2": 31,
+              "3": 25,
+              "4": 21,
+              "5": 22
+            }
+          },
+          "l1_precision_on_labelled_forms": 1.0,
+          "l1_recall_on_labelled_forms": 1.0,
+          "labelled_predicted_l1": 51,
+          "labelled_true_l1": 51,
+          "predicted_l1_total": 876,
+          "predicted_l1_label_coverage": 0.05821917808219178,
+          "unknown_forms": 74997,
+          "labelled_form_coverage": 0.001996087668170386,
+          "selection": "development",
+          "declared_label_use": "override",
+          "population_precision": null
+        },
+        "human_review50": {
+          "interpretation": "integrity_only_not_accuracy",
+          "override_preserved": true,
+          "metrics": {
+            "per_level": {
+              "1": {
+                "support": 0,
+                "predicted": 0,
+                "correct": 0,
+                "precision": null,
+                "recall": null,
+                "severe": 0
+              },
+              "2": {
+                "support": 15,
+                "predicted": 15,
+                "correct": 15,
+                "precision": 1.0,
+                "recall": 1.0,
+                "severe": 0
+              },
+              "3": {
+                "support": 20,
+                "predicted": 20,
+                "correct": 20,
+                "precision": 1.0,
+                "recall": 1.0,
+                "severe": 0
+              },
+              "4": {
+                "support": 9,
+                "predicted": 9,
+                "correct": 9,
+                "precision": 1.0,
+                "recall": 1.0,
+                "severe": 0
+              },
+              "5": {
+                "support": 6,
+                "predicted": 6,
+                "correct": 6,
+                "precision": 1.0,
+                "recall": 1.0,
+                "severe": 0
+              }
+            },
+            "n": 50,
+            "exact": 50,
+            "within_one": 50,
+            "severe": 0,
+            "excess_error_total": 0,
+            "mae": 0.0,
+            "error_histogram": {
+              "0": 50,
+              "1": 0,
+              "2": 0,
+              "3": 0,
+              "4": 0
+            },
+            "confusion": [
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                15,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                20,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                9,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                6
+              ]
+            ],
+            "predicted_counts": {
+              "1": 0,
+              "2": 15,
+              "3": 20,
+              "4": 9,
+              "5": 6
+            }
+          },
+          "l1_precision_on_labelled_forms": null,
+          "l1_recall_on_labelled_forms": null,
+          "labelled_predicted_l1": 0,
+          "labelled_true_l1": 0,
+          "predicted_l1_total": 876,
+          "predicted_l1_label_coverage": 0.0,
+          "unknown_forms": 75097,
+          "labelled_form_coverage": 0.0006653625560567953,
+          "selection": "risk_selected",
+          "declared_label_use": "override",
+          "population_precision": null
+        }
+      }
+    }
+  },
+  "findings": [
+    {
+      "code": "SOURCE_DATE_UNKNOWN",
+      "source": "seed",
+      "candidate": "",
+      "detail": {}
+    },
+    {
+      "code": "HISTORICAL_REFERENCE_NOT_TRUTH",
+      "source": "history",
+      "candidate": "",
+      "detail": {}
+    },
+    {
+      "code": "HISTORICAL_FORM_LEVEL_CONFLICT",
+      "source": "history",
+      "candidate": "",
+      "detail": {
+        "forms": 1783
+      }
+    },
+    {
+      "code": "POSITIVE_SEED_NOT_PRECISION_DENOMINATOR",
+      "source": "seed",
+      "candidate": "",
+      "detail": {}
+    },
+    {
+      "code": "L1_JACCARD_THRESHOLD_INFEASIBLE",
+      "source": "history",
+      "candidate": "baseline",
+      "detail": {
+        "ceiling": 0.3888
+      }
+    },
+    {
+      "code": "SEED_RECALL_BELOW_LEGACY_THRESHOLD",
+      "source": "seed",
+      "candidate": "baseline",
+      "detail": {
+        "recall": 0.5546875,
+        "threshold": 0.8
+      }
+    },
+    {
+      "code": "ANCHOR_MEMBERSHIP_THRESHOLD_INFEASIBLE",
+      "source": "seed",
+      "candidate": "baseline",
+      "detail": {
+        "ceiling": 0.1471264367816092
+      }
+    },
+    {
+      "code": "LABELS_REUSED_FOR_FIT",
+      "source": "human_pilot150",
+      "candidate": "baseline",
+      "detail": {}
+    },
+    {
+      "code": "SELECTED_LABELS_NOT_POPULATION_VALIDATION",
+      "source": "human_pilot150",
+      "candidate": "baseline",
+      "detail": {
+        "selection": "development"
+      }
+    },
+    {
+      "code": "SELECTED_LABELS_NOT_POPULATION_VALIDATION",
+      "source": "human_review50",
+      "candidate": "baseline",
+      "detail": {
+        "selection": "risk_selected"
+      }
+    },
+    {
+      "code": "L1_JACCARD_THRESHOLD_INFEASIBLE",
+      "source": "history",
+      "candidate": "conservative",
+      "detail": {
+        "ceiling": 0.3912
+      }
+    },
+    {
+      "code": "SEED_RECALL_BELOW_LEGACY_THRESHOLD",
+      "source": "seed",
+      "candidate": "conservative",
+      "detail": {
+        "recall": 0.5625,
+        "threshold": 0.8
+      }
+    },
+    {
+      "code": "ANCHOR_MEMBERSHIP_THRESHOLD_INFEASIBLE",
+      "source": "seed",
+      "candidate": "conservative",
+      "detail": {
+        "ceiling": 0.1461187214611872
+      }
+    },
+    {
+      "code": "HUMAN_OVERRIDE_PRESERVED",
+      "source": "human_pilot150",
+      "candidate": "conservative",
+      "detail": {}
+    },
+    {
+      "code": "SELECTED_LABELS_NOT_POPULATION_VALIDATION",
+      "source": "human_pilot150",
+      "candidate": "conservative",
+      "detail": {
+        "selection": "development"
+      }
+    },
+    {
+      "code": "HUMAN_OVERRIDE_PRESERVED",
+      "source": "human_review50",
+      "candidate": "conservative",
+      "detail": {}
+    },
+    {
+      "code": "SELECTED_LABELS_NOT_POPULATION_VALIDATION",
+      "source": "human_review50",
+      "candidate": "conservative",
+      "detail": {
+        "selection": "risk_selected"
+      }
+    }
+  ]
+}

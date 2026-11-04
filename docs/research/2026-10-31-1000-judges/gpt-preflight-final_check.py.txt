@@ -1,0 +1,28 @@
+import os,json,subprocess,hashlib,time
+from pathlib import Path
+p=Path(__file__).resolve().parent;out=p.parent;config=json.loads((out/'config.json').read_text());protocol=json.loads((out/'protocol-initial.json').read_text())
+env={k:os.environ[k] for k in protocol['environment_allowlist'] if k in os.environ}
+def options(config):
+ a=[]
+ for k,v in config.items():
+  s=('['+','.join('{path='+json.dumps(x['path'])+',enabled=false}' for x in v)+']') if isinstance(v,list) else json.dumps(v,ensure_ascii=False)
+  a+=['-c',k+'='+s]
+ return a
+cwd='/private/tmp/wrc-gpt-1000-probe-2026-10-31'
+Path(cwd).mkdir(exist_ok=True)
+assert not list(Path(cwd).iterdir())
+r=subprocess.run([protocol['cli']['path'],'debug','prompt-input',*options(config),'-c','model="gpt-6.1-sol"','Synthetic transport input, no pilot data.'],capture_output=True,text=True,cwd=cwd,env=env,timeout=60)
+assert r.returncode==0
+(p/'final-prompt-input.json').write_text(r.stdout)
+config['model_instructions_file']=str(p/'synthetic-prompt.txt')
+a=[protocol['cli']['path'],'exec','--ignore-user-config','--skip-git-repo-check','--ephemeral','--json','--sandbox','read-only','--model','gpt-6.1-sol','--cd',cwd,'--output-schema',str(p/'synthetic-schema.json'),*options(config),'-']
+t=time.time();r=subprocess.run(a,input='Return the required probe object.',capture_output=True,text=True,cwd=cwd,env=env,timeout=120)
+(p/'final-stdout.jsonl').write_text(r.stdout);(p/'final-stderr.txt').write_text(r.stderr)
+assert r.returncode==0 and not r.stderr.strip(),r.stderr
+es=[json.loads(x) for x in r.stdout.splitlines()];assert [x['type'] for x in es]==['thread.started','turn.started','item.completed','turn.completed'];assert json.loads(es[2]['item']['text'])=={'probe':'ok'}
+sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+receipt=dict(status='pass',seconds=time.time()-t,events_sha256=sha(p/'final-stdout.jsonl'),assembled_context_sha256=sha(p/'final-prompt-input.json'),config_sha256=sha(out/'config.json'),scope='Same final execution configuration, synthetic instruction/schema substituted only for transport probe. Assembled-context debug includes generic tools; no target data or project history.',usage=es[-1]['usage'])
+(p/'final-verification.json').write_text(json.dumps(receipt,indent=2)+'\n')
+protocol['final_preflight_sha256']=sha(p/'final-verification.json');protocol['runner_sha256']=sha(out/'run.py')
+(out/'protocol-initial.json').write_text(json.dumps(protocol,indent=2)+'\n')
+print(json.dumps(receipt,indent=2))

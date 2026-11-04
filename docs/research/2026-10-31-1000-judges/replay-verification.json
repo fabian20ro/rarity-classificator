@@ -1,0 +1,16 @@
+{
+  "status": "pass",
+  "gpt_requests": 1000,
+  "qwen_requests": 31,
+  "identical_requests_and_outcomes_excluding_timestamps": true,
+  "byte_identical_routing": true,
+  "process_http_network_db_blocked": true,
+  "protected_files_unchanged": 4456,
+  "routing_hashes": {
+    "summary.json": "81b5060e16cf64f60b9d3b5272c797b7cd5c98b7fbc196c881055b97252104c7",
+    "qwen-route.csv": "d30135b88f19ed36161997a2f2719e3d7eb48b57b3ecb5d0d68638f938d1b405",
+    "decisions.csv": "c7569b240917a510390739639b4471f7afb3ee6771a0d0cb7decc44a50ceebb2",
+    "manifest.json": "a1c9a55bf6ba8eef12ec5ad780a02eb82de39887a37c1adeec8ed68fe402a33c",
+    "review-queue.csv": "51719c765c02c0dbb4da8c46f60f4e0751184c154fa3e9157bb8a033c1d31509"
+  }
+}

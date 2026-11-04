@@ -1,0 +1,26 @@
+{
+  "checks": {
+    "engine": true,
+    "extension": true,
+    "inventory": true,
+    "role_absent": true,
+    "no_word_rules": true,
+    "owner_session": true,
+    "rls_unchanged": true,
+    "schema_absent": true,
+    "server_version": true,
+    "owner_unchanged": true,
+    "no_word_triggers": true,
+    "creator_capability": true,
+    "policies_unchanged": true,
+    "ddl_hooks_unchanged": true,
+    "word_grants_preserved": true,
+    "unambiguous_fingerprint": true,
+    "no_global_default_grants": true
+  },
+  "database": "postgres",
+  "read_only": "on",
+  "captured_at": "2026-11-03T22:49:33.367605+00:00",
+  "current_user": "postgres",
+  "session_user": "postgres"
+}

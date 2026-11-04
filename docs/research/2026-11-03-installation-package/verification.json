@@ -1,0 +1,19 @@
+{
+  "tests": 6,
+  "replay_identical_files": 9,
+  "protected_files_unchanged": 6151,
+  "db_calls": 0,
+  "sql_executed": false,
+  "zip_sha256": "380d14666afcac4fdb7985a983438174741ac40675eb16c8e003b9cb195474b0",
+  "artifact_hashes": {
+    "01-preflight.sql": "85d3f3179d9f6345deea48a7feff515aed3ffb51a6049ebd556b813edea8e44e",
+    "02-install.sql": "7d61f282b0fb5cfc6fa1ff747b554e6e6e5d040e87900172e714193c3d9ab7a7",
+    "03-postflight.sql": "fb8cd92de8a0f8c78637a99682f0d4cdf9d1fdc2a73bc1a21a6cc4edd2893160",
+    "report.json": "52af87914a4cccc214e694d61b1cd3c740a178bcf7b1948b840cf0ed9a4b54f5",
+    "README.md": "6e68ff660fa624a0ae66aabe576ceb29bc302b4ee2dec505742370b6b8286dc8",
+    "preconditions.csv": "188338b814c4940970601e743ea5b03b80dba81574e6051091dd9e057e164a16",
+    "corrections.csv": "c8bdea79803861ceadb118e91dabdfbbec0a0cfba506f22fa4c7af4973c0fe4d",
+    "rollback.csv": "4146414c0db21d77eafb33ab1a1e65f4333f8f004f834dc96ca97760938ae234",
+    "references.csv": "04af6fa41681604f722b98dd0c08951270d461ce7d931621dfc3126f3cbc2b52"
+  }
+}

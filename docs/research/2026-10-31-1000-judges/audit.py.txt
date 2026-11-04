@@ -1,0 +1,410 @@
+"""Independent stdlib-only audit. Default mode requires BOTH completed campaigns.
+
+No model/network/database/process access; input-only mode reads frozen lexical files,
+not new judgments. Full mode checks native receipts, policy and public review pack.
+"""
+from pathlib import Path
+from collections import Counter, defaultdict
+import csv
+import datetime
+import hashlib
+import json
+import re
+import sys
+import unicodedata
+from urllib.parse import urlsplit, quote
+
+ROOT = Path(__file__).resolve().parent
+SAMPLE = ROOT.parent / 'independent-1000-2026-10-30'
+SOURCE = ROOT.parent / 'independent-evidence-2026-10-30/run-final/audit'
+CODE = ROOT.parent / 'risk-plan-pr/src/classificator'
+G = ROOT / 'gpt'
+Q = ROOT / 'qwen'
+SCOPE = ('word_id','word','source_path','source_sha256','heading','pos','pos_detail',
+         'source_entry_id','source_dictionary','variant_id')
+POS = {'N':'substantiv neutru','F':'substantiv feminin','M':'substantiv masculin',
+       'MF':'substantiv masculin și feminin','A':'adjectiv','VT':'verb tranzitiv',
+       'V':'verb','P':'pronume','I':'interjecție'}
+GRAMMAR = re.compile(r'\b(?:locuțiune adverbială|pronume interogativ|pronume nehotărât|substantivat(?: neutru| feminin| masculin)?|adverbial(?:ă)?|reflexiv|intranzitiv|tranzitiv|articulat|singular|plural)\b', re.I)
+EXPECTED_RANK = ['gpt_failed','qwen_failed','qwen_gpt_gap>=2','span_desc',
+                 'initial_gap_desc','missing_context','multiple_pos','seeded_id']
+
+
+def unique(pairs):
+    out = {}
+    for k,v in pairs:
+        assert k not in out, ('duplicate JSON key',k)
+        out[k] = v
+    return out
+
+
+def parse(text):
+    return json.loads(text,object_pairs_hook=unique)
+
+
+def js(path):
+    return parse(Path(path).read_text())
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def read(path):
+    with Path(path).open() as f:
+        return list(csv.DictReader(f))
+
+
+def indexed(path,key='word_id'):
+    rows=read(path);out={r[key]:r for r in rows}
+    assert len(rows)==len(out), ('duplicate CSV identity',str(path))
+    assert all(re.fullmatch(r'[1-9][0-9]*',i) for i in out),str(path)
+    return out
+
+
+def hashes(mapping,base=None):
+    for name,digest in mapping.items():
+        path=Path(name) if base is None else base/name
+        assert sha(path)==digest, ('hash changed',str(path))
+
+
+def export_manifest(directory):
+    m=js(directory/'manifest.json')
+    assert m['inputs'] and m['artifacts']
+    hashes(m['inputs']);hashes(m.get('implementation',{}));hashes(m['artifacts'],directory)
+    return m
+
+
+def formkey(word):
+    return ''.join(c for c in unicodedata.normalize('NFD',word.lower()) if not unicodedata.combining(c))
+
+
+def verify_inputs():
+    protocol=js(G/'protocol.json');policy=js(ROOT/'policy.json')
+    assert protocol['model']=='gpt-6.1-sol' and protocol['reasoning_effort']=='low'
+    hashes(protocol['inputs'],G);hashes(protocol['code'])
+    for key,path in [('policy_sha256',ROOT/'policy.json'),('runner_sha256',G/'run.py'),
+      ('lexical_manifest_sha256',ROOT/'inputs-final/manifest.json'),
+      ('protected_manifest_sha256',G/'protected-inputs.json'),
+      ('pilot_verification_sha256',ROOT/'pilot-policy/verification.json'),
+      ('final_preflight_sha256',G/'preflight/final-verification.json')]:
+        assert sha(path)==protocol[key],str(path)
+    assert sha(protocol['cli']['path'])==protocol['cli']['sha256']
+    assert sha(G/'preflight/catalog.json')==protocol['cli']['catalog_sha256']
+    assert policy['version']=='exact-form-conflicts-v1'
+    assert policy['rank']==EXPECTED_RANK and policy['seed']=='qwen-pilot-v1'
+    assert policy['review_budget']==50 and policy['pilot_budget']==8
+    assert policy['frozen_before_new_inference'] is True
+    preflight=js(G/'preflight/final-verification.json');assert preflight['status']=='pass'
+    for key,name in [('events_sha256','preflight/final-stdout.jsonl'),
+                     ('assembled_context_sha256','preflight/final-prompt-input.json'),
+                     ('config_sha256','config.json')]:
+        assert preflight[key]==sha(G/name),key
+    sample=js(SAMPLE/'manifest.json');hashes(sample['outputs'],SAMPLE)
+    for source in sample['source_files'].values():assert sha(source['path'])==source['sha256']
+    vocab=indexed(G/'inputs/vocabulary.csv');forms=indexed(SAMPLE/'forms.csv','form_id')
+    signal=indexed(SAMPLE/'signals.csv','form_id');erows=indexed(G/'inputs/evidence.csv')
+    assert set(vocab)==set(forms)==set(signal)==set(erows) and len(vocab)==1000
+    assert sha(G/'inputs/vocabulary.csv')==sha(SAMPLE/'vocabulary.csv')
+    assert sha(G/'inputs/evidence.csv')==sha(ROOT/'inputs-final/evidence.csv')
+    assert sha(G/'prompt.txt')==sha(ROOT.parent/'gpt-judge-2026-10-31/prompt.txt')
+    assert sha(G/'response-schema.json')==sha(ROOT.parent/'gpt-judge-2026-10-31/response-schema.json')
+    excluded=set()
+    for name in ('pilot','reserved','unused40'):
+        rows=read(sample['source_files'][name]['path'])
+        excluded.update(formkey(r['word']) for r in rows)
+    assert len(indexed(sample['source_files']['pilot']['path']))==150
+    assert not {formkey(v['word']) for v in vocab.values()} & excluded
+    assert len({forms[i]['group'] for i in forms})==1000
+    assert len({formkey(v['word']) for v in vocab.values()})==1000
+    slices=Counter(f['selection_slice'] for f in forms.values())
+    assert slices['general600']==600 and sorted(v for k,v in slices.items() if k!='general600')==[100]*4
+    evidence={i:parse(r['evidence_json']) for i,r in erows.items()}
+    for i,v in vocab.items():
+        assert forms[i]['word']==signal[i]['word']==erows[i]['word']==v['word']
+        assert set(erows[i])=={'word_id','word','evidence_json'}
+        assert set(evidence[i])=={'coverage','valid_pos','senses'}
+        assert evidence[i]['coverage']=='source_bounded_not_exhaustive'
+    assert sum(bool(v['senses']) for v in evidence.values())==130
+    assert sum(not signal[i]['wordfreq'] for i in vocab)==851
+    assert sum(not evidence[i]['senses'] and not signal[i]['wordfreq'] for i in vocab)==764
+    export_manifest(ROOT/'inputs-final');export_manifest(SOURCE)
+    members=read(SOURCE/'membership.csv');assert len(members)==1146
+    assert len({r['word_id'] for r in members})==1146
+    for i in forms:
+        group=[r for r in members if r['form_id']==i]
+        assert {r['word_id'] for r in group}==set(map(str,parse(forms[i]['inventory_ids_json'])))
+        assert all(r['word']==vocab[i]['word'] for r in group)
+    contexts=read(SOURCE/'contexts.csv');prov=read(ROOT/'inputs-final/provenance.csv')
+    usable=[r for r in contexts if r['context_status']=='usable_source_bounded']
+    assert len(contexts)==934 and len(usable)==len(prov)==515
+    assert Counter(json.dumps({k:v for k,v in r.items() if k!='projected_sense'},sort_keys=True) for r in prov)==Counter(json.dumps(r,sort_keys=True) for r in usable)
+    parents=defaultdict(list)
+    for r in contexts:
+        assert sha(r['source_path'])==r['source_sha256']
+        parents[tuple(r[k] for k in SCOPE)+(r['sense_id'],)].append(r)
+    projected=defaultdict(list)
+    for r in prov:
+        s=parse(r['projected_sense']);i=r['form_id']
+        assert r['word_id']==i and r['word']==vocab[i]['word']
+        ancestor=r;seen=set();texts=[]
+        while ancestor['parent_sense_id']:
+            key=tuple(ancestor[k] for k in SCOPE)+(ancestor['parent_sense_id'],)
+            assert key not in seen and len(parents[key])==1,('unresolved parent',i,key)
+            seen.add(key);ancestor=parents[key][0]
+            assert ancestor['context_status']=='usable_source_bounded'
+            texts.append(ancestor['definition'])
+        labels=parse(r['tags'])
+        assert not (r['number_restriction'] and r['variant_number_restriction'] and r['number_restriction']!=r['variant_number_restriction'])
+        expected={'pos':r['pos_detail'] or r['pos'],'definition':r['definition'],
+          'number_restriction':r['number_restriction'] or r['variant_number_restriction'],
+          'grammar':sorted({x.lower() for t in labels for x in GRAMMAR.findall(t)}),
+          'context':list(reversed(texts)),'context_incomplete':False,'usage_labels':sorted(set(labels))}
+        assert s==expected,('projection mismatch',i,r['sense_id'])
+        assert r['context_text']==' — '.join([*reversed(texts),r['definition']])
+        if s not in projected[i]:projected[i].append(s)
+    for i in vocab:
+        senses=sorted(projected[i],key=lambda s:json.dumps(s,ensure_ascii=False,sort_keys=True))
+        assert evidence[i]['senses']==senses,('omitted/invented sense',i)
+        positions={re.sub(r'\d.*','',x) for x in parse(forms[i]['loc_pos_json'])}
+        assert evidence[i]['valid_pos']==sorted({POS[x] for x in positions}|{s['pos'] for s in senses})
+    protected=js(G/'protected-inputs.json');hashes(protected)
+    return vocab,evidence,forms,signal,dict(forms=1000,inventory_rows=1146,with_context=130,
+      without_context=870,without_wordfreq=851,without_context_and_wordfreq=764,
+      source_contexts=934,projected_contexts=515,slices=dict(slices),protected_files=len(protected))
+
+
+def check_answer(answer,i,word):
+    assert set(answer)=={'word_id','word','level','note'}
+    assert type(answer['word_id']) is int and answer['word_id']==int(i) and answer['word']==word
+    assert type(answer['level']) is int and 1<=answer['level']<=5
+    assert isinstance(answer['note'],str) and answer['note'].strip() and len(answer['note'])<=400
+
+
+def check_campaign_csv(directory,vocab,records):
+    preds=indexed(directory/'predictions.csv');assert set(preds)==set(records)==set(vocab)
+    for i,r in records.items():
+        assert r['word']==vocab[i]['word'] and r['type']==vocab[i]['type'] and r['word_id']==int(i)
+        assert r['confidence'] is None and r['expected_level'] is None and r['probabilities']==[]
+        row=preds[i];assert row['status']==r['status'] and row['word']==r['word']
+        assert row['rarity_level']==('' if r['rarity_level'] is None else str(r['rarity_level']))
+        assert all(row[k]=='' for k in ['confidence','expected_level',*[f'p_L{j}' for j in range(1,6)]])
+        assert r['status'] in {'scored','failed'}
+        if r['status']=='failed':assert r['rarity_level'] is None and r['error']
+        else:assert type(r['rarity_level']) is int and 1<=r['rarity_level']<=5 and not r['error']
+    assert read(directory/'run.csv')==[]
+    manifest=js(directory/'manifest.json');inventory=[{'word_id':int(i),'word':vocab[i]['word'],'type':vocab[i]['type']} for i in sorted(vocab,key=int)]
+    assert manifest['inventory_sha256']==hashlib.sha256(json.dumps(inventory,ensure_ascii=False,sort_keys=True).encode()).hexdigest()
+    digest=hashlib.sha256()
+    for p in sorted((CODE/'scoring').glob('*.py'))+[CODE/'evaluation/campaign.py',CODE/'evaluation/cli.py']:
+        digest.update(str(p.relative_to(CODE)).encode());digest.update(p.read_bytes())
+    assert manifest['implementation_sha256']==digest.hexdigest()
+    summary=js(directory/'summary.json');assert summary['total']==len(vocab) and summary['pending']==0
+    assert summary['scored']==sum(r['status']=='scored' for r in records.values())
+    assert summary['failed']==sum(r['status']=='failed' for r in records.values())
+    return preds
+
+
+def audit_full():
+    # No model outcomes are read until BOTH campaigns and final review exports exist.
+    summary=js(G/'campaign/summary.json')
+    assert summary['total']==1000 and summary['pending']==0 and summary['scored']+summary['failed']==1000
+    qprotocol=js(Q/'protocol.json');nq=qprotocol['count']
+    if nq:
+        qsummary=js(Q/'campaign/summary.json')
+        assert qsummary['total']==nq and qsummary['pending']==0 and qsummary['scored']+qsummary['failed']==nq
+    assert js(ROOT/'final-routing/summary.json')['qwen_complete'] is True
+    assert (ROOT/'review-public/cases.json').is_file()
+    vocab,evidence,forms,signal,input_receipt=verify_inputs()
+    protocol=js(G/'protocol.json');config=js(G/'config.json')
+    prompt=(G/'prompt.txt').read_text().rstrip('\n');schema=js(G/'response-schema.json')
+    assert not (G/'campaign/quarantine').exists()
+    files=list((G/'campaign/records').glob('*.json'));processfiles=list((G/'processes').glob('*.json'))
+    assert len(files)==len(processfiles)==1000
+    records={};processes=[];threads=set();event_counts=Counter()
+    config_args=[]
+    for k,v in config.items():
+        encoded=('['+','.join('{path='+json.dumps(x['path'])+',enabled=false}' for x in v)+']') if isinstance(v,list) else json.dumps(v,ensure_ascii=False)
+        config_args+=['-c',k+'='+encoded]
+    for file in files:
+        r=js(file);i=str(r['word_id']);assert i in vocab and i not in records and file.stem==i
+        records[i]=r;receipt=js(G/'processes'/file.name);processes.append(receipt)
+        request={'model':protocol['model'],'reasoning_effort':'low','instructions':prompt,
+          'input':{'word_id':int(i),'word':vocab[i]['word'],'inventory_type':vocab[i]['type'],'evidence':evidence[i]},'response_schema':schema}
+        assert r['request']==receipt['request']==request
+        assert parse(r['response'])==receipt['result']
+        cwd=Path(receipt['cwd']);assert cwd.parent==Path('/private/tmp/wrc-gpt-1000-2026-10-31') and cwd.name==i
+        assert cwd.is_dir() and not list(cwd.iterdir())
+        assert receipt['environment_keys']==sorted(set(receipt['environment_keys']))
+        assert set(receipt['environment_keys'])<=set(protocol['environment_allowlist'])
+        assert {'HOME','PATH','TMPDIR'}<=set(receipt['environment_keys'])
+        command=[protocol['cli']['path'],'exec','--ignore-user-config','--skip-git-repo-check','--ephemeral','--json','--sandbox','read-only','--model',protocol['model'],'--cd',str(cwd),'--output-schema',str(G/'response-schema.json'),*config_args,'-']
+        assert receipt['command']==command
+        assert receipt['started']<=receipt['finished']
+        result=receipt['result'];assert set(result)=={'returncode','stdout','stderr'} and not result['stderr'].strip()
+        events=[parse(line) for line in result['stdout'].splitlines() if line.strip()]
+        types=[e['type'] for e in events];event_counts.update(types)
+        assert set(types)<={'thread.started','turn.started','turn.completed','item.started','item.completed','error','turn.failed'}
+        for e in events:
+            if e['type'].startswith('item.'):
+                assert isinstance(e['item'],dict) and e['item']['type'] in {'agent_message','reasoning'},('tool/unknown event',i)
+        ids=[e['thread_id'] for e in events if e['type']=='thread.started']
+        assert len(ids)==1 and isinstance(ids[0],str) and ids[0] and ids[0] not in threads
+        threads.update(ids)
+        if r['status']=='scored':
+            assert result['returncode']==0 and not {'error','turn.failed'}&set(types)
+            assert types[:2]==['thread.started','turn.started'] and types[-1]=='turn.completed'
+            assert all(types.count(t)==1 for t in ['thread.started','turn.started','turn.completed'])
+            messages=[e['item']['text'] for e in events if e['type']=='item.completed' and e['item']['type']=='agent_message']
+            assert len(messages)==1;answer=parse(messages[0]);check_answer(answer,i,vocab[i]['word'])
+            assert r['rarity_level']==answer['level']
+    preds=check_campaign_csv(G/'campaign',vocab,records)
+    processes.sort(key=lambda r:r['started'])
+    assert all(a['finished']<=b['started'] for a,b in zip(processes,processes[1:]))
+    assert len(threads)==1000
+    gc=js(G/'campaign/manifest.json')['config']
+    assert gc['transport']=='codex-exec-native' and gc['configured_model']==protocol['model'] and gc['reasoning_effort']=='low'
+    assert gc['runtime']=={'protocol_sha256':sha(G/'protocol.json'),'runner_sha256':sha(G/'run.py')}
+    assert gc['vocabulary_sha256']==sha(G/'inputs/vocabulary.csv') and gc['evidence_sha256']==sha(G/'inputs/evidence.csv')
+    hashes(qprotocol['inputs'],Q)
+    assert qprotocol['policy_sha256']==sha(ROOT/'policy.json')
+    assert qprotocol['gpt_protocol_sha256']==sha(G/'protocol.json')
+    assert qprotocol['route_sha256']==sha(ROOT/'pre-qwen/qwen-route.csv')
+    assert qprotocol['judge_sha256']==sha(CODE/'evaluation/chat_judge.py')
+    hashes(js(Q/'protected-inputs.json'))
+    glevels={i:r['rarity_level'] for i,r in records.items()}
+    route={i for i,g in glevels.items() if g is not None and abs(g-int(signal[i]['baseline_level']))>=2 and evidence[i]['senses']}
+    assert len(route)==nq
+    qv=indexed(Q/'inputs/vocabulary.csv');qe=indexed(Q/'inputs/evidence.csv')
+    assert set(qv)==set(qe)==route
+    for i in route:
+        assert qv[i]==vocab[i] and parse(qe[i]['evidence_json'])==evidence[i]
+    qrecords={};transfers=[];options=js(Q/'options.json')
+    assert options==js(ROOT.parent/'qwen-judge-curated-2026-10-30/options.json')
+    if nq:
+        files=list((Q/'campaign/records').glob('*.json'));assert len(files)==nq
+        for file in files:
+            r=js(file);i=str(r['word_id']);assert i in route and file.stem==i and i not in qrecords
+            qrecords[i]=r
+            expected={**options,'model':'qwen3.8-27b-splash','messages':[{'role':'system','content':prompt},{'role':'user','content':json.dumps({'word_id':int(i),'word':vocab[i]['word'],'inventory_type':vocab[i]['type'],'evidence':evidence[i]},ensure_ascii=False)}],
+              'stream':False,'n':1,'response_format':{'type':'json_schema','json_schema':{'name':'exact_form_rarity','strict':True,'schema':schema}}}
+            assert r['request']==expected
+            if r['status']=='scored':
+                response=parse(r['response']);assert response['model']=='qwen3.8-27b-splash' and len(response['choices'])==1
+                choice=response['choices'][0];message=choice['message'];assert choice['finish_reason']=='stop' and message['role']=='assistant'
+                assert not any(message.get(k) for k in ('refusal','tool_calls','function_call'))
+                answer=parse(message['content']);check_answer(answer,i,vocab[i]['word']);assert answer['level']==r['rarity_level']
+        check_campaign_csv(Q/'campaign',qv,qrecords)
+        transfers=[parse(line) for line in (Q/'transfers.jsonl').read_text().splitlines() if line.strip()]
+        assert len(transfers)==nq and all(t['started']<=t['finished'] for t in transfers)
+        assert {str(t['word_id']) for t in transfers}==route
+        assert all(a['finished']<=b['started'] for a,b in zip(transfers,transfers[1:]))
+        assert min(t['started'] for t in transfers)>=max(p['finished'] for p in processes)
+        memory=[parse(line) for line in (Q/'memory.jsonl').read_text().splitlines() if line.strip()]
+        assert {str(m['word_id']) for m in memory}==route
+        assert all(m['available_proxy_bytes']>=2*2**30 and m['os_free_percentage']>=10 for m in memory)
+        runtime=js(Q/'runtime.json')['identity'];assert runtime['key']=='qwen3.8-27b-splash'
+        assert runtime['loaded_instances'][0]['config']['parallel']==1
+        loaded=[m for m in js(Q/'post-run-models.json')['models'] if m.get('loaded_instances')]
+        assert loaded==[runtime]
+    baseline=indexed(ROOT/'comparison-inputs/baseline.csv');projected_g=indexed(ROOT/'comparison-inputs/gpt.csv')
+    assert set(baseline)==set(projected_g)==set(vocab)
+    expected=[]
+    for i in sorted(vocab,key=int):
+        b=int(signal[i]['baseline_level']);g=glevels[i];q=qrecords.get(i);qs=q['status'] if q else 'not_routed';ql=q['rarity_level'] if q and q['status']=='scored' else ''
+        assert baseline[i]=={'word_id':i,'word':vocab[i]['word'],'baseline_level':str(b),'wordfreq':signal[i]['wordfreq']}
+        assert projected_g[i]=={k:preds[i][k] for k in ('word_id','word','status','rarity_level')}
+        gap=abs(g-b) if g is not None else 0;proposed=g if g is not None else b
+        r={'word_id':i,'word':vocab[i]['word'],'operational_level':b,'proposed_level':proposed,
+          'proposed_route':'gpt' if g is not None else 'baseline_after_gpt_failure',
+          'gpt_level':g if g is not None else '', 'gpt_status':records[i]['status'],
+          'qwen_level':ql,'qwen_status':qs,'qwen_route':i in route,'initial_gap':gap,
+          'has_context':bool(evidence[i]['senses']),'has_wordfreq':bool(signal[i]['wordfreq']),
+          'multiple_pos':len(evidence[i]['valid_pos'])>1,
+          'risk_band':'technical' if g is None else 'conflict' if gap>=2 else 'unknown',
+          'review_eligible':g is None or gap>=2}
+        scores=[b,proposed]+([ql] if qs=='scored' else [])
+        r['span']=max(scores)-min(scores);r['qwen_gpt_conflict']=qs=='scored' and abs(ql-proposed)>=2
+        r['reason_flags']='|'.join(name for name,flag in [
+          ('gpt_failed',g is None),('qwen_failed',qs=='failed'),('gpt_baseline_conflict',gap>=2),
+          ('qwen_gpt_conflict',r['qwen_gpt_conflict']),('missing_context',not r['has_context']),
+          ('missing_wordfreq',not r['has_wordfreq']),('multiple_pos',r['multiple_pos'])] if flag)
+        expected.append(r)
+    def priority(r):
+        return tuple(-int(x) for x in [r['gpt_status']=='failed',r['qwen_status']=='failed',r['qwen_gpt_conflict'],r['span'],r['initial_gap'],not r['has_context'],r['multiple_pos']])+(hashlib.sha256(('qwen-pilot-v1:'+r['word_id']).encode()).hexdigest(),)
+    eligible=sorted((r for r in expected if r['review_eligible']),key=priority);selected=eligible[:50]
+    cell=lambda r:{k:str(v) for k,v in r.items()}
+    assert read(ROOT/'final-routing/decisions.csv')==list(map(cell,expected))
+    assert read(ROOT/'final-routing/review-queue.csv')==list(map(cell,selected))
+    assert read(ROOT/'final-routing/qwen-route.csv')==list(map(cell,[r for r in expected if r['qwen_route']]))
+    final=js(ROOT/'final-routing/summary.json')
+    assert final['total']==1000 and final['qwen_routed']==nq and final['review_eligible']==len(eligible) and final['review_selected']==len(selected) and final['review_budget']==50
+    route_manifest=export_manifest(ROOT/'final-routing')
+    assert route_manifest['code_sha256']==sha(CODE/'evaluation/risk_queue.py')
+    assert route_manifest['review_budget']==50
+    public=ROOT/'review-public';pack=js(public/'cases.json');manifest=js(public/'manifest.json')
+    assert set(pack)=={'version','rubric','mode','forms','pack_sha256'} and pack['mode']=='risk'
+    assert pack['rubric']=='exact-form-most-familiar-valid-sense-v1'
+    nohash={k:v for k,v in pack.items() if k!='pack_sha256'}
+    assert hashlib.sha256(json.dumps(nohash,ensure_ascii=False,sort_keys=True).encode()).hexdigest()==pack['pack_sha256']==manifest['pack_sha256']
+    hashes(manifest['files'],public)
+    assert set(p.name for p in public.iterdir())=={'cases.json','index.html','app.js','style.css','manifest.json'}
+    lexical_provenance=read(ROOT/'inputs-final/provenance.csv')
+    cards={f['word_id']:f for f in pack['forms']};assert len(cards)==len(pack['forms'])==len(selected)<=50
+    assert set(cards)=={r['word_id'] for r in selected}
+    for i,f in cards.items():
+        assert set(f)=={'word_id','word','valid_pos','contexts'}
+        assert f['word']==vocab[i]['word'] and f['valid_pos']==evidence[i]['valid_pos']
+        assert len(f['contexts'])==len(evidence[i]['senses'])
+        cids=set()
+        for c in f['contexts']:
+            assert set(c)=={'context_id','pos','meaning','restrictions','source'}
+            assert c['context_id'].startswith(i+':') and c['context_id'] not in cids;cids.add(c['context_id'])
+            url=urlsplit(c['source']);assert url.scheme=='https' and url.hostname and not url.username and not url.password
+            matched=[s for s in evidence[i]['senses'] if c['context_id']==i+':sense-'+hashlib.sha256(json.dumps(s,ensure_ascii=False,sort_keys=True).encode()).hexdigest()[:12]]
+            assert len(matched)==1,('public context identity mismatch',i,c['context_id'])
+            s=matched[0]
+            assert c['pos']==s['pos'] and c['meaning']==' — '.join([*s['context'],s['definition']])
+            required=set(s['usage_labels'])|set(s['grammar'])|({'restricție de număr: '+s['number_restriction']} if s['number_restriction'] else set())
+            assert sorted(required)==c['restrictions'],('public restriction mismatch',i)
+            witnesses=[p for p in lexical_provenance if p['form_id']==i and parse(p['projected_sense'])==s]
+            assert witnesses,('missing card provenance',i)
+            valid_urls=set()
+            for witness in witnesses:
+                assert sha(witness['source_path'])==witness['source_sha256']
+                cache=js(witness['source_path']);assert cache['status']=='ok'
+                valid_urls.add('https://dexonline.ro/definitie/'+quote(cache['original'].lower()))
+            assert c['source'] in valid_urls,('public source URL mismatch',i)
+    serialized=json.dumps(pack,ensure_ascii=False,indent=2).replace('<','\\u003c')
+    assert serialized in (public/'index.html').read_text()
+    assert "riskMode?'romanian-risk-':'romanian-'" in (public/'app.js').read_text()
+    hashes(js(G/'protected-inputs.json'));hashes(js(Q/'protected-inputs.json'))
+    strata={}
+    for name,ids in [('all',set(vocab)),('general600',{i for i,f in forms.items() if f['selection_slice']=='general600'}),('stress400',{i for i,f in forms.items() if f['selection_slice']!='general600'}),('missing_context_wordfreq764',{i for i in vocab if not evidence[i]['senses'] and not signal[i]['wordfreq']})]:
+        rows=[r for r in expected if r['word_id'] in ids]
+        strata[name]={'n':len(rows),'gpt_failed':sum(r['gpt_status']=='failed' for r in rows),'qwen_routed':sum(r['qwen_route'] for r in rows),'review_eligible':sum(r['review_eligible'] for r in rows),'review_selected':sum(r['word_id'] in ids for r in selected),'gpt_baseline_gap_histogram':dict(Counter(str(r['initial_gap']) for r in rows)),'proposed_distribution':dict(Counter(str(r['proposed_level']) for r in rows))}
+    result={'status':'pass','audited_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+      'scope':'Independent stdlib audit, no model/network/database calls. Outcomes read only after both campaigns complete.',
+      'inputs':input_receipt,'gpt_native_scored':sum(r['status']=='scored' for r in records.values()),
+      'gpt_native_failed':sum(r['status']=='failed' for r in records.values()),'gpt_unique_sessions':len(threads),
+      'gpt_nonoverlap_checks':999,'qwen_calls':nq,'qwen_nonoverlap_checks':max(nq-1,0),
+      'qwen_after_gpt':True,'tools_observed':0,'stderr_records':0,'event_counts':dict(event_counts),
+      'review_eligible':len(eligible),'review_selected':len(selected),'selected_ids':[r['word_id'] for r in selected],
+      'strata':strata,'protected_files_unchanged':len(js(Q/'protected-inputs.json')),
+      'baseline_unchanged':True,'independent_policy_rank_match':True,'ui_lexical_only':True,
+      'audit_sha256':sha(__file__),
+      'limitations':['No new gold labels; disagreements are not errors or calibrated confidence.',
+        'Configured GPT identity only; managed Codex wrapper remains and zero observed tools does not imply tool unavailability.',
+        'No-context and missing-frequency population differs substantially from reused pilot.',
+        'CLI internal transport retries not independently measured.']}
+    (ROOT/'verification.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+    print(json.dumps(result,ensure_ascii=False,indent=2))
+
+
+if __name__=='__main__':
+    if sys.argv[1:]==['--inputs-only']:
+        *_,result=verify_inputs();result={'status':'pass','scope':'Frozen lexical inputs only; no new outcome inspection',**result}
+        (ROOT/'audit-inputs.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print(json.dumps(result,indent=2))
+    else:
+        assert not sys.argv[1:]
+        audit_full()

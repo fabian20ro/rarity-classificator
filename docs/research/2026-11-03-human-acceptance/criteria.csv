@@ -1,0 +1,7 @@
+criterion,satisfied
+original_human_package_and_inverse,True
+declared_scope,True
+all_reviewed_preconditions,True
+exact_full_candidate,True
+inverse_restores_snapshot,True
+full_inventory_l1_stability,True

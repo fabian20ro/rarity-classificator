@@ -1,0 +1,19 @@
+{
+  "inventory_ids_checked": 77698,
+  "exact_forms_checked": 75147,
+  "human_forms_checked": 200,
+  "human_rows_checked": 233,
+  "baseline_rows_unchanged": 77465,
+  "observations_reconciled": 1331,
+  "conflicts_reconciled": 813,
+  "source_hashes": "PASS",
+  "independent_scores_and_provenance": "PASS",
+  "snapshot_identity": "PASS",
+  "quality_arithmetic": "PASS",
+  "anchor_seed_words": 128,
+  "replay": "PASS",
+  "byte_identical_artifacts": 10,
+  "protected_files_unchanged": 4688,
+  "model_calls": 0,
+  "database_writes": 0
+}
