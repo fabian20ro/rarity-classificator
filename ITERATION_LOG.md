@@ -1390,3 +1390,23 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
   protected files unchanged. No runtime/SQL changes or redundant suite rerun.
 - Published aggregate results only; private endpoints/credentials omitted. Next
   separately instructed apply165 with transactional revalidation and receipt.
+
+
+## 2026-11-04 — approved human corrections applied in production
+
+- User confirmed the proposed apply step. Reused existing dedicated connection and
+  immutable policy/package; no new permissions, schema changes or LLM calls.
+- Fresh read-only preflight233/233 and offline provenance/acceptance preview PASS.
+  Captured full inventory and hash of every other column before execution.
+- Existing CLI applied165 sequential CAS updates in one transaction, with live
+  guards/quality checks and durable receipt. Commit acknowledged; no retries.
+- Separate READ ONLY connection recaptured all77,698rows:165score/revision changes,
+ 77,533fully unchanged;233postconditions pass. Other-column digest unchanged;
+  receipt and post-versions match the committed local evidence.7,187protected
+  files unchanged. No rollback performed, original rollback CSV retained.
+- Jaccard96.459% against original/live reference. Automatic legacy anchor gate
+  remains FAIL; scoped approved human policy passes. No baseline-only uploads.
+- Runtime unchanged; no redundant suite rerun. Published aggregate outcome only,
+  detailed receipt/snapshots/connection remain local. Updated plan/handover/ADR.
+- Next review/merge stacked PR85/86. Human deployment complete; broader automatic
+  promotion remains a separate semantic-validation decision, no new user ratings.

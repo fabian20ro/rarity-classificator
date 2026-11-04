@@ -1,8 +1,8 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-04. Stare: etapele 1–21 încheiate; conexiunea dedicată
-configurată și verificată read-only, contract/lot valide. Scoruri păstrate,
-165corecții neaplicate. Urmează apply separat autorizat. Step4 neschimbat.
+Actualizat: 2026-11-04. Stare: etapele 1–22 încheiate;165corecții umane aplicate
+și confirmate prin citire separată.77.533rânduri neschimbate;233postcondiții valide.
+Lot uman închis. Urmează review/merge PR85/86; Step4 și blocarea automată neschimbate.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -23,8 +23,9 @@ Scara rămâne 1=comun, 5=obscur; o diferență de ±1 este acceptabilă.
   Eșecul tehnic folosește baseline-ul explicit; nu devine acord sau succes al modelului.
 - Maximum 50 de forme cerute utilizatorului, într-o singură rundă. Nicio cotă ascunsă
   de audit aleator; nicio nouă evaluare a celor 150 deja notate.
-- Fără modificări în DB, scorurile înghețate sau răspunsurile originale. Nicio promovare
-  automată în producție. Step5, gating-ul Jaccard/ancore și upload partial rămân intacte.
+- Limita inițială a experimentelor: fără modificări în DB, scorurile înghețate sau
+  răspunsurile originale. Etapele20–22 execută separat operațiile ulterior autorizate;
+  răspunsurile originale rămân intacte. Nicio promovare automată în producție. Step5, gating-ul Jaccard/ancore și upload partial rămân intacte.
 
 ## Ce știm deja
 
@@ -958,7 +959,30 @@ BEGIN READ ONLY explicit și confirmă starea în tranzacție. Fișierul de cone
 nu este o barieră permanentă read-only. Check-ul de instalare NOLOGIN devine fals
 intenționat după activare; celelalte15trec și atributele active sunt verificate separat.
 
-**Următorul pas:** apply165 numai la instrucțiune explicită, folosind conexiunea
+**Pas recomandat la închiderea etapei21, realizat în etapa22:** apply165 numai la instrucțiune explicită, folosind conexiunea
 pregătită și fluxul deja aprobat; revalidare live sub lock, CAS, verificare finală
 și recipisă atomică. Fără alte evaluări sau configurări preventive. Orice drift
 oprește aplicarea; baseline50.724 și gate-urile automate rămân excluse/intacte.
+
+
+## Rezultatul etapei22 — corecții umane aplicate, 2026-11-04
+
+La confirmarea continuării, fluxul aprobat a aplicat exact165corecții umane într-o
+singură tranzacție, cu CAS secvențial și recipisă atomică. Preflight233/233 și auditul
+sursei/politicii au trecut; condițiile au fost reverificate sub lock înainte de DML.
+Jaccard96,459% față de ambele referințe. Gate-ul automat rămâne FAIL/nemodificat.
+
+Citirea READ ONLY separată confirmă233/233postcondiții,165scoruri+revizii modificate,
+77.533rânduri identice și toate celelalte coloane intacte. Recipisa DB coincide cu
+cea locală.7.187fișiere originale intacte; zero apeluri LLM/DDL/granturi noi.
+Runtime neschimbat; fără repetarea suitelor trecute. Arhivele și rollbackul păstrate.
+[Rezultat, limite și recuperare](../research/2026-11-04-human-application.md).
+
+**Următorul pas:** review/merge coordonat PR85/86. Lotul uman este închis;
+nu mai necesită instalare, activare, aplicare ori evaluări noi. Nu relua verifierul
+istoric cu ledger gol ca test al stării actuale; păstrează dovada post-apply.
+
+**Leftovers:** cele50.724schimbări baseline rămân neaplicate. Promovarea automată
+necesită în continuare o decizie distinctă despre contractul semantic L1/ancore și
+validarea erorilor≥2 pe referințele existente; succesul lotului uman nu autorizează
+acel upload. Nu transforma consensul modelelor sau potrivirea histogramei în gold.

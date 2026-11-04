@@ -180,3 +180,14 @@ verification explicitly begins and checks READ ONLY. The installer NOLOGIN check
 is intentionally obsolete after activation; do not weaken the immutable installer.
 Next: separately instructed apply through the approved transactional flow.
 [Current result](../research/2026-11-04-executor-connection.md).
+
+
+## Human corrections applied and independently verified (2026-11-04)
+
+The approved human package is now applied:165 score/revision changes,77,533 rows
+unchanged;233 human postconditions pass. A separate read-only connection confirmed
+the durable receipt and full post-state, including unchanged remaining columns.
+No runtime/grant/schema changes or LLM calls. Automatic upload gates still fail;
+baseline-only changes remain unapplied. Keep original artifacts and guarded rollback.
+Next: coordinated review/merge of stacked PR85/86; no further DB work for this lot.
+[Current result](../research/2026-11-04-human-application.md).
