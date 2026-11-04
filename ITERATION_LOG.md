@@ -1345,3 +1345,25 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
 - Result: installation prerequisites satisfied now; next separately instructed
   structural installation with repeated checks/lock, NOLOGIN/postflight. Activation
   and apply165 remain separate. Existing approval/labels and automatic gates intact.
+
+
+## 2026-11-04 — authorized production structural installation
+
+- User “do it” follows recommendation for structural installation; scope announced:
+  ledger/revisions/NOLOGIN role only, no apply165 or executor activation. No new
+  permission question, no LLM/subagents. Exact immutable bundle hash verified.
+- Real project ACTIVE_HEALTHY; repeated original17prechecks PASS. Executed original
+ 02-install.sql once via Supabase MCP, one transaction with exclusive lock, repeated
+  checks and full existing-column preservation hash. No SQL patch/retry needed.
+-16/16 postchecks PASS in separate read-only transaction. Durable receipt read in
+  another: timestamp07:10:27UTC (09:10:27local), epoch f7256150-4123-4170-88b0-41c8a5e5b387.
+ 77,698unique revisions1..77,698; before/after full-column hash6d1052a2...90f8a3 equal.
+- Executor NOLOGIN, no password provisioned; only postgres ADMIN membership with
+  INHERIT/SET false. API-role private USAGE false; correction ledger0. No scores
+  changed;165pending. Original policy, labels, gates and runtime/SQL unchanged.
+- Advisor0private findings;5existing public objects visible to anon GraphQL,
+  documented with remediation link; no out-of-scope ACL changes.7,155original files
+  unchanged. One write transaction plus3read-only; raw receipt/captures/manifest local.
+- Tests not rerun without code change; actual postflight/receipt verifies deployment.
+  Next dedicated-connection configuration/controlled activation, initially read-only;
+  separately instructed apply165 remains outstanding. No automatic reinstall/uninstall.

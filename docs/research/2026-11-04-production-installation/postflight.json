@@ -1,0 +1,18 @@
+{
+  "inventory": true,
+  "ledger_empty": true,
+  "ledger_grants": true,
+  "rls_unchanged": true,
+  "executor_grants": true,
+  "api_roles_denied": true,
+  "revision_trigger": true,
+  "revision_sequence": true,
+  "policies_unchanged": true,
+  "ddl_hooks_unchanged": true,
+  "word_grants_preserved": true,
+  "existing_data_preserved": true,
+  "revisions_complete_unique": true,
+  "role_disabled_and_bounded": true,
+  "installation_receipt_bound": true,
+  "role_no_untrusted_memberships": true
+}

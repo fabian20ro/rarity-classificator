@@ -132,3 +132,14 @@ Two READ ONLY transactions; no installation or LLM calls. Dedicated DSN not conf
 or tested. Next: separately instructed structural installation, then postchecks;
 executor stays NOLOGIN and score application is separate. Recheck under the install
 lock; this observation reserves nothing. [Current result](research/2026-11-04-production-preflight.md).
+
+
+## Production structural installation (2026-11-04)
+
+Original bundle installed once on pdliedweugywbiczajxn following user instruction.
+17/17 repeated prechecks and16/16 postchecks PASS; durable receipt read separately.
+77,698 unique revisions; all existing columns/scores preserved by full-row hash.
+Executor remains NOLOGIN; no credentials/activation/apply165. Private API-role USAGE
+false; correction ledger empty. Next: separately instructed dedicated connection
+setup/activation, initially read-only checks; apply remains separate. Do not rerun
+installer or use score rollback.csv as uninstall. [Current state](research/2026-11-04-production-installation.md).

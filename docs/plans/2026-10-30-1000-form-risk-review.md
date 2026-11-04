@@ -1,8 +1,8 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-04. Stare: etapele 1–19 încheiate; preflight real17/17 PASS,
-lot233/233 valid,165corecții încă necesare. Pachetul testat12/12 pe OrioleDB izolat.
-Urmează numai instalarea structurală explicit autorizată; nimic instalat în DB real. Step4 neschimbat.
+Actualizat: 2026-11-04. Stare: etapele 1–20 încheiate; instalarea structurală
+reală confirmată,17/17 înainte și16/16 după. Scoruri păstrate; executor NOLOGIN,
+165corecții neaplicate. Urmează conexiunea dedicată/activarea controlată. Step4 neschimbat.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -909,8 +909,32 @@ schemelor API nu este vizibilă în sesiune; postflight-ul rămâne necesar.
 35teste +70subteste PASS;6artefacte de replay identice;7.124fișiere protejate intacte.
 Nicio schimbare runtime/SQL/pachet sau evaluare. Nu s-a reluat repetiția server12/12.
 
-**Următorul pas:** instalarea structurală numai la instrucțiune explicită, cu
+**Pas recomandat la închiderea etapei19, realizat în etapa20:** instalarea structurală numai la instrucțiune explicită, cu
 preflight repetat și lock exclusiv, apoi verificările16după. Nu există blocaj tehnic
 observat în precondițiile curente. Instalarea lasă executorul NOLOGIN; activarea,
 conexiunea lui și apply165 sunt separate. Fără reaprobarea politicii/etichete noi;
 50.724schimbări baseline rămân excluse. Orice drift real oprește execuția.
+
+
+## Rezultatul etapei20 — instalare structurală reală, 2026-11-04
+
+La instrucțiunea de continuare, pachetul original instalat o singură dată pe
+pdliedweugywbiczajxn. Preflight17/17 repetat; verificări sub lock; postflight16/16
+PASS din conexiune separată. Recipisă durabilă09:10:27 Europe/Bucharest, recitită
+09:11:36. [Raport, hash-uri și limite](../research/2026-11-04-production-installation.md).
+
+Ledger/revizii/rol/granturi create.77.698revizii unice; hash identic înainte/după
+pentru TOATE coloanele existente, inclusiv scorurile. RLS/granturi existente și
+hook-uri păstrate. Executor NOLOGIN, fără parolă provisionată; schema privată fără
+USAGE pentru rolurile API. Ledger corecții gol;165scoruri încă neaplicate.
+
+O tranzacție de instalare,3read-only pentru verificare. Zero apeluri LLM;
+7.155fișiere originale intacte. Runtime/SQL neschimbate; fără repetarea testelor deja
+trecute. Advisor:0findings private;5obiecte publice vizibile GraphQL pentru anon,
+fără schimbări de acces suplimentare. Arhiva originală păstrată imutabilă.
+
+**Următorul pas:** configurarea/verificarea conexiunii dedicate și activarea
+controlată a executorului, numai explicit instruite; inițial verificări read-only.
+Apply165 rămâne separat, cu revalidare live și recipisă în aceeași tranzacție.
+Nu reinstala schema și nu folosi rollback.csv pentru dezinstalare. Politica deja
+aprobată; fără etichete noi;50.724schimbări baseline rămân excluse.
