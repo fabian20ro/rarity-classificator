@@ -51,6 +51,9 @@ def main(argv: list[str] | None = None) -> int:
         parser.print_help()
         return 2
 
+    if hasattr(args, 'evaluation_handler'):
+        return args.evaluation_handler(args)
+
     output_dir = ensure_output_dir(Path(args.output_dir))
     repo = RunCsvRepository()
 
@@ -60,6 +63,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command in {"step2-score", "step2"}:
+        if args.backend == "d1":
+            from .evaluation.cli import run_step2_d1
+            return run_step2_d1(args)
         metrics = Step2Metrics()
         lm_client = LmStudioClient(api_key=os.getenv("LMSTUDIO_API_KEY"), metrics=metrics)
 
@@ -257,6 +263,8 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-dir", default="build/rarity", help="Output root dir (default: build/rarity)")
 
     sub = parser.add_subparsers(dest="command")
+    from .evaluation.cli import add_commands
+    add_commands(sub)
 
     p1 = sub.add_parser("step1-export", help="Export source words from DB to CSV")
     p1.add_argument("--output-csv", required=True)
@@ -385,6 +393,11 @@ def _add_prompt_files_args(parser, system_prompt_default="prompts/system_prompt_
 
 
 def _add_step2_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--backend", choices=["chat", "d1"], default="chat")
+    parser.add_argument("--model-file", type=Path)
+    parser.add_argument("--runtime-version")
+    parser.add_argument("--evidence-csv", type=Path)
+    parser.add_argument("--min-probability", type=float, default=0.0)
     parser.add_argument("--run", required=True)
     parser.add_argument("--model", required=True)
     parser.add_argument("--base-csv", required=True)

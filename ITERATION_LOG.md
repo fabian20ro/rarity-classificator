@@ -480,3 +480,37 @@ GitHub rejected a lease-protected force rollback; restored the original source
 tree with normal revert 287d3a7 (tree verified identical to dc98588), then reapplied
 the fixes on the PR branch. No repository rules changed. Subsequent pushes use
 explicit full source:destination refspecs and matching branch upstreams.
+
+## 2026-10-16 — Sequential D1 adapter and offline Romanian evaluation
+
+Implemented accepted plan using Matt Pocock TDD, implement, codebase-design and
+code-review workflows. Base: origin/main 7ccddb9 after merged PR80. Work isolated
+in /tmp/word-rarity-fixes on codex/d1-evaluation-adapter; original dirty checkout
+preserved. No model loading/inference, database access or upload.
+
+Delivered explicit inventory/evidence preparation, Unicode/family collision
+splits, blind labels, optional local wordfreq export, strict System One scorer,
+chat/frequency adapters, durable per-ID campaign records and CSV projections,
+resume fingerprints, experimental Step2 opt-in, and offline paired gold reports.
+D1 HTTP requests blocking/sequential; preflight requires already-loaded decision
+instance, aborts on metadata changes; malformed distributions fail explicitly.
+Human labels barred from evidence columns. Missing frequency remains censored
+coverage, never automatically L5. Confidence means max class probability, not
+calibrated accuracy. Existing chat default, Step5 and upload gates preserved.
+
+TDD: observed red/green for adapter distributions/loading constraints, artifact
+resume/incompatibility, dataset joins/collisions, evaluation metrics and CLI
+integration. External HTTP and optional corpus mocked; real temporary files.
+Architecture review found retry write amplification and quadratic ID validation;
+regression reproduced 101 predictions.csv writes for 100 retries, fixed to <=2.
+Evidence IDs now materialized once. Raw response payloads remain on disk rather
+than accumulating in the campaign working set. DEX full-page cache size (~1.3GB)
+was a surprise flagged to user and shaped streaming extraction.
+
+Validation: Python 3.11.16, python scripts/check.py: Ruff PASS; 785 tests and
+98 subtests PASS. Implementation/ADR/runbook/plan record known limitations:
+authoritative inventory and human gold still needed; no live protocol/accuracy
+claim; no fitted hybrid, calibration, weighted/subgroup reporting, or automatic
+promotion. Next: freeze 150-word pilot/rubric, blind labels, then explicit live
+smoke/ablations when RAM permits. Additional principles recommended: high
+cohesion/low coupling, explicit dependencies, composition and reproducibility.

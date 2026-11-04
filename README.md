@@ -145,3 +145,5 @@ The same command runs Ruff and the complete pytest collection in CI and local
 automation. Pytest executes both `unittest.TestCase` tests and standalone test
 functions; `unittest discover` alone silently omits the latter. No live database
 or model is required. Inspect collection with `python -m pytest --collect-only -q`.
+
+Experimental D1 scoring and Romanian evaluation: [D1 evaluation guide](docs/D1_EVALUATION.md). Opt-in, sequential calls, no automatic model loading; existing chat workflow remains the default.
