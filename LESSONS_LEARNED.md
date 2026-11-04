@@ -474,3 +474,9 @@ assert the setting in the same transaction; a DSN option is not a security bound
 merged into82's feature branch while81/82 remained open; merged=true did not mean
 main contained it. Refresh metadata/ancestry, retarget children to the surviving
 parent, compare trees, and pin the reviewed head SHA before merging.
+
+
+**[2026-11-04]** Adding optional extras must update uv.lock as well as pyproject.
+Pip-based CI passed while the lock omitted evaluation/frequency and `uv lock --check`
+failed. Check the lock separately; regenerate without upgrading existing pins and
+report that existing-environment tests do not validate every newly locked version.

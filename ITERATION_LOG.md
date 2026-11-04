@@ -1425,3 +1425,18 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
   score changes, LLM calls or dependency installation.
 - Recommended86 retarget to85's merged parent;81/82 outside current merge scope
   unless user explicitly expands it. Review report records limits and exact refs.
+
+
+## 2026-11-04 — final main integration
+
+- User authorized final PR from d1-evaluation-adapter to main and merge after checks.
+  81 merged first;82 subsequently merged into81's old branch, so main lacked82/85/86.
+- Separate worktree; merged main36723fe into stack594e168 cleanly. Runtime/tests/
+  scripts match previously reviewed6a8f7bf. Reviewed initial82 exact-form delta too.
+- Integration surprise: uv.lock omitted evaluation/frequency extras. Reproduced
+  uv lock --check failure; regenerated lock without upgrading existing main pins;
+  offline lock check PASS. Only package metadata fetched; no project installation.
+- Official guarded offline suite PASS:986tests+456subtests,40DB tests skipped;
+  Ruff PASS. Local tests use existing environment, not newly installed lock versions.
+- Plan/report updated; final head must pass CI before SHA-pinned merge. No DB,
+  LLM calls, score operations, model loading, branch deletion or unrelated cleanup.

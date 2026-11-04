@@ -2,8 +2,8 @@
 
 Actualizat: 2026-11-04. Stare: etapele 1–22 încheiate;165corecții umane aplicate
 și confirmate prin citire separată.77.533rânduri neschimbate;233postcondiții valide.
-Lot uman închis. Review85/86 încheiat;85 era deja merged în82.
-Integrarea86 urmărește același părinte;81/82 rămân înainte de main. Step4 neschimbat.
+Lot uman închis. Review85/86 și merge-urile stivei încheiate; integrarea finală
+către main este pregătită și autorizată separat. Fără operații DB. Step4 neschimbat.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -1000,3 +1000,19 @@ Corecție față de recomandarea anterioară:85 era deja merged din30octombrie �
 branch-ul lui82.86 trebuie integrat în acel părinte; simpla închidere a stivei85/86
 nu înseamnă integrare în main. PR81/82 sunt încă deschise; extinderea review/merge-ului
 la acestea este o etapă separată. Lotul uman și gate-urile automate nu se schimbă.
+
+
+## Integrarea finală către main — 2026-11-04
+
+81 a fost merged în main;82 a fost merged ulterior în branch-ul lui81, incluzând
+85/86. Din acest motiv este necesar un PR final `codex/d1-evaluation-adapter` →
+main. Autorizat explicit în această etapă, fără acces DB sau apeluri LLM.
+
+Main combinat fără conflicte; actualizările dependențelor păstrate. Corectată
+neconcordanța dintre extras pyproject și uv.lock; verificarea lock trece, toate
+pin-urile existente păstrate. Ruff+986teste+456subteste PASS,40teste DB omise.
+[Raport de integrare și limite](../research/2026-11-04-main-integration.md).
+
+Merge numai după CI verde pe head-ul final, cu verificarea rezultatului în main.
+Nu mai este necesară o altă operație DB pentru lotul uman; promovarea baseline-ului
+rămâne separată. Consultă PR-ul final pentru statusul efectiv al integrării.
