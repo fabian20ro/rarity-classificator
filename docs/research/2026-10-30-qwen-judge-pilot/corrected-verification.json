@@ -1,0 +1,120 @@
+{
+  "status": "pass",
+  "audited_at": "2026-10-30T12:41:14.314058+00:00",
+  "scope": "Independent corrected-arm raw/evidence/metrics audit; no inference/API/DB calls",
+  "forms": 150,
+  "native_valid": 150,
+  "fallbacks": 0,
+  "protected_files_unchanged": 1721,
+  "curated_contexts": 218,
+  "changed_projection_rows": 5,
+  "unchanged_projection_rows": 213,
+  "all_initial_evidence_preserved": true,
+  "all_requests_reconstructed_without_gold": true,
+  "nonoverlap_checks": 149,
+  "metrics_subsets_verified": 7,
+  "paired": {
+    "improved": 29,
+    "worsened": 33,
+    "tied": 88,
+    "rescued_severe": 9,
+    "introduced_severe": 3
+  },
+  "bootstrap": {
+    "severe_rate_delta": {
+      "percentile95": [
+        -0.08904109589041095,
+        0.006666666666666667
+      ],
+      "scope": "Exploratory paired group bootstrap on reused development labels; not external validation or calibrated risk."
+    },
+    "excess_mean_delta": {
+      "percentile95": [
+        -0.10067114093959731,
+        0.033783783783783786
+      ],
+      "scope": "Exploratory paired group bootstrap on reused development labels; not external validation or calibrated risk."
+    }
+  },
+  "diagnostic_top8_secondary25_verified": true,
+  "promotion_gate_verified": true,
+  "baseline_all": {
+    "severe": 11,
+    "excess_error_total": 14,
+    "mae": 0.52
+  },
+  "judge_all": {
+    "severe": 5,
+    "excess_error_total": 9,
+    "mae": 0.5266666666666666
+  },
+  "historical_curated_source_files_reverified": 114,
+  "arm_comparison_independently_recomputed_from_raw": {
+    "all": {
+      "n": 150,
+      "score_changes": 12,
+      "initial_severe": 7,
+      "corrected_severe": 5,
+      "initial_excess": 11,
+      "corrected_excess": 9,
+      "errors_improved": 7,
+      "errors_worsened": 5,
+      "errors_tied": 138
+    },
+    "changed_evidence": {
+      "n": 95,
+      "score_changes": 12,
+      "initial_severe": 4,
+      "corrected_severe": 2,
+      "initial_excess": 5,
+      "corrected_excess": 3,
+      "errors_improved": 7,
+      "errors_worsened": 5,
+      "errors_tied": 83
+    },
+    "unchanged_evidence": {
+      "n": 55,
+      "score_changes": 0,
+      "initial_severe": 3,
+      "corrected_severe": 3,
+      "initial_excess": 6,
+      "corrected_excess": 6,
+      "errors_improved": 0,
+      "errors_worsened": 0,
+      "errors_tied": 55
+    }
+  },
+  "byte_identical_comparison_replay_verified": true,
+  "diagnostic_gate_verified": true,
+  "with_context_severe_baseline_judge": [
+    10,
+    2
+  ],
+  "without_context_severe_baseline_judge": [
+    1,
+    3
+  ],
+  "without_context_excess_baseline_judge": [
+    1,
+    6
+  ],
+  "audit_script_sha256": "90fb9d0ed52f5d00a6db883b1ccafbe8bd571561df82859e6e7a766a330e04ba",
+  "artifact_hashes": {
+    "protocol.json": "cef12f00a3c6d4eaf0212298e3406db382a39fff13e4d2e3ef8089d294731d71",
+    "projection.csv": "c20db64fe8e3e014852ddf2e1a34105c157a7a4e296a68b3b3021f04c1100492",
+    "inputs/evidence.csv": "c7756bd5d12b5fde9482d8212c6c1d350aa34744044f32e36c0329406e5de40b",
+    "campaign/manifest.json": "eb74c63ce4ed7a5d4bb9a41f6bfe7e8f6d67f54fbd7b8e1e702b5a9c98d081a2",
+    "comparison/report.json": "1185f2c4400609626d44986a10d1121da25c0b2e2aab9915bb161d35d3f7b65d",
+    "comparison/comparison.csv": "2e4a049dadb700fcc57c6a65860d6ba645868146da46fb04fa18af1a7c6a8170",
+    "paired-analysis.json": "f8831b21bbe5251d3bd76640227b5dad6560430941673a350d42b26cef28f5fa",
+    "arm-comparison.json": "c998611c518fde0edd170415c80f95064bed71d8eefbbd8cc08349d44ed5e435"
+  },
+  "limitations": [
+    "Corrective development arm selected after initial evidence omission discovery; not independent validation.",
+    "Curated contexts are label-exposed; examples and reviewer-directed clauses excluded.",
+    "No calibrated confidence or causal status inferred from model notes.",
+    "No-context slice membership changes24to19; compare fixed subsets before attributing changes.",
+    "No-context severity1→3/excess1→6 versus baseline;870/1000new forms lackusablecontexts.",
+    "Bootstrap95%intervals for bothsevere-rate andexcess deltas includezero."
+  ]
+}

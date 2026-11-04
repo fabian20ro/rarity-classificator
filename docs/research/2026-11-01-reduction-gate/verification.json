@@ -1,0 +1,16 @@
+{
+  "protected_files_unchanged": 4662,
+  "replay": "PASS",
+  "byte_identical_artifacts": 8,
+  "independent_reference_and_metric_checks": "PASS",
+  "corpus_changes_beyond_lexical_gate": 0,
+  "large_reductions": 58,
+  "corola_supported_large_reductions": 57,
+  "model_calls": 0,
+  "classifier_db_writes": 0,
+  "new_downloads": 0,
+  "full_coverage": {
+    "pilot150": 150,
+    "review50": 50
+  }
+}

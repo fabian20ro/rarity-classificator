@@ -1,0 +1,15 @@
+{
+  "source": "private Sites synchronized browser JSON download",
+  "site_project_id": "appgprj_6ae5bb4871e481919b30982d7ee15171",
+  "observed_server_revision": 116,
+  "revision_provenance": "Independently observed during preceding completion verification; downloaded export does not contain a server revision. No revision inferred from filename.",
+  "completion_receipt_sha256": "637f548d6fa26d0f8498852daf3acb31787f64039be22d5cb50a03de24bffd4a",
+  "exported_at": "2026-10-31T17:19:24.280Z",
+  "source_sha256": "ddf94b9ea09f93a469dfb74d9f71854ad800929c71c1a68834346fec41fd1151",
+  "pack_sha256": "c84322329255ec55a38c46235749b4213a50ddb19e3c4d1b308dcfb267c368f9",
+  "responses": 50,
+  "events": 142,
+  "raw_data_publication": "local_only",
+  "model_calls": 0,
+  "classifier_db_writes": 0
+}

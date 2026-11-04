@@ -1,0 +1,1108 @@
+{
+  "policy": "single user-authorized frozen policy; no alternate ranking searched",
+  "subsets": {
+    "all": {
+      "n": 150,
+      "baseline": {
+        "severe": 11,
+        "excess": 14,
+        "error2": 8,
+        "error3": 3,
+        "error4": 0,
+        "cases": [
+          "acrit",
+          "ata",
+          "ață",
+          "carter",
+          "dorian",
+          "drac",
+          "fulg",
+          "in",
+          "pag",
+          "tara",
+          "zar"
+        ]
+      },
+      "gpt": {
+        "severe": 3,
+        "excess": 3,
+        "error2": 3,
+        "error3": 0,
+        "error4": 0,
+        "cases": [
+          "carter",
+          "catalige",
+          "târfă"
+        ]
+      },
+      "qwen_historical_all": {
+        "severe": 5,
+        "excess": 9,
+        "error2": 1,
+        "error3": 4,
+        "error4": 0,
+        "cases": [
+          "european",
+          "fulg",
+          "micșurat",
+          "place",
+          "tara"
+        ]
+      }
+    },
+    "qwen_route": {
+      "n": 12,
+      "baseline": {
+        "severe": 8,
+        "excess": 10,
+        "error2": 6,
+        "error3": 2,
+        "error4": 0,
+        "cases": [
+          "acrit",
+          "ata",
+          "ață",
+          "dorian",
+          "drac",
+          "pag",
+          "tara",
+          "zar"
+        ]
+      },
+      "gpt": {
+        "severe": 2,
+        "excess": 2,
+        "error2": 2,
+        "error3": 0,
+        "error4": 0,
+        "cases": [
+          "catalige",
+          "târfă"
+        ]
+      },
+      "qwen_historical_all": {
+        "severe": 1,
+        "excess": 2,
+        "error2": 0,
+        "error3": 1,
+        "error4": 0,
+        "cases": [
+          "tara"
+        ]
+      }
+    },
+    "outside_route": {
+      "n": 138,
+      "baseline": {
+        "severe": 3,
+        "excess": 4,
+        "error2": 2,
+        "error3": 1,
+        "error4": 0,
+        "cases": [
+          "carter",
+          "fulg",
+          "in"
+        ]
+      },
+      "gpt": {
+        "severe": 1,
+        "excess": 1,
+        "error2": 1,
+        "error3": 0,
+        "error4": 0,
+        "cases": [
+          "carter"
+        ]
+      },
+      "qwen_historical_all": {
+        "severe": 4,
+        "excess": 7,
+        "error2": 1,
+        "error3": 3,
+        "error4": 0,
+        "cases": [
+          "european",
+          "fulg",
+          "micșurat",
+          "place"
+        ]
+      }
+    },
+    "full_queue": {
+      "n": 13,
+      "baseline": {
+        "severe": 9,
+        "excess": 11,
+        "error2": 7,
+        "error3": 2,
+        "error4": 0,
+        "cases": [
+          "tara",
+          "zar",
+          "fulg",
+          "dorian",
+          "pag",
+          "acrit",
+          "ata",
+          "ață",
+          "drac"
+        ]
+      },
+      "gpt": {
+        "severe": 2,
+        "excess": 2,
+        "error2": 2,
+        "error3": 0,
+        "error4": 0,
+        "cases": [
+          "catalige",
+          "târfă"
+        ]
+      },
+      "qwen_historical_all": {
+        "severe": 2,
+        "excess": 4,
+        "error2": 0,
+        "error3": 2,
+        "error4": 0,
+        "cases": [
+          "tara",
+          "fulg"
+        ]
+      }
+    },
+    "top8": {
+      "n": 8,
+      "baseline": {
+        "severe": 6,
+        "excess": 8,
+        "error2": 4,
+        "error3": 2,
+        "error4": 0,
+        "cases": [
+          "tara",
+          "zar",
+          "fulg",
+          "dorian",
+          "pag",
+          "acrit"
+        ]
+      },
+      "gpt": {
+        "severe": 2,
+        "excess": 2,
+        "error2": 2,
+        "error3": 0,
+        "error4": 0,
+        "cases": [
+          "catalige",
+          "târfă"
+        ]
+      },
+      "qwen_historical_all": {
+        "severe": 2,
+        "excess": 4,
+        "error2": 0,
+        "error3": 2,
+        "error4": 0,
+        "cases": [
+          "tara",
+          "fulg"
+        ]
+      }
+    },
+    "outside_queue": {
+      "n": 137,
+      "baseline": {
+        "severe": 2,
+        "excess": 3,
+        "error2": 1,
+        "error3": 1,
+        "error4": 0,
+        "cases": [
+          "carter",
+          "in"
+        ]
+      },
+      "gpt": {
+        "severe": 1,
+        "excess": 1,
+        "error2": 1,
+        "error3": 0,
+        "error4": 0,
+        "cases": [
+          "carter"
+        ]
+      },
+      "qwen_historical_all": {
+        "severe": 3,
+        "excess": 5,
+        "error2": 1,
+        "error3": 2,
+        "error4": 0,
+        "cases": [
+          "european",
+          "micșurat",
+          "place"
+        ]
+      }
+    },
+    "outside_top8": {
+      "n": 142,
+      "baseline": {
+        "severe": 5,
+        "excess": 6,
+        "error2": 4,
+        "error3": 1,
+        "error4": 0,
+        "cases": [
+          "ata",
+          "ață",
+          "carter",
+          "drac",
+          "in"
+        ]
+      },
+      "gpt": {
+        "severe": 1,
+        "excess": 1,
+        "error2": 1,
+        "error3": 0,
+        "error4": 0,
+        "cases": [
+          "carter"
+        ]
+      },
+      "qwen_historical_all": {
+        "severe": 3,
+        "excess": 5,
+        "error2": 1,
+        "error3": 2,
+        "error4": 0,
+        "cases": [
+          "european",
+          "micșurat",
+          "place"
+        ]
+      }
+    }
+  },
+  "ranked_queue": [
+    {
+      "word_id": "87696",
+      "word": "catalige",
+      "human": 4,
+      "baseline": 4,
+      "gpt": 2,
+      "qwen": 4,
+      "gap": 2,
+      "span": 2,
+      "qg_conflict": true
+    },
+    {
+      "word_id": "147255",
+      "word": "tara",
+      "human": 4,
+      "baseline": 1,
+      "gpt": 3,
+      "qwen": 1,
+      "gap": 2,
+      "span": 2,
+      "qg_conflict": true
+    },
+    {
+      "word_id": "147744",
+      "word": "târfă",
+      "human": 3,
+      "baseline": 4,
+      "gpt": 1,
+      "qwen": 2,
+      "gap": 3,
+      "span": 3,
+      "qg_conflict": false
+    },
+    {
+      "word_id": "154348",
+      "word": "zar",
+      "human": 2,
+      "baseline": 4,
+      "gpt": 1,
+      "qwen": 2,
+      "gap": 3,
+      "span": 3,
+      "qg_conflict": false
+    },
+    {
+      "word_id": "104683",
+      "word": "fulg",
+      "human": 1,
+      "baseline": 3,
+      "gpt": 1,
+      "qwen": null,
+      "gap": 2,
+      "span": 2,
+      "qg_conflict": false
+    },
+    {
+      "word_id": "99218",
+      "word": "dorian",
+      "human": 5,
+      "baseline": 2,
+      "gpt": 4,
+      "qwen": 4,
+      "gap": 2,
+      "span": 2,
+      "qg_conflict": false
+    },
+    {
+      "word_id": "126765",
+      "word": "pag",
+      "human": 4,
+      "baseline": 2,
+      "gpt": 4,
+      "qwen": 4,
+      "gap": 2,
+      "span": 2,
+      "qg_conflict": false
+    },
+    {
+      "word_id": "78185",
+      "word": "acrit",
+      "human": 2,
+      "baseline": 4,
+      "gpt": 2,
+      "qwen": 3,
+      "gap": 2,
+      "span": 2,
+      "qg_conflict": false
+    },
+    {
+      "word_id": "82205",
+      "word": "ata",
+      "human": 5,
+      "baseline": 3,
+      "gpt": 5,
+      "qwen": 4,
+      "gap": 2,
+      "span": 2,
+      "qg_conflict": false
+    },
+    {
+      "word_id": "150806",
+      "word": "țanc",
+      "human": 3,
+      "baseline": 4,
+      "gpt": 2,
+      "qwen": 3,
+      "gap": 2,
+      "span": 2,
+      "qg_conflict": false
+    },
+    {
+      "word_id": "109394",
+      "word": "idiot",
+      "human": 2,
+      "baseline": 3,
+      "gpt": 1,
+      "qwen": 1,
+      "gap": 2,
+      "span": 2,
+      "qg_conflict": false
+    },
+    {
+      "word_id": "82352",
+      "word": "ață",
+      "human": 1,
+      "baseline": 3,
+      "gpt": 1,
+      "qwen": 1,
+      "gap": 2,
+      "span": 2,
+      "qg_conflict": false
+    },
+    {
+      "word_id": "99292",
+      "word": "drac",
+      "human": 1,
+      "baseline": 3,
+      "gpt": 1,
+      "qwen": 1,
+      "gap": 2,
+      "span": 2,
+      "qg_conflict": false
+    }
+  ],
+  "strata": {
+    "true4_or5": {
+      "population": {
+        "n": 43,
+        "baseline": {
+          "severe": 5,
+          "excess": 8,
+          "error2": 2,
+          "error3": 3,
+          "error4": 0,
+          "cases": [
+            "ata",
+            "carter",
+            "dorian",
+            "pag",
+            "tara"
+          ]
+        },
+        "gpt": {
+          "severe": 2,
+          "excess": 2,
+          "error2": 2,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "carter",
+            "catalige"
+          ]
+        },
+        "qwen_historical_all": {
+          "severe": 2,
+          "excess": 3,
+          "error2": 1,
+          "error3": 1,
+          "error4": 0,
+          "cases": [
+            "micșurat",
+            "tara"
+          ]
+        }
+      },
+      "qwen_route": {
+        "n": 5,
+        "baseline": {
+          "severe": 4,
+          "excess": 6,
+          "error2": 2,
+          "error3": 2,
+          "error4": 0,
+          "cases": [
+            "ata",
+            "dorian",
+            "pag",
+            "tara"
+          ]
+        },
+        "gpt": {
+          "severe": 1,
+          "excess": 1,
+          "error2": 1,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "catalige"
+          ]
+        },
+        "qwen_historical_all": {
+          "severe": 1,
+          "excess": 2,
+          "error2": 0,
+          "error3": 1,
+          "error4": 0,
+          "cases": [
+            "tara"
+          ]
+        }
+      },
+      "top8": {
+        "n": 4,
+        "baseline": {
+          "severe": 3,
+          "excess": 5,
+          "error2": 1,
+          "error3": 2,
+          "error4": 0,
+          "cases": [
+            "tara",
+            "dorian",
+            "pag"
+          ]
+        },
+        "gpt": {
+          "severe": 1,
+          "excess": 1,
+          "error2": 1,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "catalige"
+          ]
+        },
+        "qwen_historical_all": {
+          "severe": 1,
+          "excess": 2,
+          "error2": 0,
+          "error3": 1,
+          "error4": 0,
+          "cases": [
+            "tara"
+          ]
+        }
+      }
+    },
+    "wordfreq_missing": {
+      "population": {
+        "n": 49,
+        "baseline": {
+          "severe": 2,
+          "excess": 2,
+          "error2": 2,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "acrit",
+            "zar"
+          ]
+        },
+        "gpt": {
+          "severe": 2,
+          "excess": 2,
+          "error2": 2,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "catalige",
+            "târfă"
+          ]
+        },
+        "qwen_historical_all": {
+          "severe": 1,
+          "excess": 1,
+          "error2": 1,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "micșurat"
+          ]
+        }
+      },
+      "qwen_route": {
+        "n": 5,
+        "baseline": {
+          "severe": 2,
+          "excess": 2,
+          "error2": 2,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "acrit",
+            "zar"
+          ]
+        },
+        "gpt": {
+          "severe": 2,
+          "excess": 2,
+          "error2": 2,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "catalige",
+            "târfă"
+          ]
+        },
+        "qwen_historical_all": {
+          "severe": 0,
+          "excess": 0,
+          "error2": 0,
+          "error3": 0,
+          "error4": 0,
+          "cases": []
+        }
+      },
+      "top8": {
+        "n": 4,
+        "baseline": {
+          "severe": 2,
+          "excess": 2,
+          "error2": 2,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "zar",
+            "acrit"
+          ]
+        },
+        "gpt": {
+          "severe": 2,
+          "excess": 2,
+          "error2": 2,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "catalige",
+            "târfă"
+          ]
+        },
+        "qwen_historical_all": {
+          "severe": 0,
+          "excess": 0,
+          "error2": 0,
+          "error3": 0,
+          "error4": 0,
+          "cases": []
+        }
+      }
+    },
+    "with_context": {
+      "population": {
+        "n": 131,
+        "baseline": {
+          "severe": 10,
+          "excess": 13,
+          "error2": 7,
+          "error3": 3,
+          "error4": 0,
+          "cases": [
+            "acrit",
+            "ata",
+            "ață",
+            "carter",
+            "dorian",
+            "drac",
+            "in",
+            "pag",
+            "tara",
+            "zar"
+          ]
+        },
+        "gpt": {
+          "severe": 3,
+          "excess": 3,
+          "error2": 3,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "carter",
+            "catalige",
+            "târfă"
+          ]
+        },
+        "qwen_historical_all": {
+          "severe": 2,
+          "excess": 3,
+          "error2": 1,
+          "error3": 1,
+          "error4": 0,
+          "cases": [
+            "micșurat",
+            "tara"
+          ]
+        }
+      },
+      "qwen_route": {
+        "n": 12,
+        "baseline": {
+          "severe": 8,
+          "excess": 10,
+          "error2": 6,
+          "error3": 2,
+          "error4": 0,
+          "cases": [
+            "acrit",
+            "ata",
+            "ață",
+            "dorian",
+            "drac",
+            "pag",
+            "tara",
+            "zar"
+          ]
+        },
+        "gpt": {
+          "severe": 2,
+          "excess": 2,
+          "error2": 2,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "catalige",
+            "târfă"
+          ]
+        },
+        "qwen_historical_all": {
+          "severe": 1,
+          "excess": 2,
+          "error2": 0,
+          "error3": 1,
+          "error4": 0,
+          "cases": [
+            "tara"
+          ]
+        }
+      },
+      "top8": {
+        "n": 7,
+        "baseline": {
+          "severe": 5,
+          "excess": 7,
+          "error2": 3,
+          "error3": 2,
+          "error4": 0,
+          "cases": [
+            "tara",
+            "zar",
+            "dorian",
+            "pag",
+            "acrit"
+          ]
+        },
+        "gpt": {
+          "severe": 2,
+          "excess": 2,
+          "error2": 2,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "catalige",
+            "târfă"
+          ]
+        },
+        "qwen_historical_all": {
+          "severe": 1,
+          "excess": 2,
+          "error2": 0,
+          "error3": 1,
+          "error4": 0,
+          "cases": [
+            "tara"
+          ]
+        }
+      }
+    },
+    "without_context": {
+      "population": {
+        "n": 19,
+        "baseline": {
+          "severe": 1,
+          "excess": 1,
+          "error2": 1,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "fulg"
+          ]
+        },
+        "gpt": {
+          "severe": 0,
+          "excess": 0,
+          "error2": 0,
+          "error3": 0,
+          "error4": 0,
+          "cases": []
+        },
+        "qwen_historical_all": {
+          "severe": 3,
+          "excess": 6,
+          "error2": 0,
+          "error3": 3,
+          "error4": 0,
+          "cases": [
+            "european",
+            "fulg",
+            "place"
+          ]
+        }
+      },
+      "qwen_route": {
+        "n": 0,
+        "baseline": {
+          "severe": 0,
+          "excess": 0,
+          "error2": 0,
+          "error3": 0,
+          "error4": 0,
+          "cases": []
+        },
+        "gpt": {
+          "severe": 0,
+          "excess": 0,
+          "error2": 0,
+          "error3": 0,
+          "error4": 0,
+          "cases": []
+        },
+        "qwen_historical_all": {
+          "severe": 0,
+          "excess": 0,
+          "error2": 0,
+          "error3": 0,
+          "error4": 0,
+          "cases": []
+        }
+      },
+      "top8": {
+        "n": 1,
+        "baseline": {
+          "severe": 1,
+          "excess": 1,
+          "error2": 1,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "fulg"
+          ]
+        },
+        "gpt": {
+          "severe": 0,
+          "excess": 0,
+          "error2": 0,
+          "error3": 0,
+          "error4": 0,
+          "cases": []
+        },
+        "qwen_historical_all": {
+          "severe": 1,
+          "excess": 2,
+          "error2": 0,
+          "error3": 1,
+          "error4": 0,
+          "cases": [
+            "fulg"
+          ]
+        }
+      }
+    },
+    "clarified": {
+      "population": {
+        "n": 37,
+        "baseline": {
+          "severe": 4,
+          "excess": 5,
+          "error2": 3,
+          "error3": 1,
+          "error4": 0,
+          "cases": [
+            "ata",
+            "carter",
+            "in",
+            "pag"
+          ]
+        },
+        "gpt": {
+          "severe": 1,
+          "excess": 1,
+          "error2": 1,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "carter"
+          ]
+        },
+        "qwen_historical_all": {
+          "severe": 1,
+          "excess": 1,
+          "error2": 1,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "micșurat"
+          ]
+        }
+      },
+      "qwen_route": {
+        "n": 3,
+        "baseline": {
+          "severe": 2,
+          "excess": 2,
+          "error2": 2,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "ata",
+            "pag"
+          ]
+        },
+        "gpt": {
+          "severe": 0,
+          "excess": 0,
+          "error2": 0,
+          "error3": 0,
+          "error4": 0,
+          "cases": []
+        },
+        "qwen_historical_all": {
+          "severe": 0,
+          "excess": 0,
+          "error2": 0,
+          "error3": 0,
+          "error4": 0,
+          "cases": []
+        }
+      },
+      "top8": {
+        "n": 1,
+        "baseline": {
+          "severe": 1,
+          "excess": 1,
+          "error2": 1,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "pag"
+          ]
+        },
+        "gpt": {
+          "severe": 0,
+          "excess": 0,
+          "error2": 0,
+          "error3": 0,
+          "error4": 0,
+          "cases": []
+        },
+        "qwen_historical_all": {
+          "severe": 0,
+          "excess": 0,
+          "error2": 0,
+          "error3": 0,
+          "error4": 0,
+          "cases": []
+        }
+      }
+    },
+    "opaque": {
+      "population": {
+        "n": 113,
+        "baseline": {
+          "severe": 7,
+          "excess": 9,
+          "error2": 5,
+          "error3": 2,
+          "error4": 0,
+          "cases": [
+            "acrit",
+            "ață",
+            "dorian",
+            "drac",
+            "fulg",
+            "tara",
+            "zar"
+          ]
+        },
+        "gpt": {
+          "severe": 2,
+          "excess": 2,
+          "error2": 2,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "catalige",
+            "târfă"
+          ]
+        },
+        "qwen_historical_all": {
+          "severe": 4,
+          "excess": 8,
+          "error2": 0,
+          "error3": 4,
+          "error4": 0,
+          "cases": [
+            "european",
+            "fulg",
+            "place",
+            "tara"
+          ]
+        }
+      },
+      "qwen_route": {
+        "n": 9,
+        "baseline": {
+          "severe": 6,
+          "excess": 8,
+          "error2": 4,
+          "error3": 2,
+          "error4": 0,
+          "cases": [
+            "acrit",
+            "ață",
+            "dorian",
+            "drac",
+            "tara",
+            "zar"
+          ]
+        },
+        "gpt": {
+          "severe": 2,
+          "excess": 2,
+          "error2": 2,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "catalige",
+            "târfă"
+          ]
+        },
+        "qwen_historical_all": {
+          "severe": 1,
+          "excess": 2,
+          "error2": 0,
+          "error3": 1,
+          "error4": 0,
+          "cases": [
+            "tara"
+          ]
+        }
+      },
+      "top8": {
+        "n": 7,
+        "baseline": {
+          "severe": 5,
+          "excess": 7,
+          "error2": 3,
+          "error3": 2,
+          "error4": 0,
+          "cases": [
+            "tara",
+            "zar",
+            "fulg",
+            "dorian",
+            "acrit"
+          ]
+        },
+        "gpt": {
+          "severe": 2,
+          "excess": 2,
+          "error2": 2,
+          "error3": 0,
+          "error4": 0,
+          "cases": [
+            "catalige",
+            "târfă"
+          ]
+        },
+        "qwen_historical_all": {
+          "severe": 2,
+          "excess": 4,
+          "error2": 0,
+          "error3": 2,
+          "error4": 0,
+          "cases": [
+            "tara",
+            "fulg"
+          ]
+        }
+      }
+    }
+  },
+  "top8_detection": {
+    "baseline": {
+      "found": 6,
+      "total": 11,
+      "recall": 0.5454545454545454,
+      "precision": 0.75,
+      "false_alarms": 2
+    },
+    "gpt": {
+      "found": 2,
+      "total": 3,
+      "recall": 0.6666666666666666,
+      "precision": 0.25,
+      "false_alarms": 6
+    }
+  }
+}

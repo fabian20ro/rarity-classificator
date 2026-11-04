@@ -1,0 +1,20 @@
+flowchart LR
+  %% Static module imports only; focused D1 view, not runtime calls.
+  m0["classificator.cli"]
+  m1["classificator.csv_codec"]
+  m2["classificator.evaluation.campaign"]
+  m3["classificator.evaluation.cli"]
+  m4["classificator.models"]
+  m5["classificator.scoring.base"]
+  m6["classificator.scoring.d1"]
+  m0 --> m3
+  m0 --> m4
+  m2 --> m1
+  m2 --> m4
+  m2 --> m5
+  m3 --> m1
+  m3 --> m2
+  m3 --> m6
+  m5 --> m4
+  m6 --> m4
+  m6 --> m5

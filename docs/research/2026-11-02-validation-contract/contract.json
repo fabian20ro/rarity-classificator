@@ -1,0 +1,93 @@
+{
+  "schema": "rarity-validation-audit-v1",
+  "mode": "audit",
+  "as_of": "2026-11-02",
+  "inventory": {
+    "path": "/Users/fabian/git/word-rarity-classifier/build/rarity/step1_words.csv",
+    "sha256": "3bace080fd7d8297effa6e7d8941ba7bb71be1bcaaa2c519dabad9e91b09780b"
+  },
+  "legacy_thresholds": {
+    "l1_jaccard": 0.7,
+    "anchor_precision": 0.8,
+    "anchor_recall": 0.8
+  },
+  "references": [
+    {
+      "id": "history",
+      "role": "historical_snapshot",
+      "unit": "inventory_id",
+      "path": "/Users/fabian/git/word-rarity-classifier/build/rarity/reference/current_db_levels.csv",
+      "sha256": "bfbb818b8f4e7c17c5a0c7ecffe6f3ad0f81f3fba62660afefb30ef12acc3455",
+      "universe_sha256": "3bace080fd7d8297effa6e7d8941ba7bb71be1bcaaa2c519dabad9e91b09780b",
+      "recorded_on": "2026-02-15",
+      "provenance": "Project journal documents snapshot before later February uploads; historical only, no live DB verification",
+      "level_column": "rarity_level"
+    },
+    {
+      "id": "seed",
+      "role": "positive_seed",
+      "unit": "exact_form",
+      "path": "/Users/fabian/git/word-rarity-classifier/build/d1/risk-plan-pr/docs/rarity-anchor-l1-ro.txt",
+      "sha256": "f8f4bfb586ca403524e0185f3ccaec85ec6af15fbabd7c0dfa7593c2d113afc4",
+      "universe_sha256": "3bace080fd7d8297effa6e7d8941ba7bb71be1bcaaa2c519dabad9e91b09780b",
+      "recorded_on": null,
+      "provenance": "Repository positive seed, incomplete; provenance does not attest annotation date or human validation"
+    },
+    {
+      "id": "human_pilot150",
+      "role": "human_labels",
+      "unit": "exact_form",
+      "path": "/Users/fabian/git/word-rarity-classifier/build/d1/pilot-2026-10-17/data/evaluations/2026-10-21-fabian-short/working-reference-150.csv",
+      "sha256": "32f36c283df1842065f3e72d8baab1a358792fa71b7ead34a55f17666fb16aa2",
+      "universe_sha256": "3bace080fd7d8297effa6e7d8941ba7bb71be1bcaaa2c519dabad9e91b09780b",
+      "recorded_on": "2026-10-21",
+      "provenance": "Canonical final working150; mixed provenance,113 initial opaque and37 clarified references, no new labels",
+      "level_column": "working_level",
+      "selection": "development"
+    },
+    {
+      "id": "human_review50",
+      "role": "human_labels",
+      "unit": "exact_form",
+      "path": "/Users/fabian/git/word-rarity-classifier/build/d1/review50-2026-10-31/review-responses.csv",
+      "sha256": "4a5296c9387f18e99e9462bf78135eac8c7e476d355eff98c17903e7ce09a4f5",
+      "universe_sha256": "3bace080fd7d8297effa6e7d8941ba7bb71be1bcaaa2c519dabad9e91b09780b",
+      "recorded_on": "2026-10-31",
+      "provenance": "Imported completed Sites50; selected by risk, preserve original user ratings",
+      "level_column": "working_level",
+      "selection": "risk_selected"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "baseline",
+      "role": "candidate",
+      "unit": "exact_form",
+      "path": "/Users/fabian/git/word-rarity-classifier/build/d1/offline-wordfreq-2026-10-24/export/scores.csv",
+      "sha256": "8cb9d68b75d586efe97bfc84a9165f1a3fda7332033182ce7907d75d1bf848e0",
+      "universe_sha256": "3bace080fd7d8297effa6e7d8941ba7bb71be1bcaaa2c519dabad9e91b09780b",
+      "recorded_on": "2026-10-24",
+      "provenance": "Frozen full fitted wordfreq+fallback export; not OOF; original manifest retained",
+      "level_column": "rarity_level",
+      "label_use": {
+        "human_pilot150": "fit",
+        "human_review50": "none"
+      }
+    },
+    {
+      "id": "conservative",
+      "role": "candidate",
+      "unit": "exact_form",
+      "path": "/Users/fabian/git/word-rarity-classifier/build/d1/conservative-export-2026-11-01/export/candidate.csv",
+      "sha256": "8860d689bfd607f472daf4c8deea71257a09e1baff4ea0002ebbf882d5542c2a",
+      "universe_sha256": "3bace080fd7d8297effa6e7d8941ba7bb71be1bcaaa2c519dabad9e91b09780b",
+      "recorded_on": "2026-11-01",
+      "provenance": "Frozen human exact-form overlay; agreement on reviewed forms is by construction",
+      "level_column": "final_level",
+      "label_use": {
+        "human_pilot150": "override",
+        "human_review50": "override"
+      }
+    }
+  ]
+}

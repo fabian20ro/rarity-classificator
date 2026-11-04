@@ -1,0 +1,44 @@
+{
+  "version": "human-corrections-acceptance-audit-v1",
+  "mode": "audit",
+  "as_of": "2026-11-03",
+  "scope": {
+    "correction_rows": 165,
+    "guard_rows": 233,
+    "human_references": 200
+  },
+  "human_policy_satisfied": true,
+  "legacy_gate": {
+    "distribution": {
+      "1": 1264,
+      "2": 6617,
+      "3": 12533,
+      "4": 24482,
+      "5": 32802
+    },
+    "total_rows": 77698,
+    "level_column": "rarity_level",
+    "l1_jaccard": 0.964594807238395,
+    "l1_intersection": 1226,
+    "l1_candidate_size": 1264,
+    "l1_word_count": 1153,
+    "l1_reference_size": 1233,
+    "anchor_precision": 0.047701647875108416,
+    "anchor_recall": 0.4296875,
+    "passed": false,
+    "failures": [
+      "anchor_l1_precision 0.0477 < min 0.8000",
+      "anchor_l1_recall 0.4297 < min 0.8000"
+    ]
+  },
+  "promotion_blocked": true,
+  "upload_authorized": false,
+  "rollback_authorized": false,
+  "freshness_verified": false,
+  "apply_receipt_verified": false,
+  "population_accuracy": null,
+  "seed_semantic_precision": null,
+  "unchanged_inventory_rows": 77533,
+  "seed_human_conflicts": 0,
+  "inverse_restores_snapshot": true
+}

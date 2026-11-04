@@ -1,0 +1,20 @@
+{
+  "status": "pass",
+  "scope": "Frozen lexical inputs only; no new outcome inspection",
+  "forms": 1000,
+  "inventory_rows": 1146,
+  "with_context": 130,
+  "without_context": 870,
+  "without_wordfreq": 851,
+  "without_context_and_wordfreq": 764,
+  "source_contexts": 934,
+  "projected_contexts": 515,
+  "slices": {
+    "general600": 600,
+    "orthography100": 100,
+    "pos100": 100,
+    "corpus100": 100,
+    "weak100": 100
+  },
+  "protected_files": 2440
+}

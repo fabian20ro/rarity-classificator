@@ -1,0 +1,14 @@
+{
+  "sessions": 150,
+  "wall_seconds": 782.0891950130463,
+  "process_seconds": 781.8555147647858,
+  "median_seconds": 4.95271909236908,
+  "usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 444928,
+    "input_tokens": 992416,
+    "output_tokens": 10004,
+    "reasoning_output_tokens": 477
+  },
+  "scope": "Native CLI session usage, not a billed API-cost receipt; reasoning low requested. No LMStudio calls or local model loading."
+}

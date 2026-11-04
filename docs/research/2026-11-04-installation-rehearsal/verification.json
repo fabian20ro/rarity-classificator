@@ -1,0 +1,65 @@
+{
+  "suite": [
+    {
+      "case": "test_complete_bundle_installs_as_non_superuser_and_survives_restart",
+      "seconds": 1.226
+    },
+    {
+      "case": "test_failed_installation_leaves_no_partial_objects_and_retry_succeeds[reject]",
+      "seconds": 0.189
+    },
+    {
+      "case": "test_failed_installation_leaves_no_partial_objects_and_retry_succeeds[mutate]",
+      "seconds": 0.182
+    },
+    {
+      "case": "test_failed_installation_leaves_no_partial_objects_and_retry_succeeds[disconnect]",
+      "seconds": 0.183
+    },
+    {
+      "case": "test_inventory_drift_refuses_installation_before_any_schema_change",
+      "seconds": 0.177
+    },
+    {
+      "case": "test_exclusive_lock_timeout_is_atomic_and_retryable",
+      "seconds": 5.194
+    },
+    {
+      "case": "test_lost_commit_ack_is_recovered_by_receipt_without_reinstallation",
+      "seconds": 0.179
+    },
+    {
+      "case": "test_full_inventory_install_then_executor_apply_and_rollback",
+      "seconds": 12.063
+    },
+    {
+      "case": "test_original_immutable_bundle_with_captured_nine_hooks",
+      "seconds": 4.01
+    },
+    {
+      "case": "test_postflight_rejects_permission_trigger_and_non_score_data_drift[GRANT USAGE ON SCHEMA classificator_private TO anon-api_roles_denied]",
+      "seconds": 0.182
+    },
+    {
+      "case": "test_postflight_rejects_permission_trigger_and_non_score_data_drift[ALTER TABLE public.words DISABLE TRIGGER classificator_word_revision-revision_trigger]",
+      "seconds": 0.165
+    },
+    {
+      "case": "test_postflight_rejects_permission_trigger_and_non_score_data_drift[UPDATE public.words SET extra='changed outside installer' WHERE id=100-existing_data_preserved]",
+      "seconds": 0.355
+    }
+  ],
+  "inventory_rows": 77698,
+  "changed_in_isolated_apply": 165,
+  "unchanged_in_isolated_apply": 77533,
+  "rollback_matches_original_projection": true,
+  "original_bundle_unchanged": true,
+  "original_install_sql_sha256": "7d61f282b0fb5cfc6fa1ff747b554e6e6e5d040e87900172e714193c3d9ab7a7",
+  "run_manifest_sha256": "49beb82cbf06dcae45ffb56fa3e9def8248eff7e1dc2a2aaffe834de1b967f56",
+  "offline_passed": 986,
+  "offline_skipped": 40,
+  "subtests_passed": 456,
+  "raw_data_published": false,
+  "production_db_accessed": false,
+  "model_calls": 0
+}

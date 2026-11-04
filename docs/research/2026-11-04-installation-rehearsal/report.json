@@ -1,0 +1,26 @@
+{
+  "server": {
+    "image": "supabase/postgres@sha256:62b4fa9f99afde62bb9fd49a218531b0f74cd639dc3b03749701005564b837ff",
+    "engine": "orioledb",
+    "extension_version": "1.8",
+    "server_version": "17.9",
+    "container": "codex-human-pg-d475f06fd2e9",
+    "volume": "codex-human-pg-d475f06fd2e9-data",
+    "host": "127.0.0.1",
+    "host_port": 51928,
+    "memory_limit_mib": 512,
+    "container_removed": true,
+    "volume_removed": true
+  },
+  "tests": 12,
+  "failed": 0,
+  "skipped": 0,
+  "passed": 12,
+  "exit_code": 0,
+  "full_inventory": true,
+  "installation_bundle": true,
+  "protected_files_unchanged": 6175,
+  "project_database_accessed": false,
+  "model_calls": 0,
+  "caveat": "Owned disposable database only. Fixture roles/triggers, not deployment certification. Post-commit ACK loss is injected after real commit; disconnect/restart are real. Trusted schema/backup administrators must preserve revision epochs and sequence history."
+}

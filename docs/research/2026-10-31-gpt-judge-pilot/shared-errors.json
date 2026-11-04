@@ -1,0 +1,19 @@
+{
+  "exclusive_patterns": {
+    "baseline": 8,
+    "baseline+gpt": 1,
+    "baseline+qwen": 2,
+    "gpt": 2,
+    "none": 134,
+    "qwen": 3
+  },
+  "severe_counts": {
+    "baseline": 11,
+    "qwen": 5,
+    "gpt": 3
+  },
+  "all_three": 0,
+  "qwen_and_gpt": 0,
+  "any_method": 16,
+  "scope": "Observed error overlap only, not an achievable oracle ensemble or proof of model independence."
+}

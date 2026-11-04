@@ -1,0 +1,19 @@
+{
+  "focused_tests_passed": 35,
+  "subtests_passed": 70,
+  "replay_identical_artifacts": [
+    "report.json",
+    "guard-comparison.csv",
+    "guards/report.json",
+    "guards/issues.csv",
+    "offline-preview/result.json",
+    "offline-preview/changes.csv"
+  ],
+  "protected_files_unchanged": 7124,
+  "read_only_sql_calls": 2,
+  "manifest_sha256": "49a8962e9432e01f07e14bd1fe50e0c7a7df5c05659dd0d7a5156419d1b1bcb2",
+  "original_install_sql_sha256": "7d61f282b0fb5cfc6fa1ff747b554e6e6e5d040e87900172e714193c3d9ab7a7",
+  "runtime_changes": false,
+  "db_writes": 0,
+  "model_calls": 0
+}

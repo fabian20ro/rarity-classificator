@@ -1,0 +1,60 @@
+"""Export final label-free research decisions and a bounded blind review pack."""
+import csv,hashlib,json,sys
+from collections import Counter
+from pathlib import Path
+from urllib.parse import quote
+out=Path(__file__).resolve().parent;code=out.parent/'risk-plan-pr';sample=out.parent/'independent-1000-2026-10-30'
+sys.path.insert(0,str(code/'src'))
+from classificator.evaluation.risk_queue import export_risk_csv
+from classificator.evaluation.blind_review import build_risk_review
+from classificator.evaluation.dataset import _write_csv
+read=lambda p:list(csv.DictReader(p.open()))
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+write=lambda p,x:p.write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+inputs=out/'comparison-inputs';gpt=out/'gpt';qwen=out/'qwen'
+qp=read(qwen/'campaign/predictions.csv');route=read(out/'pre-qwen/qwen-route.csv')
+assert len(qp)==len(route)
+fields=['word_id','word','status','rarity_level'];_write_csv(inputs/'qwen.csv',fields,[{k:r[k] for k in fields} for r in qp])
+routing=export_risk_csv(inputs/'baseline.csv',gpt/'inputs/evidence.csv',inputs/'gpt.csv',out/'final-routing',qwen_csv=inputs/'qwen.csv',review_budget=50)
+assert routing['qwen_complete']
+rows=read(out/'final-routing/decisions.csv');queue=read(out/'final-routing/review-queue.csv')
+forms={r['form_id']:r for r in read(sample/'forms.csv')};signals={r['form_id']:r for r in read(sample/'signals.csv')};ev={r['word_id']:json.loads(r['evidence_json']) for r in read(gpt/'inputs/evidence.csv')}
+assert set(forms)=={r['word_id'] for r in rows} and len(rows)==1000
+
+def describe(part):
+ gp=[r for r in part if r['gpt_status']=='scored'];qw=[r for r in part if r['qwen_status']=='scored']
+ return dict(n=len(part),gpt_native=len(gp),gpt_failed=len(part)-len(gp),qwen_routed=sum(r['qwen_route']=='True' for r in part),qwen_native=len(qw),qwen_failed=sum(r['qwen_status']=='failed' for r in part),gpt_baseline_gap_ge2=sum(int(r['initial_gap'])>=2 for r in part),qwen_gpt_gap_ge2=sum(r['qwen_gpt_conflict']=='True' for r in part),gpt_baseline_gap_counts=dict(sorted(Counter(r['initial_gap'] for r in gp).items())),baseline_distribution=dict(sorted(Counter(r['operational_level'] for r in part).items())),proposed_distribution=dict(sorted(Counter(r['proposed_level'] for r in part).items())),qwen_distribution=dict(sorted(Counter(r['qwen_level'] for r in qw).items())),review_selected=sum(r['word_id'] in selected for r in part))
+selected={r['word_id'] for r in queue}
+subsets={'all':rows,'general600':[r for r in rows if forms[r['word_id']]['selection_slice']=='general600'],'stress400':[r for r in rows if forms[r['word_id']]['selection_slice']!='general600'],'with_context':[r for r in rows if r['has_context']=='True'],'without_context':[r for r in rows if r['has_context']=='False'],'wordfreq_missing':[r for r in rows if r['has_wordfreq']=='False'],'without_context_and_wordfreq':[r for r in rows if r['has_context']=='False' and r['has_wordfreq']=='False']}
+for name in sorted({r['selection_slice'] for r in forms.values()}):subsets['slice_'+name]=[r for r in rows if forms[r['word_id']]['selection_slice']==name]
+causes=[]
+for r in rows:
+ s=signals[r['word_id']];flags=[]
+ for flag,yes in [('orthographic_ambiguity',s['gamekey_ambiguous']=='1' or s['multiple_spellings']=='1'),('multiple_pos',s['inventory_multi_pos']=='1'),('missing_lexical_context',r['has_context']=='False'),('missing_wordfreq',r['has_wordfreq']=='False'),('model_disagreement',r['qwen_gpt_conflict']=='True'),('gpt_baseline_disagreement',int(r['initial_gap'])>=2),('technical_failure',r['gpt_status']=='failed' or r['qwen_status']=='failed')]:
+  if yes:flags.append(flag)
+ causes.append(dict(word_id=r['word_id'],word=r['word'],hypotheses='|'.join(flags),review_selected=r['word_id'] in selected,verification='Evidence flags only; no causal or correctness probabilities'))
+_write_csv(out/'cause-audit.csv',list(causes[0]),causes)
+report=dict(status='complete',routing=routing,strata={k:describe(v) for k,v in subsets.items()},cause_counts=dict(Counter(f for r in causes for f in r['hypotheses'].split('|') if f)),limits=['New1000 unlabelled; disagreements are not measured errors.','GPT configured/requested identity through Codex, not provider-attested model.','No model agreement certified as gold; no calibrated probability.','Operational baseline unchanged, proposed GPT only in offline CSV.','Qwen only on supported conflicts; no predictions for unqueried words.','No DB writes or new pilot ratings.'])
+write(out/'report.json',report)
+provs=read(out/'inputs-final/provenance.csv');cards=[];card_provenance=[]
+for row in queue:
+ wid=row['word_id'];e=ev[wid];contexts=[]
+ for sense in e['senses']:
+  candidates=[p for p in provs if p['form_id']==wid and json.loads(p['projected_sense'])==sense]
+  assert candidates
+  source=candidates[0];path=Path(source['source_path']);assert sha(path)==source['source_sha256']
+  cached=json.loads(path.read_text());assert isinstance(cached['original'],str)
+  url='https://dexonline.ro/definitie/'+quote(cached['original'].lower())
+  cid=wid+':sense-'+hashlib.sha256(json.dumps(sense,ensure_ascii=False,sort_keys=True).encode()).hexdigest()[:12]
+  restrictions=sorted(set(sense.get('usage_labels',[])+sense['grammar']+(['restricție de număr: '+sense['number_restriction']] if sense['number_restriction'] else [])))
+  contexts.append(dict(context_id=cid,pos=sense['pos'],meaning=' — '.join(sense['context']+[sense['definition']]),restrictions=restrictions,source=url))
+  card_provenance.append(dict(context_id=cid,word_id=wid,source_path=str(path),source_sha256=sha(path),projected_sense=sense,source_url=url))
+ cards.append(dict(word_id=wid,word=row['word'],valid_pos=e['valid_pos'],contexts=contexts))
+write(out/'review-forms.json',dict(forms=cards));write(out/'card-provenance.json',card_provenance)
+if cards:
+ ui=build_risk_review(out/'review-forms.json',out/'review-public',version='risk-1000-20261031-v1',seed=20261031)
+ write(out/'review-summary.json',ui)
+ web=out/'web';web.mkdir(exist_ok=True);(web/'review-risk').symlink_to(out/'review-public',target_is_directory=True)
+else:write(out/'review-summary.json',dict(count=0,reason='No eligible conflicts; no filler cards'))
+write(out/'final-artifacts.json',{p.name:sha(p) for p in [out/'report.json',out/'cause-audit.csv',out/'review-forms.json',out/'card-provenance.json',out/'review-summary.json']})
+print(json.dumps(dict(routing=routing,all=report['strata']['all'],review=json.loads((out/'review-summary.json').read_text())),indent=2))

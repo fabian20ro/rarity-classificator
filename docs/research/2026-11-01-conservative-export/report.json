@@ -1,0 +1,99 @@
+{
+  "summary": {
+    "inventory_rows": 77698,
+    "exact_forms": 75147,
+    "human_forms": 200,
+    "human_rows": 233,
+    "baseline_rows": 77465,
+    "changed_rows": 117,
+    "changed_forms": 99,
+    "human_references": 200,
+    "model_observations": 1331,
+    "model_failed": 0,
+    "conflicts": {
+      "baseline_vs_human": 99,
+      "model_vs_candidate": 714
+    },
+    "severe_conflicts": {
+      "baseline_vs_human": 23,
+      "model_vs_candidate": 160
+    },
+    "conflicted_forms": 653,
+    "levels": {
+      "1": 978,
+      "2": 6291,
+      "3": 4389,
+      "4": 66009,
+      "5": 31
+    },
+    "mode": "offline_candidate_no_upload",
+    "model_requests": 0,
+    "database_writes": 0
+  },
+  "quality": {
+    "candidate": {
+      "distribution": {
+        "1": 978,
+        "2": 6291,
+        "3": 4389,
+        "4": 66009,
+        "5": 31
+      },
+      "total_rows": 77698,
+      "level_column": "final_level",
+      "l1_jaccard": 0.032353814188186406,
+      "l1_intersection": 109,
+      "l1_candidate_size": 978,
+      "l1_word_count": 876,
+      "l1_reference_size": 2500,
+      "anchor_precision": 0.0821917808219178,
+      "anchor_recall": 0.5625,
+      "passed": false,
+      "failures": [
+        "l1_jaccard 0.0324 < min 0.7000",
+        "anchor_l1_precision 0.0822 < min 0.8000",
+        "anchor_l1_recall 0.5625 < min 0.8000"
+      ]
+    },
+    "baseline": {
+      "distribution": {
+        "1": 972,
+        "2": 6283,
+        "3": 4355,
+        "4": 66088,
+        "5": 0
+      },
+      "total_rows": 77698,
+      "level_column": "rarity_level",
+      "l1_jaccard": 0.03179791976225854,
+      "l1_intersection": 107,
+      "l1_candidate_size": 972,
+      "l1_word_count": 870,
+      "l1_reference_size": 2500,
+      "anchor_precision": 0.08160919540229886,
+      "anchor_recall": 0.5546875,
+      "passed": false,
+      "failures": [
+        "l1_jaccard 0.0318 < min 0.7000",
+        "anchor_l1_precision 0.0816 < min 0.8000",
+        "anchor_l1_recall 0.5547 < min 0.8000"
+      ]
+    },
+    "scope": {
+      "reference_snapshot": "/Users/fabian/git/word-rarity-classifier/build/rarity/reference/current_db_levels.csv",
+      "reference_sha256": "bfbb818b8f4e7c17c5a0c7ecffe6f3ad0f81f3fba62660afefb30ef12acc3455",
+      "anchors": "/Users/fabian/git/word-rarity-classifier/build/d1/risk-plan-pr/docs/rarity-anchor-l1-ro.txt",
+      "anchors_sha256": "f8f4bfb586ca403524e0185f3ccaec85ec6af15fbabd7c0dfa7593c2d113afc4",
+      "min_l1_jaccard": 0.7,
+      "min_anchor_precision": 0.8,
+      "min_anchor_recall": 0.8,
+      "scope": "Existing local snapshot and seed anchors, not freshly queried DB or upload authorization"
+    },
+    "upload_authorized": false
+  },
+  "protected_files_unchanged": 4688,
+  "model_calls": 0,
+  "database_writes": 0,
+  "protocol_sha256": "759447e8b92afa4a2fb4fdb3efa9601f732b9b3b594a81cd58ccb33686256a5a",
+  "export_manifest_sha256": "32ebc09c97816bc24f74eb3216379f7cbbf03659ab681e3e3a393c694cf3d3de"
+}

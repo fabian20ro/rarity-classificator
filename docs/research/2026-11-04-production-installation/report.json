@@ -1,0 +1,42 @@
+{
+  "status": "INSTALLED_VERIFIED",
+  "project": "pdliedweugywbiczajxn",
+  "installation_receipt_at": "2026-11-04T07:10:27.157587+00:00",
+  "verified_at": "2026-11-04T07:11:36.164476+00:00",
+  "prechecks_passed": 17,
+  "postchecks_passed": 16,
+  "inventory_rows": 77698,
+  "unique_revisions": 77698,
+  "revision_range": [
+    1,
+    77698
+  ],
+  "revision_epoch": "f7256150-4123-4170-88b0-41c8a5e5b387",
+  "existing_columns_preserved": true,
+  "existing_columns_sha256": "6d1052a2d85f283d277e98a68a5007cca8c22189dad804c6c7fdccfad690f8a3",
+  "inventory_sha256": "0d69e5c92a45c52e85afe6fd903388009d408ebda54bb97c1d9818c0672f6fc0",
+  "executor_login": false,
+  "correction_receipts": 0,
+  "corrections_applied": 0,
+  "pending_corrections": 165,
+  "real_installation_transactions": 1,
+  "read_only_verification_transactions": 3,
+  "model_calls": 0,
+  "protected_files_unchanged": 7155,
+  "installer_sha256": "7d61f282b0fb5cfc6fa1ff747b554e6e6e5d040e87900172e714193c3d9ab7a7",
+  "private_schema_api_usage": {
+    "anon": false,
+    "service_role": false,
+    "authenticated": false,
+    "authenticator": false
+  },
+  "private_schema_advisor_findings": 0,
+  "public_graphql_findings": 5,
+  "dedicated_dsn_verified": false,
+  "limits": [
+    "Structural installation only; executor remains NOLOGIN with no password provisioned.",
+    "Human corrections and executor activation are not applied.",
+    "No automatic uninstall or reinstall; keep installation receipt and epoch.",
+    "Current postflight describes pre-apply installation state, not arbitrary future writes."
+  ]
+}
