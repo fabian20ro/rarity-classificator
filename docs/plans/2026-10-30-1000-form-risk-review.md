@@ -1,8 +1,8 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-04. Stare: etapele 1–20 încheiate; instalarea structurală
-reală confirmată,17/17 înainte și16/16 după. Scoruri păstrate; executor NOLOGIN,
-165corecții neaplicate. Urmează conexiunea dedicată/activarea controlată. Step4 neschimbat.
+Actualizat: 2026-11-04. Stare: etapele 1–21 încheiate; conexiunea dedicată
+configurată și verificată read-only, contract/lot valide. Scoruri păstrate,
+165corecții neaplicate. Urmează apply separat autorizat. Step4 neschimbat.
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -933,8 +933,32 @@ O tranzacție de instalare,3read-only pentru verificare. Zero apeluri LLM;
 trecute. Advisor:0findings private;5obiecte publice vizibile GraphQL pentru anon,
 fără schimbări de acces suplimentare. Arhiva originală păstrată imutabilă.
 
-**Următorul pas:** configurarea/verificarea conexiunii dedicate și activarea
+**Pas recomandat la închiderea etapei20, realizat în etapa21:** configurarea/verificarea conexiunii dedicate și activarea
 controlată a executorului, numai explicit instruite; inițial verificări read-only.
 Apply165 rămâne separat, cu revalidare live și recipisă în aceeași tranzacție.
 Nu reinstala schema și nu folosi rollback.csv pentru dezinstalare. Politica deja
 aprobată; fără etichete noi;50.724schimbări baseline rămân excluse.
+
+
+## Rezultatul etapei21 — conexiune dedicată verificată, 2026-11-04
+
+Configurarea și activarea controlată încheiate, fără granturi noi. Autentificare
+reală ca executor, TLS cu verificarea certificatului și hostname-ului; credentiale
+numai local, protejate și excluse din Git. Configurația administrativă păstrată.
+Session pooler folosit după ce endpointul direct nu s-a rezolvat local. CA oficial,
+fără reducerea verificărilor TLS sau instalarea unor dependențe.
+
+Validare explicit READ ONLY: contractul existent corespunde, inventarul complet
+vizibil,233/233precondiții valide, ledger gol.165corecții încă necesare,68deja corecte;
+zero scoruri aplicate sau apeluri LLM.7.172fișiere originale intacte. Runtime/SQL
+neschimbate. [Rezultat și limite](../research/2026-11-04-executor-connection.md).
+
+Opțiunile read-only de conectare nu au fost aplicate de pooler; verificarea folosește
+BEGIN READ ONLY explicit și confirmă starea în tranzacție. Fișierul de conectare
+nu este o barieră permanentă read-only. Check-ul de instalare NOLOGIN devine fals
+intenționat după activare; celelalte15trec și atributele active sunt verificate separat.
+
+**Următorul pas:** apply165 numai la instrucțiune explicită, folosind conexiunea
+pregătită și fluxul deja aprobat; revalidare live sub lock, CAS, verificare finală
+și recipisă atomică. Fără alte evaluări sau configurări preventive. Orice drift
+oprește aplicarea; baseline50.724 și gate-urile automate rămân excluse/intacte.

@@ -1,0 +1,15 @@
+{
+  "status": "DEDICATED_CONNECTION_VERIFIED",
+  "verification_read_only": true,
+  "tls_certificate_and_hostname_verified": true,
+  "role_identity_verified": true,
+  "revision_contract_verified": true,
+  "all_human_guards_satisfied": true,
+  "pending_corrections": 165,
+  "scores_changed": 0,
+  "corrections_applied": 0,
+  "new_grants": false,
+  "credentials_published": false,
+  "protected_files_unchanged": 7172,
+  "model_calls": 0
+}

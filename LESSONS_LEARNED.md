@@ -463,3 +463,8 @@ PostgreSQL17 rejects assigning an event trigger to a non-superuser, although a
 captured existing trigger can have an owner later stripped of SUPERUSER. Bootstrap
 ownership with privileges, then remove them before testing the actual non-superuser
 installer; do not weaken production role checks to make the fixture pass.
+
+**[2026-11-04]** Verify read-only mode inside the actual pooler transaction.
+The observed session pooler did not apply startup `options=-c default_transaction_read_only=on`:
+an initial SELECT saw transaction_read_only=off. Use explicit BEGIN READ ONLY and
+assert the setting in the same transaction; a DSN option is not a security boundary.

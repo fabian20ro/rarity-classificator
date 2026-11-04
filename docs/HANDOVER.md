@@ -143,3 +143,15 @@ Executor remains NOLOGIN; no credentials/activation/apply165. Private API-role U
 false; correction ledger empty. Next: separately instructed dedicated connection
 setup/activation, initially read-only checks; apply remains separate. Do not rerun
 installer or use score rollback.csv as uninstall. [Current state](research/2026-11-04-production-installation.md).
+
+
+## Dedicated connection verified (2026-11-04)
+
+Connection setup/controlled activation complete; no new grants or score changes.
+Certificate/hostname-verified TLS, dedicated identity and explicit READ ONLY checks
+pass for the existing revision contract and all human guards. Credentials/config
+remain local and untracked. Startup read-only options were not applied by the pooler;
+verification explicitly begins and checks READ ONLY. The installer NOLOGIN check
+is intentionally obsolete after activation; do not weaken the immutable installer.
+Next: separately instructed apply through the approved transactional flow.
+[Current result](research/2026-11-04-executor-connection.md).

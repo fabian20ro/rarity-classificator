@@ -1367,3 +1367,26 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
 - Tests not rerun without code change; actual postflight/receipt verifies deployment.
   Next dedicated-connection configuration/controlled activation, initially read-only;
   separately instructed apply165 remains outstanding. No automatic reinstall/uninstall.
+
+
+## 2026-11-04 — dedicated connection setup and read-only verification
+
+- User approved connection setup/controlled activation. No human corrections, new
+  grants or LLM calls. Read installed contract and local config without exposing secrets.
+- Direct endpoint DNS unavailable. Existing config used JDBC URL and separate user/
+  password; corrected local parser without executing the env file or installing dotenv.
+  Public CA bundle rejected the service chain. Located CA URL in official Supabase
+  Studio source; downloaded scoped CA and retained TLS verify-full.
+- Surprise: pooler startup options did not enforce read-only; initial SELECT probe
+  observed off. All validation transactions explicitly BEGIN READ ONLY and verify on.
+- Existing libpq generated SCRAM verifier from locally random secret. Protected
+  service/passfile written first, ignored by root checkout; role password/LOGIN changed
+  in one transaction. No passwords/verifiers in model output, process arguments,
+  evidence or repository. Directory0700/files0600; original admin config untouched.
+- Dedicated authentication, role flags/grants, runtime revision contract and whole
+  snapshot verified.233guards PASS;165pending/68correct; ledger0; original projection
+  unchanged. Original installer NOLOGIN check false by design, other15PASS.
+- Local reusable read-only verifier/runbook; standard service/env interface.7,172
+  protected files unchanged. No runtime/SQL changes or redundant suite rerun.
+- Published aggregate results only; private endpoints/credentials omitted. Next
+  separately instructed apply165 with transactional revalidation and receipt.
