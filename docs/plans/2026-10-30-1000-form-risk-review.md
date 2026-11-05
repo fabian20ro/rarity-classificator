@@ -1,9 +1,10 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-04. Stare: etapele 1–22 încheiate;165corecții umane aplicate
-și confirmate prin citire separată.77.533rânduri neschimbate;233postcondiții valide.
-Lot uman închis. Review85/86 și merge-urile stivei încheiate; integrarea finală
-către main este pregătită și autorizată separat. Fără operații DB. Step4 neschimbat.
+Actualizat la 5 noiembrie 2026. Lotul uman a fost aplicat și verificat, iar
+integrarea în main s-a încheiat prin PR87. Simularea pentru cele 50.724 de
+schimbări automate recomandă păstrarea ambelor rute ca provizorii.
+[Rezultate pe rute și cohorte](../research/2026-11-05-automatic-promotion.md).
+
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -1016,3 +1017,19 @@ pin-urile existente păstrate. Ruff+986teste+456subteste PASS,40teste DB omise.
 Merge numai după CI verde pe head-ul final, cu verificarea rezultatului în main.
 Nu mai este necesară o altă operație DB pentru lotul uman; promovarea baseline-ului
 rămâne separată. Consultă PR-ul final pentru statusul efectiv al integrării.
+
+## Simularea politicii de promovare, 5 noiembrie
+
+Politica exploratorie a fost fixată înainte de calculul pe rute. Pe pilotul de
+150 de forme, wordfreq are 9/101 erori severe în validarea cu grup exclus,
+fallback are 2/49. În lotul selectat după risc, rezultatele sunt 1/5 și 12/45.
+Wordfreq pierde pe ambele forme de nivel 4 din pilot. Fallback atribuie 4 tuturor
+celor 12 forme de nivel 2 ratate în lotul de risc. Verdictul pentru ambele rute
+este păstrarea scorurilor existente. Cele 233 de rânduri evaluate sunt protejate.
+[Politica, scenariile și motivele deciziei](../research/2026-11-05-automatic-promotion.md).
+
+Următorul experiment offline va compara fallback-ul cu o regulă care păstrează
+scorul existent la salturi de ≥2 fără frecvență. Măsurăm atât erorile severe
+introduse, cât și pe cele eliminate, pe 150/50 și pe clasele 4/5. Limita pentru
+wordfreq rămâne suportul de 5 forme în lotul de risc. Pragurile operaționale și
+decizia de aplicare se tratează separat.

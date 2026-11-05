@@ -1440,3 +1440,12 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
   Ruff PASS. Local tests use existing environment, not newly installed lock versions.
 - Plan/report updated; final head must pass CI before SHA-pinned merge. No DB,
   LLM calls, score operations, model loading, branch deletion or unrelated cleanup.
+
+## 2026-11-05 — offline automatic promotion simulation
+
+Froze policy and historical input hashes before route scoring. Group-held-out
+pilot and frozen risk50 scores yield severe errors 9/101 and 1/5 for wordfreq,
+2/49 and 12/45 for fallback. All 12 risk50 fallback misses are human2 versus
+automatic4. Both routes held. Post-human snapshot simulation splits 50,724
+changes into 7,537 observed and 43,187 fallback. All 233 human IDs protected.
+Independent counts and two-run replay reconciled. No DB, inference or new ratings.
