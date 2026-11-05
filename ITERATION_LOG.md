@@ -1449,3 +1449,12 @@ pilot and frozen risk50 scores yield severe errors 9/101 and 1/5 for wordfreq,
 automatic4. Both routes held. Post-human snapshot simulation splits 50,724
 changes into 7,537 observed and 43,187 fallback. All 233 human IDs protected.
 Independent counts and two-run replay reconciled. No DB, inference or new ratings.
+
+## 2026-11-05 — paired bounded fallback simulation
+
+Reused the frozen pre-override evaluations from PR89. The missing-frequency rule
+kept the historical score on two pilot forms and four risk forms. Pilot lost one
+useful true-4 and one true-5 correction with zero severe errors avoided. Risk50
+avoided three severe errors, lost zero, and tied on one intervention. Reconstructed
+200 decisions from the original hashes and reconciled 18 slices. Recommend holding
+both routes. Zero new ratings, inference or database access.

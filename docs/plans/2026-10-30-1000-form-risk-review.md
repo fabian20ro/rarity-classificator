@@ -2,7 +2,8 @@
 
 Actualizat la 5 noiembrie 2026. Lotul uman a fost aplicat și verificat, iar
 integrarea în main s-a încheiat prin PR87. Simularea pentru cele 50.724 de
-schimbări automate recomandă păstrarea ambelor rute ca provizorii.
+schimbări automate recomandă păstrarea ambelor rute ca provizorii. Regula de
+păstrare a scorului vechi la salturi de ≥2 a fost testată și respinsă.
 [Rezultate pe rute și cohorte](../research/2026-11-05-automatic-promotion.md).
 
 Acest document înlocuiește recomandările viitoare incompatibile din
@@ -1028,8 +1029,11 @@ celor 12 forme de nivel 2 ratate în lotul de risc. Verdictul pentru ambele rute
 este păstrarea scorurilor existente. Cele 233 de rânduri evaluate sunt protejate.
 [Politica, scenariile și motivele deciziei](../research/2026-11-05-automatic-promotion.md).
 
-Următorul experiment offline va compara fallback-ul cu o regulă care păstrează
-scorul existent la salturi de ≥2 fără frecvență. Măsurăm atât erorile severe
-introduse, cât și pe cele eliminate, pe 150/50 și pe clasele 4/5. Limita pentru
-wordfreq rămâne suportul de 5 forme în lotul de risc. Pragurile operaționale și
-decizia de aplicare se tratează separat.
+Experimentul propus pentru salturile de ≥2 este încheiat. Pe ruta fără
+frecvență regula evită 0 erori și pierde 2 corecții utile în pilotul de 150,
+câte una la nivel uman 4 și 5. În lotul de risc de 50 evită 3 erori și pierde 0,
+cu zero intervenții la nivelurile umane 4/5. Pe fallback mai rămân 9/45 erori
+severe în lotul de risc. **Decizie recomandată:** închidem această variantă.
+Folosim diferența de ≥2 ca indicator de dezacord la audit. Scorul istoric singur
+nu justifică alegerea între cele două estimări. Păstrăm ambele rute provizorii și
+regulile operaționale de upload. [Comparația pereche](../research/2026-11-05-automatic-promotion.md#rezultatul-regulii-de-păstrare-la-salturi-de-2).

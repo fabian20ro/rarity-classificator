@@ -48,3 +48,36 @@ PYTHONPATH=src python docs/research/2026-11-05-automatic-promotion/run.py \
 ```
 
 Hashurile celor șapte CSV-uri sunt fixate în politică și verificate înainte și după calcul. Cele două rulări au produs șase artefacte identice byte cu byte (patru scenarii, evaluări, raport). O reconciliere separată a verificat erorile din predicțiile sursă, ID-urile schimbate, disjuncția rutelor și protecția tuturor rândurilor umane. Rulările au folosit un guard local pentru conexiuni DB, rețea și procese de inferență. CSV-urile generate rămân locale. [Politică](2026-11-05-automatic-promotion/policy.json) · [Raport agregat](2026-11-05-automatic-promotion/report.json) · [Hashuri](2026-11-05-automatic-promotion/manifest.json).
+
+## Rezultatul regulii de păstrare la salturi de ≥2
+
+**Recomandăm respingerea regulii ca politică generală de promovare.** Pe lotul de risc protejează trei forme familiare. Pe pilot anulează două corecții utile pentru cuvinte rare. Loturile au selecții diferite și prea puține intervenții pentru o concluzie despre întregul inventar.
+
+Pentru fiecare formă fără frecvență am păstrat scorul anterior când diferența absolută dintre propunere și scorul anterior a fost de cel puțin două niveluri. Am folosit aceleași predicții înainte de override și minimul istoric peste POS, din copia anterioară corecțiilor umane. Pe pilot am folosit predicțiile cu grup exclus, pe lotul de risc scorurile înghețate. Am folosit evaluarea umană doar pentru calculul erorii.
+
+O eroare **evitată** trece de la ≥2 la ≤1 față de evaluarea umană. O corecție utilă **pierdută** trece de la ≤1 la ≥2. În aceste date, toate cazurile care se apropie sau se îndepărtează de evaluare trec și acest prag. Un caz păstrează aceeași distanță.
+
+| Lot | Forme fără frecvență | Regula se activează | Evitate | Pierdute | Severe pe fallback, înainte → după | Severe pe tot lotul | Cost peste toleranță, tot lotul |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Pilot 150 | 49 | 2 | 0 | 2 | 2 → 4 | 11 → 13 | 14 → 18 |
+| Risc 50 | 45 | 4 | 3 | 0 | 12 → 9 | 13 → 10 | 14 → 11 |
+
+| Lot și nivel uman | Forme fără frecvență | Evitate | Pierdute | Severe pe fallback | Severe pe toate formele de acel nivel |
+|---|---:|---:|---:|---:|---:|
+| Pilot, 4 | 19 | 0 | 1 | 0 → 1 | 2 → 3 din 21 |
+| Pilot, 5 | 19 | 0 | 1 | 0 → 1 | 3 → 4 din 22 |
+| Risc, 4 | 9 | 0 | 0 | 0 → 0 | 0 → 0 din 9 |
+| Risc, 5 | 5 | 0 | 0 | 0 → 0 | 1 → 1 din 6 |
+
+Pilotul pierde la *caftan* (uman 4, fallback 4, anterior 1) și *micșurat* (uman 5, fallback 4, anterior 2). În lotul de risc, *urni* și *rănire* ajung la 2, iar *utilizabil* la 1. Toate trei au evaluare umană 2. Pentru *discreditat*, evaluat cu 3, atât fallback-ul 4 cât și scorul anterior 2 sunt la distanță de un nivel. Acestea sunt toate cele șase activări.
+
+Pe lotul de risc rămân 9/45 erori severe la fallback (20%), peste limita exploratorie de 10% din simularea inițială. Recomandăm păstrarea saltului ca indicator de dezacord pentru audit și închiderea acestei variante. Ambele rute rămân provizorii.
+
+**Reproducere.** După generarea fișierului local `evaluations.csv` prin comanda de mai sus, rulați din același checkout:
+
+```sh
+PYTHONPATH=src python docs/research/2026-11-05-automatic-promotion/bounded_fallback.py \
+  --evaluations /cale/noua/simulare/evaluations.csv --output /cale/noua/regula
+```
+
+Runnerul verifică hashul evaluărilor pereche și exportă toate cele 200 de comparații în `paired.csv`, sumarul pe lot/rută/nivel și hashurile artefactelor. Verificarea separată a reconstruit decizia pentru fiecare formă din sursele originale și a reconciliat toate cele 18 rânduri agregate. [Rezultate agregate](2026-11-05-automatic-promotion/bounded-summary.csv) · [Hashuri](2026-11-05-automatic-promotion/bounded-manifest.json).
