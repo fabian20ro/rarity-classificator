@@ -1,0 +1,63 @@
+{
+  "version": "route-promotion-simulation-v1",
+  "mode": "offline_audit",
+  "upload_authorized": false,
+  "inputs": {
+    "human_pilot150": {
+      "path": "pilot-2026-10-17/data/evaluations/2026-10-21-fabian-short/working-reference-150.csv",
+      "sha256": "32f36c283df1842065f3e72d8baab1a358792fa71b7ead34a55f17666fb16aa2"
+    },
+    "human_review50": {
+      "path": "review50-2026-10-31/review-responses.csv",
+      "sha256": "4a5296c9387f18e99e9462bf78135eac8c7e476d355eff98c17903e7ce09a4f5"
+    },
+    "baseline": {
+      "path": "offline-wordfreq-2026-10-24/export/scores.csv",
+      "sha256": "8cb9d68b75d586efe97bfc84a9165f1a3fda7332033182ce7907d75d1bf848e0"
+    },
+    "oof": {
+      "path": "robustness-baselines-2026-10-24/grouped/revised_working/predictions.csv",
+      "sha256": "5f8c63adc3a3018826f127b45c44a9c49494799f320404df92cf86ed2baa733a"
+    },
+    "before": {
+      "path": "human-production-apply-2026-11-04/before/snapshot.csv",
+      "sha256": "645e56643d159b4cde181892be497fe33b528975b89a68c5f2f29e8f6a9d391f"
+    },
+    "after": {
+      "path": "human-production-apply-2026-11-04/after/snapshot.csv",
+      "sha256": "11a0f111a79fad85359cdb5074dba5e65615342336845422546fee25bd45ec24"
+    },
+    "mapping": {
+      "path": "migration-dry-run-2026-11-02/analysis/plan/plan.csv",
+      "sha256": "1b1f500278e195b1f0228301809b56ff829287ad77e94a61804425af26dab835"
+    }
+  },
+  "anchors_sha256": "f8f4bfb586ca403524e0185f3ccaec85ec6af15fbabd7c0dfa7593c2d113afc4",
+  "screen": {
+    "min_forms_per_route_per_cohort": 10,
+    "max_severe_rate": 0.1,
+    "non_regression": [
+      "severe",
+      "excess_error_total",
+      "severe_at_true_4",
+      "severe_at_true_5"
+    ]
+  },
+  "evaluation": {
+    "pilot": "Existing group-held-out predictions for screening; fitted predictions reported separately",
+    "review": "Frozen raw baseline on the 50 risk-selected forms",
+    "comparison": "Minimum pre-human snapshot score across all POS of each exact form; compare both options on identical labels",
+    "decision": "Screen both cohorts independently; require all rules in both. Report unsupported class cells as missing. A passing screen only warrants further review."
+  },
+  "scenarios": [
+    "existing",
+    "wordfreq",
+    "fallback",
+    "both"
+  ],
+  "operational_thresholds": {
+    "l1_jaccard": 0.7,
+    "anchor_precision": 0.8,
+    "anchor_recall": 0.8
+  }
+}
