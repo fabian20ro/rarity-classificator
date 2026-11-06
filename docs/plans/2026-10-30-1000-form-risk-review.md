@@ -1164,3 +1164,19 @@ planificate,zero aplicate. Zero LLM. [Raport](../research/2026-11-07-automatic-e
 verificat,cu precondiții repetate sub lock,postcheck și recipisă pentru rollback.
 **Leftovers:** apply/postcheck/recipisă;nu mai sunt configurări sau evaluări umane
 necesare pe baza verificărilor curente. Politica și limitările de precizie neschimbate.
+
+## Aplicare automată reală încheiată — 7 noiembrie
+
+Autorizare explicită pentru pachetul înghețat;preflight și confirmări pachet/epoch
+reverificate.50.724schimbări comise într-o tranzacție:7.537wordfreq+43.187fallback.
+Postcheck independent READ ONLY:77.698rânduri identice candidatului,26.974rânduri
+neschimbate,inclusiv233umane;toate celelalte coloane,recipisele/granturile umane și
+contractul de securitate păstrate. O recipisă automată durabilă;50.724revizii confirmate.
+CSV rollback cu reviziile comise,proiecție inversă verificată offline,fără rollback.
+32pini protejați neschimbați;zero LLM/evaluări. [Raport](../research/2026-11-07-automatic-production-apply.md).
+
+**Obiectiv operațional încheiat.** Next:review/merge PR89 și păstrarea artefactelor de
+recuperare. **Leftovers:**precizia populației necunoscută și fallback4vs5 provizoriu,
+conform acceptării;îmbunătățiri ulterioare separat,nu altă configurare/aplicare acum.
+Nu mai rula instalatorul/preflight-ul care fixează inventarul vechi. Orice audit sau
+rollback ulterior trebuie raportat la recipisa comisă și la eventualul drift nou.

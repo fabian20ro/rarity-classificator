@@ -1571,3 +1571,19 @@ postflight:38PASS,expected NOLOGIN-only failure. Offline accepted-package dry-ru
 50,724planned,zero applied. Temporary activation SQL removed;raw evidence local.
 No runtime changes/no redundant suite rerun. Plan/PR updated. Next:separately authorized
 frozen-package apply with locked preconditions,postcheck and atomic rollback receipt.
+
+## 2026-11-07 — Authorized automatic production apply and independent verification
+
+User approved frozen50,724-score apply. Verified implementation against full OrioleDB
+rehearsal hashes,package/candidate pins,dedicated READ ONLY inventory/guards/privileges,
+and38applicable administrative checks. Existing automatic runtime applied7537wordfreq
++43187fallback changes in one transaction with exact CAS IDs/count and final receipt/
+whole-inventory validation. Independent READ ONLY postcommit connection confirmed
+all77,698candidate rows,50,724new versions and committed receipt;26,974unchanged rows,
+including233human rows,all non-score columns unchanged. Human receipts/grants,epoch,
+RLS/hooks preserved. Four historical pre-application checks now intentionally fail;
+new-state postcheck passes.32protected input/config pins unchanged. Exported50,724
+rollback preconditions with committed revisions;inverse projection restores before
+scores offline only. No LLM,new evaluations or rollback. Raw artifacts local;aggregate
+report/plan/PR updated. Operational objective complete;review/merge and retain recovery
+artifacts. Population accuracy/fallback4vs5 limitations remain explicitly accepted.

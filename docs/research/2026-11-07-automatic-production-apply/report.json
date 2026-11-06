@@ -1,0 +1,93 @@
+{
+  "version": "automatic-production-apply-verification-v1",
+  "status": "APPLIED_AND_VERIFIED",
+  "verified_at": "2026-11-06T23:25:47.728305+00:00",
+  "explicit_read_only_postcheck": true,
+  "tls_verify_full": true,
+  "package_id": "4bbc107268d845c954dbef8749a95704d5e6bcb25b6c20d49fa2f26f57abc090",
+  "inventory_rows": 77698,
+  "candidate_matches": 77698,
+  "changed_rows": 50724,
+  "unchanged_rows": 26974,
+  "route_changes": {
+    "wordfreq": 7537,
+    "fallback": 43187
+  },
+  "protected_human_rows": 233,
+  "human_scores_and_revisions_preserved": true,
+  "non_score_columns_preserved": true,
+  "committed_receipt_matches": true,
+  "automatic_receipts": 1,
+  "post_versions_verified": 50724,
+  "rollback_preconditions_exported": 50724,
+  "rollback_projection_restores_before": true,
+  "rollback_executed": false,
+  "protected_inputs_unchanged": 32,
+  "distribution": {
+    "1": 978,
+    "2": 6291,
+    "3": 4389,
+    "4": 66009,
+    "5": 31
+  },
+  "quality": {
+    "original": {
+      "distribution": {
+        "1": 978,
+        "2": 6291,
+        "3": 4389,
+        "4": 66009,
+        "5": 31
+      },
+      "total_rows": 77698,
+      "level_column": "rarity_level",
+      "l1_jaccard": 0.16710046850598648,
+      "l1_intersection": 321,
+      "l1_candidate_size": 978,
+      "l1_word_count": 876,
+      "l1_reference_size": 1264,
+      "anchor_precision": 0.0821917808219178,
+      "anchor_recall": 0.5625,
+      "passed": false,
+      "failures": [
+        "l1_jaccard 0.1671 < min 0.7000",
+        "anchor_l1_precision 0.0822 < min 0.8000",
+        "anchor_l1_recall 0.5625 < min 0.8000"
+      ]
+    },
+    "current": {
+      "distribution": {
+        "1": 978,
+        "2": 6291,
+        "3": 4389,
+        "4": 66009,
+        "5": 31
+      },
+      "total_rows": 77698,
+      "level_column": "rarity_level",
+      "l1_jaccard": 0.16710046850598648,
+      "l1_intersection": 321,
+      "l1_candidate_size": 978,
+      "l1_word_count": 876,
+      "l1_reference_size": 1264,
+      "anchor_precision": 0.0821917808219178,
+      "anchor_recall": 0.5625,
+      "passed": false,
+      "failures": [
+        "l1_jaccard 0.1671 < min 0.7000",
+        "anchor_l1_precision 0.0822 < min 0.8000",
+        "anchor_l1_recall 0.5625 < min 0.8000"
+      ]
+    }
+  },
+  "model_calls": 0,
+  "administrative_checks_passed": 35,
+  "expected_historical_failures": [
+    "inventory",
+    "executor_disabled",
+    "automatic_ledger_empty",
+    "installation_receipt_bound"
+  ],
+  "human_receipts_and_grants_preserved": true,
+  "epoch_and_security_contract_preserved": true
+}
