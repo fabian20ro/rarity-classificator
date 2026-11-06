@@ -1097,3 +1097,22 @@ separat autorizate. Nu reaproba politica deja acceptată și nu cere etichete no
 **Leftovers:** ledger/rol automat neinstalate în această etapă pe DB real; snapshotul
 din4noiembrie trebuie revalidat, iar orice drift oprește execuția și cere reconciliere.
 Repetiția nu certifică toate triggerele/efectele externe ale mediului găzduit.
+
+## Preflight real încheiat — 7 noiembrie
+
+21/21verificări PASS în5tranzacții explicit read-only. Toate77.698rândurile coincid
+cu snapshotul post-corecții, inclusiv reviziile;233umane protejate și recipisa165
+intacte. Contractul/epoch, RLS și9hook-uri DDL verificate. Zero modificări DB/LLM.
+Ledgerul și rolul automat lipsesc; fluxul nu este încă executabil în producție.
+[Rezultate și limite](../research/2026-11-07-automatic-preflight.md).
+
+**Următorul pas concret:** pregătirea cu TDD a pachetului versionat de instalare
+minimă (ledger separat,rol NOLOGIN/granturi,pre/postchecks), plus repetiție izolată.
+Reutilizăm reviziile/schema existente; păstrăm fluxul uman. Apoi instalare separat
+autorizată, conexiune automată verificată și aplicare separat autorizată a50.724
+schimbări. Politica este deja acceptată; nu cerem evaluări noi.
+
+**Leftovers:** pachetul de instalare specific mediului,replicarea izolată,instalare,
+conexiune/dry-run,apply/postcheck și recipisă de rollback. Revalidare live obligatorie
+înaintea execuției;capturile nu rezervă starea. Preflight-ul nu certifică precizia
+scorurilor automate și nu elimină FAIL-urile istorice de calitate.

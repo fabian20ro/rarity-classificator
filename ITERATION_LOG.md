@@ -1509,3 +1509,17 @@ Next: live read-only preflight, then prepare minimal automatic-ledger/role deplo
 against that environment. Live installation/application not authorized by this stage.
 Policy already accepted; avoid repeating approval or requesting more labels. PR89
 updated with aggregate results; credentials and row-level test artifacts stay local.
+
+## 2026-11-07 — Automatic promotion production preflight, read-only
+
+Authorized continuation: production reads only. Five bounded REPEATABLE READ READ
+ONLY transactions through Supabase MCP, all read_only=on; no DDL/DML, installation,
+LLM, new labels or model loads. 21/21 capture checks passed:77,698 identity/POS/score/
+revision rows match approved post-human snapshot;233protected rows and entire165
+human correction receipt unchanged. Runtime revision contract/epoch valid;9DDL
+hooks unchanged;APIroles lack private USAGE;no applicable default grants. Automatic
+ledger/role absent, as expected. Runtime not ready until separate installation.
+Aggregate report/plan updated;raw captures,SQL,independent digest comparison and
+replay script retained locally. No runtime changes;previous1003tests+479subtests
+and18OrioleDBintegrations remain applicable. Next:TDD versioned installer/grants,
+isolated rehearsal,then separately authorized installation and application.
