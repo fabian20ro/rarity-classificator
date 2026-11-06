@@ -1,6 +1,9 @@
 # Pachet de promovare automată — audit, 6 noiembrie 2026
 
-**Pachet pregătit și verificat. Aplicare blocată. Politică propusă, neaprobată.**
+**Status la generarea pachetului: pregătit și verificat, aplicare blocată, politică neaprobată.**
+Acesta este statusul la generarea pachetului. Ulterior, utilizatorul a acceptat
+politica; [fluxul separat și repetiția izolată sunt încheiate](2026-11-06-automatic-flow.md).
+Artefactele audit inițiale rămân imutabile. Aplicarea reală nu a fost autorizată/executată.
 Reutilizează exact exportul conservator existent, cu evaluările umane prioritare,
 wordfreq pentru frecvențe prezente și fallback 4 pentru rest. Nu modifică scoruri,
 praguri, contractul operațional, executorul uman sau baza de date. Nicio evaluare
@@ -148,7 +151,7 @@ PYTHONPATH=src python docs/research/2026-11-06-promotion-package/verify.py \
 [Manifest](2026-11-06-promotion-package/manifest.json) ·
 [Reconciliere](2026-11-06-promotion-package/verification.json).
 
-## Ce mai rămâne
+## Ce mai rămânea la închiderea auditului
 
 Decizia de acceptare a politicii provizorii de mai sus. Dacă este aprobată, următoarea
 implementare este contractul operațional explicit și fluxul automat separat,

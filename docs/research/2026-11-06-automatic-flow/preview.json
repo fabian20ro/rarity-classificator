@@ -1,0 +1,34 @@
+{
+  "status": "dry_run",
+  "applied": false,
+  "policy_accepted": true,
+  "package_id": "4bbc107268d845c954dbef8749a95704d5e6bcb25b6c20d49fa2f26f57abc090",
+  "quality": {
+    "distribution": {
+      "1": 978,
+      "2": 6291,
+      "3": 4389,
+      "4": 66009,
+      "5": 31
+    },
+    "total_rows": 77698,
+    "level_column": "rarity_level",
+    "l1_jaccard": 0.16710046850598648,
+    "l1_intersection": 321,
+    "l1_candidate_size": 978,
+    "l1_word_count": 876,
+    "l1_reference_size": 1264,
+    "anchor_precision": 0.0821917808219178,
+    "anchor_recall": 0.5625,
+    "passed": false,
+    "failures": [
+      "l1_jaccard 0.1671 < min 0.7000",
+      "anchor_l1_precision 0.0822 < min 0.8000",
+      "anchor_l1_recall 0.5625 < min 0.8000"
+    ]
+  },
+  "route_changes": {
+    "wordfreq": 7537,
+    "fallback": 43187
+  }
+}

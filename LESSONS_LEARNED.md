@@ -480,3 +480,11 @@ parent, compare trees, and pin the reviewed head SHA before merging.
 Pip-based CI passed while the lock omitted evaluation/frequency and `uv lock --check`
 failed. Check the lock separately; regenerate without upgrading existing pins and
 report that existing-environment tests do not validate every newly locked version.
+
+**[2026-11-07]** Scale CAS by statements, not remote round trips. The human165 flow's
+per-row pattern took20–22s locally for50,724automatic changes and would amplify network
+latency while holding the write lock. One parameterized multi-row UPDATE preserves
+ID/spelling/POS/score/revision conditions; compare returned IDs/count and roll back on
+partial matches. Real OrioleDB statement-budget and partial-match tests validate this.
+Keep full post-state/receipt checks and fingerprints of non-score columns; new row
+revisions alone cannot reveal a trigger rewriting another column of an intended row.

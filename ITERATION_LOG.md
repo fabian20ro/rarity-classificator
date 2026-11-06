@@ -1481,3 +1481,31 @@ with aggregate artifacts only; full snapshot-derived row data remain local.
 Review caught competing snapshot score columns changing legacy audit semantics.
 Added a failing regression, then rejected final_level/median_level in snapshots.
 Rebuilt/replayed the final package; candidate bytes unchanged. Existing lesson reused.
+
+## 2026-11-07 — Accepted automatic policy, transactional flow and isolated rehearsal
+
+User accepted the documented provisional-risk policy and requested implementation/
+isolated rehearsal. Recorded acceptance for the exact frozen candidate, package and
+both routes. Separate automatic ledger/adapter/CSV flow; human flow and legacy gates
+unchanged. Metrics remain calculated with actual FAIL outcomes, diagnostic only in
+the accepted hash-bound scope. Default preview has no DSN lookup or store access.
+
+TDD exposed missing manifest coverage and a concurrent acceptance-read hash race;
+fixed both. Whole-row fingerprints catch trigger changes outside score/revision.
+Initial per-row SQL made50,724network round trips. Added a failing real-server
+statement-budget regression, replaced with one parameterized multi-row CAS UPDATE;
+partial matches still roll back entirely. No parallel model or update calls.
+
+Final:1,003offline tests+479subtests PASS,58opt-in integration skips; Ruff PASS.
+18/18owned PostgreSQL17.9/OrioleDB1.8 tests PASS, including dedicated role/RLS,
+trigger/deferred/ledger faults, timeout, backend termination, lost apply/rollback
+ACKs, concurrent retries, revision conflicts and full inventory.50,724changes,
+233protected rows, exact restoration of scores and other columns. Full apply6.75s,
+rollback6.64s locally including validation, not a production lock-time estimate.
+Seven sources and1,135server artifacts hash-verified. No real DB access, new human
+ratings or LLM calls. The absent pinned image was fetched; container/volume removed.
+
+Next: live read-only preflight, then prepare minimal automatic-ledger/role deployment
+against that environment. Live installation/application not authorized by this stage.
+Policy already accepted; avoid repeating approval or requesting more labels. PR89
+updated with aggregate results; credentials and row-level test artifacts stay local.

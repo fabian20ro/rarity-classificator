@@ -1,15 +1,17 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat la 6 noiembrie 2026. Lotul uman a fost aplicat și verificat, iar
+Actualizat la încheierea implementării fluxului automat. Lotul uman a fost aplicat și verificat, iar
 integrarea în main s-a încheiat prin PR87. Simularea pentru cele 50.724 de
 schimbări automate recomandă păstrarea ambelor rute ca provizorii. Regula de
 păstrare a scorului vechi la salturi de ≥2 a fost testată și respinsă.
 [Rezultate pe rute și cohorte](../research/2026-11-05-automatic-promotion.md).
 Pachetul complet de promovare automată este pregătit în mod audit, cu loturi și
 inverse separate, 233 de rânduri protejate și toate gate-urile existente active.
-Politica de acceptare provizorie este propusă, nu aprobată. Urmează decizia asupra
-riscului cunoscut, înaintea unui flux automat de aplicare.
+Politica provizorie a fost acceptată; fluxul automat separat este implementat și
+verificat în18probe OrioleDB, inclusiv întregul inventar și rollback. Urmează
+preflight real read-only. Nu s-au făcut instalări ori aplicări automate în DB-ul real.
 [Pachet, decizie concretă și verificare](../research/2026-11-06-promotion-package.md).
+[Flux acceptat și repetiție](../research/2026-11-06-automatic-flow.md).
 
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
@@ -1068,3 +1070,30 @@ contract operațional/flux automat separat cu TDD și repetiție izolată, prefl
 live și aplicare separat autorizată. CSV-urile inverse au nevoie de recipisa și
 reviziile post-aplicare; nu sunt rollback executabil. Datele actuale nu certifică
 precizia întregii populații, iar lipsa frecvenței nu dovedește obscuritatea.
+
+## Politică acceptată, flux automat și repetiție încheiate
+
+Confirmarea utilizatorului autorizează implementarea `automatic-provisional-acceptance-v1`
+pentru candidatul fixat și wordfreq+fallback. Evidența acceptării este separată de
+pachetul audit imutabil. Nu autorizează instalarea sau aplicarea în mediul real.
+
+Flux public CSV-first, implicit dry-run, cu replay complet și scope/hash verificat.
+Jaccard/ancore calculate cu aceleași praguri și FAIL păstrat vizibil; diagnostice în
+fluxul acceptat. Step4/Step5 și fluxul uman neschimbate. Ledger automat separat,
+DSN/confirmare pachet/epoch explicite, CAS multi-row într-un UPDATE și tranzacție
+unică pentru ambele rute, recipisă atomică, retry fără reaplicare și rollback pe
+reviziile post-aplicare. Verificare și a coloanelor fără scor.
+
+1.003teste+479subteste PASS,58integrări skip implicit;18/18probe pe OrioleDB izolat
+PASS.50.724rânduri schimbate,233umane protejate,rollback cu scoruri/altecoloane
+restaurate exact. Server/volum eliminate,7surse și1.135artefacte verificate prin hash.
+Zero LLM, evaluări noi sau acces DB real. [Raport și reproducere](../research/2026-11-06-automatic-flow.md).
+
+**Pas recomandat:** preflight real read-only pentru starea actuală, contractul de
+revizii/epoch, roluri/RLS/triggere și noul ledger. Apoi pregătirea instalării minime
+și granturilor automatizării pentru mediul verificat. Instalarea și aplicarea rămân
+separat autorizate. Nu reaproba politica deja acceptată și nu cere etichete noi.
+
+**Leftovers:** ledger/rol automat neinstalate în această etapă pe DB real; snapshotul
+din4noiembrie trebuie revalidat, iar orice drift oprește execuția și cere reconciliere.
+Repetiția nu certifică toate triggerele/efectele externe ale mediului găzduit.

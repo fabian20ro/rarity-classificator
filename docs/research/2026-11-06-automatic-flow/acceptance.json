@@ -1,0 +1,13 @@
+{
+  "version": "automatic-provisional-acceptance-v1",
+  "approved_on": "2026-11-06",
+  "package_id": "4bbc107268d845c954dbef8749a95704d5e6bcb25b6c20d49fa2f26f57abc090",
+  "candidate_sha256": "d7f52e307c523b74958bad4cf483706159cf843f4dbb593abea477c1611aa8ef",
+  "routes": [
+    "wordfreq",
+    "fallback"
+  ],
+  "legacy_gate_role": "diagnostic",
+  "population_accuracy": "unknown",
+  "human_priority": true
+}
