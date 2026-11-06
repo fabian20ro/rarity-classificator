@@ -1557,3 +1557,17 @@ Saved raw evidence locally;offline verifier reproduces aggregate report. Plan/PR
 updated. No runtime changes;previous1008tests+479subtests and20integrations retained.
 Next:separately authorized dedicated executor activation/connection check/dry-run,
 then separately authorized score application and postcheck/rollback receipt.
+
+## 2026-11-07 — Automatic executor activation and dedicated connection verification
+
+Explicit user authorization:activate executor/check dedicated connection,no scores/LLM.
+39installation postchecks passed before activation. New independent random password,
+libpq SCRAM verifier;changed only automatic role LOGIN/password. Dedicated service/
+passfile0700/0600,TLS verify-full;human files hash-unchanged. First connection rejected
+ConfigParser spaced delimiters locally;fixed key=value,second authenticated. Explicit
+REPEATABLE READ READ ONLY:correct session identity,9privilege checks,77,698rows/full
+column digest,233guards,revision epoch and empty ledger all PASS. Administrative
+postflight:38PASS,expected NOLOGIN-only failure. Offline accepted-package dry-run:
+50,724planned,zero applied. Temporary activation SQL removed;raw evidence local.
+No runtime changes/no redundant suite rerun. Plan/PR updated. Next:separately authorized
+frozen-package apply with locked preconditions,postcheck and atomic rollback receipt.

@@ -1150,3 +1150,17 @@ dedicate verificate și dry-run. **Leftovers:** acea activare/verificare,aplicar
 separat autorizată a50.724schimbări,postcheck și recipisă pentru rollback. Nu
 reinstala pachetul:condițiile de absență nu mai sunt aplicabile. Folosește
 postflight-ul înainte de activare;politica nu necesită reaprobare.
+
+## Executor automat activ și conexiune verificată — 7 noiembrie
+
+Activare autorizată:LOGIN/parolă nouă independentă,fără granturi noi. Service/passfile
+private,TLS verify-full,identitate dedicată,READ ONLY explicit.9/9checks privilegii,
+77.698rânduri și toate coloanele,233umane,revizii/epoch verificate. Ledger automat gol;
+configurația umană intactă.38postchecks istorice trec;NOLOGIN este intenționat fals,
+iar atributele active sunt verificate separat. Dry-run offline complet:50.724schimbări
+planificate,zero aplicate. Zero LLM. [Raport](../research/2026-11-07-automatic-executor-connection.md).
+
+**Următorul pas:** aplicarea separat autorizată a pachetului înghețat prin executorul
+verificat,cu precondiții repetate sub lock,postcheck și recipisă pentru rollback.
+**Leftovers:** apply/postcheck/recipisă;nu mai sunt configurări sau evaluări umane
+necesare pe baza verificărilor curente. Politica și limitările de precizie neschimbate.

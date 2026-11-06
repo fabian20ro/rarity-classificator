@@ -496,3 +496,8 @@ before deployment and pin its before/after state in the installation receipt. A 
 requires explicit administrator reconciliation, never an automatic rewind on retry.
 Lock existing installation receipts alongside the human ledger when comparing them;
 a read-only digest check does not exclude concurrent writers.
+
+**[2026-11-07]** Write libpq service files with ConfigParser's
+`space_around_delimiters=False`. Its default `key = value` output was rejected by
+libpq before connection; `key=value` authenticated successfully with the same
+password/TLS configuration. Keep service/passfile0600 and credentials out of argv.
