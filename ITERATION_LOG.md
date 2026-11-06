@@ -1587,3 +1587,20 @@ rollback preconditions with committed revisions;inverse projection restores befo
 scores offline only. No LLM,new evaluations or rollback. Raw artifacts local;aggregate
 report/plan/PR updated. Operational objective complete;review/merge and retain recovery
 artifacts. Population accuracy/fallback4vs5 limitations remain explicitly accepted.
+
+## 2026-11-07 — PR89 pre-merge review
+
+Reviewed fixed diff4cfc166..9e963ca against AGENTS/lessons and the automatic-flow/
+installation ADRs, accepted policy and plan. Standards:0actionable findings.
+Spec:0actionable findings. Checked human protection, package/source pins, exact CAS
+IDs, receipt/revision checks, retry/rollback behavior, installation privilege scope
+and preserved legacy quality gates. Local two-axis review;no model delegation.
+Fresh sanitized offline check:1008passed,479subtests passed,78integration skips;
+DB/network blocked. Existing OrioleDB evidence verified offline:18flow tests and
+20installation tests;1135+1076artifact hashes checked. Old flow evidence predates
+the human-adapter SQL constant extraction;AST equivalence verified. Latest
+installation evidence matches current implementation hashes. No DB tests rerun,
+DB access/changes or LLM calls. CI green on9e963ca;no unresolved review threads.
+Review artifacts:build/d1/pr89-review-2026-11-07 (local). Merge conditional on green
+CI for this log-only commit and unchanged reviewed runtime. Quality limitations
+remain:accepted legacy gate failures and unproven population/fallback4vs5 accuracy.
