@@ -1,0 +1,21 @@
+{
+  "server": {
+    "image": "supabase/postgres@sha256:62b4fa9f99afde62bb9fd49a218531b0f74cd639dc3b03749701005564b837ff",
+    "engine": "orioledb",
+    "extension_version": "1.8",
+    "server_version": "17.9",
+    "memory_limit_mib": 512,
+    "container_removed": true,
+    "volume_removed": true
+  },
+  "tests": 20,
+  "passed": 20,
+  "failed": 0,
+  "skipped": 0,
+  "exit_code": 0,
+  "full_inventory": true,
+  "protected_sources_unchanged": 9,
+  "production_accessed": false,
+  "model_calls": 0,
+  "limitations": "Owned OrioleDB only. Small cases use synthetic revisions/epoch; the full fixture reconstructs the archived production identity, revisions and epoch. ACK loss is injected after real commit. No live deployment certification."
+}

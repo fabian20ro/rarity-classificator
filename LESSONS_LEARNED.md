@@ -488,3 +488,11 @@ ID/spelling/POS/score/revision conditions; compare returned IDs/count and roll b
 partial matches. Real OrioleDB statement-budget and partial-match tests validate this.
 Keep full post-state/receipt checks and fingerprints of non-score columns; new row
 revisions alone cannot reveal a trigger rewriting another column of an intended row.
+
+**[2026-11-07]** Installation rollback does not restore sequences. An isolated DDL
+hook reset the revision sequence without changing row tokens; row fingerprints and
+the structural revision validator alone passed. Check sequence position against rows
+before deployment and pin its before/after state in the installation receipt. A reset
+requires explicit administrator reconciliation, never an automatic rewind on retry.
+Lock existing installation receipts alongside the human ledger when comparing them;
+a read-only digest check does not exclude concurrent writers.

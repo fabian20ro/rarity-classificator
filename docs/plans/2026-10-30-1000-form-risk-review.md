@@ -1116,3 +1116,22 @@ schimbări. Politica este deja acceptată; nu cerem evaluări noi.
 conexiune/dry-run,apply/postcheck și recipisă de rollback. Revalidare live obligatorie
 înaintea execuției;capturile nu rezervă starea. Preflight-ul nu certifică precizia
 scorurilor automate și nu elimină FAIL-urile istorice de calitate.
+
+## Instalator automat și repetiție completă — 7 noiembrie
+
+Implementat prin TDD generatorul offline versionat: ledger/recipisă automată separate,
+rol NOLOGIN/granturi explicite,28prechecks/39postchecks,manifest și recuperare după
+confirmare pierdută. Reviziile/schema și fluxul uman existente păstrate. Protecție
+suplimentară pentru secvență și lock pe recipisa umană, validate prin teste de eșec.
+
+1.008teste+479subteste PASS;20/20probe OrioleDB izolat PASS. Pachetul exact repetat
+cu77.698rânduri și9hook-uri DDL;aplicare50.724/ retry/rollback prin noul rol doar în
+fixture;233umane și recipisa intacte.24artefacte reproduse identic. Container/volum
+eliminate. O captură reală suplimentară read-only pentru pinning;zero modificări DB
+real,LLM sau evaluări. [Raport și pachet](../research/2026-11-07-automatic-installation.md).
+
+**Următorul pas:** instalare structurală reală separat autorizată, verificări
+înainte/după, rol păstrat NOLOGIN. **Leftovers:** acea instalare,activarea și verificarea
+conexiunii dedicate,dry-run,aplicare separat autorizată și postcheck/recipisă rollback.
+Politica este deja acceptată. Nu mai sunt necesare etichete sau experimente pentru
+această decizie provizorie;limitările de acuratețe și FAIL-urile istorice rămân.

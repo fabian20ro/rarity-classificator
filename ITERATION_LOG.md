@@ -1523,3 +1523,22 @@ Aggregate report/plan updated;raw captures,SQL,independent digest comparison and
 replay script retained locally. No runtime changes;previous1003tests+479subtests
 and18OrioleDBintegrations remain applicable. Next:TDD versioned installer/grants,
 isolated rehearsal,then separately authorized installation and application.
+
+## 2026-11-07 — Automatic installation package, TDD and exact OrioleDB rehearsal
+
+Implemented offline acceptance/package/capture → versioned SQL bundle;28prechecks,
+39postchecks,NOLOGIN role,explicit grants,private automatic ledger/installation receipt.
+Reused exact runtime revision SQL as a shared constant;human runtime behavior unchanged.
+RED/GREEN caught nontransactional sequence reset and missing lock on existing human
+installation receipt. Added checks/lock and recovery guidance. Fixture-only fix: do
+not regenerate a human bundle when the test explicitly uses the immutable original.
+
+1008offline tests+479subtests PASS,78server integrations skipped by default;Ruff PASS.
+20isolated OrioleDB cases PASS including exact package with9captured DDL hooks and
+all77,698rows;new executor apply50,724/retry/rollback preserved233human rows and receipt.
+24bundle artifacts identical at replay;9input pins unchanged;owned server/volume removed.
+One additional explicitly READ ONLY production capture for complete deployment pins;
+no real DDL/DML,models/LLM or new labels. Raw deployment captures/individual receipts
+remain local. Local standards/spec review;no external model delegation.
+Next:separately authorized real structural installation with disabled executor,then
+activation/connection verification and separately authorized score application.
