@@ -1,0 +1,47 @@
+{
+  "schema": "automatic-promotion-audit-v1",
+  "contract_sha256": "70e5407d73d310d7e608541ee54d38356bd823b740ade9b9ab8638aeb20e98f7",
+  "inputs": {
+    "baseline": {
+      "path": "../../../../offline-wordfreq-2026-10-24/export/scores.csv",
+      "sha256": "8cb9d68b75d586efe97bfc84a9165f1a3fda7332033182ce7907d75d1bf848e0"
+    },
+    "snapshot": {
+      "path": "../../../../human-production-apply-2026-11-04/after/snapshot.csv",
+      "sha256": "11a0f111a79fad85359cdb5074dba5e65615342336845422546fee25bd45ec24"
+    },
+    "human_pilot150": {
+      "path": "../../../../pilot-2026-10-17/data/evaluations/2026-10-21-fabian-short/working-reference-150.csv",
+      "sha256": "32f36c283df1842065f3e72d8baab1a358792fa71b7ead34a55f17666fb16aa2"
+    },
+    "human_review50": {
+      "path": "../../../../review50-2026-10-31/review-responses.csv",
+      "sha256": "4a5296c9387f18e99e9462bf78135eac8c7e476d355eff98c17903e7ce09a4f5"
+    },
+    "candidate": {
+      "path": "../../../../conservative-export-2026-11-01/export/candidate.csv",
+      "sha256": "8860d689bfd607f472daf4c8deea71257a09e1baff4ea0002ebbf882d5542c2a"
+    },
+    "anchors": {
+      "path": "../../rarity-anchor-l1-ro.txt",
+      "sha256": "f8f4bfb586ca403524e0185f3ccaec85ec6af15fbabd7c0dfa7593c2d113afc4"
+    }
+  },
+  "implementation_sha256": "7947ad917f9fb561e5a04de222787188e249032fafe2a754d0bbcde86a77e723",
+  "artifacts": {
+    "candidate.csv": "d7f52e307c523b74958bad4cf483706159cf843f4dbb593abea477c1611aa8ef",
+    "contract.json": "c8c0c229fae9bf0f0f52e24a5775e87fd8bca937e7414dc289fbfb657c400543",
+    "fallback-changes.csv": "48ef2cf663b14519cd6baaa5195f386eed033bcc67f9d4bdcb83e149cb707cda",
+    "fallback-rollback.csv": "25c927acbe590c00bcebbf7d2c9aabf7b77190102c1b2652a6b6061f9504692a",
+    "human-guards.csv": "223cdb0842a98d86ead0b90d8e7a11a7be731ae0b9e7e62e96b68846988c5f86",
+    "mapping/identity-issues.csv": "1407c58f22185039c9f4c8016924ed07f68cf14386b6a830c77d9a67308c5eae",
+    "mapping/level-conflicts.csv": "b2e326103201f85124bab15e175c48d7800878a5c46ebeb04c4202ce74071b44",
+    "mapping/manifest.json": "2841c8653d39f1eac57dfb09c0e427653a6e3891ca61478095fa8154472144f0",
+    "mapping/mapping.csv": "025068e1829bc867128fb36e725e986bf173fb684e5cc0bd596e895d6accf98b",
+    "mapping/plan.csv": "0a79cf99f5286fb6c038b7fe2eb7465ad4045d5d5503d8efc47413ff89647517",
+    "mapping/summary.json": "e7d02618e9fe7d48f891266cbc9bd110acc192a3dfb480476cb3a019fcfe4aba",
+    "report.json": "57b7a0c37691b4ea8a3fb77b179c5fbc53ca0266ef7cb3973a18f967174dd446",
+    "wordfreq-changes.csv": "947e28644f364fe825c35a861edbea197a5e59503530d6e8e03b621cad5e317b",
+    "wordfreq-rollback.csv": "e79f65e7a41ec7ee747a1868de2c1e51f2f2fb2298d3f84db26b11f06d132169"
+  }
+}

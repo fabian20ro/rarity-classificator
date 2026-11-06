@@ -1,0 +1,35 @@
+{
+  "server": {
+    "image": "supabase/postgres@sha256:62b4fa9f99afde62bb9fd49a218531b0f74cd639dc3b03749701005564b837ff",
+    "engine": "orioledb",
+    "extension_version": "1.8",
+    "server_version": "17.9",
+    "memory_limit_mib": 512,
+    "container_removed": true,
+    "volume_removed": true
+  },
+  "tests": 18,
+  "passed": 18,
+  "failed": 0,
+  "skipped": 0,
+  "exit_code": 0,
+  "full_inventory": true,
+  "protected_sources_unchanged": 7,
+  "production_accessed": false,
+  "model_calls": 0,
+  "limitations": "Owned OrioleDB only. Fixture revisions/epoch differ from production. ACK loss injected after real commit. No live deployment certification.",
+  "full_inventory_result": {
+    "inventory_rows": 77698,
+    "changed_rows": 50724,
+    "protected_rows": 233,
+    "restored_scores_and_other_columns": true,
+    "apply_seconds": 6.748198124929331,
+    "rollback_seconds": 6.6393103749724105,
+    "candidate_sha256": "d7f52e307c523b74958bad4cf483706159cf843f4dbb593abea477c1611aa8ef"
+  },
+  "offline_tests": {
+    "passed": 1003,
+    "skipped": 58,
+    "subtests": 479
+  }
+}

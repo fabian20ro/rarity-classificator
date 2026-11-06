@@ -9,9 +9,7 @@ REVISION_BODY = """BEGIN
 END;"""
 
 
-def _revision_epoch(conn):
-    valid = conn.execute(
-        """SELECT a.attnotnull AND a.atttypid='bigint'::regtype
+REVISION_VALID_SQL = """SELECT a.attnotnull AND a.atttypid='bigint'::regtype
             AND t.tgenabled='A' AND t.tgtype=23 AND t.tgqual IS NULL
             AND t.tgattr=''::int2vector AND NOT t.tgisinternal
             AND p.prosecdef AND p.proconfig=ARRAY['search_path=pg_catalog']
@@ -32,7 +30,12 @@ def _revision_epoch(conn):
         JOIN pg_class s ON s.oid=to_regclass('classificator_private.words_revision_seq')
         JOIN pg_sequence q ON q.seqrelid=s.oid
         WHERE c.oid='public.words'::regclass AND a.attname='classificator_revision'
-            AND NOT a.attisdropped""",
+            AND NOT a.attisdropped"""
+
+
+def _revision_epoch(conn):
+    valid = conn.execute(
+        REVISION_VALID_SQL,
         (REVISION_BODY,),
     ).fetchone()
     if valid != (True,):

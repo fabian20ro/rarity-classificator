@@ -1,0 +1,28 @@
+{
+  "implementation": {
+    "src/classificator/automatic_promotion_flow.py": "27d68e9140e9b6fb6f118c5ff535ade57e2031741e77d02d2cf641489fd11506",
+    "src/classificator/automatic_promotion_postgres.py": "b136adbfb11c9e17a0aa2a37fad90b2aa71b254421cb2976f49991b9094b2ca3",
+    "src/classificator/human_correction_postgres.py": "078e2910dc8964a35e2aa8f57cb407e1bccd14f7fb6143284b64a1bb2d53e31a",
+    "src/classificator/evaluation/promotion_audit.py": "7947ad917f9fb561e5a04de222787188e249032fafe2a754d0bbcde86a77e723",
+    "tests/integration/test_automatic_promotion_postgres.py": "ccfd658ff9cc9d76117112d2afe9f623b8f1396899a7cf7a99023db2fadb1de7",
+    "tests/postgres_harness.py": "f764a7e05e801a2321d5b78ad8a0dfec94d63e634d0c2575c021492e1104aa5c",
+    "docs/sql/2026-11-06-automatic-promotion-receipts.sql": "0a49146f5efccccca4c455a3d456d028a46d2913e073556590c17269ad842e2f",
+    "scripts/check_automatic_promotion.py": "0d4372eb152d02e88ba3b256a61a40daf3d59d2b46253d45e7236a2d2c063c54"
+  },
+  "inputs": {
+    "/Users/fabian/git/word-rarity-classifier/build/d1/promotion-policy-pr/docs/research/2026-11-06-promotion-package/contract.json": "70e5407d73d310d7e608541ee54d38356bd823b740ade9b9ab8638aeb20e98f7",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/offline-wordfreq-2026-10-24/export/scores.csv": "8cb9d68b75d586efe97bfc84a9165f1a3fda7332033182ce7907d75d1bf848e0",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/human-production-apply-2026-11-04/after/snapshot.csv": "11a0f111a79fad85359cdb5074dba5e65615342336845422546fee25bd45ec24",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/pilot-2026-10-17/data/evaluations/2026-10-21-fabian-short/working-reference-150.csv": "32f36c283df1842065f3e72d8baab1a358792fa71b7ead34a55f17666fb16aa2",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/review50-2026-10-31/review-responses.csv": "4a5296c9387f18e99e9462bf78135eac8c7e476d355eff98c17903e7ce09a4f5",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/conservative-export-2026-11-01/export/candidate.csv": "8860d689bfd607f472daf4c8deea71257a09e1baff4ea0002ebbf882d5542c2a",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/promotion-policy-pr/docs/rarity-anchor-l1-ro.txt": "f8f4bfb586ca403524e0185f3ccaec85ec6af15fbabd7c0dfa7593c2d113afc4"
+  },
+  "server_manifest_sha256": "0d61b9bbc0ea8229cb56dd50315e12fb5fed17f2c8cae16eadcd256bf999e9eb",
+  "preview_manifest_sha256": "31aef2b36aabf02dc0a044192e19e099ae5cba3b25bc33021a6ddf461bcbb64b",
+  "acceptance_sha256": "5b432c2ecd1323ff9ef3d02077a78eb991284917f664a1084a9245751d6dc383",
+  "source_package_manifest_sha256": "4bbc107268d845c954dbef8749a95704d5e6bcb25b6c20d49fa2f26f57abc090",
+  "verified_server_artifacts": 1135,
+  "production_accessed": false,
+  "model_calls": 0
+}

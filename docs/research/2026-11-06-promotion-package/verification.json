@@ -1,0 +1,18 @@
+{
+  "verified_rows": 77698,
+  "human_forms": 200,
+  "protected_rows": 233,
+  "changed_rows": 50724,
+  "routes": {
+    "wordfreq": 7537,
+    "fallback": 43187
+  },
+  "in_memory_apply_matches_candidate": true,
+  "in_memory_inverse_restores_snapshot": true,
+  "db_access": false,
+  "model_calls": false,
+  "verifier_sha256": "21f869c1c64287db77998619c8727e3750bbb5488dbb2fe5ca1786106a7568ad",
+  "package_manifest_sha256": "4bbc107268d845c954dbef8749a95704d5e6bcb25b6c20d49fa2f26f57abc090",
+  "byte_identical_replay_artifacts": 15,
+  "candidate_matches_previous_both_csv": true
+}
