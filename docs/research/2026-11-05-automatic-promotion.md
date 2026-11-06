@@ -34,7 +34,7 @@ Frecvența este prezentă pe 11.610 rânduri, dintre care 11.492 eligibile pentr
 
 Schimbările de ≥2 față de snapshot măsoară amploarea intervenției. Erorile severe din primul tabel sunt măsurate față de evaluări umane. Scenariul fallback include 30.524 de treceri 5→4. Niciun scenariu nu trece toate pragurile operaționale 70%/80%/80%. Lista pozitivă de ancore are acoperire incompletă. Apartenența la listă nu estimează precizia semantică globală.
 
-## Pasul recomandat
+## Pasul recomandat atunci, experiment încheiat mai jos
 
 Prioritatea este protejarea formelor familiare trimise la 4. Pentru următorul experiment, testați o singură regulă de păstrare a scorului existent când lipsește frecvența și schimbarea propusă ar fi de ≥2 niveluri. Aplicați aceeași regulă întregului lot, inclusiv cazurilor unde scorul vechi greșește. Măsurați perechile „eroare introdusă / eroare eliminată” pe ambele cohorte și costul pe 4/5. Regula ar afecta 3.350 dintre schimbările fallback propuse. Acesta este un experiment de reducere a riscului pentru fallback, fără a soluționa suportul mic al rutei wordfreq în lotul de 50. Pentru wordfreq păstrăm verdictul provizoriu și cele cinci exemple drept limită explicită. Nu cerem alte evaluări. Orice promovare operațională necesită o decizie separată și verificările obligatorii.
 

@@ -1458,3 +1458,26 @@ useful true-4 and one true-5 correction with zero severe errors avoided. Risk50
 avoided three severe errors, lost zero, and tied on one intervention. Reconstructed
 200 decisions from the original hashes and reconciled 18 slices. Recommend holding
 both routes. Zero new ratings, inference or database access.
+
+## 2026-11-06 — Automatic promotion package, audit only
+
+Prepared the frozen conservative candidate as disjoint wordfreq/fallback deltas
+and inverse CSVs. Reused exact-form/POS migration mapping and existing quality
+checks. TDD at the authorized CSV→audit-package boundary, including tampered/resealed
+sources, human POS protection, approval-mode rejection, incomplete mapping and replay.
+992 tests +468 subtests passed,40 DB integrations skipped; Ruff passed. Fifteen
+artifacts match on replay. Independent stdlib reconciliation checked all77,698 rows,
+233 protected rows and50,724 proposed changes; in-memory application/inversion restores
+the archived snapshot. Candidate bytes match the earlier both.csv. Six source hashes
+unchanged. No new labels, model calls, network collection or DB access.
+
+Documented a concrete provisional-risk policy proposal and its unresolved decision:
+legacy gates still fail and remain enforced. No approval/threshold/executor change.
+Rollback CSVs explicitly require future committed receipts/post-write revisions,
+not archived revisions. Next after policy approval: separate automatic contract/flow,
+isolated rehearsal, then separately authorized live preflight/application. PR89 updated
+with aggregate artifacts only; full snapshot-derived row data remain local.
+
+Review caught competing snapshot score columns changing legacy audit semantics.
+Added a failing regression, then rejected final_level/median_level in snapshots.
+Rebuilt/replayed the final package; candidate bytes unchanged. Existing lesson reused.

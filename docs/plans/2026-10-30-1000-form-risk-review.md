@@ -1,10 +1,15 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat la 5 noiembrie 2026. Lotul uman a fost aplicat și verificat, iar
+Actualizat la 6 noiembrie 2026. Lotul uman a fost aplicat și verificat, iar
 integrarea în main s-a încheiat prin PR87. Simularea pentru cele 50.724 de
 schimbări automate recomandă păstrarea ambelor rute ca provizorii. Regula de
 păstrare a scorului vechi la salturi de ≥2 a fost testată și respinsă.
 [Rezultate pe rute și cohorte](../research/2026-11-05-automatic-promotion.md).
+Pachetul complet de promovare automată este pregătit în mod audit, cu loturi și
+inverse separate, 233 de rânduri protejate și toate gate-urile existente active.
+Politica de acceptare provizorie este propusă, nu aprobată. Urmează decizia asupra
+riscului cunoscut, înaintea unui flux automat de aplicare.
+[Pachet, decizie concretă și verificare](../research/2026-11-06-promotion-package.md).
 
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
@@ -1037,3 +1042,29 @@ severe în lotul de risc. **Decizie recomandată:** închidem această variantă
 Folosim diferența de ≥2 ca indicator de dezacord la audit. Scorul istoric singur
 nu justifică alegerea între cele două estimări. Păstrăm ambele rute provizorii și
 regulile operaționale de upload. [Comparația pereche](../research/2026-11-05-automatic-promotion.md#rezultatul-regulii-de-păstrare-la-salturi-de-2).
+
+## Pachet de promovare în mod audit — 6 noiembrie
+
+Reutilizat candidatul conservator înghețat, identic cu scenariul complet din PR89.
+Mapare completă pentru 77.698 de rânduri/75.147 de forme. Loturi disjuncte pentru
+7.537 schimbări wordfreq și 43.187 fallback, cu scor/revizie așteptate, proveniență
+și CSV-uri inverse. Cele 233 de rânduri umane rămân intacte. Nicio regulă nouă de
+scor și nicio modificare în contractul operațional ori executorul uman.
+
+TDD la interfața CSV→pachet. 992teste+468subteste PASS,40integrări DB omise, Ruff PASS.
+15artefacte identice la replay. Verificare separată a întregului inventar, aplicare
+și inversare în memorie pentru 50.724 de schimbări. Surse intacte, zero LLM/DB.
+Jaccard16,71%, apartenență seed8,22%, recall56,25%: toate sub pragurile existente.
+`upload_authorized=false`, `ready_to_apply=false`, politica `pending`.
+
+**Pas recomandat:** decizie explicită asupra acceptării provizorii a scorurilor
+automate și a riscului măsurat/necunoscut, conform [propunerii complete](../research/2026-11-06-promotion-package.md).
+Aceasta include propunerea de a raporta gate-urile istorice ca diagnostice în
+contractul viitor; schimbarea nu este implementată sau aprobată acum. Fără reglaje
+repetate pe aceleași etichete și fără alte evaluări din partea utilizatorului.
+
+**Leftovers:** aprobarea versiunii politicii și a hashului candidatului; apoi
+contract operațional/flux automat separat cu TDD și repetiție izolată, preflight
+live și aplicare separat autorizată. CSV-urile inverse au nevoie de recipisa și
+reviziile post-aplicare; nu sunt rollback executabil. Datele actuale nu certifică
+precizia întregii populații, iar lipsa frecvenței nu dovedește obscuritatea.

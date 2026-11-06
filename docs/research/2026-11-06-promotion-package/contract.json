@@ -1,0 +1,32 @@
+{
+  "schema": "automatic-promotion-audit-v1",
+  "mode": "audit",
+  "upload_authorized": false,
+  "acceptance": "pending",
+  "inputs": {
+    "baseline": {
+      "path": "../../../../offline-wordfreq-2026-10-24/export/scores.csv",
+      "sha256": "8cb9d68b75d586efe97bfc84a9165f1a3fda7332033182ce7907d75d1bf848e0"
+    },
+    "snapshot": {
+      "path": "../../../../human-production-apply-2026-11-04/after/snapshot.csv",
+      "sha256": "11a0f111a79fad85359cdb5074dba5e65615342336845422546fee25bd45ec24"
+    },
+    "human_pilot150": {
+      "path": "../../../../pilot-2026-10-17/data/evaluations/2026-10-21-fabian-short/working-reference-150.csv",
+      "sha256": "32f36c283df1842065f3e72d8baab1a358792fa71b7ead34a55f17666fb16aa2"
+    },
+    "human_review50": {
+      "path": "../../../../review50-2026-10-31/review-responses.csv",
+      "sha256": "4a5296c9387f18e99e9462bf78135eac8c7e476d355eff98c17903e7ce09a4f5"
+    },
+    "candidate": {
+      "path": "../../../../conservative-export-2026-11-01/export/candidate.csv",
+      "sha256": "8860d689bfd607f472daf4c8deea71257a09e1baff4ea0002ebbf882d5542c2a"
+    },
+    "anchors": {
+      "path": "../../rarity-anchor-l1-ro.txt",
+      "sha256": "f8f4bfb586ca403524e0185f3ccaec85ec6af15fbabd7c0dfa7593c2d113afc4"
+    }
+  }
+}
