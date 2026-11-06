@@ -1135,3 +1135,18 @@ real,LLM sau evaluări. [Raport și pachet](../research/2026-11-07-automatic-ins
 conexiunii dedicate,dry-run,aplicare separat autorizată și postcheck/recipisă rollback.
 Politica este deja acceptată. Nu mai sunt necesare etichete sau experimente pentru
 această decizie provizorie;limitările de acuratețe și FAIL-urile istorice rămân.
+
+## Instalare structurală reală încheiată — 7 noiembrie
+
+Confirmarea utilizatorului a autorizat instalarea pachetului exact verificat.
+28/28prechecks și39/39postchecks PASS;commit confirmat prin recipisă și istoric
+migrare. Ledger/recipisă automată și rol NOLOGIN create. Toate77.698rândurile,
+coloanele/scorurile/reviziile,233umane,epoch-ul,secvența și recipisele/granturile
+umane păstrate. Ledger automat gol;zero scoruri aplicate,LLM sau evaluări noi.
+[Raport real](../research/2026-11-07-automatic-production-installation.md).
+
+**Următorul pas:** activarea separat autorizată a rolului,credențiale/conexiune
+dedicate verificate și dry-run. **Leftovers:** acea activare/verificare,aplicarea
+separat autorizată a50.724schimbări,postcheck și recipisă pentru rollback. Nu
+reinstala pachetul:condițiile de absență nu mai sunt aplicabile. Folosește
+postflight-ul înainte de activare;politica nu necesită reaprobare.

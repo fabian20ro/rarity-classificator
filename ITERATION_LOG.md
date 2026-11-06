@@ -1542,3 +1542,18 @@ no real DDL/DML,models/LLM or new labels. Raw deployment captures/individual rec
 remain local. Local standards/spec review;no external model delegation.
 Next:separately authorized real structural installation with disabled executor,then
 activation/connection verification and separately authorized score application.
+
+## 2026-11-07 — Authorized production structural installation, executor disabled
+
+User approved the previously recommended real structural installation only. Verified
+frozen bundle/installer hashes and all inputs;28/28live read-only prechecks PASS.
+Executed the exact tested SQL once via Supabase apply_migration;success and migration
+history confirmed.39/39independent postchecks PASS after commit;separate read-only
+receipt/role/ledger verification.77,698rows/all columns/scores/revisions and233human
+rows preserved;human receipts/grants,epoch andsequence unchanged. Automatic ledger
+empty;executor NOLOGIN with bounded grants. No login/password activation,score apply,
+model calls or new labels. Security advisor returned same5existing findings,no new.
+Saved raw evidence locally;offline verifier reproduces aggregate report. Plan/PR
+updated. No runtime changes;previous1008tests+479subtests and20integrations retained.
+Next:separately authorized dedicated executor activation/connection check/dry-run,
+then separately authorized score application and postcheck/rollback receipt.
