@@ -1,9 +1,18 @@
 # Plan curent: 1.000 de forme noi, maximum 50 de revizuiri
 
-Actualizat: 2026-11-04. Stare: etapele 1–22 încheiate;165corecții umane aplicate
-și confirmate prin citire separată.77.533rânduri neschimbate;233postcondiții valide.
-Lot uman închis. Review85/86 și merge-urile stivei încheiate; integrarea finală
-către main este pregătită și autorizată separat. Fără operații DB. Step4 neschimbat.
+Actualizat la încheierea implementării fluxului automat. Lotul uman a fost aplicat și verificat, iar
+integrarea în main s-a încheiat prin PR87. Simularea pentru cele 50.724 de
+schimbări automate recomandă păstrarea ambelor rute ca provizorii. Regula de
+păstrare a scorului vechi la salturi de ≥2 a fost testată și respinsă.
+[Rezultate pe rute și cohorte](../research/2026-11-05-automatic-promotion.md).
+Pachetul complet de promovare automată este pregătit în mod audit, cu loturi și
+inverse separate, 233 de rânduri protejate și toate gate-urile existente active.
+Politica provizorie a fost acceptată; fluxul automat separat este implementat și
+verificat în18probe OrioleDB, inclusiv întregul inventar și rollback. Urmează
+preflight real read-only. Nu s-au făcut instalări ori aplicări automate în DB-ul real.
+[Pachet, decizie concretă și verificare](../research/2026-11-06-promotion-package.md).
+[Flux acceptat și repetiție](../research/2026-11-06-automatic-flow.md).
+
 Acest document înlocuiește recomandările viitoare incompatibile din
 [planul istoric](2026-10-15-d1-classifier-evaluation.md), inclusiv prioritatea unui
 fallback dedicat numai diferenței 4–5. Istoricul experimentelor rămâne păstrat.
@@ -1016,3 +1025,158 @@ pin-urile existente păstrate. Ruff+986teste+456subteste PASS,40teste DB omise.
 Merge numai după CI verde pe head-ul final, cu verificarea rezultatului în main.
 Nu mai este necesară o altă operație DB pentru lotul uman; promovarea baseline-ului
 rămâne separată. Consultă PR-ul final pentru statusul efectiv al integrării.
+
+## Simularea politicii de promovare, 5 noiembrie
+
+Politica exploratorie a fost fixată înainte de calculul pe rute. Pe pilotul de
+150 de forme, wordfreq are 9/101 erori severe în validarea cu grup exclus,
+fallback are 2/49. În lotul selectat după risc, rezultatele sunt 1/5 și 12/45.
+Wordfreq pierde pe ambele forme de nivel 4 din pilot. Fallback atribuie 4 tuturor
+celor 12 forme de nivel 2 ratate în lotul de risc. Verdictul pentru ambele rute
+este păstrarea scorurilor existente. Cele 233 de rânduri evaluate sunt protejate.
+[Politica, scenariile și motivele deciziei](../research/2026-11-05-automatic-promotion.md).
+
+Experimentul propus pentru salturile de ≥2 este încheiat. Pe ruta fără
+frecvență regula evită 0 erori și pierde 2 corecții utile în pilotul de 150,
+câte una la nivel uman 4 și 5. În lotul de risc de 50 evită 3 erori și pierde 0,
+cu zero intervenții la nivelurile umane 4/5. Pe fallback mai rămân 9/45 erori
+severe în lotul de risc. **Decizie recomandată:** închidem această variantă.
+Folosim diferența de ≥2 ca indicator de dezacord la audit. Scorul istoric singur
+nu justifică alegerea între cele două estimări. Păstrăm ambele rute provizorii și
+regulile operaționale de upload. [Comparația pereche](../research/2026-11-05-automatic-promotion.md#rezultatul-regulii-de-păstrare-la-salturi-de-2).
+
+## Pachet de promovare în mod audit — 6 noiembrie
+
+Reutilizat candidatul conservator înghețat, identic cu scenariul complet din PR89.
+Mapare completă pentru 77.698 de rânduri/75.147 de forme. Loturi disjuncte pentru
+7.537 schimbări wordfreq și 43.187 fallback, cu scor/revizie așteptate, proveniență
+și CSV-uri inverse. Cele 233 de rânduri umane rămân intacte. Nicio regulă nouă de
+scor și nicio modificare în contractul operațional ori executorul uman.
+
+TDD la interfața CSV→pachet. 992teste+468subteste PASS,40integrări DB omise, Ruff PASS.
+15artefacte identice la replay. Verificare separată a întregului inventar, aplicare
+și inversare în memorie pentru 50.724 de schimbări. Surse intacte, zero LLM/DB.
+Jaccard16,71%, apartenență seed8,22%, recall56,25%: toate sub pragurile existente.
+`upload_authorized=false`, `ready_to_apply=false`, politica `pending`.
+
+**Pas recomandat:** decizie explicită asupra acceptării provizorii a scorurilor
+automate și a riscului măsurat/necunoscut, conform [propunerii complete](../research/2026-11-06-promotion-package.md).
+Aceasta include propunerea de a raporta gate-urile istorice ca diagnostice în
+contractul viitor; schimbarea nu este implementată sau aprobată acum. Fără reglaje
+repetate pe aceleași etichete și fără alte evaluări din partea utilizatorului.
+
+**Leftovers:** aprobarea versiunii politicii și a hashului candidatului; apoi
+contract operațional/flux automat separat cu TDD și repetiție izolată, preflight
+live și aplicare separat autorizată. CSV-urile inverse au nevoie de recipisa și
+reviziile post-aplicare; nu sunt rollback executabil. Datele actuale nu certifică
+precizia întregii populații, iar lipsa frecvenței nu dovedește obscuritatea.
+
+## Politică acceptată, flux automat și repetiție încheiate
+
+Confirmarea utilizatorului autorizează implementarea `automatic-provisional-acceptance-v1`
+pentru candidatul fixat și wordfreq+fallback. Evidența acceptării este separată de
+pachetul audit imutabil. Nu autorizează instalarea sau aplicarea în mediul real.
+
+Flux public CSV-first, implicit dry-run, cu replay complet și scope/hash verificat.
+Jaccard/ancore calculate cu aceleași praguri și FAIL păstrat vizibil; diagnostice în
+fluxul acceptat. Step4/Step5 și fluxul uman neschimbate. Ledger automat separat,
+DSN/confirmare pachet/epoch explicite, CAS multi-row într-un UPDATE și tranzacție
+unică pentru ambele rute, recipisă atomică, retry fără reaplicare și rollback pe
+reviziile post-aplicare. Verificare și a coloanelor fără scor.
+
+1.003teste+479subteste PASS,58integrări skip implicit;18/18probe pe OrioleDB izolat
+PASS.50.724rânduri schimbate,233umane protejate,rollback cu scoruri/altecoloane
+restaurate exact. Server/volum eliminate,7surse și1.135artefacte verificate prin hash.
+Zero LLM, evaluări noi sau acces DB real. [Raport și reproducere](../research/2026-11-06-automatic-flow.md).
+
+**Pas recomandat:** preflight real read-only pentru starea actuală, contractul de
+revizii/epoch, roluri/RLS/triggere și noul ledger. Apoi pregătirea instalării minime
+și granturilor automatizării pentru mediul verificat. Instalarea și aplicarea rămân
+separat autorizate. Nu reaproba politica deja acceptată și nu cere etichete noi.
+
+**Leftovers:** ledger/rol automat neinstalate în această etapă pe DB real; snapshotul
+din4noiembrie trebuie revalidat, iar orice drift oprește execuția și cere reconciliere.
+Repetiția nu certifică toate triggerele/efectele externe ale mediului găzduit.
+
+## Preflight real încheiat — 7 noiembrie
+
+21/21verificări PASS în5tranzacții explicit read-only. Toate77.698rândurile coincid
+cu snapshotul post-corecții, inclusiv reviziile;233umane protejate și recipisa165
+intacte. Contractul/epoch, RLS și9hook-uri DDL verificate. Zero modificări DB/LLM.
+Ledgerul și rolul automat lipsesc; fluxul nu este încă executabil în producție.
+[Rezultate și limite](../research/2026-11-07-automatic-preflight.md).
+
+**Următorul pas concret:** pregătirea cu TDD a pachetului versionat de instalare
+minimă (ledger separat,rol NOLOGIN/granturi,pre/postchecks), plus repetiție izolată.
+Reutilizăm reviziile/schema existente; păstrăm fluxul uman. Apoi instalare separat
+autorizată, conexiune automată verificată și aplicare separat autorizată a50.724
+schimbări. Politica este deja acceptată; nu cerem evaluări noi.
+
+**Leftovers:** pachetul de instalare specific mediului,replicarea izolată,instalare,
+conexiune/dry-run,apply/postcheck și recipisă de rollback. Revalidare live obligatorie
+înaintea execuției;capturile nu rezervă starea. Preflight-ul nu certifică precizia
+scorurilor automate și nu elimină FAIL-urile istorice de calitate.
+
+## Instalator automat și repetiție completă — 7 noiembrie
+
+Implementat prin TDD generatorul offline versionat: ledger/recipisă automată separate,
+rol NOLOGIN/granturi explicite,28prechecks/39postchecks,manifest și recuperare după
+confirmare pierdută. Reviziile/schema și fluxul uman existente păstrate. Protecție
+suplimentară pentru secvență și lock pe recipisa umană, validate prin teste de eșec.
+
+1.008teste+479subteste PASS;20/20probe OrioleDB izolat PASS. Pachetul exact repetat
+cu77.698rânduri și9hook-uri DDL;aplicare50.724/ retry/rollback prin noul rol doar în
+fixture;233umane și recipisa intacte.24artefacte reproduse identic. Container/volum
+eliminate. O captură reală suplimentară read-only pentru pinning;zero modificări DB
+real,LLM sau evaluări. [Raport și pachet](../research/2026-11-07-automatic-installation.md).
+
+**Următorul pas:** instalare structurală reală separat autorizată, verificări
+înainte/după, rol păstrat NOLOGIN. **Leftovers:** acea instalare,activarea și verificarea
+conexiunii dedicate,dry-run,aplicare separat autorizată și postcheck/recipisă rollback.
+Politica este deja acceptată. Nu mai sunt necesare etichete sau experimente pentru
+această decizie provizorie;limitările de acuratețe și FAIL-urile istorice rămân.
+
+## Instalare structurală reală încheiată — 7 noiembrie
+
+Confirmarea utilizatorului a autorizat instalarea pachetului exact verificat.
+28/28prechecks și39/39postchecks PASS;commit confirmat prin recipisă și istoric
+migrare. Ledger/recipisă automată și rol NOLOGIN create. Toate77.698rândurile,
+coloanele/scorurile/reviziile,233umane,epoch-ul,secvența și recipisele/granturile
+umane păstrate. Ledger automat gol;zero scoruri aplicate,LLM sau evaluări noi.
+[Raport real](../research/2026-11-07-automatic-production-installation.md).
+
+**Următorul pas:** activarea separat autorizată a rolului,credențiale/conexiune
+dedicate verificate și dry-run. **Leftovers:** acea activare/verificare,aplicarea
+separat autorizată a50.724schimbări,postcheck și recipisă pentru rollback. Nu
+reinstala pachetul:condițiile de absență nu mai sunt aplicabile. Folosește
+postflight-ul înainte de activare;politica nu necesită reaprobare.
+
+## Executor automat activ și conexiune verificată — 7 noiembrie
+
+Activare autorizată:LOGIN/parolă nouă independentă,fără granturi noi. Service/passfile
+private,TLS verify-full,identitate dedicată,READ ONLY explicit.9/9checks privilegii,
+77.698rânduri și toate coloanele,233umane,revizii/epoch verificate. Ledger automat gol;
+configurația umană intactă.38postchecks istorice trec;NOLOGIN este intenționat fals,
+iar atributele active sunt verificate separat. Dry-run offline complet:50.724schimbări
+planificate,zero aplicate. Zero LLM. [Raport](../research/2026-11-07-automatic-executor-connection.md).
+
+**Următorul pas:** aplicarea separat autorizată a pachetului înghețat prin executorul
+verificat,cu precondiții repetate sub lock,postcheck și recipisă pentru rollback.
+**Leftovers:** apply/postcheck/recipisă;nu mai sunt configurări sau evaluări umane
+necesare pe baza verificărilor curente. Politica și limitările de precizie neschimbate.
+
+## Aplicare automată reală încheiată — 7 noiembrie
+
+Autorizare explicită pentru pachetul înghețat;preflight și confirmări pachet/epoch
+reverificate.50.724schimbări comise într-o tranzacție:7.537wordfreq+43.187fallback.
+Postcheck independent READ ONLY:77.698rânduri identice candidatului,26.974rânduri
+neschimbate,inclusiv233umane;toate celelalte coloane,recipisele/granturile umane și
+contractul de securitate păstrate. O recipisă automată durabilă;50.724revizii confirmate.
+CSV rollback cu reviziile comise,proiecție inversă verificată offline,fără rollback.
+32pini protejați neschimbați;zero LLM/evaluări. [Raport](../research/2026-11-07-automatic-production-apply.md).
+
+**Obiectiv operațional încheiat.** Next:review/merge PR89 și păstrarea artefactelor de
+recuperare. **Leftovers:**precizia populației necunoscută și fallback4vs5 provizoriu,
+conform acceptării;îmbunătățiri ulterioare separat,nu altă configurare/aplicare acum.
+Nu mai rula instalatorul/preflight-ul care fixează inventarul vechi. Orice audit sau
+rollback ulterior trebuie raportat la recipisa comisă și la eventualul drift nou.

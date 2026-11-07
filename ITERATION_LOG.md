@@ -1441,6 +1441,170 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
 - Plan/report updated; final head must pass CI before SHA-pinned merge. No DB,
   LLM calls, score operations, model loading, branch deletion or unrelated cleanup.
 
+## 2026-11-05 — offline automatic promotion simulation
+
+Froze policy and historical input hashes before route scoring. Group-held-out
+pilot and frozen risk50 scores yield severe errors 9/101 and 1/5 for wordfreq,
+2/49 and 12/45 for fallback. All 12 risk50 fallback misses are human2 versus
+automatic4. Both routes held. Post-human snapshot simulation splits 50,724
+changes into 7,537 observed and 43,187 fallback. All 233 human IDs protected.
+Independent counts and two-run replay reconciled. No DB, inference or new ratings.
+
+## 2026-11-05 — paired bounded fallback simulation
+
+Reused the frozen pre-override evaluations from PR89. The missing-frequency rule
+kept the historical score on two pilot forms and four risk forms. Pilot lost one
+useful true-4 and one true-5 correction with zero severe errors avoided. Risk50
+avoided three severe errors, lost zero, and tied on one intervention. Reconstructed
+200 decisions from the original hashes and reconciled 18 slices. Recommend holding
+both routes. Zero new ratings, inference or database access.
+
+## 2026-11-06 — Automatic promotion package, audit only
+
+Prepared the frozen conservative candidate as disjoint wordfreq/fallback deltas
+and inverse CSVs. Reused exact-form/POS migration mapping and existing quality
+checks. TDD at the authorized CSV→audit-package boundary, including tampered/resealed
+sources, human POS protection, approval-mode rejection, incomplete mapping and replay.
+992 tests +468 subtests passed,40 DB integrations skipped; Ruff passed. Fifteen
+artifacts match on replay. Independent stdlib reconciliation checked all77,698 rows,
+233 protected rows and50,724 proposed changes; in-memory application/inversion restores
+the archived snapshot. Candidate bytes match the earlier both.csv. Six source hashes
+unchanged. No new labels, model calls, network collection or DB access.
+
+Documented a concrete provisional-risk policy proposal and its unresolved decision:
+legacy gates still fail and remain enforced. No approval/threshold/executor change.
+Rollback CSVs explicitly require future committed receipts/post-write revisions,
+not archived revisions. Next after policy approval: separate automatic contract/flow,
+isolated rehearsal, then separately authorized live preflight/application. PR89 updated
+with aggregate artifacts only; full snapshot-derived row data remain local.
+
+Review caught competing snapshot score columns changing legacy audit semantics.
+Added a failing regression, then rejected final_level/median_level in snapshots.
+Rebuilt/replayed the final package; candidate bytes unchanged. Existing lesson reused.
+
+## 2026-11-07 — Accepted automatic policy, transactional flow and isolated rehearsal
+
+User accepted the documented provisional-risk policy and requested implementation/
+isolated rehearsal. Recorded acceptance for the exact frozen candidate, package and
+both routes. Separate automatic ledger/adapter/CSV flow; human flow and legacy gates
+unchanged. Metrics remain calculated with actual FAIL outcomes, diagnostic only in
+the accepted hash-bound scope. Default preview has no DSN lookup or store access.
+
+TDD exposed missing manifest coverage and a concurrent acceptance-read hash race;
+fixed both. Whole-row fingerprints catch trigger changes outside score/revision.
+Initial per-row SQL made50,724network round trips. Added a failing real-server
+statement-budget regression, replaced with one parameterized multi-row CAS UPDATE;
+partial matches still roll back entirely. No parallel model or update calls.
+
+Final:1,003offline tests+479subtests PASS,58opt-in integration skips; Ruff PASS.
+18/18owned PostgreSQL17.9/OrioleDB1.8 tests PASS, including dedicated role/RLS,
+trigger/deferred/ledger faults, timeout, backend termination, lost apply/rollback
+ACKs, concurrent retries, revision conflicts and full inventory.50,724changes,
+233protected rows, exact restoration of scores and other columns. Full apply6.75s,
+rollback6.64s locally including validation, not a production lock-time estimate.
+Seven sources and1,135server artifacts hash-verified. No real DB access, new human
+ratings or LLM calls. The absent pinned image was fetched; container/volume removed.
+
+Next: live read-only preflight, then prepare minimal automatic-ledger/role deployment
+against that environment. Live installation/application not authorized by this stage.
+Policy already accepted; avoid repeating approval or requesting more labels. PR89
+updated with aggregate results; credentials and row-level test artifacts stay local.
+
+## 2026-11-07 — Automatic promotion production preflight, read-only
+
+Authorized continuation: production reads only. Five bounded REPEATABLE READ READ
+ONLY transactions through Supabase MCP, all read_only=on; no DDL/DML, installation,
+LLM, new labels or model loads. 21/21 capture checks passed:77,698 identity/POS/score/
+revision rows match approved post-human snapshot;233protected rows and entire165
+human correction receipt unchanged. Runtime revision contract/epoch valid;9DDL
+hooks unchanged;APIroles lack private USAGE;no applicable default grants. Automatic
+ledger/role absent, as expected. Runtime not ready until separate installation.
+Aggregate report/plan updated;raw captures,SQL,independent digest comparison and
+replay script retained locally. No runtime changes;previous1003tests+479subtests
+and18OrioleDBintegrations remain applicable. Next:TDD versioned installer/grants,
+isolated rehearsal,then separately authorized installation and application.
+
+## 2026-11-07 — Automatic installation package, TDD and exact OrioleDB rehearsal
+
+Implemented offline acceptance/package/capture → versioned SQL bundle;28prechecks,
+39postchecks,NOLOGIN role,explicit grants,private automatic ledger/installation receipt.
+Reused exact runtime revision SQL as a shared constant;human runtime behavior unchanged.
+RED/GREEN caught nontransactional sequence reset and missing lock on existing human
+installation receipt. Added checks/lock and recovery guidance. Fixture-only fix: do
+not regenerate a human bundle when the test explicitly uses the immutable original.
+
+1008offline tests+479subtests PASS,78server integrations skipped by default;Ruff PASS.
+20isolated OrioleDB cases PASS including exact package with9captured DDL hooks and
+all77,698rows;new executor apply50,724/retry/rollback preserved233human rows and receipt.
+24bundle artifacts identical at replay;9input pins unchanged;owned server/volume removed.
+One additional explicitly READ ONLY production capture for complete deployment pins;
+no real DDL/DML,models/LLM or new labels. Raw deployment captures/individual receipts
+remain local. Local standards/spec review;no external model delegation.
+Next:separately authorized real structural installation with disabled executor,then
+activation/connection verification and separately authorized score application.
+
+## 2026-11-07 — Authorized production structural installation, executor disabled
+
+User approved the previously recommended real structural installation only. Verified
+frozen bundle/installer hashes and all inputs;28/28live read-only prechecks PASS.
+Executed the exact tested SQL once via Supabase apply_migration;success and migration
+history confirmed.39/39independent postchecks PASS after commit;separate read-only
+receipt/role/ledger verification.77,698rows/all columns/scores/revisions and233human
+rows preserved;human receipts/grants,epoch andsequence unchanged. Automatic ledger
+empty;executor NOLOGIN with bounded grants. No login/password activation,score apply,
+model calls or new labels. Security advisor returned same5existing findings,no new.
+Saved raw evidence locally;offline verifier reproduces aggregate report. Plan/PR
+updated. No runtime changes;previous1008tests+479subtests and20integrations retained.
+Next:separately authorized dedicated executor activation/connection check/dry-run,
+then separately authorized score application and postcheck/rollback receipt.
+
+## 2026-11-07 — Automatic executor activation and dedicated connection verification
+
+Explicit user authorization:activate executor/check dedicated connection,no scores/LLM.
+39installation postchecks passed before activation. New independent random password,
+libpq SCRAM verifier;changed only automatic role LOGIN/password. Dedicated service/
+passfile0700/0600,TLS verify-full;human files hash-unchanged. First connection rejected
+ConfigParser spaced delimiters locally;fixed key=value,second authenticated. Explicit
+REPEATABLE READ READ ONLY:correct session identity,9privilege checks,77,698rows/full
+column digest,233guards,revision epoch and empty ledger all PASS. Administrative
+postflight:38PASS,expected NOLOGIN-only failure. Offline accepted-package dry-run:
+50,724planned,zero applied. Temporary activation SQL removed;raw evidence local.
+No runtime changes/no redundant suite rerun. Plan/PR updated. Next:separately authorized
+frozen-package apply with locked preconditions,postcheck and atomic rollback receipt.
+
+## 2026-11-07 — Authorized automatic production apply and independent verification
+
+User approved frozen50,724-score apply. Verified implementation against full OrioleDB
+rehearsal hashes,package/candidate pins,dedicated READ ONLY inventory/guards/privileges,
+and38applicable administrative checks. Existing automatic runtime applied7537wordfreq
++43187fallback changes in one transaction with exact CAS IDs/count and final receipt/
+whole-inventory validation. Independent READ ONLY postcommit connection confirmed
+all77,698candidate rows,50,724new versions and committed receipt;26,974unchanged rows,
+including233human rows,all non-score columns unchanged. Human receipts/grants,epoch,
+RLS/hooks preserved. Four historical pre-application checks now intentionally fail;
+new-state postcheck passes.32protected input/config pins unchanged. Exported50,724
+rollback preconditions with committed revisions;inverse projection restores before
+scores offline only. No LLM,new evaluations or rollback. Raw artifacts local;aggregate
+report/plan/PR updated. Operational objective complete;review/merge and retain recovery
+artifacts. Population accuracy/fallback4vs5 limitations remain explicitly accepted.
+
+## 2026-11-07 — PR89 pre-merge review
+
+Reviewed fixed diff4cfc166..9e963ca against AGENTS/lessons and the automatic-flow/
+installation ADRs, accepted policy and plan. Standards:0actionable findings.
+Spec:0actionable findings. Checked human protection, package/source pins, exact CAS
+IDs, receipt/revision checks, retry/rollback behavior, installation privilege scope
+and preserved legacy quality gates. Local two-axis review;no model delegation.
+Fresh sanitized offline check:1008passed,479subtests passed,78integration skips;
+DB/network blocked. Existing OrioleDB evidence verified offline:18flow tests and
+20installation tests;1135+1076artifact hashes checked. Old flow evidence predates
+the human-adapter SQL constant extraction;AST equivalence verified. Latest
+installation evidence matches current implementation hashes. No DB tests rerun,
+DB access/changes or LLM calls. CI green on9e963ca;no unresolved review threads.
+Review artifacts:build/d1/pr89-review-2026-11-07 (local). Merge conditional on green
+CI for this log-only commit and unchanged reviewed runtime. Quality limitations
+remain:accepted legacy gate failures and unproven population/fallback4vs5 accuracy.
+
 ## 2026-11-07 — D1 Score v2 implemented, run, rejected
 
 - User authorized implementation + inference + analysis; isolated branch
@@ -1492,3 +1656,20 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
   after first execution verified by byte-identical predictions/fits/report replay.
 - Plan/research updated; keep baseline/human priority, no v3 expansion or promotion.
   Next review/PR of reusable evaluator and negative result. No push/PR this iteration.
+
+## 2026-11-08 — Publish v2/v3 evaluation as PR90
+
+- Explicit user request: push `codex/d1-score-v3-offline` and create PR with
+  implementation, tests, v2/v3 results and plan; no LLM or DB actions.
+- Published commits5cd2632/a242d42; created
+  https://github.com/fabian20ro/rarity-classificator/pull/90 targeting main.
+- GitHub revealed stale origin/main: the clone's fetch refspec tracks only
+  codex/d1-evaluation-adapter. `git fetch origin main` updated FETCH_HEAD, not
+  origin/main. Fetched explicit main tracking ref and integrated4e1a60e.
+- Merge conflicts only in append-only ITERATION_LOG/LESSONS_LEARNED. Verified
+  both sides preserve the base prefix, retained all additions from both histories.
+  No source-level conflict or inference/DB action.
+- Post-integration `scripts/check.py` with audit-hook DB/network blocking:
+  1047passed,78skipped,479subtests; Ruff PASS. Historical CSV bytes/hashes preserved.
+- PR includes negative v2/v3 conclusions; no automatic-score promotion.
+  Plan updated with PR link; review/merge remains separate from publication.

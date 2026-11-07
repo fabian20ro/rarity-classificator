@@ -193,9 +193,11 @@ def prepared(cluster, tmp_path, full=False, captured_hooks=False):
         }
         capture_manifest.write_text(json.dumps(manifest))
         bundle = tmp_path / "bundle"
-        prepare_human_installation(approval, policy, capture_manifest, bundle)
         if captured_hooks:
+            # This case rehearses the immutable original, not a regenerated bundle.
             bundle = ROOT.parent / "human-installation-2026-11-03/verified"
+        else:
+            prepare_human_installation(approval, policy, capture_manifest, bundle)
         assert verify_installation_bundle(bundle)["valid"]
         yield owner, admin, bundle, approval, policy
     finally:

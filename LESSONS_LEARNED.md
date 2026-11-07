@@ -481,6 +481,27 @@ Pip-based CI passed while the lock omitted evaluation/frequency and `uv lock --c
 failed. Check the lock separately; regenerate without upgrading existing pins and
 report that existing-environment tests do not validate every newly locked version.
 
+**[2026-11-07]** Scale CAS by statements, not remote round trips. The human165 flow's
+per-row pattern took20–22s locally for50,724automatic changes and would amplify network
+latency while holding the write lock. One parameterized multi-row UPDATE preserves
+ID/spelling/POS/score/revision conditions; compare returned IDs/count and roll back on
+partial matches. Real OrioleDB statement-budget and partial-match tests validate this.
+Keep full post-state/receipt checks and fingerprints of non-score columns; new row
+revisions alone cannot reveal a trigger rewriting another column of an intended row.
+
+**[2026-11-07]** Installation rollback does not restore sequences. An isolated DDL
+hook reset the revision sequence without changing row tokens; row fingerprints and
+the structural revision validator alone passed. Check sequence position against rows
+before deployment and pin its before/after state in the installation receipt. A reset
+requires explicit administrator reconciliation, never an automatic rewind on retry.
+Lock existing installation receipts alongside the human ledger when comparing them;
+a read-only digest check does not exclude concurrent writers.
+
+**[2026-11-07]** Write libpq service files with ConfigParser's
+`space_around_delimiters=False`. Its default `key = value` output was rejected by
+libpq before connection; `key=value` authenticated successfully with the same
+password/TLS configuration. Keep service/passfile0600 and credentials out of argv.
+
 **[2026-11-07]** Historical-control replay needs explicit schema compatibility.
 The old D1 pilot contains two `context_incomplete=true` senses; the corrected
 lexical boundary intentionally rejects them. Validate every arm before loading;
@@ -506,3 +527,10 @@ V3's combined model reduced training squared error, but changed only two outputs
 by one level and corrected no severe errors. Its standalone gain on risk-selected50
 reversed on pilot150, including the missing-frequency subset. Keep both cohorts,
 class supports and paired introduced/avoided errors; do not promote from one slice.
+
+**[2026-11-08]** Inspect fetch refspecs before trusting origin/main in a narrow
+clone. `git fetch origin main` may update only FETCH_HEAD while origin/main stays
+stale when remote.origin.fetch tracks another branch. Compare the PR base SHA and
+FETCH_HEAD; explicitly fetch refs/heads/main:refs/remotes/origin/main before
+ancestry/conflict checks. This caused PR90's two append-only document conflicts;
+retain both histories and rerun offline checks against the actual base.
