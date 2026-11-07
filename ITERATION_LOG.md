@@ -1466,3 +1466,29 @@ Imported synchronized Sites export:50 exact frozen IDs,142events,2notes,3net sco
   40 skipped,456 subtests; Ruff/diff checks pass. Planner review findings resolved.
 - Plan/research/aggregate receipts saved. Next: review/PR of reusable tooling
   and negative result, not activation of v2. No new user evaluations.
+
+## 2026-11-08 — V3 offline calibration and combination
+
+- User authorized TDD + offline calibration150/50, no inference/new labels/DB.
+  Isolated branch `codex/d1-score-v3-offline`, derived from verified v2 commit.
+- Fixed native A before fitting. Nonnegative affine least squares for D1 expected
+  level, baseline-only ablation and baseline+D1. No search or post-result tuning.
+- Important leakage fix by design: refit wordfreq thresholds in each outertrain;
+  historical OOF rows are descriptive only, never meta-model covariates. Five frozen
+  folds142groups, full150fit→50. Meta-training baseline features in-sample outertrain.
+- CSV public seam TDD15tests: known scales/ties, independent signals, negative/
+  constant/collinear predictors, input/family validation, label-isolation and gates.
+- Results severe150/50: refitbaseline11/13, native43/7, calibrated34/5,
+  baselinecal11/13, combined11/13. D1alone avoids7/9 but introduces30/1 versusbase.
+  Combined changes only război1→2 and aurolac4→5, no severe correction; all gates fail.
+- True5: calibrated12/22 and2/6 versusbase3/22 and1/6. Missingwordfreq performance
+  differs sharply by selection: pilot13/49 versusbase2/49, challenge4/45 versusbase12/45.
+  Do not infer a general missing-frequency routing policy from the challenge set.
+- Audit:200forms,210sourcefiles unchanged; six label-mutation checks on temporary
+  copies;18 independent installed-SciPy NNLS checks; portable pack replay identical.
+  Network, subprocess and DB blocked during evaluation/audit; original labels intact.
+- Final `scripts/check.py`:1025passed,40skipped,456subtests; Ruff/diff checks pass.
+  Planner read-only review: no blockers. Source snapshots/protocol retained; formatting
+  after first execution verified by byte-identical predictions/fits/report replay.
+- Plan/research updated; keep baseline/human priority, no v3 expansion or promotion.
+  Next review/PR of reusable evaluator and negative result. No push/PR this iteration.

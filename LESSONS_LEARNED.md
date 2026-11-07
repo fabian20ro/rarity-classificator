@@ -494,3 +494,15 @@ at the newly written receipt is insufficient when the next invocation skips
 existing failed IDs. Check all loaded receipts before further inference;
 explicit retry archives prior bytes. Comparisons must bind references/results to
 the frozen inventory, or consistently truncated inputs can appear complete.
+
+**[2026-11-08]** OOF predictions are not automatically leakage-free covariates for
+another outer CV. A different row's historical OOF prediction may depend on the
+current holdout's labels. Refit the entire supervised baseline within each outer
+training fold, then fit calibration there; test invariance under holdout-label
+changes. Baseline-only calibration is a required ablation for claimed D1 gains.
+
+**[2026-11-08]** Positive fitted D1 coefficients do not establish operational value.
+V3's combined model reduced training squared error, but changed only two outputs
+by one level and corrected no severe errors. Its standalone gain on risk-selected50
+reversed on pilot150, including the missing-frequency subset. Keep both cohorts,
+class supports and paired introduced/avoided errors; do not promote from one slice.

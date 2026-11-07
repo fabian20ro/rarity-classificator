@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "forms": 200,
+  "cohort_sizes": {
+    "150": 150,
+    "50": 50
+  },
+  "native_predictions_replayed": true,
+  "independent_metric_replay": true,
+  "nnls_oracle_checks": 18,
+  "heldout_label_mutation_invariance": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "50"
+  ],
+  "formatted_source_replay_byte_identical": true,
+  "protected_sources_unchanged": 210,
+  "network_db_subprocess_blocked": true,
+  "implementation_sha256": "8afe460fe004ac30b7094ac1e2be5872fd27acbd263e0328d6fdcbd2873ff7a1",
+  "executed_source_archive_sha256": "6055fd245d3cf4fb5fcaf09e3d2a74e5a9b8068c38d896354a8e9eb9c69dc145",
+  "protocol_sha256": "d60a2557c18ed2f9ca6c2fa2ed899be646c512c801f1b467d12a1cb3d2ed8e40"
+}

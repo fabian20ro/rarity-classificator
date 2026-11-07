@@ -137,3 +137,10 @@ concentrarea la3, diagnosticul constant3. Decizie predeclarată:
 Chiar dacă trece, nu aplicăm scoruri automat. Extinderea candidatului pe1.000
 este un pas separat, pentru acord și audit; cele950 fără etichete nu oferă
 acuratețe măsurată. Promovarea în producție rămâne în afara experimentului.
+
+## Continuare2026-11-08: calibrare v3 offline
+
+[Plan și rezultate v3](2026-11-08-d1-score-v3.md): implementat cu TDD,
+control A fixat,5-fold150 și verificare50. D1 calibrat34/5 erori severe;
+combinația11/13, identic ca total cu baseline. Nicio variantă acceptată;
+nicio inferență, evaluare nouă sau modificare DB. V2 rămâne respins.

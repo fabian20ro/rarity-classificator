@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "sources_unchanged": 210,
+  "network_and_db_blocked": true,
+  "cohort_sizes": {
+    "150": 150,
+    "50": 50
+  },
+  "protocol_sha256": "d60a2557c18ed2f9ca6c2fa2ed899be646c512c801f1b467d12a1cb3d2ed8e40"
+}
