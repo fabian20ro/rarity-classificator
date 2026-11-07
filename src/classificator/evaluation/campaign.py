@@ -52,6 +52,7 @@ def run_campaign(
     *,
     config: dict,
     retry_failed: bool = False,
+    stop_on_failure: bool = False,
 ) -> Path:
     if not items or len({item.word_id for item in items}) != len(items):
         raise ValueError("Inventory must contain unique IDs and at least one word")
@@ -103,12 +104,23 @@ def run_campaign(
                 except (ValueError, KeyError, TypeError) as exc:
                     raise ValueError("Corrupt campaign checkpoint outcome") from exc
                 records[item.word_id] = _summary(record)
+        if stop_on_failure and not retry_failed and any(
+            record["status"] == "failed" for record in records.values()
+        ):
+            raise RuntimeError("Existing failed receipt requires explicit retry_failed=True")
         committed_since_export = 0
         try:
             for item in items:
                 record = records.get(item.word_id)
                 if record is not None and not (retry_failed and record["status"] == "failed"):
                     continue
+                if record is not None and record["status"] == "failed":
+                    # Preserve exact native failure before an explicit retry replaces it.
+                    archive = output_dir / "attempts" / str(time.time_ns())
+                    archive.mkdir(parents=True)
+                    (archive / f"{item.word_id}.json").write_bytes(
+                        (records_dir / f"{item.word_id}.json").read_bytes()
+                    )
                 started = time.perf_counter()
                 outcomes = scorer.score_batch([item])
                 elapsed = time.perf_counter() - started
@@ -126,6 +138,8 @@ def run_campaign(
                 _write_json(records_dir / f"{item.word_id}.json", record)
                 records[item.word_id] = _summary(record)
                 committed_since_export += 1
+                if stop_on_failure and outcome.status == "failed":
+                    raise RuntimeError(f"Campaign stopped after durable failed receipt: {item.word_id}")
                 if committed_since_export == 100:
                     _export(list(records.values()), output_dir, config, len(items))
                     committed_since_export = 0

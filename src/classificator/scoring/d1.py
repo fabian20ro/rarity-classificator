@@ -36,9 +36,26 @@ class D1Scorer:
         evidence=None,
         form_contract=None,
         min_probability: float = 0.0,
+        question: dict | None = None,
     ):
         if not math.isfinite(min_probability) or not 0 <= min_probability <= 1:
             raise ValueError("min_probability must be finite and in [0,1]")
+        if question is not None:
+            if (
+                not isinstance(question, dict)
+                or set(question) != {"type", "instructions", "criteria"}
+                or question["type"] != "score"
+                or not isinstance(question["instructions"], str)
+                or not question["instructions"].strip()
+                or not isinstance(question["criteria"], list)
+                or len(question["criteria"]) != 5
+                or any(not isinstance(c, str) or not c.strip() for c in question["criteria"])
+                or len(set(question["criteria"])) != 5
+            ):
+                raise ValueError("Score question requires instructions and five unique criteria")
+        self._question = json.dumps(question or {
+            "type": "choice", "instructions": INSTRUCTIONS, "criteria": RUBRIC
+        }, ensure_ascii=False, allow_nan=False)
         self.min_probability = min_probability
         self.model = model
         self.base_url = base_url.rstrip("/")
@@ -94,7 +111,7 @@ class D1Scorer:
                     "evidence": self.evidence.get(item.word_id, {}),
                 },
                 "questions": {
-                    "rarity": {"type": "choice", "instructions": INSTRUCTIONS, "criteria": RUBRIC}
+                    "rarity": json.loads(self._question)
                 },
             }
             raw_response = ""
@@ -107,9 +124,17 @@ class D1Scorer:
                     raise ValueError("Expected exactly the rarity answer")
                 answer = answers["rarity"]
                 distribution = answer["probabilities"]
-                if set(distribution) != set(RUBRIC):
-                    raise ValueError("Expected exactly L1..L5 probabilities")
-                probabilities = tuple(distribution[key] for key in RUBRIC)
+                question = payload["questions"]["rarity"]
+                score_mode = question["type"] == "score"
+                keys = [str(i) for i in range(5)] if score_mode else list(RUBRIC)
+                if set(distribution) != set(keys):
+                    raise ValueError("Expected exactly five configured probability keys")
+                if score_mode and (
+                    answer.get("type") != "score"
+                    or answer.get("legend") != dict(zip(keys, question["criteria"]))
+                ):
+                    raise ValueError("Score type/legend mismatch")
+                probabilities = tuple(distribution[key] for key in keys)
                 if any(
                     type(p) not in (int, float) or not math.isfinite(p) or not 0 <= p <= 1
                     for p in probabilities
@@ -117,10 +142,13 @@ class D1Scorer:
                     raise ValueError("Probabilities must be finite numbers in [0,1]")
                 if not math.isclose(sum(probabilities), 1, abs_tol=1e-6):
                     raise ValueError("Probabilities must sum to 1")
-                if answer["choice"] not in RUBRIC:
+                if not score_mode and answer["choice"] not in RUBRIC:
                     raise ValueError("Unknown choice")
                 # Deterministic argmax policy; API confidence is not correctness.
-                level = max(range(5), key=probabilities.__getitem__) + 1
+                level = (
+                    1 + sum(sum(probabilities[k:]) > 0.5 for k in range(1, 5))
+                    if score_mode else max(range(5), key=probabilities.__getitem__) + 1
+                )
                 outcomes.append(
                     Outcome(
                         item.word_id,

@@ -1,0 +1,11 @@
+{
+  "type": "score",
+  "instructions": "Evaluează familiaritatea formei românești exacte pentru un adult românofon obișnuit, prin cel mai familiar sens valid dintre toate părțile de vorbire admise. Nivel mai mic = formă mai comună.\n\nGrafia și diacriticele sunt intenționate, inclusiv absența lor. Nu corecta forma și nu o înlocui cu lema, altă flexiune sau alt cuvânt. valid_pos indică POS admise; inventory_type este doar metadată istorică. Nu folosi familiaritatea unei lecturi cu POS neadmis.\n\nÎn form_relation, exact_form este ținta, source_heading este intrarea-sursă, iar relation indică legătura lexicală. O variantă sau flexiune poate avea același sens, dar altă familiaritate decât intrarea-sursă. Evaluează ținta. Aplică restricțiile și marcajele de uz numai sensului sau variantei căreia îi aparțin. Un sens rar nu anulează un alt sens familiar valid.\n\nDefinițiile explică sensul, nu dovedesc familiaritatea. Posibilitatea de a deduce sensul din rădăcină, prefix sau explicație nu echivalează cu recunoașterea formei în uz. Dovezile sunt limitate la sursele disponibile. missing_definition_pos indică lipsuri ale documentării, nu lipsa unor sensuri valide; nu inventa sensuri pentru a le completa.\n\nFolosește criteriile în ordinea dată. Nu impune cote între niveluri. Lipsa dovezilor nu impune un nivel implicit. Evaluează familiaritatea independent de caracterul ofensator al cuvântului.",
+  "criteria": [
+    "Vocabular cotidian de bază, cunoscut și folosit de aproape toți adulții românofoni.",
+    "Vocabular comun, înțeles ușor de majoritatea adulților românofoni.",
+    "Vocabular cu familiaritate moderată, care nu este universal în uzul cotidian.",
+    "Vocabular rar: specializat, regional sau literar.",
+    "Vocabular foarte obscur sau puternic arhaic."
+  ]
+}

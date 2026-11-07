@@ -501,3 +501,36 @@ a read-only digest check does not exclude concurrent writers.
 `space_around_delimiters=False`. Its default `key = value` output was rejected by
 libpq before connection; `key=value` authenticated successfully with the same
 password/TLS configuration. Keep service/passfile0600 and credentials out of argv.
+
+**[2026-11-07]** Historical-control replay needs explicit schema compatibility.
+The old D1 pilot contains two `context_incomplete=true` senses; the corrected
+lexical boundary intentionally rejects them. Validate every arm before loading;
+use a pinned historical-only opt-in, never silently repair the control or weaken
+the default. A clearer prompt and corrected evidence can worsen the model:
+Score v2 yielded147/150 level3 predictions. Keep true1/true5 checks and constant3
+diagnostics; a risk-selected set without true1 can hide this collapse.
+
+**[2026-11-07]** A durable failure must also block implicit resume. Stop-on-failure
+at the newly written receipt is insufficient when the next invocation skips
+existing failed IDs. Check all loaded receipts before further inference;
+explicit retry archives prior bytes. Comparisons must bind references/results to
+the frozen inventory, or consistently truncated inputs can appear complete.
+
+**[2026-11-08]** OOF predictions are not automatically leakage-free covariates for
+another outer CV. A different row's historical OOF prediction may depend on the
+current holdout's labels. Refit the entire supervised baseline within each outer
+training fold, then fit calibration there; test invariance under holdout-label
+changes. Baseline-only calibration is a required ablation for claimed D1 gains.
+
+**[2026-11-08]** Positive fitted D1 coefficients do not establish operational value.
+V3's combined model reduced training squared error, but changed only two outputs
+by one level and corrected no severe errors. Its standalone gain on risk-selected50
+reversed on pilot150, including the missing-frequency subset. Keep both cohorts,
+class supports and paired introduced/avoided errors; do not promote from one slice.
+
+**[2026-11-08]** Inspect fetch refspecs before trusting origin/main in a narrow
+clone. `git fetch origin main` may update only FETCH_HEAD while origin/main stays
+stale when remote.origin.fetch tracks another branch. Compare the PR base SHA and
+FETCH_HEAD; explicitly fetch refs/heads/main:refs/remotes/origin/main before
+ancestry/conflict checks. This caused PR90's two append-only document conflicts;
+retain both histories and rerun offline checks against the actual base.

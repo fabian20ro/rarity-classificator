@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "policy": "d1-monotone-affine-v3",
+  "arm": "A",
+  "cohort_sizes": {
+    "150": 150,
+    "50": 50
+  },
+  "folds": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ],
+  "features_sha256": "b0a2742b124c8cc2d60ffa5a9880d9a335b6265bac350b8b905513a5a3412b54"
+}

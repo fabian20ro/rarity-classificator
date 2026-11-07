@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "arms": {
+    "A": "historical evidence/instructions/criteria",
+    "B": "corrected evidence; historical instructions/criteria",
+    "C": "corrected evidence/v2 instructions; historical criteria",
+    "D": "corrected evidence/v2 instructions/criteria"
+  },
+  "schedule": [
+    [
+      "150",
+      "A"
+    ],
+    [
+      "50",
+      "C"
+    ],
+    [
+      "150",
+      "D"
+    ],
+    [
+      "50",
+      "B"
+    ],
+    [
+      "150",
+      "C"
+    ],
+    [
+      "50",
+      "A"
+    ],
+    [
+      "150",
+      "B"
+    ],
+    [
+      "50",
+      "D"
+    ]
+  ],
+  "max_requests": 800,
+  "decoder": "lower-median-strict-survival-gt-0.5-v1",
+  "decision": "Against A: no greater severe count or excess in either cohort; strict decrease of severe or excess in at least one; no greater severe or excess separately at true 4 or true 5 in either cohort. No promotion; baseline comparison required.",
+  "runtime": {
+    "context_length": 16384,
+    "eval_batch_size": 16384,
+    "physical_batch_size": 16384,
+    "parallel": 1
+  },
+  "model": "d1-omni-2b",
+  "model_file": "/Users/fabian/.lmstudio/models/LiquidAI/d1-Omni-2B-GGUF/d1-Omni-2B-F16.gguf",
+  "model_file_sha256": "887728ee0180b60abfcf6d4370d6bc6a609cd92a58e33a20b5333e0e2438bf4f",
+  "inputs": {
+    "inputs/150/corrected.csv": "729a3424c9126d3d84a36563232d3bde11265f4f200dda9049c1a19d8bdc6eb2",
+    "inputs/150/historical.csv": "2f12c1aaae7cd137429897a03bc2ad9c3de4a5fbb83d4a41cd61fd335bf2692d",
+    "inputs/150/vocabulary.csv": "e31dc0d484cd27394a20756e90da829a2e2415c9b6234ecc33ea4540cb39b526",
+    "inputs/50/corrected.csv": "9af8098670831fbf041ffe5fee454ffd4edca328821cdef056ac8c446e69bfd3",
+    "inputs/50/historical.csv": "3149d8b6930494d65386005576e4014617b2dc4b504aeb995dd309d6878208bd",
+    "inputs/50/vocabulary.csv": "905c5d3c6810ee8ab6a9a834f317e377769bd1ff5c3d517cb8f6c3a2d8e990d7",
+    "questions/A.json": "293831a425a90c89000f520a9b5f04902c1bfc3daf7d8a98b0aacdf96cfa80b7",
+    "questions/B.json": "293831a425a90c89000f520a9b5f04902c1bfc3daf7d8a98b0aacdf96cfa80b7",
+    "questions/C.json": "2e524ed54b16ca712cb0d4c8fd4eeb2c4e18eba4f81e254c499f42bc61c5df25",
+    "questions/D.json": "7d3dd6a4259a45eb8df570a73209a1d8fc936a57f322da957d1660c7bf5480a6"
+  },
+  "implementation": {
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/__init__.py": "af5e30ae17b0dfc9a98626ac04ee0062e704b7d00b5110113c513c4d65daa0a7",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/__main__.py": "307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/batch_size_adapter.py": "2ba02ec28dcfa437851823223be3abdf03cbe8406c588c971ca2d5a3925a43ca",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/cli.py": "0a4c5ecfa96e55f5fe8048fd623ab07432a8ee1d0b191b3d9ecba49440b55fa4",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/constants.py": "c585ee55bc007db08c50cdc756d7bf3512bbb29c1d21826225ca900d34810333",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/csv_codec.py": "fe8fb98af7183a7bb7dd39e2fc6ab483b1f59c78e03d62368fe3d82b19deb117",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/distribution.py": "44b50ee69af046b275a7f76d5909902bb64ed8c3909886f646e9f1fccf7ba89e",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/audit_judge_evidence.py": "2f6aa4be6246c152aa768d6507691d0837bf43206535e9b34564db7a2543048d",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/blind_review.py": "c326c63fd31d45ee9076a4fe75114f64e109dc6b9ea9d02735859a6807c8a694",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/campaign.py": "3773e0f85106aa64b98839d345c7c43c0d4fcb5104561f357449e58226e494f3",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/chat_judge.py": "e76cd79e5c78d0930e6d6d8bb958796d69ce9c3fc55e5256e17854e5856c8e74",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/cli.py": "16f7dcf42bd95fac68cd0daada19e428eb8e08de759bb3bd488e3420f37fb9ce",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/codex_judge.py": "c937e675cad19deb9027d011f9b070ccedc1e30f1ccf24862d8476ef25398ff3",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/conservative_export.py": "0d4a7c22e25b142f0e767d31c07848d5ffe6c3344b9b00fca447422fff5c91dd",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/corola.py": "ba57eafb042637215fcdea67c2a8ea7e336edabce2e6f87147290356c54d51e5",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/corola_fallback.py": "189c8d2b5ed56dfdf3e3430aa76e600e18567f4fe48dc7c822f691112e490380",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/corpus_fallback.py": "95515e9b50579ead395f94027ae9ebc34210c2e579be6dc6ff9f1162087923ec",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/d1_score.py": "5093e164d17897a8042b3d28a8809f09520559e653ead61d154e5a1915768c7a",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/dataset.py": "c6fd9f04362a9ce3811579e9a4aed71a1c5ae9d1e55de376020fe06e4726439d",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/definition_frequency.py": "767ec81788b8e410567f1302d231cc67859d0292590c7713a2664b03a0789692",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/exact_form.py": "7afa64a0ebd27d6115fc1e0030caabbb141d6aa4508b5bdb2c4a5c9dc9def1f5",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/fineweb.py": "9439b9968faa1490842072a5ba44c945c0df8a98f49abfd06b9ad35be56b430b",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/fineweb_fallback.py": "bcfa6cebe248ec23f32ca57448b9ec71870d829fba78eca8fe1caa73290d6196",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/fineweb_transport.py": "bd7698c99403ce5b85c8d3552357a760b458990d8d8dcd31904ced1c258cb098",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/form_evidence_audit.py": "2a9697ca87256a95623f84950b5fee84320f5962e61c373e4363c2838128b6ee",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/form_frequency_report.py": "16f9bddf3dd7c0e7e09f855e7e99551c8b2c436b5a7f439b61eeef49df402a2e",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/frequency_calibration.py": "d5f8eb93c84f21acd99a7005c20f95bf5baabe077295d43ebb839ffea5560742",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/frequency_cross_validation.py": "f54cf2a583dfc723ac57c186c2ce943989ff20f147e9ff7eb6a7ac32858720d4",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/full_pilot_baselines.py": "2b24fe2bbd117a8cc50e286759f5d5a7222dfa952dc2000bea956a0d23a9609d",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/human_acceptance.py": "698f4e13bb4dc3bff647787cf92182c49cfbb886cdd05e1f29aae28175fa5ad5",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/human_corrections.py": "a6cd6ce4b4f52226d5859a11875a618dbf30c22c3c38c663d935ce52a4a98f7a",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/judge_comparison.py": "fa0732009eab837d03f33290174f53adaa4f96e67d4e71ad43525df096d9482d",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/judge_evidence.py": "89968d158c22f50e4614bf139a472889b72f13e1cf212356d2327c9fed00df6d",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/lexical_evidence.py": "76e435625e8389be29d586f5f2ea30c2e8aacaedbe76c24243ff64ad2fc0c05b",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/local_evidence.py": "0067464eb67de38fda39efeaa610ded4fc849fc9cf8ff37a6627af5819910594",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/local_fallback.py": "9b50640232701997a2f0ff35a66f720ed82ed21b6fa00bd4b7571849570a102c",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/local_mentions.py": "3084dfd54cae903f87cd32b940c28178492415cb8469e25a42be90175d1b6b25",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/migration_dry_run.py": "e7701ecd99f9495c0c8a18f1bc21939ce01939f4eebc8f332ad079ea938f9cbd",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/reduction_gate.py": "4dc6ed3a5743249403805bc6e4792d716ca9192e72830bbe0821809610bc652e",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/report.py": "c104482083a6436c2c2bd393cfb3f4ef5f45b0eac8302206fd8ee7e9bbc0aa21",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/risk_queue.py": "f36468a275a62c965de83c0aa7688afc939b661855c95c924e96391abbdd7e08",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/validation_contract.py": "61d94c23ab8fd2d235fb5b755bb136eaff29df6b34590b854d71c201f3150106",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/wordfreq_baseline.py": "add46d7f7241eaf489a0960494581138a52193a73189f0be02f8f3a18e4938b6",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/evaluation/wordfreq_source.py": "f8b563351b35c3a458626b49b885b2d083938878a7a78936a046aa0d9bb52dd8",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/fuzzy_word_matcher.py": "dbe945e9b63efd2edd3ea35f60206d624a32cee432a2f8ccd180bd1daeb9215e",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/human_correction_flow.py": "02303d4346c1f3e65e246500425ecf0726e375936f73ae8447ab16cfe1b93e06",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/human_correction_postgres.py": "078e2910dc8964a35e2aa8f57cb407e1bccd14f7fb6143284b64a1bb2d53e31a",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/human_installation.py": "61cd6fe9440650c01a32bf5ad82991cbca1f2fe12fb2923944ae962297aaf7a1",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/json_repair.py": "b9baab5efe8e3d6ec2f8decf46d69af385c919b00f0898e1bc36c1bae1b0c3c1",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/lm/__init__.py": "4c7a8edae5dd5b6d82f9a9ed512db9db554885abac417135b8f22ca30afb9c70",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/lm/client.py": "13f5b57b33a762cc31fe522ca7493b9da35c7e87ed0f855d0fb4cd3277565297",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/lm/model_profiles.py": "9117ab228342793923e307ee78b81203b4de27461cadea59c52959ba710dcc7b",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/lm/request_builder.py": "ceb5ef6682f8307bf4d5e99d2b1e7a9805c2526229eb4ede3310fee39520c323",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/lm/response_parser.py": "0f64d2108f5831da9e0a363f68d7a83e6192f1f2dc00844883a712c4fbd4ef4a",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/lock_manager.py": "c2fb2358766a97fea4d16fc000f6ba1490cc1ea91d9e07917a140e370af7a5cf",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/models.py": "1172e947bbb62b00bc3a7f4ea9c901b08c33963b037073ab83d70a3c3301b064",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/run_csv_repository.py": "328cd915ad8e0a3a75e5d5cfcc0629e05e9e0a9fa6cd5ce7f2a66eb657fa6e2c",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/scoring/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/scoring/base.py": "7883d82ddd727dfd971ee9f2f3de8c13c2a53ee3e2485b643d28149e0ec4cd9c",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/scoring/chat.py": "2a24d250c1e773cef364c6fd9f014e2ea16f01c63d9ec2ac5ce258e75ae47218",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/scoring/d1.py": "3809282f2e9ca5bf76b6ef62a8e5db3a367d8617312633de07ceabc10a6bd149",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/scoring/frequency.py": "eb2ef47b5a94a10887d897baf3549c5e41e2ed82fd74d54a470652675ba47b10",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/step2_metrics.py": "79c75c0f65a2a53682897ecb2e2580daa7416b34fc6da07182139ed62b2fec7f",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/steps/__init__.py": "66d136285e380790715adf972adfa338992722c9ffb5c0db814ac411735642df",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/steps/step1_export.py": "f0af6a4a51ab2b9bcf91d50448d8fe191055fd991cf33da3cb054b3a277b83be",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/steps/step2_score.py": "d4f18219053c50ac3faf08ba1cc2dff9554b4e91689f3744d8c2dc6e48585c43",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/steps/step3_compare.py": "f7eb5dcbef1ff44aacea25af821492e110e917bfa650de60e9ab8d11a2bb8451",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/steps/step4_upload.py": "0af05e6c7d6df5ebe922df6331d796ea5e486a56fb14cb8fdfe31995f04a2c73",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/steps/step5_rebalance.py": "54cbd223848fb7f34f4f2d4d453523d0a15d8309fdee03ddaf9254fcebf97465",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/support.py": "2d2f4e9eeed78acdd02b0c2352e33f5aad439c7089b543ef6dc2e149f642d867",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/tools/__init__.py": "cab0224f25992d3c44eb64504d63f4b70e5c9dc86d51c86e6fac0703e058b723",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/tools/build_retry_input.py": "1719562bd7259225eb213bb06a00d5ca1b19c0f37492452bc8df88d27106cf73",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/tools/chain_rebalance_target_dist.py": "0396e3cb29ace8e28529a530b6fb84d2d628170b03ccced3418497c392018420",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/tools/quality_audit.py": "12b627cc8d11ba1a197fc449a22c2cc49e7d5440145920cb217abbeead1e4ca1",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/tools/rarity_distribution.py": "f1441b1df23ece7fb0dac96b29c61e7ecfdde01af42805df5558c4098996fd46",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/tools/review_low_confidence.py": "09ed48b0b7ce14b79974f917e1a99d522232bc333986cd4eb876256d39b25081",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/transitions.py": "f9e7449d2b3386851c4bcdc49819b8674642a6460c41cc5111ebbf9fec95318a",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/upload_marker_writer.py": "83d5c2526565129814a9e29a79bffabcdcb8b027911461640883de9bb4ba5df4",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v2-code/src/classificator/word_store.py": "553a5bc41355f65cb44ac0b51a123167aa5397a65774702f8aa758b03a146210"
+  },
+  "limitations": [
+    "Reused development labels, not independent test",
+    "50 risk-selected; no true L1",
+    "Corrected lexical evidence includes human-assisted curation",
+    "Fixed interleaved cohort/arm blocks; not per-word randomized"
+  ],
+  "historical_incomplete_context": "Explicitly permitted in A only; original two incomplete contexts preserved; corrected evidence strict."
+}

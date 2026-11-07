@@ -1,0 +1,14 @@
+{
+  "inputs": {
+    "../score-v2-2026-11-07/analysis-only/reference.csv": "dfece9ce1110f4e482526c31474d0c7667f0a8702ebd961ba275a0b44ecd946b",
+    "../score-v2-2026-11-07/campaigns/150/A/predictions.csv": "d3640c526c6d6d9cd4ffedaff2518ed6af23709971b79d2c385029a452546dc0",
+    "../score-v2-2026-11-07/campaigns/150/B/predictions.csv": "f1a4a105151437f3b4e9ea341e80cf6d5d2a17b60b9ad101bbb32b932935f689",
+    "../score-v2-2026-11-07/campaigns/150/C/predictions.csv": "2c2274960dcf6c82fd9af032d55974b32a86e91852cdf38f57b1a2728cdb4ead",
+    "../score-v2-2026-11-07/campaigns/150/D/predictions.csv": "bab48f04c351b64229d64829ff698c0cd6c977f1f845c01e7a7f8441d71fdfae",
+    "../score-v2-2026-11-07/campaigns/50/A/predictions.csv": "bf69750dda954e5ddc7887ed6e1e1f7e8e1ec7aa722ad7a11eeb14e31d6a3f6c",
+    "../score-v2-2026-11-07/campaigns/50/B/predictions.csv": "38a127630512fea1757fdfcfd16afabff1a8eade98214635c593ac633b2f6597",
+    "../score-v2-2026-11-07/campaigns/50/C/predictions.csv": "784676bf3f042d19b68485785af0d50145ed280bb098a0b4092253954f495bdd",
+    "../score-v2-2026-11-07/campaigns/50/D/predictions.csv": "5e64efa7f95658fd818ac0203f9ff063b9b4696d19dae2ae9c41aafdf2102be7"
+  },
+  "implementation_sha256": "53230be211603b9d133c88e3a761b8d7ca9d9f6fd9fc87a5a05fd8786419ef8d"
+}

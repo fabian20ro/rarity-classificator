@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from ..models import BaseWordRow
-from .chat_judge import _evidence as lexical_evidence, missing_definition_pos
+from .lexical_evidence import read_lexical_evidence as lexical_evidence, missing_definition_pos
 from .corola_fallback import _evidence as corola_evidence
 from .fineweb_fallback import _evidence as fineweb_evidence, SUPPORT
 from .dataset import _lexeme, _sha256, _write_csv

@@ -1604,3 +1604,72 @@ DB access/changes or LLM calls. CI green on9e963ca;no unresolved review threads.
 Review artifacts:build/d1/pr89-review-2026-11-07 (local). Merge conditional on green
 CI for this log-only commit and unchanged reviewed runtime. Quality limitations
 remain:accepted legacy gate failures and unproven population/fallback4vs5 accuracy.
+
+## 2026-11-07 — D1 Score v2 implemented, run, rejected
+
+- User authorized implementation + inference + analysis; isolated branch
+  `codex/d1-score-prompt-v2`, latest origin/main; main checkout untouched.
+- TDD: explicit Score mode with frozen native question/legend and historic lower
+  median; shared lexical validator; sequential CSV collector; durable failure
+  stop and retry archive. Post-run regression: existing failed receipt blocks
+  implicit resume before any new call. Choice behavior preserved.
+- Surprise: historical150 evidence has two incomplete contexts. Initial attempt
+  stopped before inference; retained archived attempt. Explicit historical-only
+  opt-in preserves inputs; corrected/default validation remains strict.
+- Offline replay1,000/1,000 identical; corrected evidence1,150 validated. Frozen
+  A/B/C/D experiment800/800 sequential Score calls; no labels in requests, no DB;
+  generator idle, authorized Splash unload, RAM minimum14.57GiB, D1 unloaded.
+- Final audit: exact requested factorial matrix, source/config hashes, full
+  cohorts150/50, no overlapping calls, receipts800 replayed,8 protected files
+  unchanged. Raw artifacts `build/d1/score-v2-2026-11-07`; executed source archived.
+- Severe errors150/50: baseline11/13, A43/7, B59/6, C64/6, D72/6. D predicts3
+  for147/150 and misses true5 by≥2 in21/22 and5/6. All candidate gates fail.
+  Keep human overrides/baseline; stop v2 branch, no1,000 expansion or decoder tuning.
+- Comparison TDD rejects malformed/failing/missing and consistently truncated
+  cohorts; checks frozen inventory. Full `scripts/check.py`:1010 passed,
+  40 skipped,456 subtests; Ruff/diff checks pass. Planner review findings resolved.
+- Plan/research/aggregate receipts saved. Next: review/PR of reusable tooling
+  and negative result, not activation of v2. No new user evaluations.
+
+## 2026-11-08 — V3 offline calibration and combination
+
+- User authorized TDD + offline calibration150/50, no inference/new labels/DB.
+  Isolated branch `codex/d1-score-v3-offline`, derived from verified v2 commit.
+- Fixed native A before fitting. Nonnegative affine least squares for D1 expected
+  level, baseline-only ablation and baseline+D1. No search or post-result tuning.
+- Important leakage fix by design: refit wordfreq thresholds in each outertrain;
+  historical OOF rows are descriptive only, never meta-model covariates. Five frozen
+  folds142groups, full150fit→50. Meta-training baseline features in-sample outertrain.
+- CSV public seam TDD15tests: known scales/ties, independent signals, negative/
+  constant/collinear predictors, input/family validation, label-isolation and gates.
+- Results severe150/50: refitbaseline11/13, native43/7, calibrated34/5,
+  baselinecal11/13, combined11/13. D1alone avoids7/9 but introduces30/1 versusbase.
+  Combined changes only război1→2 and aurolac4→5, no severe correction; all gates fail.
+- True5: calibrated12/22 and2/6 versusbase3/22 and1/6. Missingwordfreq performance
+  differs sharply by selection: pilot13/49 versusbase2/49, challenge4/45 versusbase12/45.
+  Do not infer a general missing-frequency routing policy from the challenge set.
+- Audit:200forms,210sourcefiles unchanged; six label-mutation checks on temporary
+  copies;18 independent installed-SciPy NNLS checks; portable pack replay identical.
+  Network, subprocess and DB blocked during evaluation/audit; original labels intact.
+- Final `scripts/check.py`:1025passed,40skipped,456subtests; Ruff/diff checks pass.
+  Planner read-only review: no blockers. Source snapshots/protocol retained; formatting
+  after first execution verified by byte-identical predictions/fits/report replay.
+- Plan/research updated; keep baseline/human priority, no v3 expansion or promotion.
+  Next review/PR of reusable evaluator and negative result. No push/PR this iteration.
+
+## 2026-11-08 — Publish v2/v3 evaluation as PR90
+
+- Explicit user request: push `codex/d1-score-v3-offline` and create PR with
+  implementation, tests, v2/v3 results and plan; no LLM or DB actions.
+- Published commits5cd2632/a242d42; created
+  https://github.com/fabian20ro/rarity-classificator/pull/90 targeting main.
+- GitHub revealed stale origin/main: the clone's fetch refspec tracks only
+  codex/d1-evaluation-adapter. `git fetch origin main` updated FETCH_HEAD, not
+  origin/main. Fetched explicit main tracking ref and integrated4e1a60e.
+- Merge conflicts only in append-only ITERATION_LOG/LESSONS_LEARNED. Verified
+  both sides preserve the base prefix, retained all additions from both histories.
+  No source-level conflict or inference/DB action.
+- Post-integration `scripts/check.py` with audit-hook DB/network blocking:
+  1047passed,78skipped,479subtests; Ruff PASS. Historical CSV bytes/hashes preserved.
+- PR includes negative v2/v3 conclusions; no automatic-score promotion.
+  Plan updated with PR link; review/merge remains separate from publication.

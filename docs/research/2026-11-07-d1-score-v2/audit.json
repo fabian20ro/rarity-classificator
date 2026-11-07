@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "valid_receipts": 800,
+  "sequential": true,
+  "protected_inputs_unchanged": 8,
+  "cohort_sizes": {
+    "150": 150,
+    "50": 50
+  },
+  "factorial_requests_verified": true,
+  "native_replay_matches": 800,
+  "max_input_tokens": 6213,
+  "no_db_runner_guard": true,
+  "d1_unloaded": true,
+  "protocol_sha256": "d0adc893b7324524a4578f90d3e5b1976403d153b393626adba6221e0a606a94",
+  "source_archive_sha256": "f1914cf2a3989f0f72bd94a58d42e444c8db29fc3da2071be0402fe7b19d4ced",
+  "campaign_manifests": {
+    "150/A": "629a6543846e5cf0751bc758290af5280514a009a147c7b7cdd1716727763d06",
+    "150/B": "ff73ed4f5e49773a47bd9cfe19a3b93ecef127c5720a1744defa38e7e7fd905d",
+    "150/C": "3f182ce68c509900f49b2a2174711962ca46864a1fd65211d75994a91ef794d6",
+    "150/D": "23e18ea73fba202a283f22b8f0b20e91cf40e46b5d190a82305ba258aba72912",
+    "50/A": "17750045b567165973d2c43444c2529b8fa13b1819aeca7757ac3043671ac20b",
+    "50/B": "333bb10f7efea6a796beb782e06cb02ae4e771238efed10f28c6be353d174315",
+    "50/C": "4551244901202be4e22b118b588a8eda3ba374796816cdcf907e64e21d49fc0e",
+    "50/D": "4a0b984253c3b7e5a8a0824285496ce0fcac9259172f1058372a591969249f12"
+  }
+}
