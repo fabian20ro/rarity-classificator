@@ -534,3 +534,9 @@ stale when remote.origin.fetch tracks another branch. Compare the PR base SHA an
 FETCH_HEAD; explicitly fetch refs/heads/main:refs/remotes/origin/main before
 ancestry/conflict checks. This caused PR90's two append-only document conflicts;
 retain both histories and rerun offline checks against the actual base.
+
+**[2026-11-08]** Relative temperature preserves the ranking of saved class
+probabilities; better NLL need not improve ordinal safety. On D1 control A,
+OOF150 severe errors fell43→32 while true4 worsened2→8; challenge50 NLL
+worsened and `otel` became a four-level error. Keep class1/4/5, paired errors,
+excess cost and the unmodified native decoder visible; never tune T on50.

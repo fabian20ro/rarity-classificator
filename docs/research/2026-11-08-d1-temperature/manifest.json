@@ -1,0 +1,19 @@
+{
+  "policy": "d1-relative-temperature-v1",
+  "inputs": {
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v3-code/docs/research/2026-11-08-d1-score-v3/inputs/features.csv": "b0a2742b124c8cc2d60ffa5a9880d9a335b6265bac350b8b905513a5a3412b54",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v3-code/docs/research/2026-11-08-d1-score-v3/inputs/inputs.json": "5b8c8fc0cdfed8df7062c023636e89c138d8441d8688ead2639f3e7d6a2da494",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v3-code/docs/research/2026-11-08-d1-score-v3/inputs/references.csv": "7247c3c4305a914a64804b1e804e00f568e63224b07f71794df3e51a90dd02df"
+  },
+  "artifacts": {
+    "report.json": "d860a5f8759141ee9411a74ca5ddf930cdb10718347159d3dfe840ff8f7c8e1f",
+    "predictions.csv": "7589a759f1c2b62386550e7f9375c2e1825111080670faa539ed1f1c5ce66551",
+    "severe-cases.csv": "f8115daaa11f75d689707b2f25bdea018a340ba53bb110f763dbf4b8c15a8a55",
+    "protocol.json": "37b8c8f26488d3b86cd527a63271a75f056bc6a30c61e82b88751907fdbdf560",
+    "fits.json": "d38cc6dd436cd1511c3fe0f56183c06a4f07edead016b49f21f599b1177f9f90",
+    "comparators/report.json": "127e2f5cc77b306b68f1afbeb5df388ae1430607ed68471250b080a132f0fef3",
+    "comparators/predictions.csv": "15da7d60ba6e5db14e909ac89356a7282c92e05e08fcd2b4805d7c05f5d306a3",
+    "comparators/manifest.json": "51214949f636a93de0b701be53e93a8e86f5997c56f123c6ac3636143bffff8e",
+    "comparators/fits.json": "d62809c975e31884f32c09b1ab23968e04315bcaa79b18f42da2f511edc9035e"
+  }
+}

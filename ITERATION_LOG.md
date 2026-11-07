@@ -1673,3 +1673,22 @@ remain:accepted legacy gate failures and unproven population/fallback4vs5 accura
   1047passed,78skipped,479subtests; Ruff PASS. Historical CSV bytes/hashes preserved.
 - PR includes negative v2/v3 conclusions; no automatic-score promotion.
   Plan updated with PR link; review/merge remains separate from publication.
+
+## 2026-11-08 — D1 relative temperature, offline150/50
+
+User: TDD single-temperature calibration on existing distributions, no LLM/new
+labels/DB. Reused agreed CSV seam and public v3 validation/comparator evaluator.
+Predeclared beta[.05,20],epsilon1e-12,NLL,lower median; no post-outcome tuning.
+Red→green: missing evaluator / analytic T=.5; uniform identity/report failure
+then implementation. Boundary test corrected float expectation: near-one
+probability may round to1; no artificial clipping introduced. Twelve new tests.
+1059passed,78skipped,479subtests; Ruff PASS under offline guard. Independent
+SciPy6fits,6 real label-isolation mutations in temporary copies, identical replay,
+unchanged v3 outputs and210 original source hashes. Planner/read-only review PASS.
+Results150/50:baseline11/13,D1native43/7,v3affine34/5,temperature32/7 severe;
+excess41/9,Tfull=.396120. Surprise: true1 gain masks true4 regression2→8;
+50 exact-level5 precision0/3 and otel human5→prediction1. User informed.
+Gate FAIL; preserve all scores and promotion blocking. Report/plan and portable
+artifacts saved. Suggested separate regularized class-bias experiment with inner
+CV150 only; not implemented. No model loading, calls, DB or new evaluations.
+No push or PR update requested in this iteration.
