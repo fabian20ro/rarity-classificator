@@ -480,3 +480,17 @@ parent, compare trees, and pin the reviewed head SHA before merging.
 Pip-based CI passed while the lock omitted evaluation/frequency and `uv lock --check`
 failed. Check the lock separately; regenerate without upgrading existing pins and
 report that existing-environment tests do not validate every newly locked version.
+
+**[2026-11-07]** Historical-control replay needs explicit schema compatibility.
+The old D1 pilot contains two `context_incomplete=true` senses; the corrected
+lexical boundary intentionally rejects them. Validate every arm before loading;
+use a pinned historical-only opt-in, never silently repair the control or weaken
+the default. A clearer prompt and corrected evidence can worsen the model:
+Score v2 yielded147/150 level3 predictions. Keep true1/true5 checks and constant3
+diagnostics; a risk-selected set without true1 can hide this collapse.
+
+**[2026-11-07]** A durable failure must also block implicit resume. Stop-on-failure
+at the newly written receipt is insufficient when the next invocation skips
+existing failed IDs. Check all loaded receipts before further inference;
+explicit retry archives prior bytes. Comparisons must bind references/results to
+the frozen inventory, or consistently truncated inputs can appear complete.

@@ -6,7 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from ..models import BaseWordRow
-from .chat_judge import _evidence
+from .lexical_evidence import read_lexical_evidence as _evidence
 from .dataset import _read_csv, _sha256, _write_csv
 from .judge_comparison import _indexed, _level
 

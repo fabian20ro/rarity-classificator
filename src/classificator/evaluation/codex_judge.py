@@ -1,6 +1,8 @@
 """Native Codex judge receipts; configured model identity is not server attestation."""
 
 import json
+
+from .lexical_evidence import read_lexical_evidence
 from pathlib import Path
 
 from ..models import BaseWordRow
@@ -149,7 +151,7 @@ def collect_codex_csv(vocabulary_csv, evidence_csv, output_dir, *, executor, mod
     items = [
         BaseWordRow(int(r["word_id"]), r["word"], r["type"]) for r in _vocabulary(vocabulary_csv)
     ]
-    evidence = chat_judge._evidence(evidence_csv, items)
+    evidence = read_lexical_evidence(evidence_csv, items)
     config = dict(
         transport="codex-exec-native",
         configured_model=model,
