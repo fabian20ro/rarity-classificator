@@ -1733,3 +1733,17 @@ pilot excess worsens45→47. User informed. Gatebaseline/constant3 FAIL. Preserv
 baseline and human scores; stop automatic iteration through decoder variants,
 consolidate evidence before changing input information. D1simple remains deferred.
 Updated report/plan and flat artifacts. No push requested this iteration.
+
+## 2026-11-08 — Publish temperature, class-bias and ordinal experiments
+
+User requested push of local commits and updatePR90, noLLM/DB. Discovered PR90
+already merged at2146698 while its branch remained55d893f. Reported this change
+to user; a merged PR cannot absorb later commits. Explicitly fetchedmain and
+verified its tree matches55d893f; fast-forward pushedaf40a03,55818f6,dc026a8.
+Created follow-upPR91 targetingmain, preserving PR90 history. PR descriptions
+include severe/excess150/50, class1/4/5, constant3, audit evidence and rejection
+of automatic promotion. Updated plans to point toPR91 and markPR90 merged.
+Rechecked all three artifact manifests and auditPASS; prior1088passed/78skipped/
+479subtests remains applicable: no runtime code changes during publication.
+Diff whitespace check accepts CSV CRLF via command-local cr-at-eol; frozen CSV
+bytes and hashes preserved. No model calls, DB changes, inference or new labels.

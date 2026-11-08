@@ -57,8 +57,9 @@ Față de baseline, temperatura evită5/9 și introduce26/3 erori severe.
 ## Rămâne / recomandare
 
 1. Păstrăm baseline și scorurile umane; nicio extindere pe1.000/inventar/DB.
-2. Review/publicare a schimbărilor acestei iterații; PR90 existent conține v2/v3,
-   această extensie nu a fost încă împinsă în remote.
+2. Publicat în [PR #91](https://github.com/fabian20ro/rarity-classificator/pull/91),
+   continuarea PR90 deja merged. Review și merge pentru infrastructură/rezultate;
+   fără promovarea scorurilor.
 3. Dacă vrem următorul experiment Omni: bias pe clase, puternic regularizat,
    selecție exclusiv în CV internă pe150;50 rămâne challenge descriptiv.
    Scop: verificăm dacă ordinea claselor poate fi corectată, nu mai reglăm

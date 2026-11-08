@@ -62,7 +62,8 @@ identice. NLL se înrăutățește ușor pe ambele loturi. **Gate FAIL.**
 
 ## Rămâne / următorul pas
 
-1. Review/publicare a acestei iterații; fără push în această execuție.
+1. Publicat în [PR #91](https://github.com/fabian20ro/rarity-classificator/pull/91),
+   continuarea PR90 deja merged. Rămân review și merge; fără promovarea scorurilor.
 2. Păstrăm baseline și scorurile umane; nu extindem candidatul la inventar.
 3. Nu prioritizăm un calibrator global mai complex pe aceleași etichete.
    Opțiune separată, dacă continuăm offline: decoder ordinal fix pentru costul
