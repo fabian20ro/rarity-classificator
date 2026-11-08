@@ -1692,3 +1692,24 @@ Gate FAIL; preserve all scores and promotion blocking. Report/plan and portable
 artifacts saved. Suggested separate regularized class-bias experiment with inner
 CV150 only; not implemented. No model loading, calls, DB or new evaluations.
 No push or PR update requested in this iteration.
+
+## 2026-11-08 — Regularized class biases, nested offline150/50
+
+User: implement TDD regularized class corrections; tune only150, analyze severe
+errors and true1/4/5; no LLM/new labels/DB. Public CSV seam already agreed.
+Fixed q=softmax(log(p)+b), zero-sum bias, temperature1; mean NLL+lambda/2||b||²;
+grid.01/.1/1/10+identity, pooled inner CV and strongest-first ties. Outer five
+historical folds, inner remaining folds, full150-selection for50. No post-hoc tuning.
+TDD red→green: missing evaluator/known ranking correction; missing report/identity
+metrics. Ten tests include analytic bias solution, nested isolation, numerical
+edge cases and fail-closed input/output. No added runtime dependencies.
+1069passed,78skipped,479subtests; Ruff PASS under offline guard. Independent
+SciPy audit104regularized fits, all inner selections/IDs/pooled losses,6 real
+label-mutation checks on temporary copies, replay, metrics/gates,210 original
+sources intact. Read-only planner/review found no actionable issue.
+Results:41/150,7/50 severe; true1/4/5 on150=19/3/18. True5 on50=6/6. Outer
+lambda1,identity,identity,10,1; full15010. Surprise: slight inner NLL gain does
+not survive outer validation;50 predictions all unchanged. Communicated to user.
+Gate FAIL; preserve baseline and human scores. Updated report/plans and portable
+CSV/JSON audit artifacts. Optional next hypothesis: fixed ordinal decoder for
+excess error beyond±1 with constant3 control, not implemented. No push requested.

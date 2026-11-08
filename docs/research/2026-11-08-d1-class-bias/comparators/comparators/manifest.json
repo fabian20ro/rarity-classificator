@@ -1,0 +1,14 @@
+{
+  "policy": "d1-monotone-affine-v3",
+  "inputs": {
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v3-code/docs/research/2026-11-08-d1-score-v3/inputs/features.csv": "b0a2742b124c8cc2d60ffa5a9880d9a335b6265bac350b8b905513a5a3412b54",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v3-code/docs/research/2026-11-08-d1-score-v3/inputs/inputs.json": "5b8c8fc0cdfed8df7062c023636e89c138d8441d8688ead2639f3e7d6a2da494",
+    "/Users/fabian/git/word-rarity-classifier/build/d1/d1-score-v3-code/docs/research/2026-11-08-d1-score-v3/inputs/references.csv": "7247c3c4305a914a64804b1e804e00f568e63224b07f71794df3e51a90dd02df"
+  },
+  "implementation_sha256": "8afe460fe004ac30b7094ac1e2be5872fd27acbd263e0328d6fdcbd2873ff7a1",
+  "artifacts": {
+    "report.json": "127e2f5cc77b306b68f1afbeb5df388ae1430607ed68471250b080a132f0fef3",
+    "predictions.csv": "15da7d60ba6e5db14e909ac89356a7282c92e05e08fcd2b4805d7c05f5d306a3",
+    "fits.json": "d62809c975e31884f32c09b1ab23968e04315bcaa79b18f42da2f511edc9035e"
+  }
+}

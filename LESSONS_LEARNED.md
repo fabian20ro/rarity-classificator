@@ -540,3 +540,10 @@ probabilities; better NLL need not improve ordinal safety. On D1 control A,
 OOF150 severe errors fell43→32 while true4 worsened2→8; challenge50 NLL
 worsened and `otel` became a four-level error. Keep class1/4/5, paired errors,
 excess cost and the unmodified native decoder visible; never tune T on50.
+
+**[2026-11-08]** Select calibration complexity inside each outer training fold,
+including an explicit identity candidate. Pooled inner NLL must weight actual row
+counts, not average unequal folds. D1 class-bias CV selected identity twice and
+strong shrinkage otherwise; full150 inner NLL improved only0.000106 while outer
+NLL worsened and all50 median predictions stayed native. An inner-CV winner is
+not evidence of held-out improvement; persist candidate fits, IDs and losses.

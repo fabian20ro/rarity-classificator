@@ -64,3 +64,10 @@ Față de baseline, temperatura evită5/9 și introduce26/3 erori severe.
    Scop: verificăm dacă ordinea claselor poate fi corectată, nu mai reglăm
    scalarul T pe lotul50. Necesită protocol separat; neimplementat aici.
 4. D1 simplu amânat. Nicio evaluare nouă cerută; fără LLM sau DB.
+
+## Continuare: corecțiile pe clase
+
+2026-11-08: [experimentul regularizat pe clase](2026-11-08-d1-class-bias.md)
+implementat cu nested CV150. Rezultat41/150 și7/50 erori severe, gate FAIL;
+regularizarea preferă corecții foarte mici sau identitatea. Recomandarea de
+experiment din această pagină este acum executată; rezultatul nu susține promovarea.
