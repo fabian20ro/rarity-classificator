@@ -534,3 +534,29 @@ stale when remote.origin.fetch tracks another branch. Compare the PR base SHA an
 FETCH_HEAD; explicitly fetch refs/heads/main:refs/remotes/origin/main before
 ancestry/conflict checks. This caused PR90's two append-only document conflicts;
 retain both histories and rerun offline checks against the actual base.
+
+**[2026-11-08]** Relative temperature preserves the ranking of saved class
+probabilities; better NLL need not improve ordinal safety. On D1 control A,
+OOF150 severe errors fell43→32 while true4 worsened2→8; challenge50 NLL
+worsened and `otel` became a four-level error. Keep class1/4/5, paired errors,
+excess cost and the unmodified native decoder visible; never tune T on50.
+
+**[2026-11-08]** Select calibration complexity inside each outer training fold,
+including an explicit identity candidate. Pooled inner NLL must weight actual row
+counts, not average unequal folds. D1 class-bias CV selected identity twice and
+strong shrinkage otherwise; full150 inner NLL improved only0.000106 while outer
+NLL worsened and all50 median predictions stayed native. An inner-CV winner is
+not evidence of held-out improvement; persist candidate fits, IDs and losses.
+
+**[2026-11-08]** A Bayes action for model probabilities is not guaranteed to
+reduce empirical human-label errors. Fixed expected excess loss beyond±1 lowered
+D1-estimated risk but increased pilot severe errors43→46; on50 it tied constant3
+at6 errors with worse excess7 vs6. Keep constant3, true1/4/5, and estimated versus
+observed costs separate. Full-support probabilities make action2 dominate1 and4
+dominate5 for this loss; endpoint absence alone is not a decoder bug.
+
+**[2026-11-08]** No-fit experiments should consume frozen comparison CSVs rather
+than extend nested evaluator/artifact chains. Bind source hashes and exact
+IDs/forms/partitions/probabilities/references, reuse the common input validator,
+recompute metrics, and export only new decisions/costs plus provenance. Validate
+loader extraction by byte-identical replay of historical comparison results.

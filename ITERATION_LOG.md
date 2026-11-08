@@ -1673,3 +1673,77 @@ remain:accepted legacy gate failures and unproven population/fallback4vs5 accura
   1047passed,78skipped,479subtests; Ruff PASS. Historical CSV bytes/hashes preserved.
 - PR includes negative v2/v3 conclusions; no automatic-score promotion.
   Plan updated with PR link; review/merge remains separate from publication.
+
+## 2026-11-08 — D1 relative temperature, offline150/50
+
+User: TDD single-temperature calibration on existing distributions, no LLM/new
+labels/DB. Reused agreed CSV seam and public v3 validation/comparator evaluator.
+Predeclared beta[.05,20],epsilon1e-12,NLL,lower median; no post-outcome tuning.
+Red→green: missing evaluator / analytic T=.5; uniform identity/report failure
+then implementation. Boundary test corrected float expectation: near-one
+probability may round to1; no artificial clipping introduced. Twelve new tests.
+1059passed,78skipped,479subtests; Ruff PASS under offline guard. Independent
+SciPy6fits,6 real label-isolation mutations in temporary copies, identical replay,
+unchanged v3 outputs and210 original source hashes. Planner/read-only review PASS.
+Results150/50:baseline11/13,D1native43/7,v3affine34/5,temperature32/7 severe;
+excess41/9,Tfull=.396120. Surprise: true1 gain masks true4 regression2→8;
+50 exact-level5 precision0/3 and otel human5→prediction1. User informed.
+Gate FAIL; preserve all scores and promotion blocking. Report/plan and portable
+artifacts saved. Suggested separate regularized class-bias experiment with inner
+CV150 only; not implemented. No model loading, calls, DB or new evaluations.
+No push or PR update requested in this iteration.
+
+## 2026-11-08 — Regularized class biases, nested offline150/50
+
+User: implement TDD regularized class corrections; tune only150, analyze severe
+errors and true1/4/5; no LLM/new labels/DB. Public CSV seam already agreed.
+Fixed q=softmax(log(p)+b), zero-sum bias, temperature1; mean NLL+lambda/2||b||²;
+grid.01/.1/1/10+identity, pooled inner CV and strongest-first ties. Outer five
+historical folds, inner remaining folds, full150-selection for50. No post-hoc tuning.
+TDD red→green: missing evaluator/known ranking correction; missing report/identity
+metrics. Ten tests include analytic bias solution, nested isolation, numerical
+edge cases and fail-closed input/output. No added runtime dependencies.
+1069passed,78skipped,479subtests; Ruff PASS under offline guard. Independent
+SciPy audit104regularized fits, all inner selections/IDs/pooled losses,6 real
+label-mutation checks on temporary copies, replay, metrics/gates,210 original
+sources intact. Read-only planner/review found no actionable issue.
+Results:41/150,7/50 severe; true1/4/5 on150=19/3/18. True5 on50=6/6. Outer
+lambda1,identity,identity,10,1; full15010. Surprise: slight inner NLL gain does
+not survive outer validation;50 predictions all unchanged. Communicated to user.
+Gate FAIL; preserve baseline and human scores. Updated report/plans and portable
+CSV/JSON audit artifacts. Optional next hypothesis: fixed ordinal decoder for
+excess error beyond±1 with constant3 control, not implemented. No push requested.
+
+## 2026-11-08 — Fixed ordinal tolerance±1 decoder
+
+User: TDD fixed ordinal decoder, compare150/50 includingconstant3, analyze>=2 and
+true1/4/5; noLLM/newlabels/DB. Predeclared excess loss max(|k-y|-1,0), tie1e-12
+closest to native lower median then lower action; normalize native p, no floor.
+Zero fit/tuning. Extracted existing v3 validator to shared public loader unchanged.
+Consumed frozen class-bias comparison CSV with hash/identity binding; no nested
+artifact copying or comparator refit. Original scores/columns preserved.
+TDD red→green: missing evaluator/manual cost example; missing report/constant3
+excess assertions.19new tests,1088passed,78skipped,479subtests; Ruff PASS offline.
+Independent Decimal50-digit audit200actions, metrics/gates,6 label-isolation
+checks in temporary resealed fixtures, byte-identical replay, v3 extraction replay,
+210 original sources intact. Planner/read-only review found no actionable issue.
+Result46/150 and6/50 severe, excess47/7; native43/7,constant3 73/6,baseline11/13.
+True1/4/5 on150=25/2/19,50true5=6/6. Surprise: estimated risk improves while real
+pilot excess worsens45→47. User informed. Gatebaseline/constant3 FAIL. Preserve
+baseline and human scores; stop automatic iteration through decoder variants,
+consolidate evidence before changing input information. D1simple remains deferred.
+Updated report/plan and flat artifacts. No push requested this iteration.
+
+## 2026-11-08 — Publish temperature, class-bias and ordinal experiments
+
+User requested push of local commits and updatePR90, noLLM/DB. Discovered PR90
+already merged at2146698 while its branch remained55d893f. Reported this change
+to user; a merged PR cannot absorb later commits. Explicitly fetchedmain and
+verified its tree matches55d893f; fast-forward pushedaf40a03,55818f6,dc026a8.
+Created follow-upPR91 targetingmain, preserving PR90 history. PR descriptions
+include severe/excess150/50, class1/4/5, constant3, audit evidence and rejection
+of automatic promotion. Updated plans to point toPR91 and markPR90 merged.
+Rechecked all three artifact manifests and auditPASS; prior1088passed/78skipped/
+479subtests remains applicable: no runtime code changes during publication.
+Diff whitespace check accepts CSV CRLF via command-local cr-at-eol; frozen CSV
+bytes and hashes preserved. No model calls, DB changes, inference or new labels.

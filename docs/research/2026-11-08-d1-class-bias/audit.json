@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "rows": 200,
+  "protected_original_sources": 210,
+  "independent_regularized_fits": 104,
+  "max_coefficient_difference": 2.701321170917037e-08,
+  "max_gradient_residual": 9.891430374428523e-10,
+  "selected_lambdas": {
+    "outer:0": 1.0,
+    "outer:1": null,
+    "outer:2": null,
+    "outer:3": 10.0,
+    "outer:4": 1.0,
+    "full150": 10.0
+  },
+  "all_inner_splits_and_pooled_selection_verified": true,
+  "independent_distributions_medians_metrics_and_gates": true,
+  "unchanged_comparators": true,
+  "byte_identical_replay": true,
+  "real_label_isolation_checks": 6,
+  "network_db_guard": "sitecustomize offline guard",
+  "audit_script_sha256": "4d16af65edf181d462a3edec3619c03947b1dd60c7fa0f315c4ddace870c9f23"
+}

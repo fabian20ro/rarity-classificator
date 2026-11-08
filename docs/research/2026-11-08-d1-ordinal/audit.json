@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "rows": 200,
+  "fitted_parameters": 0,
+  "protected_original_sources": 210,
+  "unchanged_reference_and_comparator_columns": true,
+  "independent_decimal_loss_matrix": true,
+  "maximum_cost_difference": 4.440892098500626e-16,
+  "independent_metrics_and_gates": true,
+  "v3_loader_extraction_replay_identical": true,
+  "byte_identical_replay": true,
+  "real_label_isolation_checks": 6,
+  "network_db_guard": "sitecustomize offline guard",
+  "audit_script_sha256": "ab9caaade5291138b51a0a6076e950c89ea9d8767cf6e59591e484ad195d738c"
+}

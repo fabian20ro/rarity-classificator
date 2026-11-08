@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "rows": 200,
+  "protected_original_sources": 210,
+  "solver": {
+    "outer:0": {
+      "scipy_beta": 2.2470040676477487,
+      "beta_difference": 6.690004772380576e-08
+    },
+    "outer:1": {
+      "scipy_beta": 2.3297098369793923,
+      "beta_difference": 1.7208856561978791e-10
+    },
+    "outer:2": {
+      "scipy_beta": 2.661029093490788,
+      "beta_difference": 3.355393696224951e-08
+    },
+    "outer:3": {
+      "scipy_beta": 2.652740746152979,
+      "beta_difference": 8.15954681598896e-08
+    },
+    "outer:4": {
+      "scipy_beta": 2.7425341995884525,
+      "beta_difference": 3.837578788079554e-08
+    },
+    "full150": {
+      "scipy_beta": 2.5244888005029935,
+      "beta_difference": 2.101001594922991e-08
+    }
+  },
+  "independent_probabilities_medians_metrics": true,
+  "paired_errors_verified": true,
+  "unchanged_v3_comparators": true,
+  "byte_identical_replay": true,
+  "real_label_isolation_checks": 6,
+  "network_db_guard": "sitecustomize offline guard; no inference",
+  "audit_script_sha256": "4d25ac0c1f1259988aafca94cedc4215b25acade06089fc61ca18f6f6ffa06ef"
+}
