@@ -1713,3 +1713,23 @@ not survive outer validation;50 predictions all unchanged. Communicated to user.
 Gate FAIL; preserve baseline and human scores. Updated report/plans and portable
 CSV/JSON audit artifacts. Optional next hypothesis: fixed ordinal decoder for
 excess error beyond±1 with constant3 control, not implemented. No push requested.
+
+## 2026-11-08 — Fixed ordinal tolerance±1 decoder
+
+User: TDD fixed ordinal decoder, compare150/50 includingconstant3, analyze>=2 and
+true1/4/5; noLLM/newlabels/DB. Predeclared excess loss max(|k-y|-1,0), tie1e-12
+closest to native lower median then lower action; normalize native p, no floor.
+Zero fit/tuning. Extracted existing v3 validator to shared public loader unchanged.
+Consumed frozen class-bias comparison CSV with hash/identity binding; no nested
+artifact copying or comparator refit. Original scores/columns preserved.
+TDD red→green: missing evaluator/manual cost example; missing report/constant3
+excess assertions.19new tests,1088passed,78skipped,479subtests; Ruff PASS offline.
+Independent Decimal50-digit audit200actions, metrics/gates,6 label-isolation
+checks in temporary resealed fixtures, byte-identical replay, v3 extraction replay,
+210 original sources intact. Planner/read-only review found no actionable issue.
+Result46/150 and6/50 severe, excess47/7; native43/7,constant3 73/6,baseline11/13.
+True1/4/5 on150=25/2/19,50true5=6/6. Surprise: estimated risk improves while real
+pilot excess worsens45→47. User informed. Gatebaseline/constant3 FAIL. Preserve
+baseline and human scores; stop automatic iteration through decoder variants,
+consolidate evidence before changing input information. D1simple remains deferred.
+Updated report/plan and flat artifacts. No push requested this iteration.

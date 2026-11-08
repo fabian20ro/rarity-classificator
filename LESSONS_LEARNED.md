@@ -547,3 +547,16 @@ counts, not average unequal folds. D1 class-bias CV selected identity twice and
 strong shrinkage otherwise; full150 inner NLL improved only0.000106 while outer
 NLL worsened and all50 median predictions stayed native. An inner-CV winner is
 not evidence of held-out improvement; persist candidate fits, IDs and losses.
+
+**[2026-11-08]** A Bayes action for model probabilities is not guaranteed to
+reduce empirical human-label errors. Fixed expected excess loss beyond±1 lowered
+D1-estimated risk but increased pilot severe errors43→46; on50 it tied constant3
+at6 errors with worse excess7 vs6. Keep constant3, true1/4/5, and estimated versus
+observed costs separate. Full-support probabilities make action2 dominate1 and4
+dominate5 for this loss; endpoint absence alone is not a decoder bug.
+
+**[2026-11-08]** No-fit experiments should consume frozen comparison CSVs rather
+than extend nested evaluator/artifact chains. Bind source hashes and exact
+IDs/forms/partitions/probabilities/references, reuse the common input validator,
+recompute metrics, and export only new decisions/costs plus provenance. Validate
+loader extraction by byte-identical replay of historical comparison results.

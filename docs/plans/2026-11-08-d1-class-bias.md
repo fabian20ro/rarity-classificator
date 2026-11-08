@@ -69,3 +69,10 @@ identice. NLL se înrăutățește ușor pe ambele loturi. **Gate FAIL.**
    tolerat±1, fără parametri noi, cu constant3 drept control și gate1/4/5.
    Protocolul și tie-break-ul trebuie fixate înainte; neimplementat aici.
 4. D1 simplu amânat; nicio evaluare nouă, apel LLM sau operație DB necesară aici.
+
+## Continuare: decoderul ordinal
+
+2026-11-08: [decoderul ordinal fix](2026-11-08-d1-ordinal.md) implementat și
+verificat offline.46/150 și6/50 erori severe; constant3 73/150 și6/50.
+Gate baseline și constant3 FAIL. Opțiunea de experiment propusă mai sus este
+executată; păstrăm baseline-ul și recomandăm consolidarea rezultatelor.

@@ -103,11 +103,9 @@ def _run_split(train, heldout):
     )
 
 
-def evaluate_d1_calibration(input_dir, references_csv, output_dir):
-    """Frozen feature CSV + references -> OOF150 / full150-to50 CSVs and fit ledger."""
-    input_dir, output_dir = Path(input_dir), Path(output_dir)
-    if output_dir.exists() or output_dir.is_symlink():
-        raise FileExistsError(output_dir)
+def load_d1_evaluation_inputs(input_dir, references_csv):
+    """Validate frozen evaluation CSVs without fitting or changing any data."""
+    input_dir = Path(input_dir)
     manifest = json.loads((input_dir / "inputs.json").read_text())
     if (
         manifest["policy"] != POLICY
@@ -199,6 +197,15 @@ def evaluate_d1_calibration(input_dir, references_csv, output_dir):
             )
         )
     rows.sort(key=lambda r: int(r["word_id"]))
+    return rows, manifest
+
+
+def evaluate_d1_calibration(input_dir, references_csv, output_dir):
+    """Frozen feature CSV + references -> OOF150 / full150-to50 CSVs and fit ledger."""
+    input_dir, output_dir = Path(input_dir), Path(output_dir)
+    if output_dir.exists() or output_dir.is_symlink():
+        raise FileExistsError(output_dir)
+    rows, manifest = load_d1_evaluation_inputs(input_dir, references_csv)
     pilot = [r for r in rows if r["cohort"] == "150"]
     challenge = [r for r in rows if r["cohort"] == "50"]
     fits, predictions = {}, []
